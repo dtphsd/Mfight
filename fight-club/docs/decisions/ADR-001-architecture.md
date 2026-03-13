@@ -1,6 +1,6 @@
 # ADR-001: Modular Headless Core
 
-> Last updated: 2026-03-14 00:41 MSK
+> Last updated: 2026-03-14 12:18 MSK
 
 ---
 
@@ -22,10 +22,10 @@ Use a headless game core with React as a separate UI layer.
 
 ## Related Docs
 
-- [Docs Home](../README.md)
+- [Docs Home](../)
 - [Architecture Overview](../architecture/overview.md)
 - [Combat Design Reference](../architecture/combat-design-reference.md)
 
 ---
 
-> Last updated: 2026-03-14 00:41 MSK
+> Last updated: 2026-03-14 12:18 MSK

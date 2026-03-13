@@ -61,7 +61,10 @@ Notes:
 - `docs/SUMMARY.md` - GitBook navigation tree for the primary documentation flow
 - `docs/gitbook-publish-setup.md` - operational guide for connecting and validating GitBook publishing
 - `docs/.vitepress/config.mts` - VitePress static-site configuration
+- `docs/.vitepress/theme/` - VitePress theme entry and custom site styling
 - `docs/index.md` - VitePress root page
+- `docs/gameplay/index.md` - gameplay-oriented entry point for balance and player-facing combat behavior
+- `docs/systems/index.md` - systems-oriented entry point for runtime boundaries, refactors, and engineering workflow
 - `docs/architecture/README.md` - architecture section landing page
 - `docs/architecture/index.md` - VitePress architecture landing page
 - `docs/decisions/README.md` - architecture decisions landing page

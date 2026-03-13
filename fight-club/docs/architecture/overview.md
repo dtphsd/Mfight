@@ -1,6 +1,6 @@
 # Architecture Overview
 
-> Last updated: 2026-03-14 00:41 MSK
+> Last updated: 2026-03-14 12:18 MSK
 
 The project is split into headless domain modules and a React UI layer.
 
@@ -146,10 +146,10 @@ When the combat system changes, update documentation from the most stable source
 
 ## Related Docs
 
-- [Docs Home](../README.md)
-- [Architecture Index](./README.md)
+- [Docs Home](../)
+- [Architecture Index](./)
 - [Combat Design Reference](./combat-design-reference.md)
 
 ---
 
-> Last updated: 2026-03-14 00:41 MSK
+> Last updated: 2026-03-14 12:18 MSK

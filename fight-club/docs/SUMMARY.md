@@ -1,6 +1,8 @@
 # Summary
 
 - [Fight Club Docs](README.md)
+  - [Gameplay](gameplay/index.md)
+  - [Systems](systems/index.md)
   - [Architecture](architecture/README.md)
     - [Architecture Overview](architecture/overview.md)
     - [Combat Design Reference](architecture/combat-design-reference.md)

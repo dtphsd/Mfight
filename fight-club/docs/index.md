@@ -1,27 +1,90 @@
-# Fight Club Docs
+---
+layout: home
 
-This is the published docs site for the `Fight Club` project.
+hero:
+  name: "Fight Club Docs"
+  text: "A repo-native wiki for gameplay, systems, and combat runtime"
+  tagline: "Read the project by role: gameplay, systems, architecture, decisions, and publishing workflow all ship with the same codebase."
+  actions:
+    - theme: brand
+      text: Start With Gameplay
+      link: /gameplay/
+    - theme: alt
+      text: Explore Systems
+      link: /systems/
+    - theme: alt
+      text: Read Architecture
+      link: /architecture/
 
-Use it as the main entry point for architecture, combat-system behavior, and engineering guidance.
+features:
+  - title: Gameplay
+    details: Follow the player-facing combat model, balance logic, and combat reference without digging through source files first.
+  - title: Systems
+    details: Trace the runtime from modules to orchestration to UI boundaries and documentation workflow.
+  - title: Architecture
+    details: Read the project from high-level structure down into combat sequencing and long-term system direction.
+  - title: Decisions
+    details: Keep architectural rationale and major tradeoffs discoverable next to live runtime docs.
+  - title: Publishing
+    details: The same markdown source supports local reading, GitHub Pages, and GitBook-style handoff.
+---
 
-## Start Here
+## Choose Your Entry Point
 
-- [Architecture Overview](./architecture/)
+### Gameplay
+
+- [Gameplay Hub](./gameplay/)
 - [Combat Design Reference](./architecture/combat-design-reference)
 - [Combat System Roadmap](./architecture/combat-system-roadmap)
+
+### Systems
+
+- [Systems Hub](./systems/)
+- [Architecture Overview](./architecture/)
 - [ADR-001: Modular Headless Core](./decisions/ADR-001-architecture)
+
+### Architecture
+
+- [Architecture Hub](./architecture/)
+- [Architecture Overview](./architecture/overview)
+- [Combat Design Reference](./architecture/combat-design-reference)
+
+### Publishing And Docs Workflow
+
 - [GitBook Publish Setup](./gitbook-publish-setup)
+- `docs/.vitepress/config.mts`
+- `scripts/validate-content.mjs`
 
-## What This Site Covers
+## Quick Paths By Role
 
-- system architecture
-- combat runtime rules and formulas
-- combat sequencing and verification rules
-- architecture decisions
-- documentation publishing workflow
+### Designer / Balance
 
-## Source Of Truth
+1. [Gameplay Hub](./gameplay/)
+2. [Combat Design Reference](./architecture/combat-design-reference)
+3. `docs/balance/latest-build-matrix.md`
 
-Code is always the source of truth.
+### Engineer
 
-If runtime and docs diverge, update the docs from the live code.
+1. [Systems Hub](./systems/)
+2. [Architecture Overview](./architecture/overview)
+3. [ADR-001: Modular Headless Core](./decisions/ADR-001-architecture)
+
+### Maintainer / Publisher
+
+1. [GitBook Publish Setup](./gitbook-publish-setup)
+2. `docs/.vitepress/config.mts`
+3. [Architecture Hub](./architecture/)
+
+## Core Sources Of Truth
+
+- gameplay runtime:
+  - `src/modules/combat/`
+  - `src/orchestration/combat/`
+- UI contract:
+  - `src/ui/hooks/useCombatSandbox.ts`
+  - `src/ui/screens/Combat/CombatSandboxScreen.tsx`
+- player-facing rules:
+  - `src/ui/screens/CombatRules/`
+- docs and publishing:
+  - `docs/`
+  - `.github/workflows/deploy-docs-pages.yml`

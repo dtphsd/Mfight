@@ -1,26 +1,39 @@
 # Fight Club Docs
 
-> Last updated: 2026-03-14 00:41 MSK
+> Last updated: 2026-03-14 12:26 MSK
 
 This folder is the GitBook-ready documentation set for the `Fight Club` project.
 
-Use it as the main reading path when onboarding, reviewing architecture, or planning safe changes.
+Use it as the main reading path when onboarding, reviewing architecture, planning safe changes, or checking live combat behavior against the code.
 
 ---
 
 ## Recommended Reading Order
 
-1. [Architecture Overview](./architecture/overview.md)
-2. [Combat Design Reference](./architecture/combat-design-reference.md)
-3. [Combat System Roadmap](./architecture/combat-system-roadmap.md)
-4. [ADR-001: Modular Headless Core](./decisions/ADR-001-architecture.md)
-5. [GitBook Publish Setup](./gitbook-publish-setup.md)
+1. [Gameplay](./gameplay/index.md)
+2. [Systems](./systems/index.md)
+3. [Architecture Overview](./architecture/overview.md)
+4. [Combat Design Reference](./architecture/combat-design-reference.md)
+5. [ADR-001: Modular Headless Core](./decisions/ADR-001-architecture.md)
+6. [GitBook Publish Setup](./gitbook-publish-setup.md)
 
 For GitBook navigation, use [SUMMARY.md](./SUMMARY.md).
 
 ---
 
 ## Sections
+
+### Gameplay
+
+- [Gameplay](./gameplay/index.md)
+- [Combat Design Reference](./architecture/combat-design-reference.md)
+- [Combat System Roadmap](./architecture/combat-system-roadmap.md)
+
+### Systems
+
+- [Systems](./systems/index.md)
+- [Architecture Overview](./architecture/overview.md)
+- [GitBook Publish Setup](./gitbook-publish-setup.md)
 
 ### Architecture
 
@@ -31,10 +44,6 @@ For GitBook navigation, use [SUMMARY.md](./SUMMARY.md).
 ### Decisions
 
 - [ADR-001: Modular Headless Core](./decisions/ADR-001-architecture.md)
-
-### Publishing
-
-- [GitBook Publish Setup](./gitbook-publish-setup.md)
 
 ### Generated And Operational Artifacts
 
@@ -69,4 +78,4 @@ These operational folders are useful for engineering work, but they are not the 
 
 ---
 
-> Last updated: 2026-03-14 00:41 MSK
+> Last updated: 2026-03-14 12:26 MSK

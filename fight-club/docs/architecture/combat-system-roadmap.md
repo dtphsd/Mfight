@@ -1,6 +1,6 @@
 # Combat System Roadmap
 
-> Last updated: 2026-03-14 00:41 MSK
+> Last updated: 2026-03-14 12:18 MSK
 
 This page tracks the combat architecture evolution path.
 
@@ -267,16 +267,6 @@ Behavior:
 
 ---
 
-## Related Docs
-
-- [Docs Home](../README.md)
-- [Architecture Index](./README.md)
-- [Combat Design Reference](./combat-design-reference.md)
-
----
-
-> Last updated: 2026-03-14 00:41 MSK
-
 ### 4.3 Champion
 
 Behavior:
@@ -470,3 +460,15 @@ Whenever combat behavior changes:
 2. update this roadmap if priorities or architecture direction changed
 3. update player-facing combat docs if visible rules changed
 4. run targeted combat tests and build
+
+---
+
+## Related Docs
+
+- [Docs Home](../)
+- [Architecture Index](./)
+- [Combat Design Reference](./combat-design-reference.md)
+
+---
+
+> Last updated: 2026-03-14 12:18 MSK

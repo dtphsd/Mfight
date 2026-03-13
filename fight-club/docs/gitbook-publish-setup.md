@@ -1,6 +1,6 @@
 # GitBook Publish Setup
 
-> Last updated: 2026-03-14 00:53 MSK
+> Last updated: 2026-03-14 12:18 MSK
 
 This page explains how to publish the `fight-club/docs/` section to GitBook.
 
@@ -131,10 +131,10 @@ Whenever docs structure changes:
 
 ## Related Docs
 
-- [Docs Home](./README.md)
+- [Docs Home](./)
 - [Architecture Overview](./architecture/overview.md)
 - [Combat Design Reference](./architecture/combat-design-reference.md)
 
 ---
 
-> Last updated: 2026-03-14 00:53 MSK
+> Last updated: 2026-03-14 12:18 MSK

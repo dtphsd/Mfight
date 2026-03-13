@@ -1,6 +1,6 @@
 # MASTER-PLAN - Fight Club
 
-> Last updated: 2026-03-14 01:01 MSK
+> Last updated: 2026-03-14 12:26 MSK
 
 **Project:** Fight Club  
 **Scope:** active product planning, task tracking, and sprint history
@@ -320,6 +320,8 @@
 | v0.39 | GitBook Publish Setup Added | Added publish setup guide, docs validation script, and GitHub workflow for GitBook-ready docs handoff | `DOC-001` |
 | v0.40 | VitePress Docs Site Added | Added VitePress site config, GitHub Pages deploy workflow, and local docs build commands on top of the repo docs source | `DOC-001` |
 | v0.41 | Docs Site Build Verified | Verified local VitePress build and opted workflows into Node 24 execution for GitHub Actions stability | `DOC-001` |
+| v0.42 | Docs Site Polish Pass | Improved VitePress home page, section landing pages, sidebar structure, and theme styling for a more wiki-like docs experience | `DOC-001` |
+| v0.43 | Docs Information Architecture Expanded | Added role-based Gameplay and Systems hubs, stronger home navigation, and a more discoverable wiki-style docs structure | `DOC-001` |
 
 ---
 
@@ -334,4 +336,4 @@ When work changes state:
 
 ---
 
-> Last updated: 2026-03-14 01:01 MSK
+> Last updated: 2026-03-14 12:26 MSK

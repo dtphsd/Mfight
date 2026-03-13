@@ -24,6 +24,8 @@ The app root now also contains a local planning workflow:
 - `fight-club/docs/SUMMARY.md` as the GitBook navigation tree
 - `fight-club/docs/gitbook-publish-setup.md` as the operational setup guide for GitBook publishing
 - `fight-club/docs/.vitepress/` and `fight-club/docs/index.md` as the static docs-site layer for VitePress and GitHub Pages
+- the VitePress docs site now has a structured home page, section landing pages, sidebar navigation, local search, and branded theme styling
+- the docs site is now organized into role-based reading paths for `Gameplay`, `Systems`, `Architecture`, and `Decisions`
 - `fight-club/docs/architecture/combat-design-reference.md` as the current source-of-truth combat runtime reference
 
 It has:

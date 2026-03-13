@@ -1,6 +1,6 @@
 # Combat Design Reference
 
-> Last updated: 2026-03-14 00:41 MSK
+> Last updated: 2026-03-14 12:18 MSK
 
 **Project:** Fight Club  
 **Status:** draft from live runtime
@@ -1198,10 +1198,10 @@ Those gaps are tracked by:
 
 ## Related Docs
 
-- [Docs Home](../README.md)
-- [Architecture Index](./README.md)
+- [Docs Home](../)
+- [Architecture Index](./)
 - [Combat System Roadmap](./combat-system-roadmap.md)
 
 ---
 
-> Last updated: 2026-03-14 00:41 MSK
+> Last updated: 2026-03-14 12:18 MSK

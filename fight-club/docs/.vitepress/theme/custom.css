@@ -32,3 +32,33 @@
 .vp-doc a {
   text-underline-offset: 2px;
 }
+
+.docs-hub-grid {
+  display: grid;
+  gap: 1rem;
+  margin: 1.25rem 0 1.75rem;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.docs-hub-card {
+  border: 1px solid rgba(176, 68, 44, 0.14);
+  background: linear-gradient(180deg, rgba(255, 247, 242, 0.72), rgba(255, 251, 248, 0.92));
+  border-radius: 16px;
+  padding: 1rem 1rem 0.9rem;
+  box-shadow: 0 12px 32px rgba(68, 31, 25, 0.05);
+}
+
+.dark .docs-hub-card {
+  background: linear-gradient(180deg, rgba(34, 24, 22, 0.88), rgba(26, 20, 19, 0.96));
+  box-shadow: none;
+}
+
+.docs-hub-card h3 {
+  margin-top: 0;
+  margin-bottom: 0.45rem;
+}
+
+.docs-hub-card p {
+  margin: 0;
+  color: var(--vp-c-text-2);
+}

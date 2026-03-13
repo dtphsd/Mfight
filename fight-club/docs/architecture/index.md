@@ -1,8 +1,33 @@
+---
+title: Architecture
+---
+
 # Architecture
+
+> Last updated: 2026-03-14 12:41 MSK
 
 This section is the engineering map for `Fight Club`.
 
-Use it when you need to understand where logic belongs before making code changes.
+Use it when you need to understand where logic belongs before making code changes or when you need to trace how the runtime, orchestration, UI, and docs depend on each other.
+
+---
+
+## Who This Section Is For
+
+<div class="docs-hub-grid">
+  <div class="docs-hub-card">
+    <h3>Maintainers</h3>
+    <p>Use this section to keep the project shape legible as features, docs, and UI layers keep evolving.</p>
+  </div>
+  <div class="docs-hub-card">
+    <h3>Feature Work</h3>
+    <p>Use it before touching combat, orchestration, or screens that depend on multiple layers at once.</p>
+  </div>
+  <div class="docs-hub-card">
+    <h3>Code Review</h3>
+    <p>Use it to sanity-check whether a change belongs in the right layer and whether adjacent modules are being respected.</p>
+  </div>
+</div>
 
 ## Reading Paths
 
@@ -23,8 +48,36 @@ Use it when you need to understand where logic belongs before making code change
 - use [Architecture Overview](./overview)
 - then check [ADR-001: Modular Headless Core](../decisions/ADR-001-architecture)
 
+---
+
+## Common Architecture Tasks
+
+- deciding whether a rule belongs in `modules`, `orchestration`, or `ui`
+- checking whether a docs change must accompany a runtime change
+- planning a refactor without breaking adjacent systems
+- reviewing how combat behavior flows into player-facing surfaces
+
+---
+
 ## Pages In This Section
 
 - [Architecture Overview](./overview)
 - [Combat Design Reference](./combat-design-reference)
+- [Combat System](./combat/)
+- [Combat Model And Flow](./combat/model-and-flow)
+- [Combat Formulas And Effects](./combat/formulas-and-effects)
+- [Combat Integrations And Verification](./combat/integrations-and-verification)
+- [Combat Verification And Tests](./combat/tests-and-traceability)
 - [Combat System Roadmap](./combat-system-roadmap)
+
+---
+
+## Related Docs
+
+- [Docs Home](../)
+- [Systems](../systems/)
+- [Decisions](../decisions/)
+
+---
+
+> Last updated: 2026-03-14 12:41 MSK

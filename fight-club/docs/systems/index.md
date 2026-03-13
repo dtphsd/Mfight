@@ -4,13 +4,30 @@ title: Systems
 
 # Systems
 
-> Last updated: 2026-03-14 12:26 MSK
+> Last updated: 2026-03-14 12:41 MSK
 
 This section is the engineering entry point for understanding how Fight Club is assembled from runtime modules, orchestration layers, UI contracts, and documentation.
 
 Use it when you need to trace dependencies, plan safe refactors, or quickly locate the right layer before editing code.
 
 ---
+
+## Who This Section Is For
+
+<div class="docs-hub-grid">
+  <div class="docs-hub-card">
+    <h3>Refactoring</h3>
+    <p>Use this section before changing code that has dependencies across runtime modules, orchestration, UI, and docs.</p>
+  </div>
+  <div class="docs-hub-card">
+    <h3>UI Contract Work</h3>
+    <p>Use it when a screen or hook depends on combat state, orchestration outputs, or documentation alignment.</p>
+  </div>
+  <div class="docs-hub-card">
+    <h3>Docs And Release Flow</h3>
+    <p>Use it when the repo-native docs site, publishing workflow, and source-of-truth pages need to stay in sync.</p>
+  </div>
+</div>
 
 ## Start Here
 
@@ -45,6 +62,15 @@ Use it when you need to trace dependencies, plan safe refactors, or quickly loca
 
 ---
 
+## Common Systems Tasks
+
+- locating the correct layer before making a change
+- tracing data flow from module logic into UI state or presentation
+- checking whether a docs change also needs code or workflow updates
+- reviewing architecture boundaries before deep refactors
+
+---
+
 ## Main System Boundaries
 
 - `src/modules/`
@@ -66,4 +92,4 @@ Use it when you need to trace dependencies, plan safe refactors, or quickly loca
 
 ---
 
-> Last updated: 2026-03-14 12:26 MSK
+> Last updated: 2026-03-14 12:41 MSK

@@ -322,6 +322,8 @@
 | v0.41 | Docs Site Build Verified | Verified local VitePress build and opted workflows into Node 24 execution for GitHub Actions stability | `DOC-001` |
 | v0.42 | Docs Site Polish Pass | Improved VitePress home page, section landing pages, sidebar structure, and theme styling for a more wiki-like docs experience | `DOC-001` |
 | v0.43 | Docs Information Architecture Expanded | Added role-based Gameplay and Systems hubs, stronger home navigation, and a more discoverable wiki-style docs structure | `DOC-001` |
+| v0.44 | Docs Section Hubs Refined | Upgraded Gameplay, Systems, Architecture, and Decisions landing pages into fuller wiki-style section hubs with clearer reading paths and task-oriented entry points | `DOC-001` |
+| v0.45 | Combat Docs Subsections Added | Split the oversized combat reference into dedicated subsection pages for model, formulas, integrations, and verification with sidebar support | `DOC-001` |
 
 ---
 

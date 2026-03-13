@@ -14,6 +14,7 @@ import {
   type CombatEffectDefinition,
   type CombatEffectModifiers,
 } from "@/modules/combat/model/CombatEffect";
+import type { CombatSkill } from "@/modules/combat/model/CombatSkill";
 import { addCombatResources, type CombatResources } from "@/modules/combat/model/CombatResources";
 import type { CombatState } from "@/modules/combat/model/CombatState";
 import type { CombatZone } from "@/modules/combat/model/CombatZone";
@@ -210,6 +211,7 @@ function resolveAttack(
   const preparedAttackerModifiers = getCombatEffectModifiers(preparedAttacker.activeEffects);
   const effectivePreparedAttacker = applyCombatEffectModifiers(preparedAttacker, preparedAttackerModifiers);
   const selectedSkill = getRoundActionSkill(action);
+  const selectedSkillStateBonus = getCombatSkillStateBonus(selectedSkill, defender.activeEffects);
   const resourceCost = selectedSkill ? selectedSkill.cost : 0;
 
   if (selectedSkill && preparedAttacker.resources[selectedSkill.resourceType] < resourceCost) {
@@ -218,7 +220,8 @@ function resolveAttack(
 
   const attackProfile = applySkillDamageModifier(
     calculateAttackProfile(effectivePreparedAttacker, effectivePreparedAttacker.attackZone!),
-    selectedSkill
+    selectedSkill,
+    selectedSkillStateBonus.damageMultiplierBonus
   );
   const outgoingScaledAttackProfile = scaleProfile(attackProfile, 1 + preparedAttackerModifiers.outgoingDamagePercent / 100);
   const primaryDamageType = effectivePreparedAttacker.weaponClass
@@ -287,7 +290,10 @@ function resolveAttack(
     effectivePreparedAttacker.attackZone!,
     isBlocked,
     sumDamageProfiles(
-      selectedSkill?.armorPenetrationPercentBonus ?? zeroDamageProfile,
+      sumDamageProfiles(
+        selectedSkill?.armorPenetrationPercentBonus ?? zeroDamageProfile,
+        selectedSkillStateBonus.armorPenetrationPercentBonus
+      ),
       preparedAttackerModifiers.armorPenetrationPercentBonus
     )
   );
@@ -325,7 +331,8 @@ function resolveAttack(
   const critRate = clampChance(
     critChance(effectivePreparedAttacker.stats.rage, effectiveDefender.stats.rage) +
       effectivePreparedAttacker.critChanceBonus +
-      (selectedSkill?.critChanceBonus ?? 0)
+      (selectedSkill?.critChanceBonus ?? 0) +
+      selectedSkillStateBonus.critChanceBonus
   );
 
   if (critRoll < critRate) {
@@ -342,6 +349,10 @@ function resolveAttack(
 
   result.damage = totalProfileValue(resolvedProfile);
   result.finalDamage = Math.floor(result.damage);
+
+  if (selectedSkillStateBonus.triggeredBonusCount > 0) {
+    result.messages.push("state_bonus");
+  }
 
   if (!result.commentary) {
     result.commentary = "Attacker lands a clean strike";
@@ -468,17 +479,20 @@ function resolveConsumableUse(
 
 function applySkillDamageModifier(
   profile: DamageProfile,
-  skill: ReturnType<typeof getRoundActionSkill>
+  skill: ReturnType<typeof getRoundActionSkill>,
+  additionalDamageMultiplier = 0
 ): DamageProfile {
   if (!skill) {
     return profile;
   }
 
+  const totalDamageMultiplier = skill.damageMultiplier + additionalDamageMultiplier;
+
   return {
-    slash: profile.slash * skill.damageMultiplier,
-    pierce: profile.pierce * skill.damageMultiplier,
-    blunt: profile.blunt * skill.damageMultiplier,
-    chop: profile.chop * skill.damageMultiplier,
+    slash: profile.slash * totalDamageMultiplier,
+    pierce: profile.pierce * totalDamageMultiplier,
+    blunt: profile.blunt * totalDamageMultiplier,
+    chop: profile.chop * totalDamageMultiplier,
   };
 }
 
@@ -727,6 +741,44 @@ function clampChance(value: number) {
 
 function clampPercent(value: number) {
   return Math.min(combatChanceCaps.percent, Math.max(0, Math.round(value)));
+}
+
+function getCombatSkillStateBonus(
+  skill: CombatSkill | null | undefined,
+  activeEffects: ActiveCombatEffect[]
+) {
+  if (!skill?.stateBonuses?.length) {
+    return {
+      damageMultiplierBonus: 0,
+      critChanceBonus: 0,
+      armorPenetrationPercentBonus: zeroDamageProfile,
+      triggeredBonusCount: 0,
+    };
+  }
+
+  return skill.stateBonuses.reduce(
+    (accumulator, bonus) => {
+      if (!activeEffects.some((effect) => effect.effectId === bonus.requiredEffectId)) {
+        return accumulator;
+      }
+
+      return {
+        damageMultiplierBonus: accumulator.damageMultiplierBonus + (bonus.damageMultiplierBonus ?? 0),
+        critChanceBonus: accumulator.critChanceBonus + (bonus.critChanceBonus ?? 0),
+        armorPenetrationPercentBonus: sumDamageProfiles(
+          accumulator.armorPenetrationPercentBonus,
+          bonus.armorPenetrationPercentBonus ?? zeroDamageProfile
+        ),
+        triggeredBonusCount: accumulator.triggeredBonusCount + 1,
+      };
+    },
+    {
+      damageMultiplierBonus: 0,
+      critChanceBonus: 0,
+      armorPenetrationPercentBonus: zeroDamageProfile,
+      triggeredBonusCount: 0,
+    }
+  );
 }
 
 function getCombatEffectModifiers(effects: ActiveCombatEffect[]): CombatEffectModifiers {

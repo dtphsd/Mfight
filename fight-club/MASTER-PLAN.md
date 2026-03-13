@@ -1,6 +1,6 @@
 # MASTER-PLAN - Fight Club
 
-> Last updated: 2026-03-14 12:26 MSK
+> Last updated: 2026-03-14 13:21 MSK
 
 **Project:** Fight Club  
 **Scope:** active product planning, task tracking, and sprint history
@@ -36,6 +36,11 @@
 | COMBAT-003 | Add composition regression tests for combat rules | Combat QA | 🟡 IN PROGRESS | `features/combat-design-reference.md` | Protect combinations like skills plus consumables, effects plus death, and block plus penetration from silent regressions |
 | COMBAT-004 | Safely reduce `resolveRound.ts` risk without behavior changes | Combat Refactor | 🔴 TODO | `features/combat-design-reference.md` | Remove fragile duplication and isolate rule blocks only after the design reference and regression tests exist |
 | COMBAT-005 | Formalize combat change checklist and verification flow | Combat Workflow | 🔴 TODO | `features/combat-design-reference.md` | Define what must be checked whenever combat formulas, resources, effects, or loadout rules change |
+| COMBAT-006 | Define first-wave combat expansion states and interaction rules | Combat Design | 🟡 IN PROGRESS | `features/combat-expansion.md` | Runtime now supports first-wave state-aware bonuses through `Exposed` and `Staggered`, with initial setup/payoff skills already landed |
+| COMBAT-007 | Design and implement more varied skills around setup/payoff patterns | Combat Content | 🔴 TODO | `features/combat-expansion.md` | Make skills more interesting through control, setup, finisher, defensive, and tempo patterns |
+| COMBAT-008 | Deepen archetype identity through state synergy and combat loops | Combat Identity | 🔴 TODO | `features/combat-expansion.md` | Make Warden, Duelist, Breaker, and Executioner feel more distinct in actual fights |
+| COMBAT-009 | Expand combat docs and Combat Rules for the new state and skill layer | Combat Docs / UX | 🔴 TODO | `features/combat-expansion.md` | Keep the new combat depth understandable and synchronized with runtime behavior |
+| COMBAT-010 | Add regression and balance coverage for combat expansion content | Combat QA / Balance | 🔴 TODO | `features/combat-expansion.md` | Protect new states, synergies, and skill interactions with tests and matrix checks |
 
 ---
 
@@ -324,6 +329,7 @@
 | v0.43 | Docs Information Architecture Expanded | Added role-based Gameplay and Systems hubs, stronger home navigation, and a more discoverable wiki-style docs structure | `DOC-001` |
 | v0.44 | Docs Section Hubs Refined | Upgraded Gameplay, Systems, Architecture, and Decisions landing pages into fuller wiki-style section hubs with clearer reading paths and task-oriented entry points | `DOC-001` |
 | v0.45 | Combat Docs Subsections Added | Split the oversized combat reference into dedicated subsection pages for model, formulas, integrations, and verification with sidebar support | `DOC-001` |
+| v0.46 | Combat Expansion Track Added | Added a dedicated master-plan workstream for new combat states, more varied skills, stronger archetype identity, and matching docs/test coverage | `COMBAT-006` |
 
 ---
 
@@ -338,4 +344,4 @@ When work changes state:
 
 ---
 
-> Last updated: 2026-03-14 12:26 MSK
+> Last updated: 2026-03-14 13:21 MSK

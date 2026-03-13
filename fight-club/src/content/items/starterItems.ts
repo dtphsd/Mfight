@@ -294,7 +294,7 @@ export const starterItems: Array<{ item: Item; quantity: number }> = [
         {
           id: "training-mace-crush",
           name: "Crushing Blow",
-          description: "Guard smash: stronger blunt damage.",
+          description: "Guard smash: stronger blunt damage that spikes against staggered targets.",
           sourceItemCode: "training-mace",
           resourceType: "guard",
           cost: 24,
@@ -306,11 +306,23 @@ export const starterItems: Array<{ item: Item; quantity: number }> = [
             blunt: 10,
             chop: 0,
           },
+          stateBonuses: [
+            {
+              requiredEffectId: "state-staggered",
+              damageMultiplierBonus: 0.18,
+              armorPenetrationPercentBonus: {
+                slash: 0,
+                pierce: 0,
+                blunt: 18,
+                chop: 0,
+              },
+            },
+          ],
         },
         {
           id: "training-mace-armor-crush",
           name: "Armor Crush",
-          description: "Guard smash: reduces block power and armor.",
+          description: "Guard smash: staggers the target and weakens their defensive structure.",
           sourceItemCode: "training-mace",
           resourceType: "guard",
           cost: 26,
@@ -324,21 +336,17 @@ export const starterItems: Array<{ item: Item; quantity: number }> = [
           },
           effects: [
             {
-              id: "armor-crush-broken-guard",
-              name: "Broken Guard",
-              description: "Reduces block power and armor for a short time.",
+              id: "state-staggered",
+              name: "Staggered",
+              description: "The target has worse block power and dodge on their next exchange.",
               kind: "debuff",
               target: "target",
               trigger: "on_hit",
-              durationTurns: 1,
+              durationTurns: 2,
+              maxStacks: 2,
               modifiers: {
-                blockPowerBonus: -8,
-                armorFlatBonus: {
-                  slash: -3,
-                  pierce: -3,
-                  blunt: -5,
-                  chop: -3,
-                },
+                blockPowerBonus: -6,
+                dodgeChanceBonus: -4,
               },
             },
           ],
@@ -617,7 +625,7 @@ export const starterItems: Array<{ item: Item; quantity: number }> = [
         {
           id: "great-training-sword-execution-arc",
           name: "Execution Arc",
-          description: "Rage finisher: heavy damage and penetration.",
+          description: "Rage finisher: heavy damage that spikes against exposed targets.",
           sourceItemCode: "great-training-sword",
           resourceType: "rage",
           cost: 34,
@@ -629,6 +637,19 @@ export const starterItems: Array<{ item: Item; quantity: number }> = [
             blunt: 0,
             chop: 18,
           },
+          stateBonuses: [
+            {
+              requiredEffectId: "state-exposed",
+              damageMultiplierBonus: 0.3,
+              critChanceBonus: 12,
+              armorPenetrationPercentBonus: {
+                slash: 12,
+                pierce: 0,
+                blunt: 0,
+                chop: 12,
+              },
+            },
+          ],
         },
       ],
       statBonuses: {
@@ -1037,7 +1058,7 @@ export const starterItems: Array<{ item: Item; quantity: number }> = [
         {
           id: "duelist-charm-opening-sense",
           name: "Opening Sense",
-          description: "Focus read: crit and pierce penetration.",
+          description: "Focus read: precise pierce pressure that exposes the target for finishers.",
           sourceItemCode: "duelist-charm",
           resourceType: "focus",
           cost: 15,
@@ -1049,6 +1070,21 @@ export const starterItems: Array<{ item: Item; quantity: number }> = [
             blunt: 0,
             chop: 0,
           },
+          effects: [
+            {
+              id: "state-exposed",
+              name: "Exposed",
+              description: "The target becomes more vulnerable to follow-up damage.",
+              kind: "debuff",
+              target: "target",
+              trigger: "on_hit",
+              durationTurns: 2,
+              maxStacks: 2,
+              modifiers: {
+                incomingDamagePercent: 8,
+              },
+            },
+          ],
         },
       ],
       statBonuses: {

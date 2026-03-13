@@ -1,6 +1,6 @@
 # Combat Formulas And Effects
 
-> Last updated: 2026-03-14 12:52 MSK
+> Last updated: 2026-03-14 13:16 MSK
 
 ## Resources
 
@@ -160,6 +160,32 @@ Important design rule:
 
 ---
 
+## Named State Layer
+
+The first named state layer now includes:
+
+- `Exposed`
+  - target debuff
+  - 2 turns
+  - up to 2 stacks
+  - `+8% incoming damage` per stack
+  - intended for Duelist and Executioner setup/payoff windows
+- `Staggered`
+  - target debuff
+  - 2 turns
+  - up to 2 stacks
+  - `-6 block power` per stack
+  - `-4 dodge chance bonus` per stack
+  - intended for Breaker disruption and anti-guard pressure
+
+Design rule:
+
+- these states are intentionally readable and low-noise
+- they should create tactical windows, not hard crowd control
+- first-wave state-aware skills use the existing combat effect system instead of a separate state engine
+
+---
+
 ## Weapon-Class Passive Rules
 
 Current passive catalog from `combatWeaponPassives.ts`:
@@ -282,4 +308,4 @@ This result contract drives:
 
 ---
 
-> Last updated: 2026-03-14 12:52 MSK
+> Last updated: 2026-03-14 13:16 MSK

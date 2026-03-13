@@ -257,6 +257,10 @@ describe("combat module", () => {
       character: second.data,
       flatBonuses: [],
       percentBonuses: [],
+      combatBonuses: {
+        ...zeroCombatBonuses,
+        dodgeChance: -10,
+      },
     });
 
     const resolved = resolveRound(
@@ -1042,6 +1046,345 @@ describe("combat module", () => {
     const controlHit = controlRound.data.log.find((entry) => entry.attackerId === attacker.characterId);
 
     expect(followUpHit?.finalDamage).toBeGreaterThan(controlHit?.finalDamage ?? 0);
+  });
+
+  it("applies Exposed from Opening Sense and lets Execution Arc punish it harder", () => {
+    const inventory = createStarterInventory();
+    const withGreatsword = equipItem(createEquipment(), inventory, "great-training-sword");
+
+    if (!withGreatsword.success) {
+      throw new Error(withGreatsword.reason);
+    }
+
+    const equipped = equipItem(withGreatsword.data, inventory, "duelist-charm");
+
+    if (!equipped.success) {
+      throw new Error(equipped.reason);
+    }
+
+    const first = createCharacter("Alpha");
+    const second = createCharacter("Beta");
+
+    if (!first.success || !second.success) {
+      throw new Error("character creation failed");
+    }
+
+    const skillBonuses = getEquipmentBonuses(equipped.data, inventory);
+    const attacker = buildCombatSnapshot({
+      character: first.data,
+      flatBonuses: skillBonuses.flatBonuses,
+      percentBonuses: skillBonuses.percentBonuses,
+      baseDamage: skillBonuses.baseDamage,
+      baseArmor: skillBonuses.baseArmor,
+      armorBySlot: skillBonuses.armorBySlot,
+      combatBonuses: skillBonuses.combatBonuses,
+      preferredDamageType: skillBonuses.preferredDamageType,
+      weaponClass: skillBonuses.mainHandWeaponClass,
+    });
+    const defender = buildCombatSnapshot({
+      character: second.data,
+      flatBonuses: [],
+      percentBonuses: [],
+    });
+
+    const openingSense = skillBonuses.skills.find((entry) => entry.id === "duelist-charm-opening-sense");
+    const executionArc = skillBonuses.skills.find((entry) => entry.id === "great-training-sword-execution-arc");
+
+    expect(openingSense).toBeDefined();
+    expect(executionArc).toBeDefined();
+
+    const baseState = startCombat(
+      {
+        ...attacker,
+        stats: { ...attacker.stats, agility: 8 },
+      },
+      {
+        ...defender,
+        stats: { ...defender.stats, agility: 3 },
+      }
+    );
+    const seededState = {
+      ...baseState,
+      combatants: [
+        {
+          ...baseState.combatants[0],
+          resources: {
+            ...baseState.combatants[0].resources,
+            focus: 20,
+            rage: 40,
+          },
+        },
+        baseState.combatants[1],
+      ] as typeof baseState.combatants,
+    };
+
+    const firstRound = resolveRound(
+      seededState,
+      [
+        createSkillAttackAction({
+          attackerId: attacker.characterId,
+          attackZone: "chest",
+          defenseZones: ["waist", "legs"],
+          skill: openingSense!,
+        }),
+        createBasicAttackAction({
+          attackerId: defender.characterId,
+          attackZone: "legs",
+          defenseZones: ["head", "waist"],
+        }),
+      ],
+      new SeededRandom(11)
+    );
+
+    expect(firstRound.success).toBe(true);
+    if (!firstRound.success) {
+      return;
+    }
+
+    const defenderAfterSetup = firstRound.data.combatants.find((combatant) => combatant.id === defender.characterId);
+    expect(defenderAfterSetup?.activeEffects.map((effect) => effect.name)).toContain("Exposed");
+
+    const payoffRound = resolveRound(
+      firstRound.data,
+      [
+        createSkillAttackAction({
+          attackerId: attacker.characterId,
+          attackZone: "chest",
+          defenseZones: ["waist", "legs"],
+          skill: executionArc!,
+        }),
+        createBasicAttackAction({
+          attackerId: defender.characterId,
+          attackZone: "legs",
+          defenseZones: ["head", "waist"],
+        }),
+      ],
+      new SeededRandom(11)
+    );
+
+    const controlBaseState = startCombat(
+      {
+        ...attacker,
+        stats: { ...attacker.stats, agility: 8 },
+      },
+      {
+        ...defender,
+        stats: { ...defender.stats, agility: 3 },
+      }
+    );
+    const controlState = {
+      ...controlBaseState,
+      combatants: [
+        {
+          ...controlBaseState.combatants[0],
+          resources: {
+            ...controlBaseState.combatants[0].resources,
+            rage: 40,
+          },
+        },
+        controlBaseState.combatants[1],
+      ] as typeof controlBaseState.combatants,
+    };
+
+    const controlRound = resolveRound(
+      controlState,
+      [
+        createSkillAttackAction({
+          attackerId: attacker.characterId,
+          attackZone: "chest",
+          defenseZones: ["waist", "legs"],
+          skill: executionArc!,
+        }),
+        createBasicAttackAction({
+          attackerId: defender.characterId,
+          attackZone: "legs",
+          defenseZones: ["head", "waist"],
+        }),
+      ],
+      new SeededRandom(11)
+    );
+
+    expect(payoffRound.success).toBe(true);
+    expect(controlRound.success).toBe(true);
+    if (!payoffRound.success || !controlRound.success) {
+      return;
+    }
+
+    const payoffHit = payoffRound.data.log.find(
+      (entry) => entry.attackerId === attacker.characterId && entry.skillName === "Execution Arc"
+    );
+    const controlHit = controlRound.data.log.find(
+      (entry) => entry.attackerId === attacker.characterId && entry.skillName === "Execution Arc"
+    );
+
+    expect(payoffHit?.messages).toContain("state_bonus");
+    expect(payoffHit?.finalDamage).toBeGreaterThan(controlHit?.finalDamage ?? 0);
+  });
+
+  it("applies Staggered from Armor Crush and lets Crushing Blow hit harder after the setup", () => {
+    const inventory = createStarterInventory();
+    const equipped = equipItem(createEquipment(), inventory, "training-mace");
+
+    if (!equipped.success) {
+      throw new Error(equipped.reason);
+    }
+
+    const first = createCharacter("Alpha");
+    const second = createCharacter("Beta");
+
+    if (!first.success || !second.success) {
+      throw new Error("character creation failed");
+    }
+
+    const skillBonuses = getEquipmentBonuses(equipped.data, inventory);
+    const attacker = buildCombatSnapshot({
+      character: first.data,
+      flatBonuses: skillBonuses.flatBonuses,
+      percentBonuses: skillBonuses.percentBonuses,
+      baseDamage: skillBonuses.baseDamage,
+      baseArmor: skillBonuses.baseArmor,
+      armorBySlot: skillBonuses.armorBySlot,
+      combatBonuses: skillBonuses.combatBonuses,
+      preferredDamageType: skillBonuses.preferredDamageType,
+      weaponClass: skillBonuses.mainHandWeaponClass,
+    });
+    const defender = buildCombatSnapshot({
+      character: second.data,
+      flatBonuses: [],
+      percentBonuses: [],
+    });
+
+    const armorCrush = skillBonuses.skills.find((entry) => entry.id === "training-mace-armor-crush");
+    const crushingBlow = skillBonuses.skills.find((entry) => entry.id === "training-mace-crush");
+
+    expect(armorCrush).toBeDefined();
+    expect(crushingBlow).toBeDefined();
+
+    const baseState = startCombat(
+      {
+        ...attacker,
+        stats: { ...attacker.stats, agility: 8 },
+      },
+      {
+        ...defender,
+        stats: { ...defender.stats, agility: 3 },
+      }
+    );
+    const seededState = {
+      ...baseState,
+      combatants: [
+        {
+          ...baseState.combatants[0],
+          resources: {
+            ...baseState.combatants[0].resources,
+            guard: 60,
+          },
+        },
+        baseState.combatants[1],
+      ] as typeof baseState.combatants,
+    };
+
+    const setupRound = resolveRound(
+      seededState,
+      [
+        createSkillAttackAction({
+          attackerId: attacker.characterId,
+          attackZone: "head",
+          defenseZones: ["waist", "legs"],
+          skill: armorCrush!,
+        }),
+        createBasicAttackAction({
+          attackerId: defender.characterId,
+          attackZone: "legs",
+          defenseZones: ["head", "waist"],
+        }),
+      ],
+      new SeededRandom(6)
+    );
+
+    expect(setupRound.success).toBe(true);
+    if (!setupRound.success) {
+      return;
+    }
+
+    const defenderAfterSetup = setupRound.data.combatants.find((combatant) => combatant.id === defender.characterId);
+    expect(defenderAfterSetup?.activeEffects.map((effect) => effect.name)).toContain("Staggered");
+
+    const payoffRound = resolveRound(
+      setupRound.data,
+      [
+        createSkillAttackAction({
+          attackerId: attacker.characterId,
+          attackZone: "head",
+          defenseZones: ["waist", "legs"],
+          skill: crushingBlow!,
+        }),
+        createBasicAttackAction({
+          attackerId: defender.characterId,
+          attackZone: "legs",
+          defenseZones: ["head", "waist"],
+        }),
+      ],
+      new SeededRandom(6)
+    );
+
+    const controlBaseState = startCombat(
+      {
+        ...attacker,
+        stats: { ...attacker.stats, agility: 8 },
+      },
+      {
+        ...defender,
+        stats: { ...defender.stats, agility: 3 },
+      }
+    );
+    const controlState = {
+      ...controlBaseState,
+      combatants: [
+        {
+          ...controlBaseState.combatants[0],
+          resources: {
+            ...controlBaseState.combatants[0].resources,
+            guard: 34,
+          },
+        },
+        controlBaseState.combatants[1],
+      ] as typeof controlBaseState.combatants,
+    };
+
+    const controlRound = resolveRound(
+      controlState,
+      [
+        createSkillAttackAction({
+          attackerId: attacker.characterId,
+          attackZone: "head",
+          defenseZones: ["waist", "legs"],
+          skill: crushingBlow!,
+        }),
+        createBasicAttackAction({
+          attackerId: defender.characterId,
+          attackZone: "legs",
+          defenseZones: ["head", "waist"],
+        }),
+      ],
+      new SeededRandom(6)
+    );
+
+    expect(payoffRound.success).toBe(true);
+    expect(controlRound.success).toBe(true);
+    if (!payoffRound.success || !controlRound.success) {
+      return;
+    }
+
+    const payoffHit = payoffRound.data.log.find(
+      (entry) => entry.attackerId === attacker.characterId && entry.skillName === "Crushing Blow"
+    );
+    const controlHit = controlRound.data.log.find(
+      (entry) => entry.attackerId === attacker.characterId && entry.skillName === "Crushing Blow"
+    );
+
+    expect(payoffHit?.messages).toContain("state_bonus");
+    expect(payoffHit?.finalDamage).toBeGreaterThan(controlHit?.finalDamage ?? 0);
   });
 
   it("applies Second Wind as a defensive sustain skill with healing and guard recovery", () => {

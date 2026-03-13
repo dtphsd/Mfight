@@ -1,0 +1,4 @@
+interface:
+  display_name: "Project Audit"
+  short_description: "Analyze docs and real code before changes"
+  default_prompt: "Use $project-onboarding-audit to inspect this project before making changes."

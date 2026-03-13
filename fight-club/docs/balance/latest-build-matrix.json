@@ -1,0 +1,624 @@
+{
+  "generatedAt": "2026-03-12T22:27:18.695Z",
+  "options": {
+    "runs": 10,
+    "maxRounds": 40,
+    "difficulty": "champion",
+    "write": true
+  },
+  "presets": [
+    {
+      "id": "sword-bleed",
+      "label": "Sword / Bleed",
+      "archetype": "Pressure",
+      "targetFightLength": "13-16 rounds"
+    },
+    {
+      "id": "shield-guard",
+      "label": "Shield / Guard",
+      "archetype": "Defense",
+      "targetFightLength": "14-17 rounds"
+    },
+    {
+      "id": "dagger-crit",
+      "label": "Dagger / Crit",
+      "archetype": "Burst",
+      "targetFightLength": "12-15 rounds"
+    },
+    {
+      "id": "mace-control",
+      "label": "Mace / Control",
+      "archetype": "Control",
+      "targetFightLength": "14-17 rounds"
+    },
+    {
+      "id": "axe-pressure",
+      "label": "Axe / Pressure",
+      "archetype": "Tempo",
+      "targetFightLength": "12-15 rounds"
+    },
+    {
+      "id": "heavy-two-hand",
+      "label": "Heavy / Two-Hand",
+      "archetype": "Heavy",
+      "targetFightLength": "11-14 rounds"
+    },
+    {
+      "id": "sustain-regen",
+      "label": "Sustain / Regen",
+      "archetype": "Sustain",
+      "targetFightLength": "15-18 rounds"
+    }
+  ],
+  "matrix": [
+    {
+      "leftId": "sword-bleed",
+      "leftLabel": "Sword / Bleed",
+      "rightId": "sword-bleed",
+      "rightLabel": "Sword / Bleed",
+      "leftWins": 3,
+      "rightWins": 7,
+      "draws": 0,
+      "averageRounds": 23.3
+    },
+    {
+      "leftId": "sword-bleed",
+      "leftLabel": "Sword / Bleed",
+      "rightId": "shield-guard",
+      "rightLabel": "Shield / Guard",
+      "leftWins": 0,
+      "rightWins": 4,
+      "draws": 6,
+      "averageRounds": 39.4
+    },
+    {
+      "leftId": "sword-bleed",
+      "leftLabel": "Sword / Bleed",
+      "rightId": "dagger-crit",
+      "rightLabel": "Dagger / Crit",
+      "leftWins": 8,
+      "rightWins": 2,
+      "draws": 0,
+      "averageRounds": 8.1
+    },
+    {
+      "leftId": "sword-bleed",
+      "leftLabel": "Sword / Bleed",
+      "rightId": "mace-control",
+      "rightLabel": "Mace / Control",
+      "leftWins": 0,
+      "rightWins": 10,
+      "draws": 0,
+      "averageRounds": 20.1
+    },
+    {
+      "leftId": "sword-bleed",
+      "leftLabel": "Sword / Bleed",
+      "rightId": "axe-pressure",
+      "rightLabel": "Axe / Pressure",
+      "leftWins": 0,
+      "rightWins": 10,
+      "draws": 0,
+      "averageRounds": 12.7
+    },
+    {
+      "leftId": "sword-bleed",
+      "leftLabel": "Sword / Bleed",
+      "rightId": "heavy-two-hand",
+      "rightLabel": "Heavy / Two-Hand",
+      "leftWins": 0,
+      "rightWins": 10,
+      "draws": 0,
+      "averageRounds": 15.3
+    },
+    {
+      "leftId": "sword-bleed",
+      "leftLabel": "Sword / Bleed",
+      "rightId": "sustain-regen",
+      "rightLabel": "Sustain / Regen",
+      "leftWins": 2,
+      "rightWins": 3,
+      "draws": 5,
+      "averageRounds": 39.1
+    },
+    {
+      "leftId": "shield-guard",
+      "leftLabel": "Shield / Guard",
+      "rightId": "sword-bleed",
+      "rightLabel": "Sword / Bleed",
+      "leftWins": 9,
+      "rightWins": 0,
+      "draws": 1,
+      "averageRounds": 29.7
+    },
+    {
+      "leftId": "shield-guard",
+      "leftLabel": "Shield / Guard",
+      "rightId": "shield-guard",
+      "rightLabel": "Shield / Guard",
+      "leftWins": 0,
+      "rightWins": 0,
+      "draws": 10,
+      "averageRounds": 41
+    },
+    {
+      "leftId": "shield-guard",
+      "leftLabel": "Shield / Guard",
+      "rightId": "dagger-crit",
+      "rightLabel": "Dagger / Crit",
+      "leftWins": 10,
+      "rightWins": 0,
+      "draws": 0,
+      "averageRounds": 9.6
+    },
+    {
+      "leftId": "shield-guard",
+      "leftLabel": "Shield / Guard",
+      "rightId": "mace-control",
+      "rightLabel": "Mace / Control",
+      "leftWins": 0,
+      "rightWins": 0,
+      "draws": 10,
+      "averageRounds": 41
+    },
+    {
+      "leftId": "shield-guard",
+      "leftLabel": "Shield / Guard",
+      "rightId": "axe-pressure",
+      "rightLabel": "Axe / Pressure",
+      "leftWins": 2,
+      "rightWins": 8,
+      "draws": 0,
+      "averageRounds": 25.6
+    },
+    {
+      "leftId": "shield-guard",
+      "leftLabel": "Shield / Guard",
+      "rightId": "heavy-two-hand",
+      "rightLabel": "Heavy / Two-Hand",
+      "leftWins": 6,
+      "rightWins": 4,
+      "draws": 0,
+      "averageRounds": 29.9
+    },
+    {
+      "leftId": "shield-guard",
+      "leftLabel": "Shield / Guard",
+      "rightId": "sustain-regen",
+      "rightLabel": "Sustain / Regen",
+      "leftWins": 0,
+      "rightWins": 0,
+      "draws": 10,
+      "averageRounds": 41
+    },
+    {
+      "leftId": "dagger-crit",
+      "leftLabel": "Dagger / Crit",
+      "rightId": "sword-bleed",
+      "rightLabel": "Sword / Bleed",
+      "leftWins": 5,
+      "rightWins": 5,
+      "draws": 0,
+      "averageRounds": 9.6
+    },
+    {
+      "leftId": "dagger-crit",
+      "leftLabel": "Dagger / Crit",
+      "rightId": "shield-guard",
+      "rightLabel": "Shield / Guard",
+      "leftWins": 0,
+      "rightWins": 10,
+      "draws": 0,
+      "averageRounds": 10.2
+    },
+    {
+      "leftId": "dagger-crit",
+      "leftLabel": "Dagger / Crit",
+      "rightId": "dagger-crit",
+      "rightLabel": "Dagger / Crit",
+      "leftWins": 4,
+      "rightWins": 6,
+      "draws": 0,
+      "averageRounds": 7.2
+    },
+    {
+      "leftId": "dagger-crit",
+      "leftLabel": "Dagger / Crit",
+      "rightId": "mace-control",
+      "rightLabel": "Mace / Control",
+      "leftWins": 5,
+      "rightWins": 5,
+      "draws": 0,
+      "averageRounds": 14.5
+    },
+    {
+      "leftId": "dagger-crit",
+      "leftLabel": "Dagger / Crit",
+      "rightId": "axe-pressure",
+      "rightLabel": "Axe / Pressure",
+      "leftWins": 0,
+      "rightWins": 10,
+      "draws": 0,
+      "averageRounds": 7.7
+    },
+    {
+      "leftId": "dagger-crit",
+      "leftLabel": "Dagger / Crit",
+      "rightId": "heavy-two-hand",
+      "rightLabel": "Heavy / Two-Hand",
+      "leftWins": 4,
+      "rightWins": 6,
+      "draws": 0,
+      "averageRounds": 7.1
+    },
+    {
+      "leftId": "dagger-crit",
+      "leftLabel": "Dagger / Crit",
+      "rightId": "sustain-regen",
+      "rightLabel": "Sustain / Regen",
+      "leftWins": 5,
+      "rightWins": 5,
+      "draws": 0,
+      "averageRounds": 11.4
+    },
+    {
+      "leftId": "mace-control",
+      "leftLabel": "Mace / Control",
+      "rightId": "sword-bleed",
+      "rightLabel": "Sword / Bleed",
+      "leftWins": 10,
+      "rightWins": 0,
+      "draws": 0,
+      "averageRounds": 19.9
+    },
+    {
+      "leftId": "mace-control",
+      "leftLabel": "Mace / Control",
+      "rightId": "shield-guard",
+      "rightLabel": "Shield / Guard",
+      "leftWins": 0,
+      "rightWins": 0,
+      "draws": 10,
+      "averageRounds": 41
+    },
+    {
+      "leftId": "mace-control",
+      "leftLabel": "Mace / Control",
+      "rightId": "dagger-crit",
+      "rightLabel": "Dagger / Crit",
+      "leftWins": 10,
+      "rightWins": 0,
+      "draws": 0,
+      "averageRounds": 14.5
+    },
+    {
+      "leftId": "mace-control",
+      "leftLabel": "Mace / Control",
+      "rightId": "mace-control",
+      "rightLabel": "Mace / Control",
+      "leftWins": 0,
+      "rightWins": 0,
+      "draws": 10,
+      "averageRounds": 41
+    },
+    {
+      "leftId": "mace-control",
+      "leftLabel": "Mace / Control",
+      "rightId": "axe-pressure",
+      "rightLabel": "Axe / Pressure",
+      "leftWins": 0,
+      "rightWins": 10,
+      "draws": 0,
+      "averageRounds": 28.9
+    },
+    {
+      "leftId": "mace-control",
+      "leftLabel": "Mace / Control",
+      "rightId": "heavy-two-hand",
+      "rightLabel": "Heavy / Two-Hand",
+      "leftWins": 10,
+      "rightWins": 0,
+      "draws": 0,
+      "averageRounds": 23.3
+    },
+    {
+      "leftId": "mace-control",
+      "leftLabel": "Mace / Control",
+      "rightId": "sustain-regen",
+      "rightLabel": "Sustain / Regen",
+      "leftWins": 0,
+      "rightWins": 0,
+      "draws": 10,
+      "averageRounds": 41
+    },
+    {
+      "leftId": "axe-pressure",
+      "leftLabel": "Axe / Pressure",
+      "rightId": "sword-bleed",
+      "rightLabel": "Sword / Bleed",
+      "leftWins": 8,
+      "rightWins": 2,
+      "draws": 0,
+      "averageRounds": 11.8
+    },
+    {
+      "leftId": "axe-pressure",
+      "leftLabel": "Axe / Pressure",
+      "rightId": "shield-guard",
+      "rightLabel": "Shield / Guard",
+      "leftWins": 1,
+      "rightWins": 9,
+      "draws": 0,
+      "averageRounds": 23.9
+    },
+    {
+      "leftId": "axe-pressure",
+      "leftLabel": "Axe / Pressure",
+      "rightId": "dagger-crit",
+      "rightLabel": "Dagger / Crit",
+      "leftWins": 10,
+      "rightWins": 0,
+      "draws": 0,
+      "averageRounds": 7
+    },
+    {
+      "leftId": "axe-pressure",
+      "leftLabel": "Axe / Pressure",
+      "rightId": "mace-control",
+      "rightLabel": "Mace / Control",
+      "leftWins": 10,
+      "rightWins": 0,
+      "draws": 0,
+      "averageRounds": 25.9
+    },
+    {
+      "leftId": "axe-pressure",
+      "leftLabel": "Axe / Pressure",
+      "rightId": "axe-pressure",
+      "rightLabel": "Axe / Pressure",
+      "leftWins": 6,
+      "rightWins": 4,
+      "draws": 0,
+      "averageRounds": 12.2
+    },
+    {
+      "leftId": "axe-pressure",
+      "leftLabel": "Axe / Pressure",
+      "rightId": "heavy-two-hand",
+      "rightLabel": "Heavy / Two-Hand",
+      "leftWins": 10,
+      "rightWins": 0,
+      "draws": 0,
+      "averageRounds": 9.4
+    },
+    {
+      "leftId": "axe-pressure",
+      "leftLabel": "Axe / Pressure",
+      "rightId": "sustain-regen",
+      "rightLabel": "Sustain / Regen",
+      "leftWins": 7,
+      "rightWins": 3,
+      "draws": 0,
+      "averageRounds": 21.5
+    },
+    {
+      "leftId": "heavy-two-hand",
+      "leftLabel": "Heavy / Two-Hand",
+      "rightId": "sword-bleed",
+      "rightLabel": "Sword / Bleed",
+      "leftWins": 9,
+      "rightWins": 1,
+      "draws": 0,
+      "averageRounds": 16.2
+    },
+    {
+      "leftId": "heavy-two-hand",
+      "leftLabel": "Heavy / Two-Hand",
+      "rightId": "shield-guard",
+      "rightLabel": "Shield / Guard",
+      "leftWins": 4,
+      "rightWins": 5,
+      "draws": 1,
+      "averageRounds": 36.5
+    },
+    {
+      "leftId": "heavy-two-hand",
+      "leftLabel": "Heavy / Two-Hand",
+      "rightId": "dagger-crit",
+      "rightLabel": "Dagger / Crit",
+      "leftWins": 3,
+      "rightWins": 7,
+      "draws": 0,
+      "averageRounds": 6.7
+    },
+    {
+      "leftId": "heavy-two-hand",
+      "leftLabel": "Heavy / Two-Hand",
+      "rightId": "mace-control",
+      "rightLabel": "Mace / Control",
+      "leftWins": 0,
+      "rightWins": 10,
+      "draws": 0,
+      "averageRounds": 23.5
+    },
+    {
+      "leftId": "heavy-two-hand",
+      "leftLabel": "Heavy / Two-Hand",
+      "rightId": "axe-pressure",
+      "rightLabel": "Axe / Pressure",
+      "leftWins": 3,
+      "rightWins": 7,
+      "draws": 0,
+      "averageRounds": 10.8
+    },
+    {
+      "leftId": "heavy-two-hand",
+      "leftLabel": "Heavy / Two-Hand",
+      "rightId": "heavy-two-hand",
+      "rightLabel": "Heavy / Two-Hand",
+      "leftWins": 9,
+      "rightWins": 1,
+      "draws": 0,
+      "averageRounds": 13
+    },
+    {
+      "leftId": "heavy-two-hand",
+      "leftLabel": "Heavy / Two-Hand",
+      "rightId": "sustain-regen",
+      "rightLabel": "Sustain / Regen",
+      "leftWins": 5,
+      "rightWins": 5,
+      "draws": 0,
+      "averageRounds": 28
+    },
+    {
+      "leftId": "sustain-regen",
+      "leftLabel": "Sustain / Regen",
+      "rightId": "sword-bleed",
+      "rightLabel": "Sword / Bleed",
+      "leftWins": 7,
+      "rightWins": 0,
+      "draws": 3,
+      "averageRounds": 37.6
+    },
+    {
+      "leftId": "sustain-regen",
+      "leftLabel": "Sustain / Regen",
+      "rightId": "shield-guard",
+      "rightLabel": "Shield / Guard",
+      "leftWins": 0,
+      "rightWins": 0,
+      "draws": 10,
+      "averageRounds": 41
+    },
+    {
+      "leftId": "sustain-regen",
+      "leftLabel": "Sustain / Regen",
+      "rightId": "dagger-crit",
+      "rightLabel": "Dagger / Crit",
+      "leftWins": 9,
+      "rightWins": 1,
+      "draws": 0,
+      "averageRounds": 11.5
+    },
+    {
+      "leftId": "sustain-regen",
+      "leftLabel": "Sustain / Regen",
+      "rightId": "mace-control",
+      "rightLabel": "Mace / Control",
+      "leftWins": 0,
+      "rightWins": 0,
+      "draws": 10,
+      "averageRounds": 41
+    },
+    {
+      "leftId": "sustain-regen",
+      "leftLabel": "Sustain / Regen",
+      "rightId": "axe-pressure",
+      "rightLabel": "Axe / Pressure",
+      "leftWins": 6,
+      "rightWins": 4,
+      "draws": 0,
+      "averageRounds": 20.3
+    },
+    {
+      "leftId": "sustain-regen",
+      "leftLabel": "Sustain / Regen",
+      "rightId": "heavy-two-hand",
+      "rightLabel": "Heavy / Two-Hand",
+      "leftWins": 1,
+      "rightWins": 9,
+      "draws": 0,
+      "averageRounds": 25.5
+    },
+    {
+      "leftId": "sustain-regen",
+      "leftLabel": "Sustain / Regen",
+      "rightId": "sustain-regen",
+      "rightLabel": "Sustain / Regen",
+      "leftWins": 0,
+      "rightWins": 0,
+      "draws": 10,
+      "averageRounds": 41
+    }
+  ],
+  "summary": [
+    {
+      "id": "axe-pressure",
+      "label": "Axe / Pressure",
+      "wins": 52,
+      "losses": 18,
+      "draws": 0,
+      "totalAverageRounds": 111.7,
+      "matchups": 7,
+      "net": 34,
+      "averageRounds": 16
+    },
+    {
+      "id": "mace-control",
+      "label": "Mace / Control",
+      "wins": 30,
+      "losses": 10,
+      "draws": 30,
+      "totalAverageRounds": 209.60000000000002,
+      "matchups": 7,
+      "net": 20,
+      "averageRounds": 29.9
+    },
+    {
+      "id": "shield-guard",
+      "label": "Shield / Guard",
+      "wins": 27,
+      "losses": 12,
+      "draws": 31,
+      "totalAverageRounds": 217.8,
+      "matchups": 7,
+      "net": 15,
+      "averageRounds": 31.1
+    },
+    {
+      "id": "sustain-regen",
+      "label": "Sustain / Regen",
+      "wins": 23,
+      "losses": 14,
+      "draws": 33,
+      "totalAverageRounds": 217.9,
+      "matchups": 7,
+      "net": 9,
+      "averageRounds": 31.1
+    },
+    {
+      "id": "heavy-two-hand",
+      "label": "Heavy / Two-Hand",
+      "wins": 33,
+      "losses": 36,
+      "draws": 1,
+      "totalAverageRounds": 134.7,
+      "matchups": 7,
+      "net": -3,
+      "averageRounds": 19.2
+    },
+    {
+      "id": "dagger-crit",
+      "label": "Dagger / Crit",
+      "wins": 23,
+      "losses": 47,
+      "draws": 0,
+      "totalAverageRounds": 67.7,
+      "matchups": 7,
+      "net": -24,
+      "averageRounds": 9.7
+    },
+    {
+      "id": "sword-bleed",
+      "label": "Sword / Bleed",
+      "wins": 13,
+      "losses": 46,
+      "draws": 11,
+      "totalAverageRounds": 158,
+      "matchups": 7,
+      "net": -33,
+      "averageRounds": 22.6
+    }
+  ]
+}

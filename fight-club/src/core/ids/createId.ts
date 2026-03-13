@@ -1,0 +1,7 @@
+let counter = 0;
+
+export function createId(prefix = "id") {
+  counter += 1;
+  return `${prefix}-${counter}`;
+}
+

@@ -1,0 +1,149 @@
+
+> fight-club@0.1.0 dev
+> vite --host 127.0.0.1 --port 5173
+
+
+  [32m[1mVITE[22m v6.4.1[39m  [2mready in [0m[1m220[22m[2m[0m ms[22m
+
+  [32m➜[39m  [1mLocal[22m:   [36mhttp://127.0.0.1:[1m5173[22m/[39m
+[2m14:14:32[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/screens/Combat/CombatSandboxScreen.tsx[22m
+[2m14:14:45[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/screens/Combat/CombatSandboxScreen.tsx[22m
+[2m14:15:03[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/screens/Combat/CombatSandboxScreen.tsx[22m
+[2m14:15:44[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/components/combat/BuilderPopover.tsx[22m
+[2m14:16:11[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/screens/Combat/CombatSandboxScreen.tsx[22m
+[2m14:16:23[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/screens/CombatRules/CombatRulesScreen.tsx, /src/ui/screens/Combat/CombatSandboxScreen.tsx, /src/ui/components/combat/InventoryPopover.tsx[22m
+[2m14:23:25[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/screens/Combat/CombatSandboxScreen.tsx[22m
+[2m14:23:38[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/components/combat/BuilderPopover.tsx[22m
+[2m14:53:53[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/screens/Combat/CombatSandboxScreen.tsx[22m
+[2m14:54:24[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/screens/Combat/CombatSandboxScreen.tsx[22m
+[2m15:00:30[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/screens/Combat/CombatSandboxScreen.tsx[22m
+[2m15:00:35[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/screens/Combat/CombatSandboxScreen.tsx[22m
+[2m15:01:52[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/screens/Combat/CombatSandboxScreen.tsx[22m
+[2m15:02:11[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/screens/Combat/CombatSandboxScreen.tsx[22m
+[2m15:02:19[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/screens/Combat/CombatSandboxScreen.tsx[22m
+[2m15:02:23[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/screens/Combat/CombatSandboxScreen.tsx[22m
+[2m15:03:21[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/screens/Combat/CombatSandboxScreen.tsx[22m
+[2m15:03:25[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/screens/Combat/CombatSandboxScreen.tsx[22m
+[2m15:04:01[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/screens/Combat/CombatSandboxScreen.tsx[22m
+[2m15:05:09[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/screens/Combat/CombatSandboxScreen.tsx[22m
+[2m15:05:23[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/screens/Combat/CombatSandboxScreen.tsx[22m
+[2m15:05:38[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/screens/Combat/CombatSandboxScreen.tsx[22m
+[2m15:06:15[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/screens/Combat/CombatSandboxScreen.tsx[22m
+[2m15:06:41[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/components/combat/BuilderPopover.tsx[22m
+[2m15:07:02[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/components/combat/BuilderPopover.tsx[22m
+[2m15:08:13[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/screens/Combat/CombatSandboxScreen.tsx[22m
+[2m15:08:37[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/screens/Combat/CombatSandboxScreen.tsx[22m
+[2m15:11:30[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/screens/Combat/CombatSandboxScreen.tsx[22m
+[2m15:12:26[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/screens/Combat/CombatSandboxScreen.tsx[22m
+[2m15:13:39[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/screens/Combat/CombatSandboxScreen.tsx[22m
+[2m15:14:44[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/screens/Combat/CombatSandboxScreen.tsx[22m
+[2m15:15:24[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/screens/Combat/CombatSandboxScreen.tsx[22m
+[2m15:17:17[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/components/combat/InventoryPopover.tsx[22m
+[2m15:17:25[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/components/combat/InventoryPopover.tsx[22m
+[2m15:17:49[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/components/combat/InventoryPopover.tsx[22m
+[2m15:18:42[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/components/combat/InventoryPopover.tsx[22m
+[2m15:19:33[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/components/combat/EquipmentSlotPopover.tsx[22m
+[2m15:19:48[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/components/combat/EquipmentSlotPopover.tsx[22m
+[2m15:19:53[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/components/combat/EquipmentSlotPopover.tsx[22m
+[2m15:20:19[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/components/combat/EquipmentSlotPopover.tsx[22m
+[2m15:20:42[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/components/combat/InventoryPopover.tsx[22m
+[2m15:20:53[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/components/combat/EquipmentSlotPopover.tsx[22m
+[2m15:26:21[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/components/combat/ItemPresentationCard.tsx[22m
+[2m15:32:58[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/components/combat/InventoryPopover.tsx[22m
+[2m15:33:45[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/components/combat/EquipmentSlotPopover.tsx[22m
+[2m15:43:37[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/screens/Combat/CombatSandboxScreen.tsx[22m
+[2m15:44:02[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/screens/Combat/CombatSandboxScreen.tsx[22m
+[2m15:44:48[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/components/combat/BuilderPopover.tsx[22m
+[2m15:44:57[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/components/combat/InventoryPopover.tsx[22m
+[2m15:45:17[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/components/combat/EquipmentSlotPopover.tsx[22m
+[2m15:48:07[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/screens/Combat/CombatSandboxScreen.tsx[22m
+[2m15:49:06[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/components/combat/CombatSilhouette.tsx[22m
+[2m15:49:36[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/components/combat/CombatSilhouette.tsx[22m
+[2m15:51:07[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/components/combat/ItemPresentationCard.tsx[22m
+[2m15:51:52[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/components/combat/CombatSilhouette.tsx[22m
+[2m15:53:33[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/components/combat/CombatSilhouette.tsx[22m
+[2m15:53:45[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/components/combat/CombatSilhouette.tsx[22m
+[2m15:58:06[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/components/combat/InventoryPopover.tsx[22m
+[2m15:58:25[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/components/combat/EquipmentSlotPopover.tsx[22m
+[2m16:02:43[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/screens/Combat/CombatSandboxScreen.tsx[22m
+[2m16:02:54[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/screens/Combat/CombatSandboxScreen.tsx[22m
+[2m16:03:04[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/screens/Combat/CombatSandboxScreen.tsx[22m
+[2m16:03:13[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/screens/Combat/CombatSandboxScreen.tsx[22m
+[2m16:03:21[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/screens/Combat/CombatSandboxScreen.tsx[22m
+[2m16:04:45[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/screens/Combat/CombatSandboxScreen.tsx[22m
+[2m16:05:12[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/screens/CombatRules/CombatRulesScreen.tsx, /src/ui/screens/Combat/CombatSandboxScreen.tsx, /src/ui/components/combat/InventoryPopover.tsx[22m
+[2m16:05:26[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/components/combat/BattleLogPanel.tsx, /src/ui/screens/Combat/CombatSandboxScreen.tsx[22m
+[2m16:05:53[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/screens/Combat/CombatSandboxScreen.tsx[22m
+[2m16:06:23[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/screens/Combat/CombatSandboxScreen.tsx[22m
+[2m16:07:48[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/screens/CombatRules/CombatRulesScreen.tsx, /src/ui/screens/Combat/CombatSandboxScreen.tsx, /src/ui/components/combat/InventoryPopover.tsx[22m
+[2m16:08:47[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/screens/Combat/CombatSandboxScreen.tsx[22m
+[2m16:09:01[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/screens/Combat/CombatSandboxScreen.tsx[22m
+[2m16:11:45[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/screens/Combat/CombatSandboxScreen.tsx[22m
+[2m16:12:03[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/screens/Combat/CombatSandboxScreen.tsx[22m
+[2m16:16:05[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/components/combat/CombatSilhouette.tsx[22m
+[2m16:16:13[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/screens/Combat/CombatSandboxScreen.tsx[22m
+[2m16:17:06[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/screens/Combat/CombatSandboxScreen.tsx[22m
+[2m16:17:30[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/components/combat/CombatSilhouette.tsx[22m
+[2m16:18:03[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/screens/Combat/CombatSandboxScreen.tsx[22m
+[2m16:22:37[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/screens/Combat/CombatSandboxScreen.tsx, /src/ui/components/combat/InventoryPopover.tsx, /src/ui/screens/CombatRules/CombatRulesScreen.tsx[22m
+[2m16:22:58[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/screens/Combat/CombatSandboxScreen.tsx[22m
+[2m16:23:16[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/screens/CombatRules/CombatRulesScreen.tsx, /src/ui/screens/Combat/CombatSandboxScreen.tsx, /src/ui/components/combat/InventoryPopover.tsx[22m
+[2m16:23:25[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/screens/Combat/CombatSandboxScreen.tsx[22m
+[2m16:27:09[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/components/combat/BattleLogPanel.tsx, /src/ui/screens/Combat/CombatSandboxScreen.tsx[22m
+[2m16:27:14[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/components/combat/BattleLogPanel.tsx[22m
+[2m16:31:36[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/components/combat/BattleLogPanel.tsx, /src/ui/screens/Combat/CombatSandboxScreen.tsx[22m
+[2m16:31:46[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/components/combat/BattleLogPanel.tsx[22m
+[2m16:34:52[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/components/combat/BattleLogPanel.tsx, /src/ui/screens/Combat/CombatSandboxScreen.tsx[22m
+[2m16:34:56[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/components/combat/BattleLogPanel.tsx[22m
+[2m16:47:59[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/screens/CombatRules/CombatRulesScreen.tsx[22m
+[2m16:49:20[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/screens/CombatRules/CombatRulesScreen.tsx[22m
+[2m16:55:25[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/screens/CombatRules/CombatRulesScreen.tsx[22m
+[2m16:56:14[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/screens/CombatRules/CombatRulesScreen.tsx[22m
+[2m16:57:30[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/screens/CombatRules/CombatRulesScreen.tsx[22m
+[2m17:12:33[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/screens/Combat/CombatSandboxScreen.tsx[22m
+[2m17:13:07[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/screens/Combat/CombatSandboxScreen.tsx[22m
+[2m23:01:22[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/screens/Combat/CombatSandboxScreen.tsx[22m
+[2m23:01:30[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/screens/Combat/CombatSandboxScreen.tsx[22m
+[2m23:01:36[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/screens/Combat/CombatSandboxScreen.tsx[22m
+[2m23:01:45[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/screens/Combat/CombatSandboxScreen.tsx[22m
+[2m23:02:01[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/screens/Combat/CombatSandboxScreen.tsx[22m
+[2m23:04:12[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/components/combat/BuilderPopover.tsx[22m
+[2m23:04:50[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/screens/Combat/CombatSandboxScreen.tsx[22m
+[2m23:11:11[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/components/combat/BuildPresetsPopover.tsx[22m
+[2m23:12:22[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/components/combat/BuilderPopover.tsx[22m
+[2m23:12:46[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/components/combat/BuilderPopover.tsx[22m
+[2m23:13:05[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/components/combat/BuilderPopover.tsx[22m
+[2m23:13:16[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/components/combat/BuilderPopover.tsx[22m
+[2m23:13:35[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/components/combat/BuilderPopover.tsx[22m
+[2m23:13:53[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/components/combat/BuilderPopover.tsx[22m
+[2m23:18:12[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/components/combat/BuildPresetsPopover.tsx[22m
+[2m23:18:43[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/components/combat/BuildPresetsPopover.tsx[22m
+[2m23:24:23[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/components/combat/BuilderPopover.tsx[22m
+[2m23:24:48[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/components/combat/BuilderPopover.tsx[22m
+[2m23:35:16[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/components/combat/BuilderPopover.tsx[22m
+[2m23:37:18[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/components/combat/BuilderPopover.tsx[22m
+[2m23:41:41[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/components/combat/BuilderPopover.tsx[22m
+[2m23:42:17[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/components/combat/BuilderPopover.tsx[22m
+[2m23:48:01[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/screens/Combat/CombatSandboxScreen.tsx[22m
+[2m23:49:36[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/screens/Combat/CombatSandboxScreen.tsx[22m
+[2m23:51:19[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/screens/Combat/CombatSandboxScreen.tsx[22m
+[2m23:51:39[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/screens/Combat/CombatSandboxScreen.tsx[22m
+[2m23:51:58[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/screens/Combat/CombatSandboxScreen.tsx[22m
+[2m23:58:44[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/screens/Combat/CombatSandboxScreen.tsx[22m
+[2m23:59:14[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/screens/Combat/CombatSandboxScreen.tsx[22m
+[2m23:59:48[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/screens/Combat/CombatSandboxScreen.tsx[22m
+[2m00:06:30[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/screens/Combat/CombatSandboxScreen.tsx[22m
+[2m00:07:33[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/screens/Combat/CombatSandboxScreen.tsx[22m
+[2m00:07:46[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/screens/Combat/CombatSandboxScreen.tsx[22m
+[2m00:16:42[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/screens/Combat/CombatSandboxScreen.tsx[22m
+[2m00:22:24[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/screens/Combat/CombatSandboxScreen.tsx[22m
+[2m00:22:32[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/screens/Combat/CombatSandboxScreen.tsx[22m
+[2m00:22:37[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/screens/Combat/CombatSandboxScreen.tsx[22m
+[2m00:23:25[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/screens/Combat/CombatSandboxScreen.tsx[22m
+[2m00:23:30[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/screens/Combat/CombatSandboxScreen.tsx[22m
+[2m00:39:59[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/screens/CombatRules/CombatRulesScreen.tsx, /src/ui/screens/Combat/CombatSandboxScreen.tsx, /src/ui/components/combat/InventoryPopover.tsx, /src/ui/components/combat/BuildPresetsPopover.tsx[22m
+[2m00:40:11[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/screens/Combat/CombatSandboxScreen.tsx[22m
+[2m00:42:04[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/screens/CombatRules/CombatRulesScreen.tsx, /src/ui/screens/Combat/CombatSandboxScreen.tsx, /src/ui/components/combat/InventoryPopover.tsx, /src/ui/components/combat/BuildPresetsPopover.tsx[22m
+[2m00:42:11[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/screens/Combat/CombatSandboxScreen.tsx[22m
+[2m00:44:04[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/screens/CombatRules/CombatRulesScreen.tsx, /src/ui/screens/Combat/CombatSandboxScreen.tsx, /src/ui/components/combat/InventoryPopover.tsx, /src/ui/components/combat/BuildPresetsPopover.tsx[22m
+[2m00:44:34[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/ui/screens/Combat/CombatSandboxScreen.tsx[22m

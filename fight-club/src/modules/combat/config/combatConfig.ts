@@ -1,0 +1,175 @@
+import type { CombatZone } from "@/modules/combat/model/CombatZone";
+import type { EquipmentSlot } from "@/modules/equipment";
+import type { ArmorProfile, DamageProfile, DamageType, WeaponClass } from "@/modules/inventory";
+
+export const combatDamageTypes: DamageType[] = ["slash", "pierce", "blunt", "chop"];
+
+export const combatZoneDamageModifiers: Record<CombatZone, number> = {
+  head: 1.2,
+  chest: 1.1,
+  belly: 1,
+  waist: 0.9,
+  legs: 0.8,
+};
+
+export const combatChanceCaps = {
+  chance: 95,
+  percent: 90,
+  baseDodgeChance: 45,
+  dodgeChance: 60,
+  baseBlockPenetration: 75,
+  blockPenetration: 80,
+  baseCritChance: 40,
+} as const;
+
+export const combatBlockConfig = {
+  penetrationArmorDivisor: 3.2,
+  baseBlockedPercent: 34,
+  focusStrengthDivisor: 160,
+  basePenetrationFloor: 10,
+  basePenetrationStart: 20,
+  strengthToBasePenetrationFactor: 3,
+  defenderStrengthPenaltyFactor: 2,
+} as const;
+
+export const combatResourceRewards = {
+  dodgeDefenderFocus: 10,
+  blockDefenderGuard: 8,
+  penetrationAttackerMomentum: 8,
+  critAttackerRage: 14,
+  cleanHitAttackerMomentum: 12,
+} as const;
+
+export const combatProgressionConfig = {
+  baseHp: 100,
+  enduranceHpFactor: 10,
+  minStatValue: 1,
+  minPercentValue: -100,
+  maxPercentValue: 1000,
+} as const;
+
+export const combatFormulaConfig = {
+  dodgeBase: 5,
+  agilityToBaseDodgeFactor: 2,
+  attackerAgilityDodgePenaltyFactor: 2,
+  critBase: 3,
+  rageToBaseCritFactor: 3,
+  defenderRageCritPenaltyFactor: 2,
+  critMultiplierBase: 1.5,
+  enduranceToCritMultiplierFactor: 0.03,
+  baseDamage: 10,
+  strengthToBaseDamageFactor: 1.5,
+} as const;
+
+export const combatProfileMixConfig = {
+  baseDamageWeight: 0.6,
+  styleProfileWeight: 0.4,
+} as const;
+
+export const combatBotPlannerConfig = {
+  recruitAttackPoolSize: 3,
+  closeDamageGapThreshold: 2,
+  championVarianceRate: 18,
+  veteranVarianceRate: 35,
+  veteranSkillDamageThreshold: 1.24,
+  skillDamageMultiplierWeight: 100,
+  skillCritChanceWeight: 2,
+  skillArmorPenetrationWeightDivisor: 3,
+  skillCostPenaltyFactor: 0.35,
+} as const;
+
+export const combatZoneDefenseSlots: Record<CombatZone, Array<{ slot: EquipmentSlot; weight: number }>> = {
+  head: [
+    { slot: "helmet", weight: 1.2 },
+    { slot: "offHand", weight: 0.7 },
+    { slot: "armor", weight: 0.15 },
+  ],
+  chest: [
+    { slot: "armor", weight: 1.2 },
+    { slot: "offHand", weight: 0.65 },
+    { slot: "gloves", weight: 0.15 },
+  ],
+  belly: [
+    { slot: "armor", weight: 0.95 },
+    { slot: "offHand", weight: 0.3 },
+    { slot: "accessory", weight: 0.1 },
+  ],
+  waist: [
+    { slot: "armor", weight: 0.55 },
+    { slot: "offHand", weight: 0.2 },
+    { slot: "accessory", weight: 0.15 },
+    { slot: "gloves", weight: 0.1 },
+  ],
+  legs: [
+    { slot: "boots", weight: 1.15 },
+    { slot: "armor", weight: 0.2 },
+  ],
+};
+
+export const combatGenericZoneDefenseProfiles: Record<CombatZone, ArmorProfile> = {
+  head: { slash: 1, pierce: 2, blunt: 2, chop: 1 },
+  chest: { slash: 1, pierce: 1, blunt: 2, chop: 1 },
+  belly: { slash: 1, pierce: 1, blunt: 1, chop: 1 },
+  waist: { slash: 0, pierce: 0, blunt: 1, chop: 1 },
+  legs: { slash: 0, pierce: 0, blunt: 1, chop: 1 },
+};
+
+export const combatZoneFallbackProfiles: Record<CombatZone, DamageProfile> = {
+  head: { slash: 1, pierce: 2, blunt: 1, chop: 0 },
+  chest: { slash: 1, pierce: 1, blunt: 2, chop: 1 },
+  belly: { slash: 1, pierce: 2, blunt: 1, chop: 1 },
+  waist: { slash: 2, pierce: 2, blunt: 0, chop: 1 },
+  legs: { slash: 1, pierce: 0, blunt: 1, chop: 2 },
+};
+
+export const combatWeaponClassProfiles: Record<WeaponClass, Record<CombatZone, DamageProfile>> = {
+  sword: {
+    head: { slash: 4, pierce: 2, blunt: 0, chop: 0 },
+    chest: { slash: 3, pierce: 1, blunt: 0, chop: 0 },
+    belly: { slash: 3, pierce: 1, blunt: 0, chop: 0 },
+    waist: { slash: 4, pierce: 2, blunt: 0, chop: 0 },
+    legs: { slash: 3, pierce: 1, blunt: 0, chop: 0 },
+  },
+  greatsword: {
+    head: { slash: 4, pierce: 1, blunt: 0, chop: 2 },
+    chest: { slash: 3, pierce: 0, blunt: 0, chop: 3 },
+    belly: { slash: 4, pierce: 1, blunt: 0, chop: 2 },
+    waist: { slash: 4, pierce: 1, blunt: 0, chop: 2 },
+    legs: { slash: 3, pierce: 0, blunt: 0, chop: 3 },
+  },
+  dagger: {
+    head: { slash: 1, pierce: 5, blunt: 0, chop: 0 },
+    chest: { slash: 1, pierce: 4, blunt: 0, chop: 0 },
+    belly: { slash: 1, pierce: 4, blunt: 0, chop: 0 },
+    waist: { slash: 1, pierce: 5, blunt: 0, chop: 0 },
+    legs: { slash: 1, pierce: 4, blunt: 0, chop: 0 },
+  },
+  mace: {
+    head: { slash: 0, pierce: 0, blunt: 5, chop: 0 },
+    chest: { slash: 0, pierce: 0, blunt: 5, chop: 0 },
+    belly: { slash: 0, pierce: 0, blunt: 4, chop: 0 },
+    waist: { slash: 0, pierce: 0, blunt: 4, chop: 0 },
+    legs: { slash: 0, pierce: 0, blunt: 4, chop: 0 },
+  },
+  greatmace: {
+    head: { slash: 0, pierce: 0, blunt: 6, chop: 0 },
+    chest: { slash: 0, pierce: 0, blunt: 6, chop: 0 },
+    belly: { slash: 0, pierce: 0, blunt: 5, chop: 0 },
+    waist: { slash: 0, pierce: 0, blunt: 5, chop: 0 },
+    legs: { slash: 0, pierce: 0, blunt: 5, chop: 0 },
+  },
+  axe: {
+    head: { slash: 1, pierce: 0, blunt: 0, chop: 4 },
+    chest: { slash: 1, pierce: 0, blunt: 0, chop: 4 },
+    belly: { slash: 1, pierce: 0, blunt: 0, chop: 4 },
+    waist: { slash: 0, pierce: 0, blunt: 0, chop: 5 },
+    legs: { slash: 0, pierce: 0, blunt: 0, chop: 5 },
+  },
+  greataxe: {
+    head: { slash: 1, pierce: 0, blunt: 0, chop: 5 },
+    chest: { slash: 0, pierce: 0, blunt: 1, chop: 6 },
+    belly: { slash: 1, pierce: 0, blunt: 0, chop: 5 },
+    waist: { slash: 1, pierce: 0, blunt: 0, chop: 5 },
+    legs: { slash: 0, pierce: 0, blunt: 1, chop: 6 },
+  },
+};

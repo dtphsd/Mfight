@@ -1,6 +1,6 @@
 # UI / UX Refactor
 
-> Last updated: 2026-03-13 21:52 MSK
+> Last updated: 2026-03-13 21:55 MSK
 
 **Feature:** UI / UX Refactor  
 **Status:** 🟡 IN PROGRESS
@@ -69,6 +69,7 @@ Start with shared UI primitives and popover infrastructure before touching behav
 
 - planning workflow is active in `MASTER-PLAN.md`
 - current saved planning checkpoint is `v0.3`
+- current saved UI rollback checkpoint is `v0.4`
 - first implementation task is `UI-002`
 
 ---
@@ -260,4 +261,4 @@ Expected effect:
 
 ---
 
-> Last updated: 2026-03-13 21:52 MSK
+> Last updated: 2026-03-13 21:55 MSK

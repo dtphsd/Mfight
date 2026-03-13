@@ -1,6 +1,6 @@
 # MASTER-PLAN - Fight Club
 
-> Last updated: 2026-03-13 21:52 MSK
+> Last updated: 2026-03-13 21:55 MSK
 
 **Project:** Fight Club  
 **Scope:** active product planning, task tracking, and sprint history
@@ -71,6 +71,12 @@
 - marked the audit and roadmap task as complete
 - confirmed that the next implementation step is `UI-002`
 
+### v0.4 - UI Rollback Checkpoint Saved
+
+- saved a dedicated UI backup point before starting `UI-002`
+- copied the current live combat UI files into `docs/backup-points/2026-03-13-2155-ui-baseline/`
+- recorded the checkpoint in `docs/backup-points/BACKUP-POINT-2026-03-13-2155-MSK.md`
+
 ---
 
 ## Planned Refactor Phases
@@ -129,6 +135,7 @@
 | Version | Type | Description | Next Step |
 |---------|------|-------------|-----------|
 | v0.3 | Planning Baseline | Current UI / UX audit, phased roadmap, and task-tracking workflow saved before refactor work starts | `UI-002` |
+| v0.4 | UI Backup Point | Live UI snapshot saved before shared-primitives refactor begins | `UI-002` |
 
 ---
 
@@ -143,4 +150,4 @@ When work changes state:
 
 ---
 
-> Last updated: 2026-03-13 21:52 MSK
+> Last updated: 2026-03-13 21:55 MSK

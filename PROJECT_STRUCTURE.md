@@ -1,6 +1,6 @@
 # PROJECT_STRUCTURE - Fight Club
 
-> Last updated: 2026-03-13 21:41 MSK
+> Last updated: 2026-03-13 21:55 MSK
 
 **Project root:** `c:/Users/dtphs/.vscode/Project`
 
@@ -44,6 +44,7 @@ Notes:
 - `dist/` is generated output, never source
 - `vite.config.js` / `vitest.config.js` and matching `.d.ts` files are generated beside the TypeScript sources
 - `docs/balance/` stores generated preset matchup reports
+- `docs/backup-points/` now stores both documentation markers and restorable UI baseline snapshots
 - `features/` stores per-feature tracking docs used together with `MASTER-PLAN.md`
 
 ---
@@ -312,4 +313,4 @@ Current status:
 
 ---
 
-> Last updated: 2026-03-13 21:41 MSK
+> Last updated: 2026-03-13 21:55 MSK

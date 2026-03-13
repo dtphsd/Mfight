@@ -1,8 +1,22 @@
 # Architecture Overview
 
+> Last updated: 2026-03-14 00:41 MSK
+
 The project is split into headless domain modules and a React UI layer.
 
-Last updated: 2026-03-12
+This page is the best starting point for understanding where logic belongs before making changes.
+
+---
+
+## Read Next
+
+- [Combat Design Reference](./combat-design-reference.md)
+- [Combat System Roadmap](./combat-system-roadmap.md)
+- [ADR-001: Modular Headless Core](../decisions/ADR-001-architecture.md)
+
+---
+
+## System Layers
 
 - `core` contains infrastructure-like primitives: events, logging, RNG, time, storage.
 - `modules` expose public APIs and events, but do not directly mutate each other.
@@ -22,7 +36,7 @@ The combat sandbox is now split across three layers instead of keeping all battl
 
 Related planning document:
 
-- `docs/architecture/combat-system-roadmap.md`
+- [Combat System Roadmap](./combat-system-roadmap.md)
   - phased refactor and gameplay roadmap for future combat-system work
 
 ### Combat Lifecycle
@@ -127,3 +141,15 @@ When the combat system changes, update documentation from the most stable source
 3. If a gameplay change alters page-visible facts, update both the code path and the matching explanatory copy in the same change.
 4. If the gameplay change affects combat flow, phase behavior, or bot choices, update this architecture page as well.
 5. If the gameplay change affects consumable usage rules, update both combat docs and the player-facing UI descriptions in the sandbox.
+
+---
+
+## Related Docs
+
+- [Docs Home](../README.md)
+- [Architecture Index](./README.md)
+- [Combat Design Reference](./combat-design-reference.md)
+
+---
+
+> Last updated: 2026-03-14 00:41 MSK

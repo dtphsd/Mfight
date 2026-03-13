@@ -1,6 +1,19 @@
 # Combat System Roadmap
 
-Last updated: 2026-03-12
+> Last updated: 2026-03-14 00:41 MSK
+
+This page tracks the combat architecture evolution path.
+
+It is a planning document, not the source of truth for the current runtime. For live behavior, use the combat reference.
+
+---
+
+## Read Next
+
+- [Combat Design Reference](./combat-design-reference.md)
+- [Architecture Overview](./overview.md)
+
+---
 
 ## Purpose
 
@@ -39,6 +52,19 @@ The main remaining constraints are now narrower:
 3. Keep React hooks/screens as thin adapters.
 4. Prefer data-driven balance in content/config files over hardcoded branching in UI.
 5. Add or update tests whenever the combat contract changes.
+
+---
+
+## Runtime Source Of Truth
+
+Use these pages together:
+
+- current runtime behavior:
+  - [Combat Design Reference](./combat-design-reference.md)
+- higher-level system map:
+  - [Architecture Overview](./overview.md)
+- architectural rationale:
+  - [ADR-001: Modular Headless Core](../decisions/ADR-001-architecture.md)
 
 ## Phase 1: Simplify The Current Stack
 
@@ -238,6 +264,18 @@ Behavior:
 - pressure-aware targeting
 - better defense-zone guesses
 - moderate skill usage
+
+---
+
+## Related Docs
+
+- [Docs Home](../README.md)
+- [Architecture Index](./README.md)
+- [Combat Design Reference](./combat-design-reference.md)
+
+---
+
+> Last updated: 2026-03-14 00:41 MSK
 
 ### 4.3 Champion
 

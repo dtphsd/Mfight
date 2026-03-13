@@ -1,6 +1,6 @@
 # RULES.md - Documentation And Safe Change Rules
 
-> Last updated: 2026-03-13 18:40 MSK
+> Last updated: 2026-03-13 23:33 MSK
 
 **Project:** Fight Club  
 **Path:** `c:/Users/dtphs/.vscode/Project`
@@ -75,6 +75,10 @@ Update when:
 - Mark unfinished modules explicitly as `stub`, `skeleton`, or `not implemented`.
 - For missing subsystems, write `absent` instead of using generic template text.
 - For dangerous areas, explain both the file and the reason it is risky.
+- Combat system design and rules documentation is critical project infrastructure, not optional extra notes.
+- Combat docs must be easy to navigate, complete enough for safe changes, and kept in sync with the real runtime because much of the project depends on combat behavior.
+- If combat formulas, turn flow, effects, resource rules, zones, skills, consumables, or bot assumptions change, update the combat design reference so it still contains the full working model.
+- If docs are prepared for GitBook publishing, keep `fight-club/docs/README.md` and `fight-club/docs/SUMMARY.md` in sync with the actual document structure.
 
 ---
 
@@ -188,3 +192,4 @@ Whenever you edit these root docs:
 ---
 
 > Last updated: 2026-03-13 18:40 MSK
+> Last updated: 2026-03-13 23:33 MSK

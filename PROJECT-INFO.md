@@ -1,6 +1,6 @@
 # PROJECT-INFO - Fight Club
 
-> Last updated: 2026-03-13 22:25 MSK
+> Last updated: 2026-03-14 00:41 MSK
 
 **Project:** Fight Club  
 **Type:** browser-only SPA / combat sandbox  
@@ -19,6 +19,10 @@ The app root now also contains a local planning workflow:
 
 - `fight-club/MASTER-PLAN.md` for active tasks and sprint history
 - `fight-club/features/` for per-feature tracking documents
+- `fight-club/features/combat-design-reference.md` for combat-system documentation and safety tasks
+- `fight-club/docs/README.md` as the GitBook-style documentation landing page
+- `fight-club/docs/SUMMARY.md` as the GitBook navigation tree
+- `fight-club/docs/architecture/combat-design-reference.md` as the current source-of-truth combat runtime reference
 
 It has:
 
@@ -264,4 +268,4 @@ From repo root:
 
 ---
 
-> Last updated: 2026-03-13 22:25 MSK
+> Last updated: 2026-03-14 00:41 MSK

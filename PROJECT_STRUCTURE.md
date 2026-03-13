@@ -1,6 +1,6 @@
 # PROJECT_STRUCTURE - Fight Club
 
-> Last updated: 2026-03-13 22:25 MSK
+> Last updated: 2026-03-14 00:41 MSK
 
 **Project root:** `c:/Users/dtphs/.vscode/Project`
 
@@ -45,6 +45,7 @@ Notes:
 - `vite.config.js` / `vitest.config.js` and matching `.d.ts` files are generated beside the TypeScript sources
 - `docs/balance/` stores generated preset matchup reports
 - `docs/backup-points/` now stores both documentation markers and restorable UI baseline snapshots
+- `docs/README.md` is the GitBook-style documentation landing page
 - `features/` stores per-feature tracking docs used together with `MASTER-PLAN.md`
 
 ---
@@ -54,6 +55,12 @@ Notes:
 - `MASTER-PLAN.md` - project-wide task tracker with statuses and sprint history
 - `features/_TEMPLATE.md` - base template for feature tracking files
 - `features/ui-ux-refactor.md` - current tracked refactor thread for UI / UX audit and planning
+- `features/combat-design-reference.md` - tracked combat-system documentation and safety workstream
+- `docs/README.md` - docs home page for GitBook-style navigation
+- `docs/SUMMARY.md` - GitBook navigation tree for the primary documentation flow
+- `docs/architecture/README.md` - architecture section landing page
+- `docs/decisions/README.md` - architecture decisions landing page
+- `docs/architecture/combat-design-reference.md` - live combat-system reference based on the current runtime
 
 ---
 
@@ -327,4 +334,4 @@ Current status:
 
 ---
 
-> Last updated: 2026-03-13 22:25 MSK
+> Last updated: 2026-03-14 00:41 MSK

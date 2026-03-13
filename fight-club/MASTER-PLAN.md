@@ -1,6 +1,6 @@
 # MASTER-PLAN - Fight Club
 
-> Last updated: 2026-03-13 23:20 MSK
+> Last updated: 2026-03-14 00:46 MSK
 
 **Project:** Fight Club  
 **Scope:** active product planning, task tracking, and sprint history
@@ -31,7 +31,11 @@
 | UI-008 | Split heavyweight combat components | UI Architecture | 🟡 IN PROGRESS | `features/ui-ux-refactor.md` | `CombatSilhouette` now has extracted header, hp bar, board shell, figure, zones layer, legend, equipment layer, and status-effects layer; next step is choosing the next heavyweight component or continuing with status-effect popup internals |
 | UI-009 | Add UI contract tests for critical flows | QA / UI | 🔴 TODO | `features/ui-ux-refactor.md` | Protect build flow, action flow, and modal behavior during refactor |
 | UI-010 | Run visual polish pass across combat UI | Visual Design | 🟡 IN PROGRESS | `features/ui-ux-refactor.md` | `VP-M01`, `VP-M02`, and `VP-M03` are live; next motion decision is whether to add `VP-M04` micro-feedback or shift back to broader visual polish work |
-| DOC-001 | Maintain root docs accuracy against real code | Docs | 🔴 TODO | - | Update docs whenever structure or workflow changes |
+| COMBAT-001 | Create complete combat design and rules reference | Combat Design / Docs | ✅ DONE | `features/combat-design-reference.md` | Source-of-truth combat reference now covers runtime model, formulas, passives, turn-order examples, verification rules, bot assumptions, and Combat Rules alignment |
+| COMBAT-002 | Document combat resolution pipeline and turn order | Combat Design / Docs | ✅ DONE | `features/combat-design-reference.md` | Combat pipeline docs now cover exact sequencing, edge cases, traceability, and a regression-test target matrix for follow-up QA work |
+| COMBAT-003 | Add composition regression tests for combat rules | Combat QA | 🟡 IN PROGRESS | `features/combat-design-reference.md` | Protect combinations like skills plus consumables, effects plus death, and block plus penetration from silent regressions |
+| COMBAT-004 | Safely reduce `resolveRound.ts` risk without behavior changes | Combat Refactor | 🔴 TODO | `features/combat-design-reference.md` | Remove fragile duplication and isolate rule blocks only after the design reference and regression tests exist |
+| COMBAT-005 | Formalize combat change checklist and verification flow | Combat Workflow | 🔴 TODO | `features/combat-design-reference.md` | Define what must be checked whenever combat formulas, resources, effects, or loadout rules change |
 
 ---
 
@@ -302,6 +306,17 @@
 | v0.25 | Ready-State Motion Slice | `VP-M02` ready-state pulse implemented for skill buttons and `Resolve Round` | `UI-010` |
 | v0.26 | Silhouette Hit Reaction Slice | `VP-M03` silhouette impact animation implemented for real incoming damage | `UI-010` |
 | v0.27 | Resource Ring Slice | `VP-M01` circular readiness ring implemented for skill buttons while resources are building | `UI-010` |
+| v0.28 | Combat Design Rules Requirement | Combat design and rules documentation promoted to a tracked first-class requirement in the master plan | `COMBAT-001` |
+| v0.29 | Combat Track Expanded | Combat documentation requirement split into spec, pipeline, test, refactor, and verification tasks | `COMBAT-001` |
+| v0.30 | Combat Reference Draft Started | First source-of-truth combat design draft added under `docs/architecture/` and `COMBAT-001` moved to in-progress | `COMBAT-001` |
+| v0.31 | Combat Formula Draft Expanded | Combat reference now includes formula coefficients, passive rules, and current coverage notes from the live test suite | `COMBAT-001` |
+| v0.32 | Combat Order And Verification Slice | Combat reference now includes turn-order examples and a formal verification checklist for combat changes | `COMBAT-001` |
+| v0.33 | Combat Reference Closed | Combat source-of-truth now covers runtime model, formulas, passives, turn order examples, bot assumptions, and rules-screen alignment | `COMBAT-002` |
+| v0.34 | Combat Sequencing Slice | Combat pipeline documentation now captures exact per-actor sequencing, path order, and critical edge cases from `resolveRound(...)` | `COMBAT-002` |
+| v0.35 | Combat Traceability Slice | Combat reference now maps major runtime rules to tests and Combat Rules dependencies for safer follow-up work | `COMBAT-002` |
+| v0.36 | Combat Regression Matrix Added | Combat pipeline docs now hand off directly into a prioritized regression-test matrix for `COMBAT-003` | `COMBAT-003` |
+| v0.37 | GitBook Docs Prep | Added docs landing pages, section indexes, and GitBook-friendly navigation links across architecture and decision docs | `DOC-001` |
+| v0.38 | GitBook Navigation Finalized | Added `docs/SUMMARY.md` and synchronized root docs for GitBook export readiness | `DOC-001` |
 
 ---
 
@@ -316,4 +331,4 @@ When work changes state:
 
 ---
 
-> Last updated: 2026-03-13 22:33 MSK
+> Last updated: 2026-03-14 00:46 MSK

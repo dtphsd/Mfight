@@ -1,6 +1,6 @@
 # PROJECT-INFO - Fight Club
 
-> Last updated: 2026-03-13 18:40 MSK
+> Last updated: 2026-03-13 21:41 MSK
 
 **Project:** Fight Club  
 **Type:** browser-only SPA / combat sandbox  
@@ -14,6 +14,11 @@
 The project is a single frontend app in `fight-club/`.
 
 The repository root also contains the shared documentation set plus helper scripts for local development and git push workflow.
+
+The app root now also contains a local planning workflow:
+
+- `fight-club/MASTER-PLAN.md` for active tasks and sprint history
+- `fight-club/features/` for per-feature tracking documents
 
 It has:
 
@@ -255,4 +260,4 @@ From repo root:
 
 ---
 
-> Last updated: 2026-03-13 18:40 MSK
+> Last updated: 2026-03-13 21:41 MSK

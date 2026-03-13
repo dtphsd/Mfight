@@ -1,6 +1,6 @@
 # PROJECT_STRUCTURE - Fight Club
 
-> Last updated: 2026-03-13 18:40 MSK
+> Last updated: 2026-03-13 21:41 MSK
 
 **Project root:** `c:/Users/dtphs/.vscode/Project`
 
@@ -21,6 +21,8 @@ Main app tree:
 
 ```text
 fight-club/
+|-- features/              # Feature-level task and change tracking docs
+|-- MASTER-PLAN.md         # Global master plan for active tasks and sprint history
 |-- docs/                  # Local project notes, backup points, and balance artifacts
 |-- node_modules/          # Installed packages
 |-- scripts/               # Helper scripts
@@ -42,6 +44,15 @@ Notes:
 - `dist/` is generated output, never source
 - `vite.config.js` / `vitest.config.js` and matching `.d.ts` files are generated beside the TypeScript sources
 - `docs/balance/` stores generated preset matchup reports
+- `features/` stores per-feature tracking docs used together with `MASTER-PLAN.md`
+
+---
+
+## Planning Docs
+
+- `MASTER-PLAN.md` - project-wide task tracker with statuses and sprint history
+- `features/_TEMPLATE.md` - base template for feature tracking files
+- `features/ui-ux-refactor.md` - current tracked refactor thread for UI / UX audit and planning
 
 ---
 
@@ -301,4 +312,4 @@ Current status:
 
 ---
 
-> Last updated: 2026-03-13 18:40 MSK
+> Last updated: 2026-03-13 21:41 MSK

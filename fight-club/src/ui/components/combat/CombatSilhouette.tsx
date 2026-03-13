@@ -1,8 +1,9 @@
-import { useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
+import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import type { ActiveCombatEffect, CombatZone, RoundResult } from "@/modules/combat";
 import type { EquipmentSlot } from "@/modules/equipment";
 import type { Item } from "@/modules/inventory";
-import { ItemPresentationCard } from "@/ui/components/combat/ItemPresentationCard";
+import { ItemPreviewPopover } from "@/ui/components/shared/ItemPreviewPopover";
+import { useAnchoredPopup } from "@/ui/hooks/useAnchoredPopup";
 
 interface CombatSilhouetteProps {
   title: string;
@@ -111,149 +112,287 @@ export function CombatSilhouette({
   onDefenseToggle,
 }: CombatSilhouetteProps) {
   const [hoveredEquipmentSlot, setHoveredEquipmentSlot] = useState<EquipmentSlot | null>(null);
+  const [impactActive, setImpactActive] = useState(false);
+
+  useEffect(() => {
+    if (!incomingResult || incomingResult.finalDamage <= 0) {
+      return;
+    }
+
+    setImpactActive(true);
+    const timeoutId = window.setTimeout(() => setImpactActive(false), 220);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [incomingResult]);
+
+  return (
+    <div style={{ display: "grid", gap: "10px", justifyItems: "center", width: "220px", margin: "0 auto" }}>
+      <SilhouetteHeader title={title} currentHp={currentHp} maxHp={maxHp} activeEffects={activeEffects} />
+
+      <SilhouetteBoard impactActive={impactActive}>
+        <SilhouetteFigure />
+        <SilhouetteZonesLayer
+          title={title}
+          selectedAttackZone={selectedAttackZone}
+          selectedDefenseZones={selectedDefenseZones}
+          lastIncomingZone={lastIncomingZone}
+          lastOutgoingZone={lastOutgoingZone}
+          incomingResult={incomingResult}
+          outgoingResult={outgoingResult}
+          interactive={interactive}
+          zoneHighlights={zoneHighlights}
+          onAttackSelect={onAttackSelect}
+          onDefenseToggle={onDefenseToggle}
+        />
+
+        <SilhouetteEquipmentLayer
+          equipmentSlots={equipmentSlots}
+          hoveredEquipmentSlot={hoveredEquipmentSlot}
+          onHoverSlot={setHoveredEquipmentSlot}
+          onEquipmentSlotClick={onEquipmentSlotClick}
+        />
+      </SilhouetteBoard>
+
+      <SilhouetteLegend />
+    </div>
+  );
+}
+
+function SilhouetteHeader({
+  title,
+  currentHp,
+  maxHp,
+  activeEffects,
+}: {
+  title: string;
+  currentHp: number;
+  maxHp: number;
+  activeEffects: ActiveCombatEffect[];
+}) {
   const hpPercent = Math.max(0, Math.min(100, (currentHp / maxHp) * 100));
   const hpColor = getHpColor(hpPercent);
 
   return (
-    <div style={{ display: "grid", gap: "10px", justifyItems: "center", width: "220px", margin: "0 auto" }}>
-      <div style={{ width: "220px" }}>
-        <div style={{ display: "grid", gap: "5px", marginBottom: "0" }}>
-          <div style={{ display: "flex", justifyContent: "space-between", gap: "8px", fontWeight: 700, alignItems: "center" }}>
-            <span style={{ letterSpacing: "0.04em", flexShrink: 0 }}>{title}</span>
-            <StatusEffectsHeader effects={activeEffects} />
-            <span style={{ color: "rgba(255,244,231,0.78)", fontSize: "12px", flexShrink: 0 }}>
-              {currentHp}/{maxHp}
-            </span>
-          </div>
-        </div>
-        <div
-          style={{
-            height: "14px",
-            borderRadius: "999px",
-            overflow: "hidden",
-            background: "rgba(255,255,255,0.06)",
-            border: "1px solid rgba(255,255,255,0.1)",
-            boxShadow: "inset 0 1px 0 rgba(255,255,255,0.03)",
-          }}
-        >
-          <div
-            style={{
-              width: `${hpPercent}%`,
-              height: "100%",
-              background: `linear-gradient(90deg, ${hpColor.from}, ${hpColor.to})`,
-              transition: "width 180ms ease",
-              boxShadow: "0 0 18px rgba(255,159,98,0.18)",
-            }}
-          />
+    <div style={{ width: "220px" }}>
+      <div style={{ display: "grid", gap: "5px", marginBottom: "0" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", gap: "8px", fontWeight: 700, alignItems: "center" }}>
+          <span style={{ letterSpacing: "0.04em", flexShrink: 0 }}>{title}</span>
+          <SilhouetteStatusEffects effects={activeEffects} />
+          <span style={{ color: "rgba(255,244,231,0.78)", fontSize: "12px", flexShrink: 0 }}>
+            {currentHp}/{maxHp}
+          </span>
         </div>
       </div>
-
-      <div
-        style={{
-          position: "relative",
-          width: "220px",
-          height: "360px",
-          borderRadius: "28px",
-          background:
-            "radial-gradient(circle at top, rgba(120,189,255,0.14), transparent 22%), radial-gradient(circle at bottom, rgba(255,179,108,0.08), transparent 24%), linear-gradient(180deg, rgba(255,255,255,0.075), rgba(255,255,255,0.025))",
-          border: "1px solid rgba(255,255,255,0.12)",
-          boxShadow: "inset 0 0 36px rgba(0,0,0,0.24), 0 18px 34px rgba(0,0,0,0.18)",
-          overflow: "hidden",
-        }}
-      >
-        <svg
-          viewBox="0 0 220 360"
-          width="220"
-          height="360"
-          style={{ position: "absolute", inset: 0, opacity: 0.38 }}
-        >
-          <path
-            d="M111 34c20 0 37 18 37 39 0 16-9 29-22 35 10 8 15 22 18 35l10 42c2 8 8 15 15 19l8 4-11 14-12-6-6 25 13 65-18 8-21-75h-8l-21 75-18-8 13-65-6-25-12 6-11-14 8-4c7-4 13-11 15-19l10-42c3-13 8-27 18-35-13-6-22-19-22-35 0-21 17-39 37-39Z"
-            fill="rgba(255,255,255,0.82)"
-          />
-        </svg>
-
-        {(Object.entries(zoneRects) as Array<[CombatZone, CSSProperties]>).map(([zone, rect]) => {
-          const selectedAttack = selectedAttackZone === zone;
-          const selectedDefense = selectedDefenseZones.includes(zone);
-          const incoming = lastIncomingZone === zone;
-          const outgoing = lastOutgoingZone === zone;
-          const highlight = zoneHighlights[zone];
-          const zoneGlow = getZoneHighlightGlow(highlight);
-
-          return (
-            <button
-              key={zone}
-              type="button"
-              aria-label={`${title} zone ${zone}`}
-              onClick={() => {
-                if (!interactive) {
-                  return;
-                }
-
-                onAttackSelect?.(zone);
-                onDefenseToggle?.(zone);
-              }}
-              style={{
-                position: "absolute",
-                ...rect,
-                border: selectedAttack
-                  ? "2px solid #ffb36c"
-                  : selectedDefense
-                    ? "2px solid #69dbc2"
-                    : incoming
-                      ? "2px solid #ff6b57"
-                      : outgoing
-                        ? "2px solid #e9d06b"
-                        : "1px solid rgba(255,255,255,0.14)",
-                background: selectedAttack
-                  ? "rgba(255,179,108,0.24)"
-                  : selectedDefense
-                    ? "rgba(105,219,194,0.2)"
-                    : incoming
-                      ? "rgba(255,107,87,0.24)"
-                      : outgoing
-                        ? "rgba(233,208,107,0.2)"
-                        : "rgba(255,255,255,0.05)",
-                cursor: interactive ? "pointer" : "default",
-                color: "#fff",
-                fontSize: "10px",
-                fontWeight: 700,
-                letterSpacing: "0.03em",
-                textTransform: "capitalize",
-                backdropFilter: "blur(3px)",
-                boxShadow: zoneGlow.boxShadow,
-              }}
-            >
-              {zone}
-              <ZoneMarkers zone={zone} incomingResult={incomingResult} outgoingResult={outgoingResult} />
-              <ZoneOutlookBadges zone={zone} highlight={highlight} />
-            </button>
-          );
-        })}
-
-        {equipmentSlots.map(({ slot, item }) => (
-          <EquipmentSlotButton
-            key={slot}
-            slot={slot}
-            item={item}
-            hovered={hoveredEquipmentSlot === slot}
-            onMouseEnter={() => setHoveredEquipmentSlot(slot)}
-            onMouseLeave={() => setHoveredEquipmentSlot((current) => (current === slot ? null : current))}
-            onClick={() => onEquipmentSlotClick?.(slot)}
-          />
-        ))}
-      </div>
-
-      <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", justifyContent: "center", fontSize: "11px", opacity: 0.82 }}>
-        <LegendIcon markerKey="hit" />
-        <LegendIcon markerKey="block" />
-        <LegendIcon markerKey="crit" />
-        <LegendIcon markerKey="penetration" />
-        <LegendIcon markerKey="dodge" />
-      </div>
+      <SilhouetteHpBar hpPercent={hpPercent} hpColor={hpColor} />
     </div>
   );
+}
+
+function SilhouetteHpBar({
+  hpPercent,
+  hpColor,
+}: {
+  hpPercent: number;
+  hpColor: ReturnType<typeof getHpColor>;
+}) {
+  return (
+    <div
+      style={{
+        height: "14px",
+        borderRadius: "999px",
+        overflow: "hidden",
+        background: "rgba(255,255,255,0.06)",
+        border: "1px solid rgba(255,255,255,0.1)",
+        boxShadow: "inset 0 1px 0 rgba(255,255,255,0.03)",
+      }}
+    >
+      <div
+        style={{
+          width: `${hpPercent}%`,
+          height: "100%",
+          background: `linear-gradient(90deg, ${hpColor.from}, ${hpColor.to})`,
+          transition: "width 180ms ease",
+          boxShadow: "0 0 18px rgba(255,159,98,0.18)",
+        }}
+      />
+    </div>
+  );
+}
+
+function SilhouetteBoard({
+  children,
+  impactActive = false,
+}: {
+  children: ReactNode;
+  impactActive?: boolean;
+}) {
+  return (
+    <div
+      className={impactActive ? "combat-silhouette-impact" : undefined}
+      style={{
+        position: "relative",
+        width: "220px",
+        height: "360px",
+        borderRadius: "28px",
+        background:
+          "radial-gradient(circle at top, rgba(120,189,255,0.14), transparent 22%), radial-gradient(circle at bottom, rgba(255,179,108,0.08), transparent 24%), linear-gradient(180deg, rgba(255,255,255,0.075), rgba(255,255,255,0.025))",
+        border: "1px solid rgba(255,255,255,0.12)",
+        boxShadow: "inset 0 0 36px rgba(0,0,0,0.24), 0 18px 34px rgba(0,0,0,0.18)",
+        overflow: "hidden",
+      }}
+    >
+      {children}
+    </div>
+  );
+}
+
+function SilhouetteFigure() {
+  return (
+    <svg
+      viewBox="0 0 220 360"
+      width="220"
+      height="360"
+      style={{ position: "absolute", inset: 0, opacity: 0.38 }}
+    >
+      <path
+        d="M111 34c20 0 37 18 37 39 0 16-9 29-22 35 10 8 15 22 18 35l10 42c2 8 8 15 15 19l8 4-11 14-12-6-6 25 13 65-18 8-21-75h-8l-21 75-18-8 13-65-6-25-12 6-11-14 8-4c7-4 13-11 15-19l10-42c3-13 8-27 18-35-13-6-22-19-22-35 0-21 17-39 37-39Z"
+        fill="rgba(255,255,255,0.82)"
+      />
+    </svg>
+  );
+}
+
+function SilhouetteZonesLayer({
+  title,
+  selectedAttackZone,
+  selectedDefenseZones,
+  lastIncomingZone,
+  lastOutgoingZone,
+  incomingResult,
+  outgoingResult,
+  interactive,
+  zoneHighlights,
+  onAttackSelect,
+  onDefenseToggle,
+}: {
+  title: string;
+  selectedAttackZone?: CombatZone | null;
+  selectedDefenseZones: CombatZone[];
+  lastIncomingZone?: CombatZone | null;
+  lastOutgoingZone?: CombatZone | null;
+  incomingResult: RoundResult | null;
+  outgoingResult: RoundResult | null;
+  interactive: boolean;
+  zoneHighlights: Partial<Record<CombatZone, ZoneHighlightFlags>>;
+  onAttackSelect?: (zone: CombatZone) => void;
+  onDefenseToggle?: (zone: CombatZone) => void;
+}) {
+  return (
+    <>
+      {(Object.entries(zoneRects) as Array<[CombatZone, CSSProperties]>).map(([zone, rect]) => {
+        const selectedAttack = selectedAttackZone === zone;
+        const selectedDefense = selectedDefenseZones.includes(zone);
+        const incoming = lastIncomingZone === zone;
+        const outgoing = lastOutgoingZone === zone;
+        const highlight = zoneHighlights[zone];
+        const zoneGlow = getZoneHighlightGlow(highlight);
+
+        return (
+          <button
+            key={zone}
+            type="button"
+            aria-label={`${title} zone ${zone}`}
+            onClick={() => {
+              if (!interactive) {
+                return;
+              }
+
+              onAttackSelect?.(zone);
+              onDefenseToggle?.(zone);
+            }}
+            style={{
+              position: "absolute",
+              ...rect,
+              border: selectedAttack
+                ? "2px solid #ffb36c"
+                : selectedDefense
+                  ? "2px solid #69dbc2"
+                  : incoming
+                    ? "2px solid #ff6b57"
+                    : outgoing
+                      ? "2px solid #e9d06b"
+                      : "1px solid rgba(255,255,255,0.14)",
+              background: selectedAttack
+                ? "rgba(255,179,108,0.24)"
+                : selectedDefense
+                  ? "rgba(105,219,194,0.2)"
+                  : incoming
+                    ? "rgba(255,107,87,0.24)"
+                    : outgoing
+                      ? "rgba(233,208,107,0.2)"
+                      : "rgba(255,255,255,0.05)",
+              cursor: interactive ? "pointer" : "default",
+              color: "#fff",
+              fontSize: "10px",
+              fontWeight: 700,
+              letterSpacing: "0.03em",
+              textTransform: "capitalize",
+              backdropFilter: "blur(3px)",
+              boxShadow: zoneGlow.boxShadow,
+            }}
+          >
+            {zone}
+            <ZoneMarkers zone={zone} incomingResult={incomingResult} outgoingResult={outgoingResult} />
+            <ZoneOutlookBadges zone={zone} highlight={highlight} />
+          </button>
+        );
+      })}
+    </>
+  );
+}
+
+function SilhouetteLegend() {
+  return (
+    <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", justifyContent: "center", fontSize: "11px", opacity: 0.82 }}>
+      <LegendIcon markerKey="hit" />
+      <LegendIcon markerKey="block" />
+      <LegendIcon markerKey="crit" />
+      <LegendIcon markerKey="penetration" />
+      <LegendIcon markerKey="dodge" />
+    </div>
+  );
+}
+
+function SilhouetteEquipmentLayer({
+  equipmentSlots,
+  hoveredEquipmentSlot,
+  onHoverSlot,
+  onEquipmentSlotClick,
+}: {
+  equipmentSlots: Array<{ slot: EquipmentSlot; item: Item | null }>;
+  hoveredEquipmentSlot: EquipmentSlot | null;
+  onHoverSlot: (slot: EquipmentSlot | null | ((current: EquipmentSlot | null) => EquipmentSlot | null)) => void;
+  onEquipmentSlotClick?: (slot: EquipmentSlot) => void;
+}) {
+  return (
+    <>
+      {equipmentSlots.map(({ slot, item }) => (
+        <EquipmentSlotButton
+          key={slot}
+          slot={slot}
+          item={item}
+          hovered={hoveredEquipmentSlot === slot}
+          onMouseEnter={() => onHoverSlot(slot)}
+          onMouseLeave={() => onHoverSlot((current) => (current === slot ? null : current))}
+          onClick={() => onEquipmentSlotClick?.(slot)}
+        />
+      ))}
+    </>
+  );
+}
+
+function SilhouetteStatusEffects({ effects }: { effects: ActiveCombatEffect[] }) {
+  return <StatusEffectsHeader effects={effects} />;
 }
 
 function StatusEffectsHeader({ effects }: { effects: ActiveCombatEffect[] }) {
@@ -537,56 +676,16 @@ function EquipmentSlotButton({
   const itemName = item?.name ?? null;
   const buttonRef = useRef<HTMLButtonElement | null>(null);
   const popupRef = useRef<HTMLDivElement | null>(null);
-  const [popupStyle, setPopupStyle] = useState<CSSProperties | null>(null);
-
-  useLayoutEffect(() => {
-    if (!hovered || !item || !buttonRef.current || !popupRef.current) {
-      return;
-    }
-
-    const updatePosition = () => {
-      if (!buttonRef.current || !popupRef.current) {
-        return;
-      }
-
-      const viewportPadding = 12;
-      const gap = 8;
-      const buttonRect = buttonRef.current.getBoundingClientRect();
-      const popupRect = popupRef.current.getBoundingClientRect();
-      const viewportWidth = window.innerWidth;
-      const viewportHeight = window.innerHeight;
-
-      const desiredLeft = buttonRect.left + buttonRect.width / 2 - popupRect.width / 2;
-      const clampedLeft = Math.max(viewportPadding, Math.min(desiredLeft, viewportWidth - popupRect.width - viewportPadding));
-
-      const spaceBelow = viewportHeight - buttonRect.bottom - viewportPadding;
-      const spaceAbove = buttonRect.top - viewportPadding;
-      const placeBelow = spaceBelow >= popupRect.height + gap || spaceBelow >= spaceAbove;
-
-      const top = placeBelow
-        ? Math.min(buttonRect.bottom + gap, viewportHeight - popupRect.height - viewportPadding)
-        : Math.max(viewportPadding, buttonRect.top - popupRect.height - gap);
-
-      setPopupStyle({
-        position: "fixed",
-        left: `${clampedLeft}px`,
-        top: `${top}px`,
-        width: `min(320px, calc(100vw - ${viewportPadding * 2}px))`,
-        zIndex: 30,
-        pointerEvents: "none",
-      });
-    };
-
-    updatePosition();
-
-    window.addEventListener("resize", updatePosition);
-    window.addEventListener("scroll", updatePosition, true);
-
-    return () => {
-      window.removeEventListener("resize", updatePosition);
-      window.removeEventListener("scroll", updatePosition, true);
-    };
-  }, [hovered, item]);
+  const popupStyle = useAnchoredPopup({
+    open: hovered && Boolean(item),
+    triggerRef: buttonRef,
+    popupRef,
+    placement: "vertical",
+    preferredWidth: 320,
+    gap: 8,
+    viewportPadding: 12,
+    zIndex: 30,
+  });
 
   return (
     <div
@@ -688,53 +787,17 @@ function EquipmentItemPopover({
   style: CSSProperties | null;
   popupRef: React.RefObject<HTMLDivElement | null>;
 }) {
+  const previewEntry = { item, quantity: 1 as const };
+
   return (
-    <div
-      ref={popupRef}
-      style={{
-        ...(style ?? {
-          position: "fixed",
-          left: "12px",
-          top: "12px",
-          width: "min(320px, calc(100vw - 24px))",
-          zIndex: 30,
-          pointerEvents: "none",
-        }),
-      }}
-    >
-      <div
-        style={{
-          borderRadius: "18px",
-          border: "1px solid rgba(255,255,255,0.12)",
-          background:
-            "linear-gradient(180deg, rgba(25,22,27,0.98), rgba(14,13,18,0.98)), radial-gradient(circle at top, rgba(255,214,164,0.08), transparent 32%)",
-          boxShadow: "0 24px 40px rgba(0,0,0,0.34)",
-          padding: "8px",
-        }}
-      >
-        <div style={{ display: "grid", gap: "8px" }}>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              gap: "8px",
-              alignItems: "center",
-              padding: "2px 4px 0",
-            }}
-          >
-            <div style={{ fontSize: "9px", textTransform: "uppercase", letterSpacing: "0.08em", color: "rgba(255,233,205,0.72)" }}>
-              Equipped {formatEquipmentSlotLabel(slot)}
-            </div>
-            <HoverTag label="Equipped" />
-          </div>
-          <ItemPresentationCard
-            entry={{ item, quantity: 1 }}
-            compact
-            showQuantityTag={false}
-          />
-        </div>
-      </div>
-    </div>
+    <ItemPreviewPopover
+      entry={previewEntry}
+      popupRef={popupRef}
+      style={style}
+      fallbackWidth="min(320px, calc(100vw - 24px))"
+      label={`Equipped ${formatEquipmentSlotLabel(slot)}`}
+      tagLabel="Equipped"
+    />
   );
 }
 
@@ -995,23 +1058,6 @@ function formatEquipmentSlotLabel(slot: EquipmentSlot) {
   }
 }
 
-
-function HoverTag({ label }: { label: string }) {
-  return (
-    <span
-      style={{
-        borderRadius: "999px",
-        padding: "3px 7px",
-        fontSize: "9px",
-        color: "#e8dbc9",
-        background: "rgba(255,255,255,0.06)",
-        border: "1px solid rgba(255,255,255,0.08)",
-      }}
-    >
-      {label}
-    </span>
-  );
-}
 
 function getEffectAccent(kind: ActiveCombatEffect["kind"]) {
   if (kind === "buff") {

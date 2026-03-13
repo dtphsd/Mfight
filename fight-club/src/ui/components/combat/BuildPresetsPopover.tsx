@@ -3,6 +3,10 @@ import { useMemo, useState, type CSSProperties } from "react";
 import { starterItems } from "@/content/items/starterItems";
 import { getWeaponClassPassivePreview } from "@/modules/combat/config/combatWeaponPassives";
 import type { CombatBuildPreset } from "@/orchestration/combat/combatSandboxConfigs";
+import { ActionButton } from "@/ui/components/shared/ActionButton";
+import { ModalOverlay } from "@/ui/components/shared/ModalOverlay";
+import { ModalSurface } from "@/ui/components/shared/ModalSurface";
+import { PanelCard } from "@/ui/components/shared/PanelCard";
 
 interface BuildPresetsPopoverProps {
   buildPresets: CombatBuildPreset[];
@@ -12,13 +16,9 @@ interface BuildPresetsPopoverProps {
   onClose: () => void;
 }
 
-const buttonStyle: CSSProperties = {
+const secondaryButtonStyle: CSSProperties = {
   padding: "8px 12px",
-  borderRadius: "999px",
-  border: "1px solid rgba(255,255,255,0.14)",
-  background: "rgba(255,255,255,0.04)",
   color: "#fff2df",
-  cursor: "pointer",
   fontSize: "10px",
   fontWeight: 700,
 };
@@ -53,36 +53,17 @@ export function BuildPresetsPopover({
   }
 
   return (
-    <div
-      style={{
-        position: "fixed",
-        inset: 0,
-        zIndex: 45,
-        display: "grid",
-        placeItems: "center",
-        padding: "22px",
-      }}
+    <ModalOverlay
+      onClose={onClose}
+      closeLabel="Close build presets popover"
+      zIndex={45}
+      backdrop="rgba(7, 8, 12, 0.76)"
     >
-      <button
-        type="button"
-        aria-label="Close build presets popover"
-        onClick={onClose}
+      <ModalSurface
         style={{
-          position: "absolute",
-          inset: 0,
-          border: "none",
-          background: "rgba(7, 8, 12, 0.76)",
-          cursor: "pointer",
-        }}
-      />
-      <div
-        style={{
-          position: "relative",
           width: "min(1180px, 100%)",
           maxHeight: "min(820px, calc(100vh - 36px))",
           borderRadius: "24px",
-          overflow: "hidden",
-          border: "1px solid rgba(255,255,255,0.12)",
           background:
             "linear-gradient(180deg, rgba(23,20,18,0.98), rgba(11,10,9,0.98)), radial-gradient(circle at top, rgba(255,188,118,0.08), transparent 28%)",
           boxShadow: "0 28px 72px rgba(0,0,0,0.48)",
@@ -134,9 +115,9 @@ export function BuildPresetsPopover({
                 Six moderated presets tuned for readable fights, clearer matchup testing, and a target pace around fifteen rounds.
               </div>
             </div>
-            <button type="button" onClick={onClose} style={buttonStyle}>
+            <ActionButton type="button" onClick={onClose} tone="secondary" style={secondaryButtonStyle}>
               Close
-            </button>
+            </ActionButton>
           </div>
         </div>
 
@@ -246,12 +227,8 @@ export function BuildPresetsPopover({
             </div>
 
             <div style={{ display: "grid", gap: "10px" }}>
-              <div
+              <PanelCard
                 style={{
-                  borderRadius: "16px",
-                  padding: "12px",
-                  background: "rgba(255,255,255,0.03)",
-                  border: "1px solid rgba(255,255,255,0.08)",
                   display: "grid",
                   gap: "8px",
                 }}
@@ -283,24 +260,25 @@ export function BuildPresetsPopover({
                     <div style={{ fontSize: "10px", color: "#d8c7b1", lineHeight: 1.3, maxWidth: "640px" }}>{selectedPreset.description}</div>
                   </div>
                   <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
-                    <button type="button" onClick={() => onApplyItemsOnly(selectedPreset.id)} style={buttonStyle}>
+                    <ActionButton type="button" onClick={() => onApplyItemsOnly(selectedPreset.id)} tone="secondary" style={secondaryButtonStyle}>
                       Apply Items Only
-                    </button>
-                    <button type="button" onClick={() => onApplySkillsOnly(selectedPreset.id)} style={buttonStyle}>
+                    </ActionButton>
+                    <ActionButton type="button" onClick={() => onApplySkillsOnly(selectedPreset.id)} tone="secondary" style={secondaryButtonStyle}>
                       Apply Skills Only
-                    </button>
-                    <button
+                    </ActionButton>
+                    <ActionButton
                       type="button"
                       onClick={() => onApplyBuild(selectedPreset.id)}
+                      tone="primary"
                       style={{
-                        ...buttonStyle,
+                        ...secondaryButtonStyle,
                         border: "1px solid rgba(255,171,97,0.34)",
                         background: "linear-gradient(180deg, rgba(221,122,68,0.32), rgba(207,106,50,0.14))",
                         color: "#ffe2c2",
                       }}
                     >
                       Apply Build
-                    </button>
+                    </ActionButton>
                   </div>
                 </div>
 
@@ -311,15 +289,11 @@ export function BuildPresetsPopover({
                   <PresetMetric label="Consumables" value={String(selectedPreset.consumables.length)} />
                 </div>
                 <PresetBarRow presetId={selectedPreset.id} archetype={selectedPreset.archetype} />
-              </div>
+              </PanelCard>
 
               <div style={{ display: "grid", gridTemplateColumns: "minmax(0, 1.08fr) minmax(0, 0.92fr)", gap: "10px" }}>
-                <div
+                <PanelCard
                   style={{
-                    borderRadius: "16px",
-                    padding: "12px",
-                    background: "rgba(255,255,255,0.03)",
-                    border: "1px solid rgba(255,255,255,0.08)",
                     display: "grid",
                     gap: "10px",
                   }}
@@ -445,15 +419,11 @@ export function BuildPresetsPopover({
                       );
                     })}
                   </div>
-                </div>
+                </PanelCard>
 
                 <div style={{ display: "grid", gap: "12px" }}>
-                  <div
+                  <PanelCard
                     style={{
-                      borderRadius: "16px",
-                      padding: "12px",
-                      background: "rgba(255,255,255,0.03)",
-                      border: "1px solid rgba(255,255,255,0.08)",
                       display: "grid",
                       gap: "8px",
                     }}
@@ -487,14 +457,10 @@ export function BuildPresetsPopover({
                         );
                       })}
                     </div>
-                  </div>
+                  </PanelCard>
 
-                  <div
+                  <PanelCard
                     style={{
-                      borderRadius: "16px",
-                      padding: "12px",
-                      background: "rgba(255,255,255,0.03)",
-                      border: "1px solid rgba(255,255,255,0.08)",
                       display: "grid",
                       gap: "8px",
                     }}
@@ -503,32 +469,30 @@ export function BuildPresetsPopover({
                     <ListBlock items={selectedPreset.strengths} tone="good" />
                     <SectionLabel label="Weaknesses" icon="▼" />
                     <ListBlock items={selectedPreset.weaknesses} tone="risk" />
-                  </div>
+                  </PanelCard>
                 </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
-    </div>
+      </ModalSurface>
+    </ModalOverlay>
   );
 }
 
 function PresetMetric({ label, value }: { label: string; value: string }) {
   return (
-    <div
+    <PanelCard
       style={{
-        borderRadius: "12px",
         padding: "8px 9px",
         background: "rgba(255,255,255,0.03)",
-        border: "1px solid rgba(255,255,255,0.08)",
         display: "grid",
         gap: "3px",
       }}
     >
       <div style={{ fontSize: "8px", opacity: 0.68, textTransform: "uppercase", letterSpacing: "0.08em" }}>{label}</div>
       <div style={{ fontSize: "13px", fontWeight: 800, color: "#fff1df", lineHeight: 1.05 }}>{value}</div>
-    </div>
+    </PanelCard>
   );
 }
 

@@ -1,0 +1,19 @@
+import type { CSSProperties, ReactNode } from "react";
+
+interface PreviewSurfaceProps {
+  children: ReactNode;
+  style?: CSSProperties;
+}
+
+const baseStyle: CSSProperties = {
+  borderRadius: "18px",
+  border: "1px solid rgba(255,255,255,0.12)",
+  background:
+    "linear-gradient(180deg, rgba(25,22,27,0.98), rgba(14,13,18,0.98)), radial-gradient(circle at top, rgba(255,214,164,0.08), transparent 32%)",
+  boxShadow: "0 24px 40px rgba(0,0,0,0.34)",
+  padding: "8px",
+};
+
+export function PreviewSurface({ children, style }: PreviewSurfaceProps) {
+  return <div style={{ ...baseStyle, ...style }}>{children}</div>;
+}

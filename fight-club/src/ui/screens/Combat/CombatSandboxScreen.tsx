@@ -56,6 +56,8 @@ const statMeta: Record<CharacterStatName, { short: string; color: string; backgr
   endurance: { short: "END", color: "#ebcf8b", background: "rgba(214,177,95,0.14)", border: "rgba(214,177,95,0.28)" },
 };
 
+type CombatSandboxModel = ReturnType<typeof useCombatSandbox>;
+
 export function CombatSandboxScreen() {
   const sandbox = useCombatSandbox();
   const [builderOpen, setBuilderOpen] = useState(false);
@@ -94,370 +96,39 @@ export function CombatSandboxScreen() {
     <section data-testid="combat-sandbox-screen" style={{ display: "grid", gap: "14px" }}>
       <div style={{ ...shellStyle, padding: "16px", display: "grid", gap: "14px" }}>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "14px", alignItems: "start" }}>
-          <SidePanel
-            eyebrow="Player"
-            title={sandbox.playerCharacter.name}
-            note={formatMaybeTitle(sandbox.metrics.weaponDamageType)}
-            silhouette={
-              <CombatSilhouette
-                title="Player"
-                currentHp={sandbox.playerCombatant?.currentHp ?? sandbox.playerSnapshot.maxHp}
-                maxHp={sandbox.playerCombatant?.maxHp ?? sandbox.playerSnapshot.maxHp}
-                selectedDefenseZones={sandbox.selectedDefenseZones}
-                lastIncomingZone={sandbox.latestBotLogEntry?.attackZone ?? null}
-                lastOutgoingZone={sandbox.latestPlayerLogEntry?.attackZone ?? null}
-                incomingResult={sandbox.playerIncomingResult}
-                outgoingResult={sandbox.playerOutgoingResult}
-                interactive
-                zoneHighlights={buildZoneHighlights(sandbox.metrics.matchup.botZonePressure)}
-                activeEffects={sandbox.playerCombatant?.activeEffects ?? []}
-                equipmentSlots={playerEquipment}
-                onEquipmentSlotClick={(slot) => setSelectedEquipmentSlot(slot)}
-                onDefenseToggle={sandbox.toggleDefenseZone}
-              />
-            }
-            sidebar={
-              <div style={{ display: "grid", gap: "8px", alignContent: "start", height: "100%" }}>
-                <MiniPanel title="Utility">
-                  <div style={{ display: "grid", gap: "6px" }}>
-                    <button type="button" aria-label="Open builder" onClick={() => setBuilderOpen(true)} style={buttonStyle}>Builder</button>
-                    <button type="button" aria-label="Open build presets" onClick={() => setBuildPresetsOpen(true)} style={buttonStyle}>Builds</button>
-                    <button type="button" aria-label="Open inventory" onClick={() => setInventoryOpen(true)} style={buttonStyle}>Inventory</button>
-                  </div>
-                </MiniPanel>
-                <MiniPanel title="Build">
-                  <StatTuning stats={sandbox.playerCharacter.baseStats} unspentPoints={sandbox.playerCharacter.unspentStatPoints} onIncrease={sandbox.increaseStat} onDecrease={sandbox.decreaseStat} />
-                </MiniPanel>
-                <MiniPanel title="Snapshot">
-                  <MetricGrid
-                    items={[
-                      { label: "HP", value: String(sandbox.metrics.maxHp) },
-                      { label: "DMG", value: String(sandbox.metrics.totalDamage), tone: "warm" },
-                      { label: "Armor", value: String(sandbox.metrics.totalArmor) },
-                      { label: "Crit", value: `${sandbox.metrics.baseCritChance + sandbox.metrics.critChanceBonus}%` },
-                      { label: "Dodge", value: `${sandbox.metrics.baseDodgeChance + sandbox.metrics.dodgeChanceBonus}%` },
-                      { label: "Type", value: formatMaybeTitle(sandbox.metrics.weaponDamageType) },
-                    ]}
-                  />
-                </MiniPanel>
-              </div>
-            }
-            blocks={[]}
-            overlay={
-              selectedEquipmentSlot ? (
-                <EquipmentSlotPopover
-                  slot={selectedEquipmentSlot}
-                  entries={sandbox.getInventoryOptionsForSlot(selectedEquipmentSlot)}
-                  equippedItemCode={sandbox.equippedItems.find((entry) => entry.slot === selectedEquipmentSlot)?.item?.code ?? null}
-                  onEquip={(itemCode) => {
-                    sandbox.equipItemByCode(itemCode);
-                    setSelectedEquipmentSlot(null);
-                  }}
-                  onUnequip={(slot) => {
-                    sandbox.unequipSlot(slot);
-                    setSelectedEquipmentSlot(null);
-                  }}
-                  onClose={() => setSelectedEquipmentSlot(null)}
-                />
-              ) : null
-            }
+          <PlayerCombatPanel
+            sandbox={sandbox}
+            equipment={playerEquipment}
+            selectedEquipmentSlot={selectedEquipmentSlot}
+            onOpenBuilder={() => setBuilderOpen(true)}
+            onOpenBuildPresets={() => setBuildPresetsOpen(true)}
+            onOpenInventory={() => setInventoryOpen(true)}
+            onSelectEquipmentSlot={setSelectedEquipmentSlot}
+            onCloseEquipmentSlot={() => setSelectedEquipmentSlot(null)}
           />
 
-          <div data-testid="fight-setup-panel" style={{ ...shellStyle, padding: "16px", display: "grid", gap: "14px", alignContent: "start" }}>
-            <PanelHeader eyebrow="Control Hub" title="Fight Setup" note={selectedActionLabel} />
+          <FightSetupPanel
+            sandbox={sandbox}
+            selectedActionLabel={selectedActionLabel}
+            selectedActionTags={selectedActionTags}
+            selectedActionSummary={selectedActionSummary}
+            latestRoundSummary={latestRoundSummary}
+            onOpenSkillLoadout={() => setSkillLoadoutOpen(true)}
+          />
 
-            <div style={{ display: "grid", gap: "12px" }}>
-              <div style={{ display: "grid", gridTemplateColumns: "minmax(0, 0.92fr) minmax(0, 1.08fr)", gap: "12px", alignItems: "stretch" }}>
-                <MiniPanel title="Fight Controls">
-                  <div style={{ display: "grid", gap: "10px", height: "100%", alignContent: "space-between" }}>
-                    <div style={{ display: "grid", gap: "10px" }}>
-                      <button
-                        type="button"
-                        aria-label="Start fight"
-                        onClick={sandbox.startFight}
-                        disabled={!sandbox.canStartFight}
-                        style={{
-                          ...primaryButtonStyle,
-                          ...(sandbox.canStartFight ? {} : { opacity: 0.48, cursor: "not-allowed" }),
-                        }}
-                      >
-                        {sandbox.combatPhase === "finished" ? "Restart Fight" : "Start Fight"}
-                      </button>
-                    </div>
-                    <div style={{ display: "grid", gap: "6px" }}>
-                      <div style={{ display: "flex", justifyContent: "space-between", gap: "10px", flexWrap: "wrap", alignItems: "center" }}>
-                        <div style={{ fontSize: "10px", textTransform: "uppercase", opacity: 0.68 }}>Current Action</div>
-                        <div style={{ fontSize: "10px", opacity: 0.66 }}>{sandbox.combatState ? `Round ${sandbox.combatState.round}` : "Pre-fight"}</div>
-                      </div>
-                      <div data-testid="selected-action-label" style={{ fontSize: "16px", fontWeight: 800, lineHeight: 1.2 }}>{selectedActionLabel}</div>
-                      <div data-testid="selected-action-tags" style={{ display: "flex", gap: "4px", flexWrap: "wrap" }}>
-                        {selectedActionTags.map((tag) => (
-                          <span
-                            key={`${selectedActionLabel}-${tag}`}
-                            style={{
-                              borderRadius: "999px",
-                              padding: "3px 6px",
-                              fontSize: "8px",
-                              lineHeight: 1.1,
-                              background: "rgba(255,171,97,0.08)",
-                              border: "1px solid rgba(255,171,97,0.18)",
-                              color: "#ffe2c2",
-                              fontWeight: 700,
-                            }}
-                          >
-                            {tag}
-                          </span>
-                        ))}
-                      </div>
-                      <div style={{ display: "flex", gap: "4px", flexWrap: "wrap" }}>
-                        {selectedActionSummary.slice(0, 3).map((entry) => (
-                          <span
-                            key={`${selectedActionLabel}-${entry}`}
-                            style={{
-                              borderRadius: "999px",
-                              padding: "3px 6px",
-                              fontSize: "8px",
-                              lineHeight: 1.1,
-                              background: "rgba(255,255,255,0.045)",
-                              border: "1px solid rgba(255,255,255,0.08)",
-                              color: "#e7d9c8",
-                            }}
-                          >
-                            {entry}
-                          </span>
-                        ))}
-                      </div>
-                      <div style={{ fontSize: "9px", textTransform: "uppercase", letterSpacing: "0.08em", color: "#d7c6b2", opacity: 0.72 }}>
-                        Phase: {sandbox.combatPhaseLabel}
-                      </div>
-                    </div>
-                  </div>
-                </MiniPanel>
-
-                <MiniPanel title="Attack Target + Round">
-                  <div style={{ display: "grid", gap: "10px", height: "100%", alignContent: "space-between" }}>
-                    <div style={{ display: "grid", gap: "9px" }}>
-                      <div style={{ display: "grid", gridTemplateColumns: "repeat(5, minmax(0, 1fr))", gap: "7px" }}>
-                        {sandbox.zones.map((zone) => (
-                          <button
-                            key={zone}
-                            type="button"
-                            aria-label={`Select attack zone ${zone}`}
-                            onClick={() => sandbox.setSelectedAttackZone(zone)}
-                            style={{
-                              ...buttonStyle,
-                              ...(sandbox.selectedAttackZone === zone ? { background: "rgba(207,106,50,0.16)", border: "1px solid rgba(255,171,97,0.4)", color: "#ffe2c2" } : {}),
-                              padding: "11px 4px",
-                              fontSize: "10px",
-                              textTransform: "capitalize",
-                            }}
-                          >
-                            {zone}
-                          </button>
-                        ))}
-                      </div>
-                      <ResourceGrid resources={sandbox.playerResources} />
-                    </div>
-                    <div style={{ display: "grid", gap: "7px" }}>
-                      {sandbox.canPrepareNextRound ? (
-                        <button
-                          type="button"
-                          aria-label="Prepare next round"
-                          onClick={sandbox.prepareNextRound}
-                          style={primaryButtonStyle}
-                        >
-                          Next Round
-                        </button>
-                      ) : (
-                        <button
-                          type="button"
-                          aria-label="Resolve round"
-                          onClick={sandbox.resolveNextRound}
-                          disabled={!sandbox.canResolveRound}
-                          style={{
-                            ...primaryButtonStyle,
-                            ...(sandbox.canResolveRound ? {} : { opacity: 0.48, cursor: "not-allowed" }),
-                          }}
-                        >
-                          {sandbox.combatPhase === "resolving_round" ? "Resolving..." : "Resolve Round"}
-                        </button>
-                      )}
-                      <div data-testid="latest-round-summary" style={{ display: "none" }}>{latestRoundSummary}</div>
-                    </div>
-                  </div>
-                </MiniPanel>
-              </div>
-
-              <MiniPanel title="Combat Actions">
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
-                  <ActionRail
-                    title="Skills"
-                    emptyLabel=""
-                    countLabel={`${sandbox.equippedSkills.length}/${sandbox.maxEquippedSkills}`}
-                    entrySlots={sandbox.maxEquippedSkills}
-                    headerAction={
-                      <div style={{ display: "flex", gap: "4px", alignItems: "center" }}>
-                        <button
-                          type="button"
-                          aria-label="Select basic attack"
-                          onClick={sandbox.selectBasicAction}
-                          style={{
-                            ...buttonStyle,
-                            padding: "5px 8px",
-                            fontSize: "9px",
-                            ...(sandbox.selectedAction.kind === "basic_attack"
-                              ? {
-                                  border: "1px solid rgba(255,171,97,0.4)",
-                                  background: "linear-gradient(180deg, rgba(221,122,68,0.24), rgba(207,106,50,0.12))",
-                                  color: "#ffe2c2",
-                                }
-                              : {}),
-                          }}
-                        >
-                          Basic
-                        </button>
-                        {sandbox.unlockedSkills.length > 0 ? (
-                          <button
-                            type="button"
-                            aria-label="Manage equipped skills"
-                            onClick={() => setSkillLoadoutOpen(true)}
-                            style={{ ...buttonStyle, padding: "5px 8px", fontSize: "9px" }}
-                          >
-                            Manage
-                          </button>
-                        ) : null}
-                      </div>
-                    }
-                    entries={sandbox.equippedSkills.map((skill) => {
-                      const currentValue = (sandbox.playerResources ?? { rage: 0, guard: 0, momentum: 0, focus: 0 })[skill.resourceType];
-                      return (
-                        <ActionButton
-                          key={skill.id}
-                          selected={sandbox.selectedAction.kind === "skill_attack" && sandbox.selectedAction.skillId === skill.id}
-                          muted={currentValue < skill.cost}
-                          onClick={() =>
-                            sandbox.setSelectedSkillAction(
-                              sandbox.selectedAction.kind === "skill_attack" && sandbox.selectedAction.skillId === skill.id
-                                ? null
-                                : skill.id
-                            )}
-                          label={skill.name}
-                          note={`${currentValue}/${skill.cost} ${skill.resourceType}`}
-                          description={skill.description}
-                          detailLines={formatSkillDetailLines(skill)}
-                          icon={getSkillIcon(skill.name, skill.sourceItemCode)}
-                          iconHint={skill.sourceItemCode}
-                          badge={`${skill.cost}`}
-                        />
-                      );
-                    })}
-                  />
-                  <ActionRail
-                    title="Consumables"
-                    emptyLabel="No consumables."
-                    countLabel={String(sandbox.availableConsumables.length)}
-                    entries={sandbox.availableConsumables.map((entry) => (
-                      <ActionButton
-                        key={entry.item.code}
-                        selected={sandbox.selectedAction.kind === "consumable" && sandbox.selectedAction.consumableCode === entry.item.code}
-                        onClick={() =>
-                          sandbox.setSelectedConsumableAction(
-                            sandbox.selectedAction.kind === "consumable" &&
-                              sandbox.selectedAction.consumableCode === entry.item.code
-                              ? null
-                              : entry.item.code
-                          )}
-                        label={entry.item.name}
-                        note={`x${entry.quantity}`}
-                        description={entry.item.description}
-                        detailLines={formatConsumableDetailLines(entry.item)}
-                        icon={getConsumableIcon(entry.item.name)}
-                      />
-                    ))}
-                  />
-                </div>
-              </MiniPanel>
-            </div>
-
-          </div>
-
-          <SidePanel
-            eyebrow="Target"
-            title="Bot"
-            note={formatMaybeTitle(sandbox.metrics.opponentWeaponDamageType)}
-            silhouette={
-              <CombatSilhouette
-                title="Bot"
-                currentHp={sandbox.botCombatant?.currentHp ?? sandbox.botSnapshot.maxHp}
-                maxHp={sandbox.botCombatant?.maxHp ?? sandbox.botSnapshot.maxHp}
-                selectedAttackZone={sandbox.selectedAttackZone}
-                lastIncomingZone={sandbox.latestPlayerLogEntry?.attackZone ?? null}
-                lastOutgoingZone={sandbox.latestBotLogEntry?.attackZone ?? null}
-                incomingResult={sandbox.botIncomingResult}
-                outgoingResult={sandbox.botOutgoingResult}
-                interactive
-                zoneHighlights={buildZoneHighlights(sandbox.metrics.matchup.playerZonePressure)}
-                activeEffects={sandbox.botCombatant?.activeEffects ?? []}
-                equipmentSlots={botEquipment}
-                onAttackSelect={sandbox.setSelectedAttackZone}
-              />
-            }
-            sidebar={
-              <div style={{ display: "grid", gap: "8px", alignContent: "start", height: "100%" }}>
-                <MiniPanel title="Utility">
-                  <div style={{ display: "grid", gap: "6px" }}>
-                    <button
-                      type="button"
-                      aria-label="Open bot build presets"
-                      onClick={() => setBotBuildPresetsOpen(true)}
-                      style={buttonStyle}
-                    >
-                      Bot Build
-                    </button>
-                    <div
-                      style={{
-                        borderRadius: "10px",
-                        padding: "7px 8px",
-                        background: "rgba(255,255,255,0.03)",
-                        border: "1px solid rgba(255,255,255,0.08)",
-                        display: "grid",
-                        gap: "2px",
-                      }}
-                    >
-                      <div style={{ fontSize: "7px", textTransform: "uppercase", letterSpacing: "0.12em", color: "#d8c7b1", opacity: 0.76 }}>
-                        Current Build
-                      </div>
-                      <div style={{ fontSize: "11px", fontWeight: 800, color: "#fff3e2", lineHeight: 1.15 }}>
-                        {sandbox.botBuildPreset.label}
-                      </div>
-                      <div style={{ fontSize: "8px", lineHeight: 1.25, color: "#cbbba8" }}>
-                        {sandbox.botBuildPreset.archetype} • {sandbox.botBuildPreset.targetFightLength}
-                      </div>
-                    </div>
-                  </div>
-                </MiniPanel>
-                <MiniPanel title="Snapshot">
-                  <StatGrid stats={sandbox.botSnapshot.stats} />
-                  <MetricGrid
-                    items={[
-                      { label: "HP", value: String(sandbox.metrics.opponentMaxHp) },
-                      { label: "DMG", value: String(sandbox.metrics.opponentTotalDamage), tone: "warm" },
-                      { label: "Armor", value: String(sandbox.metrics.opponentTotalArmor) },
-                      { label: "Type", value: formatMaybeTitle(sandbox.metrics.opponentWeaponDamageType) },
-                    ]}
-                  />
-                  <ResourceGrid resources={sandbox.botResources} />
-                </MiniPanel>
-              </div>
-            }
-            blocks={[]}
+          <BotCombatPanel
+            sandbox={sandbox}
+            equipment={botEquipment}
+            onOpenBuildPresets={() => setBotBuildPresetsOpen(true)}
           />
         </div>
       </div>
 
-      <div style={{ ...shellStyle, padding: "16px" }}>
-        <BattleLogPanel entries={sandbox.battleLogEntries} playerId={sandbox.playerSnapshot.characterId} botId={sandbox.botSnapshot.characterId} />
-      </div>
+      <BattleLogSection
+        entries={sandbox.battleLogEntries}
+        playerId={sandbox.playerSnapshot.characterId}
+        botId={sandbox.botSnapshot.characterId}
+      />
 
       {buildPresetsOpen ? (
         <BuildPresetsPopover
@@ -520,6 +191,497 @@ export function CombatSandboxScreen() {
         />
       ) : null}
     </section>
+  );
+}
+
+function PlayerCombatPanel({
+  sandbox,
+  equipment,
+  selectedEquipmentSlot,
+  onOpenBuilder,
+  onOpenBuildPresets,
+  onOpenInventory,
+  onSelectEquipmentSlot,
+  onCloseEquipmentSlot,
+}: {
+  sandbox: CombatSandboxModel;
+  equipment: Array<{ slot: EquipmentSlot; item: Item | null }>;
+  selectedEquipmentSlot: EquipmentSlot | null;
+  onOpenBuilder: () => void;
+  onOpenBuildPresets: () => void;
+  onOpenInventory: () => void;
+  onSelectEquipmentSlot: (slot: EquipmentSlot) => void;
+  onCloseEquipmentSlot: () => void;
+}) {
+  return (
+    <SidePanel
+      eyebrow="Player"
+      title={sandbox.playerCharacter.name}
+      note={formatMaybeTitle(sandbox.metrics.weaponDamageType)}
+      silhouette={
+        <CombatSilhouette
+          title="Player"
+          currentHp={sandbox.playerCombatant?.currentHp ?? sandbox.playerSnapshot.maxHp}
+          maxHp={sandbox.playerCombatant?.maxHp ?? sandbox.playerSnapshot.maxHp}
+          selectedDefenseZones={sandbox.selectedDefenseZones}
+          lastIncomingZone={sandbox.latestBotLogEntry?.attackZone ?? null}
+          lastOutgoingZone={sandbox.latestPlayerLogEntry?.attackZone ?? null}
+          incomingResult={sandbox.playerIncomingResult}
+          outgoingResult={sandbox.playerOutgoingResult}
+          interactive
+          zoneHighlights={buildZoneHighlights(sandbox.metrics.matchup.botZonePressure)}
+          activeEffects={sandbox.playerCombatant?.activeEffects ?? []}
+          equipmentSlots={equipment}
+          onEquipmentSlotClick={onSelectEquipmentSlot}
+          onDefenseToggle={sandbox.toggleDefenseZone}
+        />
+      }
+      sidebar={
+        <div style={{ display: "grid", gap: "8px", alignContent: "start", height: "100%" }}>
+          <MiniPanel title="Utility">
+            <div style={{ display: "grid", gap: "6px" }}>
+              <button type="button" aria-label="Open builder" onClick={onOpenBuilder} style={buttonStyle}>Builder</button>
+              <button type="button" aria-label="Open build presets" onClick={onOpenBuildPresets} style={buttonStyle}>Builds</button>
+              <button type="button" aria-label="Open inventory" onClick={onOpenInventory} style={buttonStyle}>Inventory</button>
+            </div>
+          </MiniPanel>
+          <MiniPanel title="Build">
+            <StatTuning
+              stats={sandbox.playerCharacter.baseStats}
+              unspentPoints={sandbox.playerCharacter.unspentStatPoints}
+              onIncrease={sandbox.increaseStat}
+              onDecrease={sandbox.decreaseStat}
+            />
+          </MiniPanel>
+          <MiniPanel title="Snapshot">
+            <MetricGrid
+              items={[
+                { label: "HP", value: String(sandbox.metrics.maxHp) },
+                { label: "DMG", value: String(sandbox.metrics.totalDamage), tone: "warm" },
+                { label: "Armor", value: String(sandbox.metrics.totalArmor) },
+                { label: "Crit", value: `${sandbox.metrics.baseCritChance + sandbox.metrics.critChanceBonus}%` },
+                { label: "Dodge", value: `${sandbox.metrics.baseDodgeChance + sandbox.metrics.dodgeChanceBonus}%` },
+                { label: "Type", value: formatMaybeTitle(sandbox.metrics.weaponDamageType) },
+              ]}
+            />
+          </MiniPanel>
+        </div>
+      }
+      blocks={[]}
+      overlay={
+        selectedEquipmentSlot ? (
+          <EquipmentSlotPopover
+            slot={selectedEquipmentSlot}
+            entries={sandbox.getInventoryOptionsForSlot(selectedEquipmentSlot)}
+            equippedItemCode={sandbox.equippedItems.find((entry) => entry.slot === selectedEquipmentSlot)?.item?.code ?? null}
+            onEquip={(itemCode) => {
+              sandbox.equipItemByCode(itemCode);
+              onCloseEquipmentSlot();
+            }}
+            onUnequip={(slot) => {
+              sandbox.unequipSlot(slot);
+              onCloseEquipmentSlot();
+            }}
+            onClose={onCloseEquipmentSlot}
+          />
+        ) : null
+      }
+    />
+  );
+}
+
+function BotCombatPanel({
+  sandbox,
+  equipment,
+  onOpenBuildPresets,
+}: {
+  sandbox: CombatSandboxModel;
+  equipment: Array<{ slot: EquipmentSlot; item: Item | null }>;
+  onOpenBuildPresets: () => void;
+}) {
+  return (
+    <SidePanel
+      eyebrow="Target"
+      title="Bot"
+      note={formatMaybeTitle(sandbox.metrics.opponentWeaponDamageType)}
+      silhouette={
+        <CombatSilhouette
+          title="Bot"
+          currentHp={sandbox.botCombatant?.currentHp ?? sandbox.botSnapshot.maxHp}
+          maxHp={sandbox.botCombatant?.maxHp ?? sandbox.botSnapshot.maxHp}
+          selectedAttackZone={sandbox.selectedAttackZone}
+          lastIncomingZone={sandbox.latestPlayerLogEntry?.attackZone ?? null}
+          lastOutgoingZone={sandbox.latestBotLogEntry?.attackZone ?? null}
+          incomingResult={sandbox.botIncomingResult}
+          outgoingResult={sandbox.botOutgoingResult}
+          interactive
+          zoneHighlights={buildZoneHighlights(sandbox.metrics.matchup.playerZonePressure)}
+          activeEffects={sandbox.botCombatant?.activeEffects ?? []}
+          equipmentSlots={equipment}
+          onAttackSelect={sandbox.setSelectedAttackZone}
+        />
+      }
+      sidebar={<BotCombatPanelSidebar sandbox={sandbox} onOpenBuildPresets={onOpenBuildPresets} />}
+      blocks={[]}
+    />
+  );
+}
+
+function FightSetupPanel({
+  sandbox,
+  selectedActionLabel,
+  selectedActionTags,
+  selectedActionSummary,
+  latestRoundSummary,
+  onOpenSkillLoadout,
+}: {
+  sandbox: CombatSandboxModel;
+  selectedActionLabel: string;
+  selectedActionTags: string[];
+  selectedActionSummary: string[];
+  latestRoundSummary: string;
+  onOpenSkillLoadout: () => void;
+}) {
+  return (
+    <div data-testid="fight-setup-panel" style={{ ...shellStyle, padding: "16px", display: "grid", gap: "14px", alignContent: "start" }}>
+      <PanelHeader eyebrow="Control Hub" title="Fight Setup" note={selectedActionLabel} />
+
+      <div style={{ display: "grid", gap: "12px" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "minmax(0, 0.92fr) minmax(0, 1.08fr)", gap: "12px", alignItems: "stretch" }}>
+          <FightControlsPanel
+            sandbox={sandbox}
+            selectedActionLabel={selectedActionLabel}
+            selectedActionTags={selectedActionTags}
+            selectedActionSummary={selectedActionSummary}
+          />
+
+          <AttackTargetRoundPanel sandbox={sandbox} latestRoundSummary={latestRoundSummary} />
+        </div>
+
+        <CombatActionsPanel sandbox={sandbox} onOpenSkillLoadout={onOpenSkillLoadout} />
+      </div>
+    </div>
+  );
+}
+
+function FightControlsPanel({
+  sandbox,
+  selectedActionLabel,
+  selectedActionTags,
+  selectedActionSummary,
+}: {
+  sandbox: CombatSandboxModel;
+  selectedActionLabel: string;
+  selectedActionTags: string[];
+  selectedActionSummary: string[];
+}) {
+  return (
+    <MiniPanel title="Fight Controls">
+      <div style={{ display: "grid", gap: "10px", height: "100%", alignContent: "space-between" }}>
+        <div style={{ display: "grid", gap: "10px" }}>
+          <button
+            type="button"
+            aria-label="Start fight"
+            onClick={sandbox.startFight}
+            disabled={!sandbox.canStartFight}
+            style={{
+              ...primaryButtonStyle,
+              ...(sandbox.canStartFight ? {} : { opacity: 0.48, cursor: "not-allowed" }),
+            }}
+          >
+            {sandbox.combatPhase === "finished" ? "Restart Fight" : "Start Fight"}
+          </button>
+        </div>
+        <div style={{ display: "grid", gap: "6px" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", gap: "10px", flexWrap: "wrap", alignItems: "center" }}>
+            <div style={{ fontSize: "10px", textTransform: "uppercase", opacity: 0.68 }}>Current Action</div>
+            <div style={{ fontSize: "10px", opacity: 0.66 }}>{sandbox.combatState ? `Round ${sandbox.combatState.round}` : "Pre-fight"}</div>
+          </div>
+          <div data-testid="selected-action-label" style={{ fontSize: "16px", fontWeight: 800, lineHeight: 1.2 }}>{selectedActionLabel}</div>
+          <div data-testid="selected-action-tags" style={{ display: "flex", gap: "4px", flexWrap: "wrap" }}>
+            {selectedActionTags.map((tag) => (
+              <span
+                key={`${selectedActionLabel}-${tag}`}
+                style={{
+                  borderRadius: "999px",
+                  padding: "3px 6px",
+                  fontSize: "8px",
+                  lineHeight: 1.1,
+                  background: "rgba(255,171,97,0.08)",
+                  border: "1px solid rgba(255,171,97,0.18)",
+                  color: "#ffe2c2",
+                  fontWeight: 700,
+                }}
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
+          <div style={{ display: "flex", gap: "4px", flexWrap: "wrap" }}>
+            {selectedActionSummary.slice(0, 3).map((entry) => (
+              <span
+                key={`${selectedActionLabel}-${entry}`}
+                style={{
+                  borderRadius: "999px",
+                  padding: "3px 6px",
+                  fontSize: "8px",
+                  lineHeight: 1.1,
+                  background: "rgba(255,255,255,0.045)",
+                  border: "1px solid rgba(255,255,255,0.08)",
+                  color: "#e7d9c8",
+                }}
+              >
+                {entry}
+              </span>
+            ))}
+          </div>
+          <div style={{ fontSize: "9px", textTransform: "uppercase", letterSpacing: "0.08em", color: "#d7c6b2", opacity: 0.72 }}>
+            Phase: {sandbox.combatPhaseLabel}
+          </div>
+        </div>
+      </div>
+    </MiniPanel>
+  );
+}
+
+function AttackTargetRoundPanel({
+  sandbox,
+  latestRoundSummary,
+}: {
+  sandbox: CombatSandboxModel;
+  latestRoundSummary: string;
+}) {
+  return (
+    <MiniPanel title="Attack Target + Round">
+      <div style={{ display: "grid", gap: "10px", height: "100%", alignContent: "space-between" }}>
+        <div style={{ display: "grid", gap: "9px" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(5, minmax(0, 1fr))", gap: "7px" }}>
+            {sandbox.zones.map((zone) => (
+              <button
+                key={zone}
+                type="button"
+                aria-label={`Select attack zone ${zone}`}
+                onClick={() => sandbox.setSelectedAttackZone(zone)}
+                style={{
+                  ...buttonStyle,
+                  ...(sandbox.selectedAttackZone === zone
+                    ? { background: "rgba(207,106,50,0.16)", border: "1px solid rgba(255,171,97,0.4)", color: "#ffe2c2" }
+                    : {}),
+                  padding: "11px 4px",
+                  fontSize: "10px",
+                  textTransform: "capitalize",
+                }}
+              >
+                {zone}
+              </button>
+            ))}
+          </div>
+          <ResourceGrid resources={sandbox.playerResources} />
+        </div>
+        <div style={{ display: "grid", gap: "7px" }}>
+          {sandbox.canPrepareNextRound ? (
+            <button
+              type="button"
+              aria-label="Prepare next round"
+              onClick={sandbox.prepareNextRound}
+              style={primaryButtonStyle}
+            >
+              Next Round
+            </button>
+          ) : (
+            <button
+              type="button"
+              aria-label="Resolve round"
+              onClick={sandbox.resolveNextRound}
+              disabled={!sandbox.canResolveRound}
+              className={sandbox.canResolveRound ? "combat-action-ready-pulse" : undefined}
+              style={{
+                ...primaryButtonStyle,
+                ...(sandbox.canResolveRound ? {} : { opacity: 0.48, cursor: "not-allowed" }),
+              }}
+            >
+              {sandbox.combatPhase === "resolving_round" ? "Resolving..." : "Resolve Round"}
+            </button>
+          )}
+          <div data-testid="latest-round-summary" style={{ display: "none" }}>{latestRoundSummary}</div>
+        </div>
+      </div>
+    </MiniPanel>
+  );
+}
+
+function CombatActionsPanel({
+  sandbox,
+  onOpenSkillLoadout,
+}: {
+  sandbox: CombatSandboxModel;
+  onOpenSkillLoadout: () => void;
+}) {
+  return (
+    <MiniPanel title="Combat Actions">
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
+        <ActionRail
+          title="Skills"
+          emptyLabel=""
+          countLabel={`${sandbox.equippedSkills.length}/${sandbox.maxEquippedSkills}`}
+          entrySlots={sandbox.maxEquippedSkills}
+          headerAction={
+            <div style={{ display: "flex", gap: "4px", alignItems: "center" }}>
+              <button
+                type="button"
+                aria-label="Select basic attack"
+                onClick={sandbox.selectBasicAction}
+                style={{
+                  ...buttonStyle,
+                  padding: "5px 8px",
+                  fontSize: "9px",
+                  ...(sandbox.selectedAction.kind === "basic_attack"
+                    ? {
+                        border: "1px solid rgba(255,171,97,0.4)",
+                        background: "linear-gradient(180deg, rgba(221,122,68,0.24), rgba(207,106,50,0.12))",
+                        color: "#ffe2c2",
+                      }
+                    : {}),
+                }}
+              >
+                Basic
+              </button>
+              {sandbox.unlockedSkills.length > 0 ? (
+                <button
+                  type="button"
+                  aria-label="Manage equipped skills"
+                  onClick={onOpenSkillLoadout}
+                  style={{ ...buttonStyle, padding: "5px 8px", fontSize: "9px" }}
+                >
+                  Manage
+                </button>
+              ) : null}
+            </div>
+          }
+          entries={sandbox.equippedSkills.map((skill) => {
+            const currentValue = (sandbox.playerResources ?? { rage: 0, guard: 0, momentum: 0, focus: 0 })[skill.resourceType];
+            return (
+              <ActionButton
+                key={skill.id}
+                selected={sandbox.selectedAction.kind === "skill_attack" && sandbox.selectedAction.skillId === skill.id}
+                muted={currentValue < skill.cost}
+                ready={currentValue >= skill.cost}
+                resourceProgress={skill.cost > 0 ? Math.min(1, currentValue / skill.cost) : 1}
+                onClick={() =>
+                  sandbox.setSelectedSkillAction(
+                    sandbox.selectedAction.kind === "skill_attack" && sandbox.selectedAction.skillId === skill.id
+                      ? null
+                      : skill.id
+                  )}
+                label={skill.name}
+                note={`${currentValue}/${skill.cost} ${skill.resourceType}`}
+                description={skill.description}
+                detailLines={formatSkillDetailLines(skill)}
+                icon={getSkillIcon(skill.name, skill.sourceItemCode)}
+                iconHint={skill.sourceItemCode}
+                badge={`${skill.cost}`}
+              />
+            );
+          })}
+        />
+        <ActionRail
+          title="Consumables"
+          emptyLabel="No consumables."
+          countLabel={String(sandbox.availableConsumables.length)}
+          entries={sandbox.availableConsumables.map((entry) => (
+            <ActionButton
+              key={entry.item.code}
+              selected={sandbox.selectedAction.kind === "consumable" && sandbox.selectedAction.consumableCode === entry.item.code}
+              onClick={() =>
+                sandbox.setSelectedConsumableAction(
+                  sandbox.selectedAction.kind === "consumable" &&
+                    sandbox.selectedAction.consumableCode === entry.item.code
+                    ? null
+                    : entry.item.code
+                )}
+              label={entry.item.name}
+              note={`x${entry.quantity}`}
+              description={entry.item.description}
+              detailLines={formatConsumableDetailLines(entry.item)}
+              icon={getConsumableIcon(entry.item.name)}
+            />
+          ))}
+        />
+      </div>
+    </MiniPanel>
+  );
+}
+
+function BotCombatPanelSidebar({
+  sandbox,
+  onOpenBuildPresets,
+}: {
+  sandbox: CombatSandboxModel;
+  onOpenBuildPresets: () => void;
+}) {
+  return (
+    <div style={{ display: "grid", gap: "8px", alignContent: "start", height: "100%" }}>
+      <MiniPanel title="Utility">
+        <div style={{ display: "grid", gap: "6px" }}>
+          <button
+            type="button"
+            aria-label="Open bot build presets"
+            onClick={onOpenBuildPresets}
+            style={buttonStyle}
+          >
+            Bot Build
+          </button>
+          <div
+            style={{
+              borderRadius: "10px",
+              padding: "7px 8px",
+              background: "rgba(255,255,255,0.03)",
+              border: "1px solid rgba(255,255,255,0.08)",
+              display: "grid",
+              gap: "2px",
+            }}
+          >
+            <div style={{ fontSize: "7px", textTransform: "uppercase", letterSpacing: "0.12em", color: "#d8c7b1", opacity: 0.76 }}>
+              Current Build
+            </div>
+            <div style={{ fontSize: "11px", fontWeight: 800, color: "#fff3e2", lineHeight: 1.15 }}>
+              {sandbox.botBuildPreset.label}
+            </div>
+            <div style={{ fontSize: "8px", lineHeight: 1.25, color: "#cbbba8" }}>
+              {sandbox.botBuildPreset.archetype} вЂў {sandbox.botBuildPreset.targetFightLength}
+            </div>
+          </div>
+        </div>
+      </MiniPanel>
+      <MiniPanel title="Snapshot">
+        <StatGrid stats={sandbox.botSnapshot.stats} />
+        <MetricGrid
+          items={[
+            { label: "HP", value: String(sandbox.metrics.opponentMaxHp) },
+            { label: "DMG", value: String(sandbox.metrics.opponentTotalDamage), tone: "warm" },
+            { label: "Armor", value: String(sandbox.metrics.opponentTotalArmor) },
+            { label: "Type", value: formatMaybeTitle(sandbox.metrics.opponentWeaponDamageType) },
+          ]}
+        />
+        <ResourceGrid resources={sandbox.botResources} />
+      </MiniPanel>
+    </div>
+  );
+}
+
+function BattleLogSection({
+  entries,
+  playerId,
+  botId,
+}: {
+  entries: CombatSandboxModel["battleLogEntries"];
+  playerId: string;
+  botId: string;
+}) {
+  return (
+    <div style={{ ...shellStyle, padding: "16px" }}>
+      <BattleLogPanel entries={entries} playerId={playerId} botId={botId} />
+    </div>
   );
 }
 
@@ -1126,6 +1288,8 @@ function ActionRail({
 function ActionButton({
   selected,
   muted = false,
+  ready = false,
+  resourceProgress = 0,
   onClick,
   label,
   note,
@@ -1137,6 +1301,8 @@ function ActionButton({
 }: {
   selected: boolean;
   muted?: boolean;
+  ready?: boolean;
+  resourceProgress?: number;
   onClick: () => void;
   label: string;
   note: string;
@@ -1148,9 +1314,24 @@ function ActionButton({
 }) {
   const [popupOpen, setPopupOpen] = useState(false);
   const visual = getActionVisual(label, iconHint);
+  const progress = Math.max(0, Math.min(1, resourceProgress));
+  const showProgressRing = progress > 0 && progress < 1 && !ready;
 
   return (
     <div style={{ position: "relative", display: "grid", justifyItems: "center", alignItems: "center" }}>
+      {showProgressRing ? (
+        <span
+          aria-hidden="true"
+          style={{
+            position: "absolute",
+            inset: "-3px",
+            borderRadius: "999px",
+            background: `conic-gradient(rgba(255,193,122,0.94) 0deg, rgba(255,193,122,0.94) ${progress * 360}deg, rgba(255,255,255,0.08) ${progress * 360}deg, rgba(255,255,255,0.08) 360deg)`,
+            boxShadow: "0 0 12px rgba(255,171,97,0.16)",
+            pointerEvents: "none",
+          }}
+        />
+      ) : null}
       <button
         type="button"
         aria-label={`Select ${label}`}
@@ -1159,6 +1340,7 @@ function ActionButton({
         onMouseLeave={() => setPopupOpen(false)}
         onFocus={() => setPopupOpen(true)}
         onBlur={() => setPopupOpen(false)}
+        className={ready && !muted ? "combat-action-ready-pulse" : undefined}
         style={{
           width: "34px",
           height: "34px",
@@ -1174,14 +1356,19 @@ function ActionButton({
           display: "grid",
           placeItems: "center",
           textAlign: "center",
-          boxShadow: selected ? "0 10px 22px rgba(207,106,50,0.18)" : "none",
+          boxShadow: selected
+            ? "0 10px 22px rgba(207,106,50,0.18)"
+            : ready && !muted
+              ? "0 0 0 1px rgba(255,194,115,0.18), 0 10px 24px rgba(255,159,98,0.12)"
+              : "none",
           fontSize: "15px",
           lineHeight: 1,
           overflow: "hidden",
           position: "relative",
+          zIndex: 1,
         }}
       >
-        <span aria-hidden="true">{icon ?? "•"}</span>
+        <span aria-hidden="true">{icon ?? "вЂў"}</span>
         {badge ? (
           <span
             style={{
@@ -1266,7 +1453,7 @@ function ActionButton({
                 opacity: 0.85,
               }}
             />
-            <div style={{ position: "relative", fontSize: "42px", lineHeight: 1 }}>{icon ?? "•"}</div>
+            <div style={{ position: "relative", fontSize: "42px", lineHeight: 1 }}>{icon ?? "вЂў"}</div>
           </div>
           {description ? <div style={{ fontSize: "10px", lineHeight: 1.35, color: "#d7cbbc" }}>{description}</div> : null}
           {detailLines.length > 0 ? (
@@ -1562,23 +1749,23 @@ function getSkillIcon(skillName: string, iconHint?: string) {
   const normalizedHint = (iconHint ?? "").toLowerCase();
 
   if (normalizedHint.includes("shield") || normalizedName.includes("shield")) {
-    return "🛡";
+    return "рџ›Ў";
   }
 
   if (normalizedHint.includes("helmet") || normalizedHint.includes("cap") || normalizedName.includes("head")) {
-    return "🪖";
+    return "рџЄ–";
   }
 
   if (normalizedHint.includes("armor") || normalizedHint.includes("vest") || normalizedHint.includes("jacket")) {
-    return "🦺";
+    return "рџ¦є";
   }
 
   if (normalizedHint.includes("glove") || normalizedHint.includes("gauntlet") || normalizedName.includes("grip")) {
-    return "🧤";
+    return "рџ§¤";
   }
 
   if (normalizedHint.includes("boot") || normalizedName.includes("step") || normalizedName.includes("kick")) {
-    return "🥾";
+    return "рџҐѕ";
   }
 
   if (
@@ -1588,52 +1775,52 @@ function getSkillIcon(skillName: string, iconHint?: string) {
     normalizedHint.includes("medallion") ||
     normalizedHint.includes("accessory")
   ) {
-    return "💍";
+    return "рџ’Ќ";
   }
 
   if (normalizedHint.includes("dagger") || normalizedName.includes("pierc") || normalizedName.includes("lunge")) {
-    return "🗡";
+    return "рџ—Ў";
   }
 
   if (normalizedHint.includes("axe") || normalizedName.includes("cleave")) {
-    return "🪓";
+    return "рџЄ“";
   }
 
   if (normalizedHint.includes("mace") || normalizedHint.includes("hammer") || normalizedName.includes("bash")) {
-    return "🔨";
+    return "рџ”Ё";
   }
 
   if (normalizedHint.includes("sword") || normalizedName.includes("slash")) {
-    return "⚔";
+    return "вљ”";
   }
 
   if (normalizedName.includes("shield")) {
-    return "🛡";
+    return "рџ›Ў";
   }
 
   if (normalizedName.includes("pierc") || normalizedName.includes("lunge") || normalizedName.includes("dagger")) {
-    return "🗡";
+    return "рџ—Ў";
   }
 
   if (normalizedName.includes("cleave") || normalizedName.includes("slash") || normalizedName.includes("sword")) {
-    return "⚔";
+    return "вљ”";
   }
 
-  return "✦";
+  return "вњ¦";
 }
 
 function getConsumableIcon(itemName: string) {
   const normalizedName = itemName.toLowerCase();
 
   if (normalizedName.includes("potion")) {
-    return "🧪";
+    return "рџ§Є";
   }
 
   if (normalizedName.includes("bandage")) {
-    return "🩹";
+    return "рџ©№";
   }
 
-  return "◉";
+  return "в—‰";
 }
 
 function getActionVisual(label: string, iconHint?: string) {

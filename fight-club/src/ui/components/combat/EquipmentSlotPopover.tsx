@@ -1,8 +1,10 @@
-import type { CSSProperties } from "react";
 import type { EquipmentSlot } from "@/modules/equipment";
 import type { InventoryEntry } from "@/modules/inventory";
 import { ItemHoverPreview } from "@/ui/components/combat/ItemHoverPreview";
 import { ItemPresentationCard } from "@/ui/components/combat/ItemPresentationCard";
+import { ActionButton } from "@/ui/components/shared/ActionButton";
+import { ModalOverlay } from "@/ui/components/shared/ModalOverlay";
+import { ModalSurface } from "@/ui/components/shared/ModalSurface";
 
 interface EquipmentSlotPopoverProps {
   slot: EquipmentSlot;
@@ -12,32 +14,6 @@ interface EquipmentSlotPopoverProps {
   onUnequip: (slot: EquipmentSlot) => void;
   onClose: () => void;
 }
-
-const surfaceStyle: CSSProperties = {
-  borderRadius: "22px",
-  border: "1px solid rgba(255,255,255,0.12)",
-  background:
-    "linear-gradient(180deg, rgba(18,18,24,0.98), rgba(12,12,18,0.98)), radial-gradient(circle at top, rgba(120,189,255,0.08), transparent 32%)",
-  boxShadow: "0 22px 44px rgba(0,0,0,0.38)",
-};
-
-const primaryButtonStyle: CSSProperties = {
-  padding: "8px 12px",
-  borderRadius: "999px",
-  border: "none",
-  background: "#cf6a32",
-  color: "#fff8ed",
-  cursor: "pointer",
-};
-
-const secondaryButtonStyle: CSSProperties = {
-  padding: "8px 12px",
-  borderRadius: "999px",
-  border: "1px solid rgba(255,255,255,0.16)",
-  background: "rgba(255,255,255,0.04)",
-  color: "#fff8ed",
-  cursor: "pointer",
-};
 
 const slotToneBySlot: Record<EquipmentSlot, { icon: string; tint: string; border: string; text: string }> = {
   mainHand: { icon: "⚔", tint: "rgba(229,115,79,0.16)", border: "rgba(229,115,79,0.34)", text: "#f0a286" },
@@ -60,37 +36,21 @@ export function EquipmentSlotPopover({
   const slotTone = slotToneBySlot[slot];
 
   return (
-    <div
-      style={{
-        position: "absolute",
-        inset: 0,
-        zIndex: 20,
-        display: "grid",
-        placeItems: "start center",
-        padding: "18px",
-      }}
+    <ModalOverlay
+      onClose={onClose}
+      closeLabel="Close equipment popover"
+      zIndex={20}
+      position="absolute"
+      placeItems="start center"
+      padding="18px"
+      backdrop="rgba(7, 8, 12, 0.62)"
     >
-      <button
-        type="button"
-        aria-label="Close equipment popover"
-        onClick={onClose}
+      <ModalSurface
         style={{
-          position: "absolute",
-          inset: 0,
-          border: "none",
-          background: "rgba(7, 8, 12, 0.62)",
-          cursor: "pointer",
-        }}
-      />
-      <div
-        style={{
-          ...surfaceStyle,
-          position: "relative",
           width: "min(540px, 100%)",
           maxHeight: "min(640px, calc(100vh - 140px))",
           display: "grid",
           gridTemplateRows: "auto auto minmax(0, 1fr)",
-          overflow: "hidden",
         }}
       >
         <div
@@ -142,9 +102,9 @@ export function EquipmentSlotPopover({
                 Choose a compatible item for this slot.
               </div>
             </div>
-            <button type="button" onClick={onClose} style={{ ...secondaryButtonStyle, padding: "6px 10px", fontSize: "11px" }}>
+            <ActionButton type="button" onClick={onClose} tone="secondary" style={{ padding: "6px 10px", fontSize: "11px" }}>
               Close
-            </button>
+            </ActionButton>
           </div>
           <div
             style={{
@@ -175,13 +135,14 @@ export function EquipmentSlotPopover({
         </div>
 
         {equippedItemCode ? (
-          <button
+          <ActionButton
             type="button"
             onClick={() => onUnequip(slot)}
-            style={{ ...secondaryButtonStyle, width: "calc(100% - 32px)", margin: "12px 16px 0", fontSize: "12px" }}
+            tone="secondary"
+            style={{ width: "calc(100% - 32px)", margin: "12px 16px 0", fontSize: "12px" }}
           >
             Unequip current item
-          </button>
+          </ActionButton>
         ) : null}
 
         <div style={{ display: "grid", gap: "10px", maxHeight: "480px", overflowY: "auto", padding: "12px 16px 16px", paddingRight: "12px" }}>
@@ -197,29 +158,29 @@ export function EquipmentSlotPopover({
                 <ItemPresentationCard
                   entry={entry}
                   footer={
-                    <button
+                    <ActionButton
                       type="button"
                       aria-label={`Equip ${entry.item.name}`}
                       onClick={() => onEquip(entry.item.code)}
+                      tone={equippedItemCode === entry.item.code ? "secondary" : "primary"}
                       style={{
-                        ...(equippedItemCode === entry.item.code ? secondaryButtonStyle : primaryButtonStyle),
                         width: "100%",
                         fontSize: "12px",
                         border: equippedItemCode === entry.item.code ? `1px solid ${slotTone.border}` : "none",
-                        background: equippedItemCode === entry.item.code ? slotTone.tint : primaryButtonStyle.background,
-                        color: equippedItemCode === entry.item.code ? slotTone.text : primaryButtonStyle.color,
+                        background: equippedItemCode === entry.item.code ? slotTone.tint : undefined,
+                        color: equippedItemCode === entry.item.code ? slotTone.text : undefined,
                       }}
                     >
                       {equippedItemCode === entry.item.code ? "Equipped" : "Equip"}
-                    </button>
+                    </ActionButton>
                   }
                 />
               </ItemHoverPreview>
             ))
           )}
         </div>
-      </div>
-    </div>
+      </ModalSurface>
+    </ModalOverlay>
   );
 }
 

@@ -1,6 +1,6 @@
 # PROJECT_STRUCTURE - Fight Club
 
-> Last updated: 2026-03-13 21:55 MSK
+> Last updated: 2026-03-13 22:25 MSK
 
 **Project root:** `c:/Users/dtphs/.vscode/Project`
 
@@ -224,6 +224,16 @@ Current preset fact:
 - `ItemPresentationCard.tsx` - full item card with prominent `Weapon Passive` and `Signature Skill` blocks
 - `ItemHoverPreview.tsx` - smart hover card positioning for item previews
 
+### `components/shared`
+
+- `ActionButton.tsx` - shared pill-button primitive for combat modal actions
+- `ModalOverlay.tsx` - shared close-backdrop and positioning shell for modal popovers
+- `ModalSurface.tsx` - shared elevated modal container with default visual treatment
+- `PanelCard.tsx` - shared bordered panel surface for compact metric and summary cards
+- `ItemPreviewPopover.tsx` - shared item-preview shell built on top of preview surface and tag primitives
+- `PreviewSurface.tsx` - shared hover-preview and anchored item-preview shell
+- `PreviewTag.tsx` - shared compact tag used inside preview headers
+
 Backup artifacts intentionally kept:
 
 - `CombatSilhouette.backup-2026-03-11.tsx`
@@ -236,6 +246,7 @@ Backup artifacts intentionally kept:
 
 - `useGameApp.ts` - app context access
 - `useCombatSandbox.ts` - React adapter between UI and orchestration/combat runtime
+- `useAnchoredPopup.ts` - shared viewport-aware popup positioning for hover previews and anchored equipment popovers
 
 ### `screens`
 
@@ -252,6 +263,9 @@ Current UI facts:
 - status effects live above HP to avoid spending extra vertical space
 - hover popups for items and effects are now part of the real live UI contract
 - item cards and preset equipment previews surface weapon passives and key item skills as primary feature blocks
+- `src/ui/components/shared/` now exists as the first extracted UI-foundation layer for `UI-002`
+- `src/ui/hooks/useAnchoredPopup.ts` is the first shared infrastructure piece for `UI-004`
+- preview chrome and preview item shell are now unified through `PreviewSurface.tsx`, `PreviewTag.tsx`, and `ItemPreviewPopover.tsx`
 
 ---
 
@@ -313,4 +327,4 @@ Current status:
 
 ---
 
-> Last updated: 2026-03-13 21:55 MSK
+> Last updated: 2026-03-13 22:25 MSK

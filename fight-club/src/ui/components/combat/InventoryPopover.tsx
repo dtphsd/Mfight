@@ -1,8 +1,11 @@
-import type { CSSProperties } from "react";
 import { getEquipmentSlotForItem, type EquipmentSlot } from "@/modules/equipment";
 import type { InventoryEntry } from "@/modules/inventory";
 import { ItemHoverPreview } from "@/ui/components/combat/ItemHoverPreview";
 import { ItemPresentationCard } from "@/ui/components/combat/ItemPresentationCard";
+import { ActionButton } from "@/ui/components/shared/ActionButton";
+import { ModalOverlay } from "@/ui/components/shared/ModalOverlay";
+import { ModalSurface } from "@/ui/components/shared/ModalSurface";
+import { PanelCard } from "@/ui/components/shared/PanelCard";
 
 interface InventoryPopoverProps {
   entries: InventoryEntry[];
@@ -12,32 +15,6 @@ interface InventoryPopoverProps {
   onEquip: (itemCode: string) => void;
   onClose: () => void;
 }
-
-const surfaceStyle: CSSProperties = {
-  borderRadius: "22px",
-  border: "1px solid rgba(255,255,255,0.12)",
-  background:
-    "linear-gradient(180deg, rgba(18,18,24,0.98), rgba(12,12,18,0.98)), radial-gradient(circle at top, rgba(120,189,255,0.08), transparent 32%)",
-  boxShadow: "0 22px 44px rgba(0,0,0,0.38)",
-};
-
-const primaryButtonStyle: CSSProperties = {
-  padding: "8px 12px",
-  borderRadius: "999px",
-  border: "none",
-  background: "#cf6a32",
-  color: "#fff8ed",
-  cursor: "pointer",
-};
-
-const secondaryButtonStyle: CSSProperties = {
-  padding: "8px 12px",
-  borderRadius: "999px",
-  border: "1px solid rgba(255,255,255,0.16)",
-  background: "rgba(255,255,255,0.04)",
-  color: "#fff8ed",
-  cursor: "pointer",
-};
 
 const slotToneBySlot: Record<EquipmentSlot, { icon: string; tint: string; border: string; text: string }> = {
   mainHand: { icon: "⚔", tint: "rgba(229,115,79,0.16)", border: "rgba(229,115,79,0.34)", text: "#f0a286" },
@@ -62,37 +39,13 @@ export function InventoryPopover({
   const equippableCount = entries.filter((entry) => getEquipmentSlotForItem(entry.item)).length;
 
   return (
-    <div
-      style={{
-        position: "fixed",
-        inset: 0,
-        zIndex: 40,
-        display: "grid",
-        placeItems: "center",
-        padding: "22px",
-      }}
-    >
-      <button
-        type="button"
-        aria-label="Close inventory popover"
-        onClick={onClose}
+    <ModalOverlay onClose={onClose} closeLabel="Close inventory popover">
+      <ModalSurface
         style={{
-          position: "absolute",
-          inset: 0,
-          border: "none",
-          background: "rgba(7, 8, 12, 0.72)",
-          cursor: "pointer",
-        }}
-      />
-      <div
-        style={{
-          ...surfaceStyle,
-          position: "relative",
           width: "min(1180px, 100%)",
           maxHeight: "min(820px, calc(100vh - 44px))",
           display: "grid",
           gridTemplateRows: "auto minmax(0, 1fr)",
-          overflow: "hidden",
         }}
       >
         <div
@@ -114,9 +67,9 @@ export function InventoryPopover({
                 Browse current items and equip compatible gear directly from the list.
               </div>
             </div>
-            <button type="button" onClick={onClose} style={{ ...secondaryButtonStyle, padding: "6px 10px", fontSize: "11px" }}>
+            <ActionButton type="button" onClick={onClose} tone="secondary" style={{ padding: "6px 10px", fontSize: "11px" }}>
               Close
-            </button>
+            </ActionButton>
           </div>
 
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))", gap: "6px" }}>
@@ -206,22 +159,22 @@ export function InventoryPopover({
                           </div>
                         )}
                         {slot ? (
-                          <button
+                          <ActionButton
                             type="button"
                             aria-label={`Equip ${entry.item.name}`}
                             onClick={() => onEquip(entry.item.code)}
+                            tone={equipped ? "secondary" : "primary"}
                             style={{
-                              ...(equipped ? secondaryButtonStyle : primaryButtonStyle),
                               width: "100%",
                               fontSize: "11px",
                               padding: "7px 10px",
                               border: equipped ? `1px solid ${slotTone?.border}` : "none",
-                              background: equipped ? slotTone?.tint : primaryButtonStyle.background,
-                              color: equipped ? slotTone?.text : primaryButtonStyle.color,
+                              background: equipped ? slotTone?.tint : undefined,
+                              color: equipped ? slotTone?.text : undefined,
                             }}
                           >
                             {equipped ? "Equipped" : occupiedBy ? `Equip to ${formatSlot(slot)}` : "Equip"}
-                          </button>
+                          </ActionButton>
                         ) : null}
                       </div>
                     }
@@ -231,26 +184,24 @@ export function InventoryPopover({
             })}
           </div>
         </div>
-      </div>
-    </div>
+      </ModalSurface>
+    </ModalOverlay>
   );
 }
 
 function SummaryPill({ label, value }: { label: string; value: string }) {
   return (
-    <div
+    <PanelCard
       style={{
-        borderRadius: "14px",
         padding: "8px 10px",
         background: "rgba(255,255,255,0.045)",
-        border: "1px solid rgba(255,255,255,0.08)",
         display: "grid",
         gap: "2px",
       }}
     >
       <div style={{ fontSize: "9px", textTransform: "uppercase", opacity: 0.68 }}>{label}</div>
       <div style={{ fontSize: "14px", fontWeight: 800, color: "#eef7ff" }}>{value}</div>
-    </div>
+    </PanelCard>
   );
 }
 

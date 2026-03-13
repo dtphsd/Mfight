@@ -2,6 +2,10 @@ import type { CSSProperties, ReactNode } from "react";
 import type { CharacterStatName } from "@/modules/character";
 import type { CombatSkill } from "@/modules/combat";
 import type { ArmorProfile, DamageProfile } from "@/modules/inventory";
+import { ActionButton } from "@/ui/components/shared/ActionButton";
+import { ModalOverlay } from "@/ui/components/shared/ModalOverlay";
+import { ModalSurface } from "@/ui/components/shared/ModalSurface";
+import { PanelCard as SharedPanelCard } from "@/ui/components/shared/PanelCard";
 
 interface BuilderPopoverProps {
   buildPresets: Array<{ id: string; label: string; description?: string }>;
@@ -191,36 +195,16 @@ export function BuilderPopover({
   onClose,
 }: BuilderPopoverProps) {
   return (
-    <div
-      style={{
-        position: "fixed",
-        inset: 0,
-        zIndex: 40,
-        display: "grid",
-        placeItems: "center",
-        padding: "22px",
-      }}
+    <ModalOverlay
+      onClose={onClose}
+      closeLabel="Close builder popover"
+      zIndex={40}
+      backdrop="rgba(7, 8, 12, 0.72)"
     >
-      <button
-        type="button"
-        aria-label="Close builder popover"
-        onClick={onClose}
+      <ModalSurface
         style={{
-          position: "absolute",
-          inset: 0,
-          border: "none",
-          background: "rgba(7, 8, 12, 0.72)",
-          cursor: "pointer",
-        }}
-      />
-      <div
-        style={{
-          position: "relative",
           width: "min(1120px, 100%)",
           maxHeight: "min(780px, calc(100vh - 36px))",
-          borderRadius: "22px",
-          overflow: "hidden",
-          border: "1px solid rgba(255,255,255,0.12)",
           background:
             "linear-gradient(180deg, rgba(25,22,27,0.98), rgba(14,13,18,0.98)), radial-gradient(circle at top, rgba(255,214,164,0.08), transparent 32%)",
           boxShadow: "0 28px 72px rgba(0,0,0,0.48)",
@@ -281,12 +265,12 @@ export function BuilderPopover({
               </div>
             </div>
             <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
-              <button type="button" onClick={resetBuild} style={{ ...secondaryButtonStyle, padding: "6px 10px" }}>
+              <ActionButton type="button" onClick={resetBuild} tone="secondary" style={{ ...secondaryButtonStyle, padding: "6px 10px" }}>
                 Reset Build
-              </button>
-              <button type="button" onClick={onClose} style={{ ...secondaryButtonStyle, padding: "6px 10px" }}>
+              </ActionButton>
+              <ActionButton type="button" onClick={onClose} tone="secondary" style={{ ...secondaryButtonStyle, padding: "6px 10px" }}>
                 Close
-              </button>
+              </ActionButton>
             </div>
           </div>
 
@@ -355,9 +339,10 @@ export function BuilderPopover({
                       Open the dedicated build presets browser to compare six curated archetypes, inspect their five-skill panels, and apply the one you want.
                     </div>
                     <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
-                      <button
+                      <ActionButton
                         type="button"
                         onClick={onOpenBuildPresets}
+                        tone="secondary"
                         style={{
                           ...secondaryButtonStyle,
                           padding: "6px 10px",
@@ -366,12 +351,13 @@ export function BuilderPopover({
                         }}
                       >
                         Open Build Presets
-                      </button>
+                      </ActionButton>
                       {buildPresets.slice(0, 3).map((preset) => (
-                        <button
+                        <ActionButton
                           key={preset.id}
                           type="button"
                           onClick={() => applyPreset(preset.id)}
+                          tone="secondary"
                           style={{
                             ...secondaryButtonStyle,
                             padding: "6px 8px",
@@ -381,7 +367,7 @@ export function BuilderPopover({
                           }}
                         >
                           {preset.label}
-                        </button>
+                        </ActionButton>
                       ))}
                     </div>
                   </div>
@@ -796,25 +782,23 @@ export function BuilderPopover({
             </div>
           </div>
         </div>
-      </div>
-    </div>
+      </ModalSurface>
+    </ModalOverlay>
   );
 }
 
 function PanelCard({ children, compact = false }: { children: ReactNode; compact?: boolean }) {
   return (
-    <div
+    <SharedPanelCard
       style={{
         borderRadius: compact ? "12px" : "16px",
         padding: compact ? "9px" : "12px",
-        background: "rgba(255,255,255,0.03)",
-        border: "1px solid rgba(255,255,255,0.08)",
         display: "grid",
         gap: compact ? "7px" : "9px",
       }}
     >
       {children}
-    </div>
+    </SharedPanelCard>
   );
 }
 

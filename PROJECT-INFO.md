@@ -1,6 +1,6 @@
 # PROJECT-INFO - Fight Club
 
-> Last updated: 2026-03-13 21:41 MSK
+> Last updated: 2026-03-13 22:25 MSK
 
 **Project:** Fight Club  
 **Type:** browser-only SPA / combat sandbox  
@@ -116,6 +116,10 @@ Effects are visible:
 - builder popover
 - inventory popover
 - equipment slot popover
+- first extracted shared UI primitives now live in `src/ui/components/shared/` for modal overlays, modal surfaces, action buttons, and compact panel cards
+- hover preview positioning is now starting to move into shared infrastructure through `src/ui/hooks/useAnchoredPopup.ts`
+- hover preview chrome is also starting to converge through `src/ui/components/shared/PreviewSurface.tsx` and `PreviewTag.tsx`
+- item-based hover preview shell is now also partially unified through `src/ui/components/shared/ItemPreviewPopover.tsx`
 - skill loadout popover
 - rich hover cards for equipped items and inventory/equipment cards
 - prominent `Weapon Passive` block on weapon cards
@@ -260,4 +264,4 @@ From repo root:
 
 ---
 
-> Last updated: 2026-03-13 21:41 MSK
+> Last updated: 2026-03-13 22:25 MSK

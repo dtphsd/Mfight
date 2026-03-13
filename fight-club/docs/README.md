@@ -14,6 +14,7 @@ Use it as the main reading path when onboarding, reviewing architecture, or plan
 2. [Combat Design Reference](./architecture/combat-design-reference.md)
 3. [Combat System Roadmap](./architecture/combat-system-roadmap.md)
 4. [ADR-001: Modular Headless Core](./decisions/ADR-001-architecture.md)
+5. [GitBook Publish Setup](./gitbook-publish-setup.md)
 
 For GitBook navigation, use [SUMMARY.md](./SUMMARY.md).
 
@@ -30,6 +31,10 @@ For GitBook navigation, use [SUMMARY.md](./SUMMARY.md).
 ### Decisions
 
 - [ADR-001: Modular Headless Core](./decisions/ADR-001-architecture.md)
+
+### Publishing
+
+- [GitBook Publish Setup](./gitbook-publish-setup.md)
 
 ### Generated And Operational Artifacts
 

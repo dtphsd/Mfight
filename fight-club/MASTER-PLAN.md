@@ -317,6 +317,7 @@
 | v0.36 | Combat Regression Matrix Added | Combat pipeline docs now hand off directly into a prioritized regression-test matrix for `COMBAT-003` | `COMBAT-003` |
 | v0.37 | GitBook Docs Prep | Added docs landing pages, section indexes, and GitBook-friendly navigation links across architecture and decision docs | `DOC-001` |
 | v0.38 | GitBook Navigation Finalized | Added `docs/SUMMARY.md` and synchronized root docs for GitBook export readiness | `DOC-001` |
+| v0.39 | GitBook Publish Setup Added | Added publish setup guide, docs validation script, and GitHub workflow for GitBook-ready docs handoff | `DOC-001` |
 
 ---
 

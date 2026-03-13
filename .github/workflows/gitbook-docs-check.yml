@@ -1,0 +1,39 @@
+name: GitBook Docs Check
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "fight-club/docs/**"
+      - "fight-club/scripts/validate-content.mjs"
+      - "fight-club/package.json"
+  pull_request:
+    paths:
+      - "fight-club/docs/**"
+      - "fight-club/scripts/validate-content.mjs"
+      - "fight-club/package.json"
+
+jobs:
+  validate-docs:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: fight-club
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: fight-club/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Validate GitBook docs structure
+        run: npm run docs:validate

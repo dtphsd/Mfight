@@ -22,6 +22,7 @@ The app root now also contains a local planning workflow:
 - `fight-club/features/combat-design-reference.md` for combat-system documentation and safety tasks
 - `fight-club/docs/README.md` as the GitBook-style documentation landing page
 - `fight-club/docs/SUMMARY.md` as the GitBook navigation tree
+- `fight-club/docs/gitbook-publish-setup.md` as the operational setup guide for GitBook publishing
 - `fight-club/docs/architecture/combat-design-reference.md` as the current source-of-truth combat runtime reference
 
 It has:

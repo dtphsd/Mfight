@@ -79,6 +79,7 @@ Update when:
 - Combat docs must be easy to navigate, complete enough for safe changes, and kept in sync with the real runtime because much of the project depends on combat behavior.
 - If combat formulas, turn flow, effects, resource rules, zones, skills, consumables, or bot assumptions change, update the combat design reference so it still contains the full working model.
 - If docs are prepared for GitBook publishing, keep `fight-club/docs/README.md` and `fight-club/docs/SUMMARY.md` in sync with the actual document structure.
+- Before publishing docs changes, run `npm run docs:validate` from `fight-club/`.
 
 ---
 

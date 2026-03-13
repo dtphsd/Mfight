@@ -7,3 +7,4 @@
     - [Combat System Roadmap](architecture/combat-system-roadmap.md)
   - [Architecture Decisions](decisions/README.md)
     - [ADR-001: Modular Headless Core](decisions/ADR-001-architecture.md)
+  - [GitBook Publish Setup](gitbook-publish-setup.md)

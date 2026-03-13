@@ -58,6 +58,7 @@ Notes:
 - `features/combat-design-reference.md` - tracked combat-system documentation and safety workstream
 - `docs/README.md` - docs home page for GitBook-style navigation
 - `docs/SUMMARY.md` - GitBook navigation tree for the primary documentation flow
+- `docs/gitbook-publish-setup.md` - operational guide for connecting and validating GitBook publishing
 - `docs/architecture/README.md` - architecture section landing page
 - `docs/decisions/README.md` - architecture decisions landing page
 - `docs/architecture/combat-design-reference.md` - live combat-system reference based on the current runtime

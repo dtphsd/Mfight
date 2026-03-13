@@ -10,6 +10,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "lint": "eslint .",
+    "docs:validate": "node scripts/validate-content.mjs",
     "generate:module": "node scripts/generate-module.mjs",
     "balance:matrix": "node scripts/run-build-matrix.cjs"
   },

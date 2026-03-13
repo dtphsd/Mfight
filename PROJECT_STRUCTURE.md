@@ -1,12 +1,23 @@
 # PROJECT_STRUCTURE - Fight Club
 
-> Last updated: 2026-03-13 02:00 MSK
+> Last updated: 2026-03-13 18:40 MSK
 
-**Project root:** `c:/Users/dtphs/.vscode/Project/fight-club`
+**Project root:** `c:/Users/dtphs/.vscode/Project`
 
 ---
 
 ## Top Level
+
+Repo root helper files:
+
+- `RULES.md` - root documentation rules and safe-change workflow
+- `PROJECT-INFO.md` - current repo-level reality and workflow notes
+- `PROJECT_STRUCTURE.md` - current documented structure and key files
+- `push-git.ps1` - short repo command for staging, committing, and pushing the current repo state
+- `publish-github.ps1` - underlying publish helper used by `push-git.ps1`
+- `start-fight-club-dev.ps1` - local dev launcher for the Vite app
+
+Main app tree:
 
 ```text
 fight-club/
@@ -39,6 +50,14 @@ Notes:
 - `generate-module.mjs` - helper generator for new module scaffolding
 - `run-build-matrix.cjs` - standalone balance runner with sandbox-style stat-budget parity for the right-side preset
 - `run-build-matrix.ts` - TypeScript helper version of the same balance matrix logic
+
+---
+
+## Repo Root Helpers
+
+- `push-git.ps1` - repo-level command wrapper for the standard git push workflow
+- `publish-github.ps1` - repo-level publish helper that runs `git add -A`, `git commit -m`, and `git push origin <current-branch>`
+- `start-fight-club-dev.ps1` - repo-level PowerShell launcher for local development
 
 ---
 
@@ -282,4 +301,4 @@ Current status:
 
 ---
 
-> Last updated: 2026-03-13 02:00 MSK
+> Last updated: 2026-03-13 18:40 MSK

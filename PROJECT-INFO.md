@@ -1,6 +1,6 @@
 # PROJECT-INFO - Fight Club
 
-> Last updated: 2026-03-13 02:00 MSK
+> Last updated: 2026-03-13 18:40 MSK
 
 **Project:** Fight Club  
 **Type:** browser-only SPA / combat sandbox  
@@ -12,6 +12,8 @@
 ## Current Reality
 
 The project is a single frontend app in `fight-club/`.
+
+The repository root also contains the shared documentation set plus helper scripts for local development and git push workflow.
 
 It has:
 
@@ -248,8 +250,9 @@ From repo root:
 
 ```powershell
 ./start-fight-club-dev.ps1
+./push-git.ps1 -Message "docs: update root rules"
 ```
 
 ---
 
-> Last updated: 2026-03-13 02:00 MSK
+> Last updated: 2026-03-13 18:40 MSK

@@ -1,6 +1,6 @@
 # RULES.md - Documentation And Safe Change Rules
 
-> Last updated: 2026-03-13 02:00 MSK
+> Last updated: 2026-03-13 18:40 MSK
 
 **Project:** Fight Club  
 **Path:** `c:/Users/dtphs/.vscode/Project`
@@ -75,6 +75,15 @@ Update when:
 - Mark unfinished modules explicitly as `stub`, `skeleton`, or `not implemented`.
 - For missing subsystems, write `absent` instead of using generic template text.
 - For dangerous areas, explain both the file and the reason it is risky.
+
+---
+
+## Completion And GitHub Sync
+
+- A task is not complete until the related documentation is updated.
+- After code changes and documentation updates are finished, push the project state to git.
+- Do not leave completed work only in the local workspace if it is ready to be shared as the current project state.
+- Use `./push-git.ps1 -Message "type: short summary"` from the repo root to stage, commit, and push the current state.
 
 ---
 
@@ -178,4 +187,4 @@ Whenever you edit these root docs:
 
 ---
 
-> Last updated: 2026-03-13 02:00 MSK
+> Last updated: 2026-03-13 18:40 MSK

@@ -1,8 +1,10 @@
 # GitBook Publish Setup
 
-> Last updated: 2026-03-14 00:46 MSK
+> Last updated: 2026-03-14 00:53 MSK
 
 This page explains how to publish the `fight-club/docs/` section to GitBook.
+
+For the built-in static docs site, also see the VitePress and GitHub Pages notes below.
 
 ---
 
@@ -12,9 +14,11 @@ The repository is now prepared for GitBook import:
 
 - `docs/README.md` is the docs landing page
 - `docs/SUMMARY.md` is the GitBook navigation tree
+- `docs/index.md` is the VitePress landing page
 - `docs/architecture/` contains the main technical reading flow
 - `docs/decisions/` contains ADR pages
 - `.github/workflows/gitbook-docs-check.yml` validates the docs structure on GitHub
+- `.github/workflows/deploy-docs-pages.yml` builds and deploys the VitePress site to GitHub Pages
 
 ---
 
@@ -48,6 +52,7 @@ Run:
 
 ```bash
 npm run docs:validate
+npm run docs:build
 ```
 
 This checks:
@@ -55,6 +60,7 @@ This checks:
 - required docs pages exist
 - `SUMMARY.md` links resolve
 - `docs/README.md` still links to `SUMMARY.md`
+- the VitePress site builds from the same docs source
 
 ---
 
@@ -63,10 +69,39 @@ This checks:
 The repository now includes:
 
 - `.github/workflows/gitbook-docs-check.yml`
+- `.github/workflows/deploy-docs-pages.yml`
 
 It validates docs structure on pushes and pull requests that touch docs-related files.
 
-This is not a GitBook deploy job by itself. It is a safety check so broken docs navigation does not reach the publishing branch.
+`gitbook-docs-check.yml` is not a GitBook deploy job by itself. It is a safety check so broken docs navigation does not reach the publishing branch.
+
+`deploy-docs-pages.yml` builds the VitePress site and publishes it to GitHub Pages.
+
+---
+
+## Static Docs Site
+
+The repository now also supports a built-in static docs site through VitePress.
+
+Available commands:
+
+```bash
+npm run docs:dev
+npm run docs:build
+npm run docs:preview
+```
+
+Main files:
+
+- `docs/.vitepress/config.mts`
+- `docs/index.md`
+- `docs/architecture/index.md`
+- `docs/decisions/index.md`
+
+This means you now have two publish-friendly docs paths from the same markdown source:
+
+- GitBook via `README.md` and `SUMMARY.md`
+- GitHub Pages via VitePress
 
 ---
 
@@ -102,4 +137,4 @@ Whenever docs structure changes:
 
 ---
 
-> Last updated: 2026-03-14 00:46 MSK
+> Last updated: 2026-03-14 00:53 MSK

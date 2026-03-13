@@ -10,6 +10,9 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "lint": "eslint .",
+    "docs:dev": "vitepress dev docs",
+    "docs:build": "vitepress build docs",
+    "docs:preview": "vitepress preview docs",
     "docs:validate": "node scripts/validate-content.mjs",
     "generate:module": "node scripts/generate-module.mjs",
     "balance:matrix": "node scripts/run-build-matrix.cjs"
@@ -33,6 +36,7 @@
     "typescript": "^5.7.3",
     "typescript-eslint": "^8.24.1",
     "vite": "^6.2.0",
+    "vitepress": "^1.6.4",
     "vitest": "^3.0.8"
   }
 }

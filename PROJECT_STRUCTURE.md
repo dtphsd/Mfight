@@ -1,6 +1,6 @@
 # PROJECT_STRUCTURE - Fight Club
 
-> Last updated: 2026-03-14 00:41 MSK
+> Last updated: 2026-03-14 00:53 MSK
 
 **Project root:** `c:/Users/dtphs/.vscode/Project`
 
@@ -46,6 +46,7 @@ Notes:
 - `docs/balance/` stores generated preset matchup reports
 - `docs/backup-points/` now stores both documentation markers and restorable UI baseline snapshots
 - `docs/README.md` is the GitBook-style documentation landing page
+- `docs/index.md` is the VitePress landing page
 - `features/` stores per-feature tracking docs used together with `MASTER-PLAN.md`
 
 ---
@@ -59,8 +60,12 @@ Notes:
 - `docs/README.md` - docs home page for GitBook-style navigation
 - `docs/SUMMARY.md` - GitBook navigation tree for the primary documentation flow
 - `docs/gitbook-publish-setup.md` - operational guide for connecting and validating GitBook publishing
+- `docs/.vitepress/config.mts` - VitePress static-site configuration
+- `docs/index.md` - VitePress root page
 - `docs/architecture/README.md` - architecture section landing page
+- `docs/architecture/index.md` - VitePress architecture landing page
 - `docs/decisions/README.md` - architecture decisions landing page
+- `docs/decisions/index.md` - VitePress decisions landing page
 - `docs/architecture/combat-design-reference.md` - live combat-system reference based on the current runtime
 
 ---
@@ -335,4 +340,4 @@ Current status:
 
 ---
 
-> Last updated: 2026-03-14 00:41 MSK
+> Last updated: 2026-03-14 00:53 MSK

@@ -10,11 +10,14 @@ const docsHomePath = path.join(docsRoot, "README.md");
 const requiredFiles = [
   docsHomePath,
   summaryPath,
+  path.join(docsRoot, "index.md"),
   path.join(docsRoot, "architecture", "README.md"),
+  path.join(docsRoot, "architecture", "index.md"),
   path.join(docsRoot, "architecture", "overview.md"),
   path.join(docsRoot, "architecture", "combat-design-reference.md"),
   path.join(docsRoot, "architecture", "combat-system-roadmap.md"),
   path.join(docsRoot, "decisions", "README.md"),
+  path.join(docsRoot, "decisions", "index.md"),
   path.join(docsRoot, "decisions", "ADR-001-architecture.md"),
 ];
 

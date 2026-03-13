@@ -1,6 +1,6 @@
 # RULES.md - Documentation And Safe Change Rules
 
-> Last updated: 2026-03-13 23:33 MSK
+> Last updated: 2026-03-14 00:53 MSK
 
 **Project:** Fight Club  
 **Path:** `c:/Users/dtphs/.vscode/Project`
@@ -80,6 +80,7 @@ Update when:
 - If combat formulas, turn flow, effects, resource rules, zones, skills, consumables, or bot assumptions change, update the combat design reference so it still contains the full working model.
 - If docs are prepared for GitBook publishing, keep `fight-club/docs/README.md` and `fight-club/docs/SUMMARY.md` in sync with the actual document structure.
 - Before publishing docs changes, run `npm run docs:validate` from `fight-club/`.
+- If docs are also published as a static site, keep the VitePress entry pages and config under `fight-club/docs/.vitepress/` in sync with the markdown structure.
 
 ---
 
@@ -193,4 +194,4 @@ Whenever you edit these root docs:
 ---
 
 > Last updated: 2026-03-13 18:40 MSK
-> Last updated: 2026-03-13 23:33 MSK
+> Last updated: 2026-03-14 00:53 MSK

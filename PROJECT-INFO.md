@@ -1,6 +1,6 @@
 # PROJECT-INFO - Fight Club
 
-> Last updated: 2026-03-14 00:41 MSK
+> Last updated: 2026-03-14 00:53 MSK
 
 **Project:** Fight Club  
 **Type:** browser-only SPA / combat sandbox  
@@ -23,6 +23,7 @@ The app root now also contains a local planning workflow:
 - `fight-club/docs/README.md` as the GitBook-style documentation landing page
 - `fight-club/docs/SUMMARY.md` as the GitBook navigation tree
 - `fight-club/docs/gitbook-publish-setup.md` as the operational setup guide for GitBook publishing
+- `fight-club/docs/.vitepress/` and `fight-club/docs/index.md` as the static docs-site layer for VitePress and GitHub Pages
 - `fight-club/docs/architecture/combat-design-reference.md` as the current source-of-truth combat runtime reference
 
 It has:
@@ -269,4 +270,4 @@ From repo root:
 
 ---
 
-> Last updated: 2026-03-14 00:41 MSK
+> Last updated: 2026-03-14 00:53 MSK

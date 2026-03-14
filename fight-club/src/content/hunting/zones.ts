@@ -1,4 +1,32 @@
 export const huntingZones = [
-  { id: "yard", name: "Backyard", minLevel: 1, maxLevel: 3, durationMinutes: 15 },
+  {
+    id: "forest-edge",
+    name: "Forest Edge",
+    minHunterLevel: 1,
+    durationMinutes: 15,
+    dangerRating: 1,
+    resourceTags: ["wood", "herbs", "hide"],
+    baseCurrencyReward: 8,
+    encounterProfileId: "forest-edge-common",
+  },
+  {
+    id: "rocky-hills",
+    name: "Rocky Hills",
+    minHunterLevel: 3,
+    durationMinutes: 20,
+    dangerRating: 2,
+    resourceTags: ["ore", "bone", "hide"],
+    baseCurrencyReward: 14,
+    encounterProfileId: "rocky-hills-common",
+  },
+  {
+    id: "ruined-trail",
+    name: "Ruined Trail",
+    minHunterLevel: 6,
+    durationMinutes: 25,
+    dangerRating: 3,
+    resourceTags: ["relic", "ore", "egg"],
+    baseCurrencyReward: 22,
+    encounterProfileId: "ruined-trail-common",
+  },
 ] as const;
-

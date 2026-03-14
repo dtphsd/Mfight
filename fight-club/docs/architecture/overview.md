@@ -1,6 +1,6 @@
 # Architecture Overview
 
-> Last updated: 2026-03-14 12:18 MSK
+> Last updated: 2026-03-14 18:08 MSK
 
 The project is split into headless domain modules and a React UI layer.
 
@@ -142,6 +142,51 @@ When the combat system changes, update documentation from the most stable source
 4. If the gameplay change affects combat flow, phase behavior, or bot choices, update this architecture page as well.
 5. If the gameplay change affects consumable usage rules, update both combat docs and the player-facing UI descriptions in the sandbox.
 
+## Hunting Flow Architecture
+
+The hunting module is now the second live gameplay bounded context after combat.
+
+Its split is intentionally simpler:
+
+- `modules/hunting`
+  - owns hunter progression, hunt state, deterministic resolution, gear bonuses, and pet-lite traits
+- `content/hunting`
+  - owns zones, reward items, gear catalog, and pet catalog
+- `ui/hooks/useHuntingSandbox.ts`
+  - adapts the live hunting module into screen-ready state and actions
+- `ui/screens/Hunting/HuntingScreen.tsx`
+  - first shell surface for zone selection, route control, reward claim, and inventory feedback
+
+### Hunting Lifecycle
+
+- `src/modules/hunting/application/startHunt.ts`
+  - validates unlocked zones and creates `HuntState(status="hunting")`
+- `src/modules/hunting/application/resolveHunt.ts`
+  - resolves a finished route deterministically using hunter stats, zone danger, gear bonuses, and pet traits
+- `src/modules/hunting/application/claimHuntRewards.ts`
+  - moves pending rewards into shared inventory and returns the hunt to `idle`
+- `src/modules/hunting/application/addHunterExperience.ts`
+  - applies hunter EXP and zone unlock progression after claims
+- `src/ui/hooks/useHuntingSandbox.ts`
+  - stitches the route loop together in the current UI shell
+
+### Hunting Safety Rule
+
+If hunting changes, keep it a separate simulation:
+
+1. Hunt math or reward math:
+   edit `modules/hunting/application/resolveHunt.ts`
+2. Hunter progression or unlocks:
+   edit `addHunterExperience.ts`
+3. Hunting gear and pet modifiers:
+   edit `model/HuntingGear.ts`, `model/HuntingPet.ts`, and their application helpers
+4. Player-facing route flow:
+   edit `useHuntingSandbox.ts` and `HuntingScreen.tsx`
+5. Shared reward storage only:
+   bridge through inventory at claim time
+
+Do not route hunting through combat runtime code.
+
 ---
 
 ## Related Docs
@@ -149,7 +194,8 @@ When the combat system changes, update documentation from the most stable source
 - [Docs Home](../)
 - [Architecture Index](./)
 - [Combat Design Reference](./combat-design-reference.md)
+- [Hunting Runtime Reference](./hunting-runtime-reference.md)
 
 ---
 
-> Last updated: 2026-03-14 12:18 MSK
+> Last updated: 2026-03-14 18:08 MSK

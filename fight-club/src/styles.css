@@ -368,6 +368,1080 @@ textarea {
   color: #e6ded3;
 }
 
+.hunting-lodge {
+  display: grid;
+  gap: 24px;
+  position: relative;
+}
+
+.hunting-lodge__hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(280px, 0.8fr);
+  gap: 20px;
+}
+
+.hunting-lodge__panel,
+.hunting-lodge__snapshot,
+.hunting-lodge__section {
+  border: 1px solid rgba(255, 244, 225, 0.09);
+  border-radius: 28px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.02));
+  box-shadow:
+    var(--shadow-card),
+    inset 0 1px 0 rgba(255, 255, 255, 0.035);
+}
+
+.hunting-lodge__panel {
+  padding: 30px;
+}
+
+.hunting-lodge__eyebrow,
+.hunting-lodge__section-label {
+  margin: 0;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  font-size: 12px;
+  color: #d0b498;
+}
+
+.hunting-lodge__title {
+  margin: 10px 0 14px;
+  font-size: clamp(34px, 5vw, 58px);
+  line-height: 0.94;
+}
+
+.hunting-lodge__copy {
+  margin: 0;
+  color: var(--text-dim);
+  font-size: 16px;
+  line-height: 1.65;
+  max-width: 760px;
+}
+
+.hunting-lodge__restore-banner {
+  margin-top: 18px;
+  padding: 14px 16px;
+  border-radius: 20px;
+  border: 1px solid rgba(120, 189, 255, 0.22);
+  background: linear-gradient(180deg, rgba(120, 189, 255, 0.12), rgba(255, 255, 255, 0.03));
+}
+
+.hunting-lodge__restore-title {
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(180, 220, 255, 0.92);
+}
+
+.hunting-lodge__restore-copy {
+  margin-top: 8px;
+  color: rgba(244, 239, 227, 0.82);
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.hunting-lodge__restore-meta {
+  margin-top: 10px;
+  color: rgba(186, 223, 255, 0.94);
+  font-size: 13px;
+}
+
+.hunting-lodge__flow-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.hunting-lodge__flow-step {
+  padding: 8px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.035);
+  color: rgba(244, 239, 227, 0.68);
+  font-size: 12px;
+}
+
+.hunting-lodge__flow-step--active {
+  border-color: rgba(240, 203, 136, 0.22);
+  background: rgba(240, 203, 136, 0.12);
+  color: rgba(255, 244, 231, 0.94);
+}
+
+.hunting-lodge__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 22px;
+}
+
+.hunting-lodge__route-console {
+  margin-top: 20px;
+  padding: 18px;
+  border-radius: 24px;
+  border: 1px solid rgba(255, 220, 155, 0.12);
+  background:
+    radial-gradient(circle at top left, rgba(255, 210, 120, 0.12), transparent 38%),
+    linear-gradient(180deg, rgba(18, 28, 22, 0.86), rgba(255, 255, 255, 0.02));
+  transition:
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    transform 180ms ease;
+}
+
+.hunting-lodge__route-console--ready,
+.hunting-lodge__route-console--claimable {
+  border-color: rgba(255, 204, 120, 0.26);
+  box-shadow: 0 0 0 1px rgba(255, 204, 120, 0.08), 0 18px 36px rgba(0, 0, 0, 0.12);
+  transform: translateY(-1px);
+}
+
+.hunting-lodge__route-console-head,
+.hunting-lodge__countdown-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+}
+
+.hunting-lodge__route-console-title {
+  margin-top: 6px;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.hunting-lodge__route-state {
+  padding: 8px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 212, 138, 0.2);
+  background: rgba(255, 212, 138, 0.11);
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255, 241, 215, 0.92);
+}
+
+.hunting-lodge__route-console-copy {
+  margin-top: 10px;
+  color: rgba(244, 239, 227, 0.78);
+  line-height: 1.55;
+}
+
+.hunting-lodge__countdown {
+  margin-top: 16px;
+  display: grid;
+  gap: 10px;
+}
+
+.hunting-lodge__countdown-track {
+  overflow: hidden;
+  height: 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.hunting-lodge__countdown-fill {
+  height: 100%;
+  border-radius: inherit;
+  background:
+    linear-gradient(90deg, rgba(255, 104, 84, 0.95), rgba(255, 194, 104, 0.92));
+  box-shadow: 0 0 18px rgba(255, 147, 84, 0.35);
+  transition: width 0.8s ease;
+}
+
+.hunting-lodge__countdown-meta strong {
+  font-size: 18px;
+}
+
+.hunting-lodge__action-button {
+  position: relative;
+  overflow: hidden;
+}
+
+.hunting-lodge__action-button--ready,
+.hunting-lodge__action-button--resolve,
+.hunting-lodge__action-button--claim {
+  border-color: rgba(255, 211, 142, 0.22);
+  color: rgba(255, 246, 232, 0.96);
+  animation: hunting-lodge-action-pulse 1.8s ease-in-out infinite;
+}
+
+.hunting-lodge__action-button--resolve {
+  background: rgba(255, 194, 104, 0.12);
+}
+
+.hunting-lodge__action-button--claim {
+  background: rgba(120, 189, 255, 0.12);
+}
+
+.hunting-lodge__actions button:disabled,
+.hunting-lodge__zone-card:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.hunting-lodge__snapshot {
+  display: grid;
+  gap: 12px;
+  padding: 20px;
+  align-content: start;
+}
+
+.hunting-lodge__snapshot-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.hunting-lodge__snapshot-card,
+.hunting-lodge__status-card,
+.hunting-lodge__inventory-card {
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.035);
+  padding: 16px;
+}
+
+.hunting-lodge__hud-card {
+  border-radius: 22px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.02));
+  padding: 18px;
+}
+
+.hunting-lodge__hud-card--route {
+  background:
+    radial-gradient(circle at top left, rgba(255, 204, 125, 0.16), transparent 40%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
+}
+
+.hunting-lodge__hud-card--route-ready {
+  box-shadow: 0 0 0 1px rgba(255, 207, 132, 0.08), 0 16px 30px rgba(0, 0, 0, 0.14);
+}
+
+.hunting-lodge__snapshot-label,
+.hunting-lodge__status-label,
+.hunting-lodge__reward-label,
+.hunting-lodge__inventory-name,
+.hunting-lodge__gear-slot,
+.hunting-lodge__hint {
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+.hunting-lodge__snapshot-value,
+.hunting-lodge__status-value,
+.hunting-lodge__reward-value,
+.hunting-lodge__inventory-value,
+.hunting-lodge__pet-name {
+  margin-top: 6px;
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.hunting-lodge__hud-route-name {
+  margin-top: 8px;
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.hunting-lodge__hud-route-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 10px;
+  color: rgba(244, 239, 227, 0.68);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.hunting-lodge__hud-route-status {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: end;
+  margin-top: 16px;
+}
+
+.hunting-lodge__hud-route-state {
+  font-size: 13px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255, 222, 177, 0.9);
+}
+
+.hunting-lodge__hud-route-timer {
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.hunting-lodge__hud-route-progress {
+  margin-top: 12px;
+}
+
+.hunting-lodge__hud-route-progress-track {
+  overflow: hidden;
+  height: 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.hunting-lodge__hud-route-progress-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, rgba(255, 205, 128, 0.95), rgba(255, 127, 92, 0.95));
+  transition: width 0.8s ease;
+}
+
+.hunting-lodge__mini-inventory {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.hunting-lodge__mini-slot {
+  padding: 10px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.hunting-lodge__mini-slot--earth {
+  background: linear-gradient(180deg, rgba(108, 78, 52, 0.28), rgba(255, 255, 255, 0.03));
+}
+
+.hunting-lodge__mini-slot--grove {
+  background: linear-gradient(180deg, rgba(61, 113, 66, 0.28), rgba(255, 255, 255, 0.03));
+}
+
+.hunting-lodge__mini-slot--hide {
+  background: linear-gradient(180deg, rgba(128, 92, 66, 0.28), rgba(255, 255, 255, 0.03));
+}
+
+.hunting-lodge__mini-slot--steel {
+  background: linear-gradient(180deg, rgba(92, 112, 130, 0.28), rgba(255, 255, 255, 0.03));
+}
+
+.hunting-lodge__mini-slot--bone {
+  background: linear-gradient(180deg, rgba(168, 162, 139, 0.22), rgba(255, 255, 255, 0.03));
+}
+
+.hunting-lodge__mini-slot--arcane {
+  background: linear-gradient(180deg, rgba(79, 110, 174, 0.24), rgba(255, 255, 255, 0.03));
+}
+
+.hunting-lodge__mini-slot--sun {
+  background: linear-gradient(180deg, rgba(184, 136, 64, 0.28), rgba(255, 255, 255, 0.03));
+}
+
+.hunting-lodge__mini-slot-name {
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(233, 223, 207, 0.72);
+}
+
+.hunting-lodge__mini-slot-value {
+  margin-top: 6px;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.hunting-lodge__hud-haul-value {
+  margin-top: 8px;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.hunting-lodge__hud-haul-meta {
+  margin-top: 8px;
+  color: rgba(244, 239, 227, 0.68);
+  font-size: 13px;
+}
+
+.hunting-lodge__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.hunting-lodge__section {
+  padding: 24px;
+  display: grid;
+  gap: 18px;
+}
+
+.hunting-lodge__section-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: start;
+}
+
+.hunting-lodge__section-title {
+  margin: 6px 0 0;
+  font-size: 28px;
+}
+
+.hunting-lodge__section-title--compact {
+  font-size: 20px;
+}
+
+.hunting-lodge__zone-list,
+.hunting-lodge__inventory-grid {
+  display: grid;
+  gap: 12px;
+}
+
+.hunting-lodge__zone-card {
+  text-align: left;
+  border-radius: 22px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
+  color: inherit;
+  padding: 16px;
+}
+
+.hunting-lodge__zone-card--active {
+  border-color: rgba(240, 203, 136, 0.34);
+  background: linear-gradient(180deg, rgba(240, 203, 136, 0.14), rgba(255, 255, 255, 0.03));
+}
+
+.hunting-lodge__zone-card--locked {
+  filter: saturate(0.6);
+}
+
+.hunting-lodge__zone-head,
+.hunting-lodge__zone-meta,
+.hunting-lodge__reward-strip,
+.hunting-lodge__stat-row,
+.hunting-lodge__pet-traits {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.hunting-lodge__zone-head {
+  justify-content: space-between;
+  align-items: center;
+}
+
+.hunting-lodge__zone-name-wrap {
+  display: inline-flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.hunting-lodge__zone-icon {
+  display: inline-grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.05);
+  font-size: 18px;
+}
+
+.hunting-lodge__zone-name {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.hunting-lodge__zone-pill,
+.hunting-lodge__tag,
+.hunting-lodge__stat-chip {
+  padding: 7px 11px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.04);
+  font-size: 12px;
+  color: rgba(255, 244, 231, 0.88);
+}
+
+.hunting-lodge__zone-tags,
+.hunting-lodge__reward-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.hunting-lodge__zone-loot-preview {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.hunting-lodge__zone-loot-chip {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  min-height: 42px;
+  padding: 10px 12px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.025);
+  color: rgba(244, 239, 227, 0.78);
+  font-size: 12px;
+}
+
+.hunting-lodge__zone-loot-icon {
+  display: inline-grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  font-size: 14px;
+}
+
+.hunting-lodge__zone-threat,
+.hunting-lodge__zone-footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+}
+
+.hunting-lodge__zone-threat-label,
+.hunting-lodge__zone-footer {
+  font-size: 12px;
+  color: rgba(244, 239, 227, 0.7);
+}
+
+.hunting-lodge__zone-threat-pips {
+  display: inline-flex;
+  gap: 6px;
+}
+
+.hunting-lodge__zone-threat-pip {
+  width: 28px;
+  height: 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.hunting-lodge__zone-threat-pip--filled {
+  background: linear-gradient(90deg, rgba(255, 127, 92, 0.92), rgba(255, 191, 120, 0.9));
+  box-shadow: 0 0 14px rgba(255, 127, 92, 0.18);
+}
+
+.hunting-lodge__zone-footer {
+  padding-top: 4px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.hunting-lodge__status-grid,
+.hunting-lodge__inventory-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.hunting-lodge__reward-card,
+.hunting-lodge__pet-card,
+.hunting-lodge__empty {
+  border-radius: 22px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
+  padding: 18px;
+}
+
+.hunting-lodge__ledger {
+  display: grid;
+  gap: 12px;
+}
+
+.hunting-lodge__ledger-list {
+  display: grid;
+  gap: 10px;
+}
+
+.hunting-lodge__ledger-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: start;
+  padding: 14px 16px;
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.hunting-lodge__ledger-title {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.hunting-lodge__ledger-meta,
+.hunting-lodge__ledger-time {
+  margin-top: 6px;
+  color: rgba(244, 239, 227, 0.68);
+  font-size: 12px;
+}
+
+.hunting-lodge__reward-card--claimed {
+  background: linear-gradient(180deg, rgba(120, 189, 255, 0.1), rgba(255, 255, 255, 0.03));
+}
+
+.hunting-lodge__session-banner {
+  border-radius: 20px;
+  border: 1px solid rgba(255, 201, 120, 0.16);
+  background: linear-gradient(180deg, rgba(255, 190, 118, 0.1), rgba(255, 255, 255, 0.025));
+  padding: 16px;
+}
+
+.hunting-lodge__session-banner-title,
+.hunting-lodge__loot-popup-label {
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255, 228, 176, 0.9);
+}
+
+.hunting-lodge__session-banner-copy,
+.hunting-lodge__loot-popup-copy {
+  margin-top: 8px;
+  color: rgba(244, 239, 227, 0.8);
+  line-height: 1.5;
+}
+
+.hunting-lodge__reward-head,
+.hunting-lodge__gear-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+}
+
+.hunting-lodge__gear-list {
+  display: grid;
+  gap: 10px;
+}
+
+.hunting-lodge__tool-kit {
+  display: grid;
+  gap: 8px;
+}
+
+.hunting-lodge__tool-grid {
+  display: grid;
+  gap: 8px;
+}
+
+.hunting-lodge__tool-chip {
+  text-align: left;
+  padding: 10px 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  background: rgba(255, 255, 255, 0.03);
+  color: inherit;
+}
+
+.hunting-lodge__tool-chip--active {
+  border-color: rgba(255, 204, 120, 0.24);
+  background: rgba(255, 204, 120, 0.08);
+}
+
+.hunting-lodge__tool-name {
+  display: block;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.hunting-lodge__tool-meta {
+  display: block;
+  margin-top: 4px;
+  color: rgba(244, 239, 227, 0.68);
+  font-size: 11px;
+}
+
+.hunting-lodge__gear-row {
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.hunting-lodge__gear-row:last-child {
+  border-bottom: none;
+}
+
+.hunting-lodge__gear-name {
+  text-align: right;
+}
+
+.hunting-lodge__loot-popup {
+  position: sticky;
+  top: 18px;
+  z-index: 4;
+  justify-self: end;
+  width: min(360px, 100%);
+  padding: 16px 18px;
+  border-radius: 22px;
+  border: 1px solid rgba(255, 210, 128, 0.2);
+  background:
+    radial-gradient(circle at top right, rgba(255, 212, 120, 0.18), transparent 32%),
+    linear-gradient(180deg, rgba(27, 23, 16, 0.96), rgba(255, 255, 255, 0.04));
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.28);
+}
+
+.hunting-lodge__loot-popup-title {
+  margin-top: 8px;
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.hunting-lodge__loot-popup-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.hunting-lodge__loot-pill {
+  padding: 7px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.045);
+  font-size: 12px;
+  color: rgba(255, 244, 231, 0.92);
+}
+
+@keyframes hunting-lodge-action-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(255, 206, 130, 0.08);
+    transform: translateY(0);
+  }
+
+  50% {
+    box-shadow: 0 0 0 6px rgba(255, 206, 130, 0.04);
+    transform: translateY(-1px);
+  }
+}
+
+.hunting-lodge--compact {
+  gap: 12px;
+}
+
+.hunting-lodge--compact .hunting-lodge__hero {
+  gap: 12px;
+}
+
+.hunting-lodge--compact .hunting-lodge__panel,
+.hunting-lodge--compact .hunting-lodge__snapshot,
+.hunting-lodge--compact .hunting-lodge__section {
+  border-radius: 18px;
+}
+
+.hunting-lodge--compact .hunting-lodge__panel,
+.hunting-lodge--compact .hunting-lodge__snapshot {
+  padding: 14px;
+}
+
+.hunting-lodge--compact .hunting-lodge__section {
+  padding: 14px;
+  gap: 10px;
+}
+
+.hunting-lodge--compact .hunting-lodge__eyebrow,
+.hunting-lodge--compact .hunting-lodge__section-label,
+.hunting-lodge--compact .hunting-lodge__hint,
+.hunting-lodge--compact .hunting-lodge__snapshot-label,
+.hunting-lodge--compact .hunting-lodge__status-label,
+.hunting-lodge--compact .hunting-lodge__reward-label,
+.hunting-lodge--compact .hunting-lodge__inventory-name,
+.hunting-lodge--compact .hunting-lodge__gear-slot {
+  font-size: 10px;
+}
+
+.hunting-lodge--compact .hunting-lodge__eyebrow {
+  font-size: 7px;
+  letter-spacing: 0.12em;
+}
+
+.hunting-lodge--compact .hunting-lodge__title {
+  margin: 6px 0 8px;
+  font-size: clamp(22px, 3vw, 30px);
+}
+
+.hunting-lodge--compact .hunting-lodge__copy,
+.hunting-lodge--compact .hunting-lodge__route-console-copy,
+.hunting-lodge--compact .hunting-lodge__restore-copy,
+.hunting-lodge--compact .hunting-lodge__session-banner-copy,
+.hunting-lodge--compact .hunting-lodge__hud-haul-meta,
+.hunting-lodge--compact .hunting-lodge__ledger-meta,
+.hunting-lodge--compact .hunting-lodge__ledger-time {
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+.hunting-lodge--compact .hunting-lodge__restore-banner,
+.hunting-lodge--compact .hunting-lodge__route-console,
+.hunting-lodge--compact .hunting-lodge__hud-card,
+.hunting-lodge--compact .hunting-lodge__reward-card,
+.hunting-lodge--compact .hunting-lodge__session-banner,
+.hunting-lodge--compact .hunting-lodge__empty {
+  border-radius: 14px;
+}
+
+.hunting-lodge--compact .hunting-lodge__restore-banner,
+.hunting-lodge--compact .hunting-lodge__route-console,
+.hunting-lodge--compact .hunting-lodge__hud-card,
+.hunting-lodge--compact .hunting-lodge__reward-card,
+.hunting-lodge--compact .hunting-lodge__session-banner,
+.hunting-lodge--compact .hunting-lodge__empty,
+.hunting-lodge--compact .hunting-lodge__snapshot-card,
+.hunting-lodge--compact .hunting-lodge__status-card,
+.hunting-lodge--compact .hunting-lodge__inventory-card,
+.hunting-lodge--compact .hunting-lodge__ledger-row,
+.hunting-lodge--compact .hunting-lodge__zone-card {
+  padding: 10px 12px;
+}
+
+.hunting-lodge--compact .hunting-lodge__flow-strip,
+.hunting-lodge--compact .hunting-lodge__actions,
+.hunting-lodge--compact .hunting-lodge__zone-list,
+.hunting-lodge--compact .hunting-lodge__ledger-list,
+.hunting-lodge--compact .hunting-lodge__gear-list {
+  gap: 6px;
+}
+
+.hunting-lodge--compact .hunting-lodge__actions button {
+  min-height: 30px;
+  padding: 6px 10px;
+  font-size: 11px;
+  border-radius: 999px;
+}
+
+.hunting-lodge--compact .hunting-lodge__flow-step,
+.hunting-lodge--compact .hunting-lodge__zone-pill,
+.hunting-lodge--compact .hunting-lodge__tag,
+.hunting-lodge--compact .hunting-lodge__stat-chip,
+.hunting-lodge--compact .hunting-lodge__loot-pill {
+  padding: 4px 7px;
+  font-size: 10px;
+}
+
+.hunting-lodge--compact .hunting-lodge__route-console-title,
+.hunting-lodge--compact .hunting-lodge__hud-route-name,
+.hunting-lodge--compact .hunting-lodge__section-title {
+  font-size: 18px;
+}
+
+.hunting-lodge--compact .hunting-lodge__section-title--compact {
+  font-size: 15px;
+}
+
+.hunting-lodge--compact .hunting-lodge__snapshot-value,
+.hunting-lodge--compact .hunting-lodge__status-value,
+.hunting-lodge--compact .hunting-lodge__reward-value,
+.hunting-lodge--compact .hunting-lodge__inventory-value,
+.hunting-lodge--compact .hunting-lodge__pet-name,
+.hunting-lodge--compact .hunting-lodge__hud-route-timer,
+.hunting-lodge--compact .hunting-lodge__hud-haul-value {
+  font-size: 16px;
+}
+
+.hunting-lodge--compact .hunting-lodge__grid {
+  grid-template-columns: 1.1fr 1fr 0.9fr;
+  gap: 12px;
+}
+
+.hunting-lodge--compact .hunting-lodge__grid--compact {
+  grid-template-columns: 1.45fr 0.85fr;
+}
+
+.hunting-lodge__section-tabs {
+  display: inline-flex;
+  gap: 6px;
+  padding: 4px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  width: fit-content;
+}
+
+.hunting-lodge__section-tab {
+  padding: 5px 10px;
+  border-radius: 999px;
+  border: 0;
+  background: transparent;
+  color: rgba(244, 239, 227, 0.7);
+  font-size: 11px;
+}
+
+.hunting-lodge__section-tab--active {
+  background: rgba(255, 206, 130, 0.14);
+  color: rgba(255, 245, 232, 0.96);
+}
+
+.hunting-lodge--compact .hunting-lodge__status-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.hunting-lodge--compact .hunting-lodge__snapshot-grid {
+  gap: 8px;
+}
+
+.hunting-lodge--compact .hunting-lodge__tool-grid {
+  gap: 6px;
+}
+
+.hunting-lodge--compact .hunting-lodge__tool-chip {
+  padding: 8px 10px;
+  border-radius: 10px;
+}
+
+.hunting-lodge--compact .hunting-lodge__tool-name {
+  font-size: 11px;
+}
+
+.hunting-lodge--compact .hunting-lodge__tool-meta {
+  font-size: 10px;
+}
+
+.hunting-lodge--compact .hunting-lodge__mini-inventory {
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.hunting-lodge--compact .hunting-lodge__mini-slot {
+  padding: 7px;
+  border-radius: 10px;
+}
+
+.hunting-lodge--compact .hunting-lodge__mini-slot-name,
+.hunting-lodge--compact .hunting-lodge__mini-slot-value {
+  font-size: 10px;
+}
+
+.hunting-lodge--compact .hunting-lodge__mini-slot-value {
+  margin-top: 4px;
+  font-size: 13px;
+}
+
+.hunting-lodge--compact .hunting-lodge__zone-name {
+  font-size: 15px;
+}
+
+.hunting-lodge--compact .hunting-lodge__zone-icon {
+  width: 28px;
+  height: 28px;
+  font-size: 14px;
+  border-radius: 10px;
+}
+
+.hunting-lodge--compact .hunting-lodge__zone-meta,
+.hunting-lodge--compact .hunting-lodge__zone-threat,
+.hunting-lodge--compact .hunting-lodge__zone-footer {
+  font-size: 11px;
+}
+
+.hunting-lodge--compact .hunting-lodge__zone-loot-preview {
+  gap: 6px;
+}
+
+.hunting-lodge--compact .hunting-lodge__zone-loot-chip {
+  min-height: 28px;
+  padding: 5px 7px;
+  border-radius: 10px;
+  font-size: 10px;
+}
+
+.hunting-lodge--compact .hunting-lodge__zone-loot-icon {
+  width: 18px;
+  height: 18px;
+  font-size: 11px;
+}
+
+.hunting-lodge--compact .hunting-lodge__gear-row {
+  padding: 6px 0;
+}
+
+.hunting-lodge--compact .hunting-lodge__loot-popup {
+  width: min(280px, 100%);
+  padding: 10px 12px;
+  border-radius: 14px;
+}
+
+.hunting-lodge--compact .hunting-lodge__loot-popup-title {
+  font-size: 16px;
+}
+
+.hunting-lodge--compact .hunting-lodge__route-console {
+  margin-top: 8px;
+  padding: 8px 10px;
+}
+
+.hunting-lodge--compact .hunting-lodge__route-console-title {
+  font-size: 15px;
+}
+
+.hunting-lodge--compact .hunting-lodge__route-console-copy {
+  margin-top: 4px;
+  font-size: 10px;
+}
+
+.hunting-lodge--compact .hunting-lodge__countdown {
+  margin-top: 6px;
+  gap: 4px;
+}
+
+.hunting-lodge--compact .hunting-lodge__countdown-track {
+  height: 6px;
+}
+
+.hunting-lodge--compact .hunting-lodge__countdown-meta {
+  font-size: 10px;
+}
+
+.hunting-lodge--compact .hunting-lodge__countdown-meta strong {
+  font-size: 12px;
+}
+
+.hunting-lodge--compact .hunting-lodge__snapshot {
+  gap: 6px;
+}
+
+.hunting-lodge--compact .hunting-lodge__hud-card {
+  padding: 8px 10px;
+}
+
+.hunting-lodge--compact .hunting-lodge__hud-route-name {
+  font-size: 16px;
+}
+
+.hunting-lodge--compact .hunting-lodge__pet-name,
+.hunting-lodge--compact .hunting-lodge__hud-haul-value {
+  font-size: 14px;
+}
+
+.hunting-lodge--compact .hunting-lodge__hud-route-meta,
+.hunting-lodge--compact .hunting-lodge__hud-haul-meta {
+  margin-top: 4px;
+  font-size: 10px;
+}
+
+.hunting-lodge--compact .hunting-lodge__pet-traits,
+.hunting-lodge--compact .hunting-lodge__loot-popup-tags {
+  gap: 4px;
+  margin-top: 6px;
+}
+
+.hunting-lodge--compact .hunting-lodge__snapshot-grid {
+  gap: 6px;
+}
+
 .combat-rules-library {
   display: grid;
   gap: 16px;
@@ -823,6 +1897,15 @@ textarea {
     grid-template-columns: 1fr;
   }
 
+  .hunting-lodge__hero,
+  .hunting-lodge__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .hunting-lodge__loot-popup {
+    justify-self: stretch;
+  }
+
   .main-menu__feature-strip {
     grid-template-columns: 1fr;
   }
@@ -850,6 +1933,12 @@ textarea {
   .combat-rules-library__hero,
   .combat-rules-library__section {
     border-radius: 22px;
+  }
+
+  .hunting-lodge__panel,
+  .hunting-lodge__section,
+  .hunting-lodge__snapshot {
+    padding: 16px;
   }
 
   .combat-rules-library {
@@ -888,5 +1977,19 @@ textarea {
   .combat-rules-library__step,
   .combat-rules-library__table td {
     font-size: 11px;
+  }
+
+  .hunting-lodge__status-grid,
+  .hunting-lodge__inventory-grid,
+  .hunting-lodge__snapshot-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .hunting-lodge__mini-inventory {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .hunting-lodge__zone-loot-preview {
+    grid-template-columns: 1fr;
   }
 }

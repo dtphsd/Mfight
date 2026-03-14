@@ -1,6 +1,6 @@
 # PROJECT_STRUCTURE - Fight Club
 
-> Last updated: 2026-03-14 00:53 MSK
+> Last updated: 2026-03-14 22:20 MSK
 
 **Project root:** `c:/Users/dtphs/.vscode/Project`
 
@@ -57,6 +57,7 @@ Notes:
 - `features/_TEMPLATE.md` - base template for feature tracking files
 - `features/ui-ux-refactor.md` - current tracked refactor thread for UI / UX audit and planning
 - `features/combat-design-reference.md` - tracked combat-system documentation and safety workstream
+- `features/hunting-mvp.md` - tracked MVP scope and implementation roadmap for the autonomous hunting module
 - `docs/README.md` - docs home page for GitBook-style navigation
 - `docs/SUMMARY.md` - GitBook navigation tree for the primary documentation flow
 - `docs/gitbook-publish-setup.md` - operational guide for connecting and validating GitBook publishing
@@ -70,6 +71,8 @@ Notes:
 - `docs/decisions/README.md` - architecture decisions landing page
 - `docs/decisions/index.md` - VitePress decisions landing page
 - `docs/architecture/combat-design-reference.md` - live combat-system reference based on the current runtime
+- `docs/architecture/hunting-mvp-blueprint.md` - original architecture blueprint for the hunting bounded context
+- `docs/architecture/hunting-runtime-reference.md` - live hunting runtime reference, reward bridge map, and verification checklist
 
 ---
 
@@ -122,7 +125,11 @@ src/
 - `items/starterItems.ts` - all starter weapons, armor, accessories, consumables, and materials
 - `commentator/phrases.ts` - phrase pools for battle log flavor
 - `combat/balance.ts` - compatibility export layer
-- `hunting/zones.ts` - unfinished hunting data
+- `hunting/zones.ts` - live hunting zone catalog
+- `hunting/rewardItems.ts` - claimable hunting reward item catalog
+- `hunting/gear.ts` - starter hunting gear catalog
+- `hunting/pets.ts` - starter hunting pet catalog
+- `hunting/tools.ts` - starter hunting tool catalog for route-focused yield bonuses
 
 Important current fact:
 
@@ -192,11 +199,16 @@ Current item model supports:
 - hand rules
 - equipment-derived combat bonuses and skill aggregation
 
+### `hunting`
+
+- autonomous hunting model, progression, reward bridge, and route resolver
+- gear, tool, and pet-lite modifiers
+- first module tests for start, resolve, claim, progression, and loadout bonuses
+
 ### Stub modules
 
 - `arena`
 - `shop`
-- `hunting`
 - `commentator`
 
 These still contain partial contracts/models/events with stub application logic.
@@ -262,6 +274,7 @@ Backup artifacts intentionally kept:
 
 - `useGameApp.ts` - app context access
 - `useCombatSandbox.ts` - React adapter between UI and orchestration/combat runtime
+- `useHuntingSandbox.ts` - React adapter for the live hunting loop and reward-claim flow
 - `useAnchoredPopup.ts` - shared viewport-aware popup positioning for hover previews and anchored equipment popovers
 
 ### `screens`
@@ -269,6 +282,7 @@ Backup artifacts intentionally kept:
 - `MainMenu/MainMenuScreen.tsx`
 - `Combat/CombatSandboxScreen.tsx`
 - `CombatRules/CombatRulesScreen.tsx`
+- `Hunting/HuntingScreen.tsx`
 - `CombatRules/combatRulesContent.ts` - localized Combat Codex content
 - `CombatRules/combatRulesFacts.ts` - generated item/skill facts from live starter content
 
@@ -276,6 +290,8 @@ Current UI facts:
 
 - skills are manually selected into a 5-slot loadout
 - consumables come from inventory
+- hunting is now accessible from the main menu through `Hunting Lodge`
+- hunting has its own live UI shell, separate from combat sandbox
 - status effects live above HP to avoid spending extra vertical space
 - hover popups for items and effects are now part of the real live UI contract
 - item cards and preset equipment previews surface weapon passives and key item skills as primary feature blocks
@@ -343,4 +359,4 @@ Current status:
 
 ---
 
-> Last updated: 2026-03-14 00:53 MSK
+> Last updated: 2026-03-14 18:08 MSK

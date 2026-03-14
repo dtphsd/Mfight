@@ -3,9 +3,10 @@ import { useGameApp } from "@/ui/hooks/useGameApp";
 interface MainMenuScreenProps {
   onOpenCombatSandbox: () => void;
   onOpenCombatRules: () => void;
+  onOpenHunting: () => void;
 }
 
-export function MainMenuScreen({ onOpenCombatSandbox, onOpenCombatRules }: MainMenuScreenProps) {
+export function MainMenuScreen({ onOpenCombatSandbox, onOpenCombatRules, onOpenHunting }: MainMenuScreenProps) {
   const { logger } = useGameApp();
 
   return (
@@ -36,6 +37,16 @@ export function MainMenuScreen({ onOpenCombatSandbox, onOpenCombatRules }: MainM
             </button>
             <button type="button" className="main-menu__ghost" onClick={onOpenCombatRules}>
               Read Combat Rules
+            </button>
+            <button
+              type="button"
+              className="main-menu__ghost"
+              onClick={() => {
+                logger.info("Hunting lodge opened");
+                onOpenHunting();
+              }}
+            >
+              Open Hunting Lodge
             </button>
           </div>
           <div className="main-menu__feature-strip">

@@ -1,6 +1,6 @@
 # MASTER-PLAN - Fight Club
 
-> Last updated: 2026-03-14 13:21 MSK
+> Last updated: 2026-03-14 22:20 MSK
 
 **Project:** Fight Club  
 **Scope:** active product planning, task tracking, and sprint history
@@ -36,11 +36,20 @@
 | COMBAT-003 | Add composition regression tests for combat rules | Combat QA | 🟡 IN PROGRESS | `features/combat-design-reference.md` | Protect combinations like skills plus consumables, effects plus death, and block plus penetration from silent regressions |
 | COMBAT-004 | Safely reduce `resolveRound.ts` risk without behavior changes | Combat Refactor | 🔴 TODO | `features/combat-design-reference.md` | Remove fragile duplication and isolate rule blocks only after the design reference and regression tests exist |
 | COMBAT-005 | Formalize combat change checklist and verification flow | Combat Workflow | 🔴 TODO | `features/combat-design-reference.md` | Define what must be checked whenever combat formulas, resources, effects, or loadout rules change |
-| COMBAT-006 | Define first-wave combat expansion states and interaction rules | Combat Design | 🟡 IN PROGRESS | `features/combat-expansion.md` | Runtime now supports first-wave state-aware bonuses through `Exposed` and `Staggered`, with initial setup/payoff skills already landed |
-| COMBAT-007 | Design and implement more varied skills around setup/payoff patterns | Combat Content | 🔴 TODO | `features/combat-expansion.md` | Make skills more interesting through control, setup, finisher, defensive, and tempo patterns |
-| COMBAT-008 | Deepen archetype identity through state synergy and combat loops | Combat Identity | 🔴 TODO | `features/combat-expansion.md` | Make Warden, Duelist, Breaker, and Executioner feel more distinct in actual fights |
-| COMBAT-009 | Expand combat docs and Combat Rules for the new state and skill layer | Combat Docs / UX | 🔴 TODO | `features/combat-expansion.md` | Keep the new combat depth understandable and synchronized with runtime behavior |
-| COMBAT-010 | Add regression and balance coverage for combat expansion content | Combat QA / Balance | 🔴 TODO | `features/combat-expansion.md` | Protect new states, synergies, and skill interactions with tests and matrix checks |
+| COMBAT-006 | Define first-wave combat expansion states and interaction rules | Combat Design | 🟡 IN PROGRESS | `features/combat-expansion.md` | `Exposed` and `Staggered` now power live setup/payoff loops across charm, mace, axe, shield, and greatsword skills, so the next handoff is player-facing rules/docs sync |
+| COMBAT-007 | Design and implement more varied skills around setup/payoff patterns | Combat Content | 🟡 IN PROGRESS | `features/combat-expansion.md` | Second-wave payoff skills are now expanding into armor and accessory kits through `Body Check` and `Killer Focus`, both tied to the live `Exposed` / `Staggered` windows |
+| COMBAT-008 | Deepen archetype identity through state synergy and combat loops | Combat Identity | ✅ DONE | `features/combat-expansion.md` | Warden guard loops and Duelist / Executioner finisher loops are now both readable through state-aware payoff skills like `Parry Riposte`, `Iron Brace`, `Heartseeker`, and `Execution Mark` |
+| COMBAT-009 | Expand combat docs and Combat Rules for the new state and skill layer | Combat Docs / UX | ✅ DONE | `features/combat-expansion.md` | `Combat Rules` generated facts, verification docs, and reader-facing rules copy now explain `Exposed`, `Staggered`, setup/payoff windows, and short rider expiry nuances |
+| COMBAT-010 | Add regression and balance coverage for combat expansion content | Combat QA / Balance | 🟡 IN PROGRESS | `features/combat-expansion.md` | Expansion tests and matrix playtests are running; the latest heavy rescue pass improved `Heavy / Two-Hand` from `Net -27` to `Net -24`, but `Shield / Guard` and `Sustain / Regen` still own the top tier and `Mace / Control` paid part of the price, so the next move should target the sustain/guard cluster or isolate a safer heavy-only buff |
+| HUNT-001 | Define hunting domain model and save boundaries | Hunting Architecture | ✅ DONE | `features/hunting-mvp.md` | Hunting model contracts, starter zones, creation helpers, and the `state.hunting.*` save-boundary draft are now established |
+| HUNT-002 | Implement autonomous idle hunt loop and session resolution | Hunting Runtime | ✅ DONE | `features/hunting-mvp.md` | `startHunt` and `resolveHunt` now provide deterministic idle hunt simulation with test coverage |
+| HUNT-003 | Add reward bridge from hunting into shared inventory | Hunting Economy | ✅ DONE | `features/hunting-mvp.md` | `claimHuntRewards` now converts pending hunt rewards into shared inventory items through the existing inventory module |
+| HUNT-004 | Implement hunter progression and base stat allocation | Hunting Progression | ✅ DONE | `features/hunting-mvp.md` | `addHunterExperience` and `allocateHunterStatPoint` are live with tests; level-step rewards and zone unlock timing are now verified |
+| HUNT-005 | Implement hunting gear and pet-lite bonuses | Hunting Systems | ✅ DONE | `features/hunting-mvp.md` | Starter hunting gear and pet catalogs, equip and assign flows, and live resolver bonuses are now in place |
+| HUNT-006 | Build first hunting UI shell and claim flow | Hunting UX | ✅ DONE | `features/hunting-mvp.md` | `HuntingScreen` and `useHuntingSandbox` now expose zone selection, start/resolve/claim flow, profile summary, pet summary, and shared inventory feedback |
+| HUNT-007 | Document hunting architecture and verification flow | Hunting Docs / Safety | ✅ DONE | `features/hunting-mvp.md` | Hunting runtime reference, reward bridge rules, architecture overview sync, and root doc alignment are now documented and validated |
+| HUNT-008 | Persist hunting state and offline return flow | Hunting Persistence | ✅ DONE | `features/hunting-mvp.md` | Hunting state now round-trips through the shared save envelope, restores route progress between sessions, and ships with a compact no-scroll lodge UI tuned around restored-session flow, route timing, and claim review |
+| HUNT-009 | Add first hunting tool focus layer | Hunting Gameplay | 🟡 IN PROGRESS | `features/hunting-mvp.md` | A first tool-focus layer is now live with route-specific yield bonuses, profile-level tool equip flow, and compact tool selection in the hunting profile tab |
 
 ---
 
@@ -58,6 +67,16 @@
 - Work strictly phase by phase.
 - Keep only one UI refactor task in `🟡 IN PROGRESS` at a time unless a parallel task is genuinely independent.
 - Before starting the next phase, update the current task status and add the completed result to `Sprint History`.
+
+---
+
+## Upcoming UX Cleanup Queue
+
+- `UI-011` - add a clear `Current Turn` focus block so the player always sees attack, target zone, defense, active skill or consumable, and readiness in one place
+- `UI-012` - turn round setup into a guided path: attack -> zone -> defense -> optional skill or consumable -> resolve
+- `UI-013` - reduce combat-screen noise and separate play-now information from analysis and log-heavy information
+- `UI-014` - make `Exposed`, `Staggered`, and payoff windows self-explanatory directly in the combat UI
+- `UI-015` - reduce build-editing friction by moving presets, inventory, equipment, and skills toward one clearer build center
 
 ---
 
@@ -199,7 +218,19 @@
 
 - added `UI-010` as a dedicated visual polish task for combat UI
 - separated visual styling improvements from the active structural refactor track
-- documented concrete polish targets so future visual work can be executed incrementally instead of ad hoc
+- prepared a dedicated visual-improvement backlog without mixing it into the structural UI refactor
+
+### v0.82 - Hunting Tool Focus Layer Added
+
+- opened `HUNT-009` as the first hunting gameplay layer after the stabilized lodge MVP
+- added a compact tool-focus system that changes route-specific yields through `equipHuntingTool(...)`
+- documented tool-driven route planning as the next hunting gameplay base after persistence and UI compaction
+
+### v0.83 - Hunting Profile Tab Legacy Save Fix Added
+
+- fixed the hunting `Profile` tab crash for older saves created before `profile.tool` existed
+- added save normalization in `loadHuntingState(...)` so legacy hunting profiles automatically receive an empty tool loadout
+- added regression coverage for legacy hunting saves without the tool field
 
 ### v0.24 - Motion Feedback Added To Visual Plan
 
@@ -330,6 +361,42 @@
 | v0.44 | Docs Section Hubs Refined | Upgraded Gameplay, Systems, Architecture, and Decisions landing pages into fuller wiki-style section hubs with clearer reading paths and task-oriented entry points | `DOC-001` |
 | v0.45 | Combat Docs Subsections Added | Split the oversized combat reference into dedicated subsection pages for model, formulas, integrations, and verification with sidebar support | `DOC-001` |
 | v0.46 | Combat Expansion Track Added | Added a dedicated master-plan workstream for new combat states, more varied skills, stronger archetype identity, and matching docs/test coverage | `COMBAT-006` |
+| v0.47 | Combat State Layer Expanded | Extended the first-wave state system across axe and shield skills, keeping the same readable `Exposed` / `Staggered` layer while growing setup/payoff diversity and regression coverage | `COMBAT-006` |
+| v0.48 | Combat Rules State Sync Started | Updated generated Combat Rules facts so the player-facing rules screen now explains the live `Exposed` / `Staggered` setup-payoff layer and condition-based skill bonuses | `COMBAT-009` |
+| v0.49 | Combat Verification Docs Synced With State Layer | Extended combat integration and traceability docs so setup/payoff windows and short rider expiry behavior are explicitly part of combat verification | `COMBAT-009` |
+| v0.50 | Combat Rules Copy Synced With State Layer | Updated the main English Combat Rules copy so named states and setup/payoff windows are explained directly in the reader-facing sections, not only in generated fact cards | `COMBAT-009` |
+| v0.51 | Combat Rules State Sync Closed | Finished the first full docs/rules handoff for the new `Exposed` / `Staggered` layer so runtime, Combat Rules, and verification docs are aligned again | `COMBAT-009` |
+| v0.52 | More Varied Payoff Skills Started | Began `COMBAT-007` by extending the current state windows into armor and accessory kits through `Body Check` and `Killer Focus` payoff interactions | `COMBAT-007` |
+| v0.53 | Warden Counter Loop Started | Began `COMBAT-008` by turning guard-based kits into a clearer counter-archetype through `Shield Bash` setup into `Parry Riposte` and `Iron Brace` payoff pressure | `COMBAT-008` |
+| v0.54 | Duelist And Executioner Loop Expanded | Extended `COMBAT-008` so `Execution Mark` now creates `Exposed` and `Heartseeker` now cashes it in, giving precision and finisher kits a clearer identity alongside the Warden slice | `COMBAT-008` |
+| v0.55 | Combat Expansion Balance Snapshot Captured | Promoted `COMBAT-010` into active work after a fresh build matrix showed `Shield / Guard` leading the field while `Dagger / Crit` and `Heavy / Two-Hand` lag behind the current meta | `COMBAT-010` |
+| v0.56 | Preset Balance Pass Measured | Rebalanced the curated presets and re-ran the matrix: `Heavy / Two-Hand` improved materially, `Shield / Guard` stayed dominant, and `Dagger / Crit` became the clearest weak point | `COMBAT-010` |
+| v0.57 | Dagger Rescue Pass Measured | Restored a more direct burst profile to `Dagger / Crit` and re-ran the matrix: dagger improved clearly, `Shield / Guard` softened slightly, and `Sustain / Regen` emerged as the other top-tier outlier | `COMBAT-010` |
+| v0.58 | Heavy Rescue Pass Measured | Restored the stable heavy preset shell, raised greatsword baseline pressure, and slightly strengthened `Execution Arc`; the matrix moved `Heavy / Two-Hand` from `Net -27` to `Net -24`, while `Mace / Control` slipped and the sustain/guard leaders stayed in place | `COMBAT-010` |
+| v0.59 | UX Cleanup Track Added | Shifted the next product focus away from open-ended balance tuning and formalized a combat UX cleanup queue around a `Current Turn` block, guided round setup, lower screen noise, clearer state/payoff feedback, and a more unified build flow | `UI-011`, `UI-012`, `UI-013`, `UI-014`, `UI-015` |
+| v0.60 | Hunting MVP Blueprint Added | Formalized `hunting` as an autonomous idle-sim workstream, added the first architecture blueprint, and created `HUNT-001` through `HUNT-007` as the implementation roadmap | `HUNT-001`, `HUNT-002`, `HUNT-003`, `HUNT-004`, `HUNT-005`, `HUNT-006`, `HUNT-007` |
+| v0.61 | Hunting Domain Contracts Landed | Started `HUNT-001` by adding the first-pass hunting model contracts for hunter profile, hunting stats, hunt state, hunt rewards, pet-lite, gear, and expanded zone metadata, then verified the new bounded context layer with a clean build | `HUNT-001` |
+| v0.62 | Hunting Factories And Save Draft Added | Extended `HUNT-001` with starter zones, profile and gear creation helpers, and a draft save-shape for `state.hunting.*`, leaving the module ready for deterministic hunt start and resolution work | `HUNT-001` |
+| v0.63 | Hunting Runtime Slice Landed | Started `HUNT-002` by implementing deterministic `startHunt` and `resolveHunt`, added the first hunting module tests, and verified the new loop with green tests and build | `HUNT-002` |
+| v0.64 | Hunting Reward Bridge Landed | Started `HUNT-003` by adding a dedicated hunting reward catalog and `claimHuntRewards`, then verified that pending hunt rewards can be claimed into the shared inventory through the existing inventory module | `HUNT-003` |
+| v0.65 | Hunting Progression Slice Landed | Started `HUNT-004` by adding hunter experience, level-step progression, stat allocation, and verified zone unlock timing for the first hunting progression loop | `HUNT-004` |
+| v0.66 | Hunting Gear And Pet-Lite Slice Landed | Started `HUNT-005` by adding starter gear and pet catalogs, profile-level equip and assign flows, and live resolver bonuses for speed, survival, loot quantity, and rare drops | `HUNT-005` |
+| v0.67 | Hunting UI Shell Landed | Started `HUNT-006` by adding the first hunting screen, menu navigation, screen-state hook, and a visible start-resolve-claim loop over the live hunting runtime and reward bridge | `HUNT-006` |
+| v0.68 | Hunting Docs Handoff Started | Started `HUNT-007` by adding a live hunting runtime reference, syncing architecture overview, and aligning root project docs with the now-live hunting module | `HUNT-007` |
+| v0.69 | Hunting MVP Handoff Closed | Finished the first hunting documentation handoff, validated the docs, and closed the initial hunting MVP track with runtime, UI shell, and verification rules all in sync | `HUNT-007` |
+| v0.70 | Hunting Persistence Slice Landed | Started `HUNT-008` by persisting hunting state through the shared save envelope, restoring the hook state on load, and adding dedicated persistence tests | `HUNT-008` |
+| v0.71 | Hunting Restored-Session UX Added | Extended `HUNT-008` with a restored-session banner, a clearer step-strip, live elapsed and remaining route timing, and resolve gating so the player can understand saved hunting state and only finish a route once the timer is truly complete | `HUNT-008` |
+| v0.72 | Hunting UI Polish Slice Added | Extended `HUNT-008` with a reverse route countdown bar, mini inventory strip, stronger route console, and MMO-style loot popup feedback so the hunting screen reads more like a live game mode than a raw debug shell | `HUNT-008` |
+| v0.73 | Hunting Route Ledger Added | Extended `HUNT-008` with persist-backed recent claim history and a route ledger panel so the lodge keeps a short campaign log instead of only showing the latest haul | `HUNT-008` |
+| v0.74 | Hunting Zone Board Enriched | Extended `HUNT-008` with richer route cards that surface base payout, threat pips, and loot-profile hints so route selection reads more like a real game board and less like raw data tags | `HUNT-008` |
+| v0.75 | Hunting HUD Rail Added | Extended `HUNT-008` with a dedicated right-side HUD rail for active route state, companion status, quick stash, and latest haul so the lodge now reads as a single game panel instead of disconnected cards | `HUNT-008` |
+| v0.76 | Hunting Route Atmosphere Added | Extended `HUNT-008` with route icons and richer loot-preview chips on zone cards so route selection feels more atmospheric and MMORPG-like instead of purely textual | `HUNT-008` |
+| v0.77 | Hunting Action Motion Added | Extended `HUNT-008` with ready, resolve, and claim micro-interactions plus stronger ready-state emphasis on the route console and route HUD so the hunting flow feels more alive in motion | `HUNT-008` |
+| v0.78 | Hunting Compact Layout Pass Added | Extended `HUNT-008` with a compact-mode layout, reduced panel density, fewer duplicate sections, and more tooltip-driven secondary details so the lodge is much closer to fitting into a single screen without scroll | `HUNT-008` |
+| v0.79 | Hunting Tabbed Single-Screen Pass Added | Extended `HUNT-008` by replacing the lower multi-panel stack with a tabbed panel plus compact ledger column so the lodge is much closer to a true one-screen layout without losing route, status, or profile detail | `HUNT-008` |
+| v0.80 | Hunting No-Scroll Pass Tightened | Tightened `HUNT-008` further by leaning harder into tabbed panels, shorter copy, and tooltip-driven secondary context so the lodge is more aggressively tuned for one-screen use | `HUNT-008` |
+| v0.81 | Hunting HUD Compact Step Added | Tightened the right-side hunting HUD with smaller companion and haul cards so the one-screen layout wastes less vertical space in the snapshot rail | `HUNT-008` |
+| v0.82 | Hunting Tool Focus Slice Landed | Closed the main `HUNT-008` persistence/UI work and opened `HUNT-009` with a first hunting tool-focus layer that changes route yields, persists through the hunter profile, and is selectable from the profile tab | `HUNT-009` |
 
 ---
 
@@ -344,4 +411,4 @@ When work changes state:
 
 ---
 
-> Last updated: 2026-03-14 13:21 MSK
+> Last updated: 2026-03-14 20:17 MSK

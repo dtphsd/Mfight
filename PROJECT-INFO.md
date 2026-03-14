@@ -1,6 +1,6 @@
 # PROJECT-INFO - Fight Club
 
-> Last updated: 2026-03-14 00:53 MSK
+> Last updated: 2026-03-14 22:20 MSK
 
 **Project:** Fight Club  
 **Type:** browser-only SPA / combat sandbox  
@@ -20,6 +20,7 @@ The app root now also contains a local planning workflow:
 - `fight-club/MASTER-PLAN.md` for active tasks and sprint history
 - `fight-club/features/` for per-feature tracking documents
 - `fight-club/features/combat-design-reference.md` for combat-system documentation and safety tasks
+- `fight-club/features/hunting-mvp.md` for the planned autonomous hunting module and implementation roadmap
 - `fight-club/docs/README.md` as the GitBook-style documentation landing page
 - `fight-club/docs/SUMMARY.md` as the GitBook navigation tree
 - `fight-club/docs/gitbook-publish-setup.md` as the operational setup guide for GitBook publishing
@@ -27,6 +28,8 @@ The app root now also contains a local planning workflow:
 - the VitePress docs site now has a structured home page, section landing pages, sidebar navigation, local search, and branded theme styling
 - the docs site is now organized into role-based reading paths for `Gameplay`, `Systems`, `Architecture`, and `Decisions`
 - `fight-club/docs/architecture/combat-design-reference.md` as the current source-of-truth combat runtime reference
+- `fight-club/docs/architecture/hunting-mvp-blueprint.md` as the original architecture blueprint for the autonomous hunting module
+- `fight-club/docs/architecture/hunting-runtime-reference.md` as the live hunting runtime reference and verification guide
 
 It has:
 
@@ -47,6 +50,15 @@ The main implemented user flow is:
 - resolve rounds
 - read combat log, resources, HP, and status effects
 
+The app now also has a second live flow:
+
+- open `Hunting Lodge`
+- choose an unlocked hunting zone
+- start a route
+- resolve the completed session
+- claim rewards into shared inventory
+- gain hunter EXP and continue the hunting loop
+
 ---
 
 ## Implemented Systems
@@ -66,6 +78,24 @@ The main implemented user flow is:
 - support for `one_hand`, `two_hand`, and `off_hand_only`
 - item-driven `skills[]`
 - consumables with direct effects and timed combat effects
+
+### Hunting Module
+
+- autonomous hunter profile
+- deterministic idle route resolution
+- hunter EXP and level-step progression
+- zone unlocks
+- hunting-only stats:
+  - `power`
+  - `speed`
+  - `survival`
+  - `fortune`
+- hunting gear bonuses
+- hunting tool focus bonuses for route-specific yields
+- pet-lite passive traits
+- explicit reward-claim bridge into shared inventory
+- first hunting screen shell with menu navigation
+- save-backed offline return and compact lodge UI
 
 ### Combat Runtime
 
@@ -199,6 +229,17 @@ There is also a dedicated balance runner:
 - `fight-club/src/ui/components/combat/ItemPresentationCard.tsx`
 - `fight-club/src/ui/components/combat/BuildPresetsPopover.tsx`
 - `fight-club/src/content/items/starterItems.ts`
+- `fight-club/src/modules/hunting/application/startHunt.ts`
+- `fight-club/src/modules/hunting/application/resolveHunt.ts`
+- `fight-club/src/modules/hunting/application/claimHuntRewards.ts`
+- `fight-club/src/modules/hunting/application/addHunterExperience.ts`
+- `fight-club/src/modules/hunting/application/equipHuntingGear.ts`
+- `fight-club/src/modules/hunting/application/assignPetToHunter.ts`
+- `fight-club/src/content/hunting/zones.ts`
+- `fight-club/src/content/hunting/gear.ts`
+- `fight-club/src/content/hunting/pets.ts`
+- `fight-club/src/ui/hooks/useHuntingSandbox.ts`
+- `fight-club/src/ui/screens/Hunting/HuntingScreen.tsx`
 
 ---
 
@@ -272,4 +313,4 @@ From repo root:
 
 ---
 
-> Last updated: 2026-03-14 00:53 MSK
+> Last updated: 2026-03-14 18:08 MSK

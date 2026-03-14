@@ -2,10 +2,11 @@ import { useState } from "react";
 import { AppShell } from "@/ui/components/layout/AppShell";
 import { CombatSandboxScreen } from "@/ui/screens/Combat/CombatSandboxScreen";
 import { CombatRulesScreen } from "@/ui/screens/CombatRules/CombatRulesScreen";
+import { HuntingScreen } from "@/ui/screens/Hunting/HuntingScreen";
 import { MainMenuScreen } from "@/ui/screens/MainMenu/MainMenuScreen";
 
 export function App() {
-  const [screen, setScreen] = useState<"menu" | "combat" | "rules">("menu");
+  const [screen, setScreen] = useState<"menu" | "combat" | "rules" | "hunting">("menu");
 
   return (
     <AppShell>
@@ -13,12 +14,15 @@ export function App() {
         <MainMenuScreen
           onOpenCombatSandbox={() => setScreen("combat")}
           onOpenCombatRules={() => setScreen("rules")}
+          onOpenHunting={() => setScreen("hunting")}
         />
       ) : screen === "rules" ? (
         <CombatRulesScreen
           onBack={() => setScreen("menu")}
           onOpenCombatSandbox={() => setScreen("combat")}
         />
+      ) : screen === "hunting" ? (
+        <HuntingScreen onBack={() => setScreen("menu")} />
       ) : (
         <CombatSandboxScreen />
       )}

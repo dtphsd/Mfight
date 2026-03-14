@@ -4,7 +4,7 @@ title: Architecture
 
 # Architecture
 
-> Last updated: 2026-03-14 12:41 MSK
+> Last updated: 2026-03-14 18:08 MSK
 
 This section is the engineering map for `Fight Club`.
 
@@ -36,6 +36,7 @@ Use it when you need to understand where logic belongs before making code change
 1. [Architecture Overview](./overview)
 2. [Combat Design Reference](./combat-design-reference)
 3. [Combat System Roadmap](./combat-system-roadmap)
+4. [Hunting Runtime Reference](./hunting-runtime-reference)
 
 ### If You Are Changing Combat
 
@@ -56,6 +57,7 @@ Use it when you need to understand where logic belongs before making code change
 - checking whether a docs change must accompany a runtime change
 - planning a refactor without breaking adjacent systems
 - reviewing how combat behavior flows into player-facing surfaces
+- tracing how hunting resolves, claims rewards, and bridges into shared inventory
 
 ---
 
@@ -63,6 +65,8 @@ Use it when you need to understand where logic belongs before making code change
 
 - [Architecture Overview](./overview)
 - [Combat Design Reference](./combat-design-reference)
+- [Hunting Runtime Reference](./hunting-runtime-reference)
+- [Hunting MVP Blueprint](./hunting-mvp-blueprint)
 - [Combat System](./combat/)
 - [Combat Model And Flow](./combat/model-and-flow)
 - [Combat Formulas And Effects](./combat/formulas-and-effects)
@@ -80,4 +84,4 @@ Use it when you need to understand where logic belongs before making code change
 
 ---
 
-> Last updated: 2026-03-14 12:41 MSK
+> Last updated: 2026-03-14 18:08 MSK

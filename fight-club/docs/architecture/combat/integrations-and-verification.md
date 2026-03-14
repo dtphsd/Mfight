@@ -1,6 +1,6 @@
 # Combat Integrations And Verification
 
-> Last updated: 2026-03-14 12:52 MSK
+> Last updated: 2026-03-14 15:19 MSK
 
 ## Sandbox And UI Dependencies
 
@@ -71,11 +71,12 @@ Current live alignment facts:
 
 - `CombatRulesScreen.tsx` renders `combatRulesContent`
 - `combatRulesContent.ts` passes sections through `withGeneratedCombatRulesFacts(...)`
-- `combatRulesFacts.ts` generates item rows and skill callouts from `starterItems`
+- `combatRulesFacts.ts` generates item rows, skill callouts, and the named-state primer from `starterItems`
 
 What this means:
 
 - showcased item and skill facts on the rules screen are partially driven by current content
+- player-facing setup/payoff guidance for `Exposed` and `Staggered` now also comes from the generated facts layer
 - if starter item skills, costs, damage multipliers, penetration, or effect metadata change, rules-screen facts can change too
 - not all explanatory copy is generated, so manual rules text can still drift from runtime truth
 
@@ -84,6 +85,13 @@ Safe rule:
 - whenever combat behavior changes, check both:
   - generated combat facts
   - manual explanatory sections in `combatRulesContent.ts`
+
+Current named-state sync points:
+
+- `Opening Sense` and `Open Flank` should remain readable as `Exposed` setup tools
+- `Armor Crush` and `Shield Bash` should remain readable as `Staggered` setup tools
+- `Execution Arc`, `Hook Chop`, and `Crushing Blow` should remain readable as payoff skills
+- the rules screen must explain the setup -> payoff loop, not only isolated skill cards
 
 If runtime and rules screen diverge:
 
@@ -153,6 +161,7 @@ Use this checklist whenever combat formulas, effects, resources, action rules, c
 - verify consumable effects still apply in the correct mode
 - verify weapon passives still trigger only on their intended conditions
 - verify stacks, durations, expiry, and periodic values still behave correctly
+- verify named state windows like `Exposed` and `Staggered` still last long enough to create the intended follow-up turn
 
 ### 6. Sandbox and UI contracts
 
@@ -160,8 +169,12 @@ Use this checklist whenever combat formulas, effects, resources, action rules, c
 - verify battle log entries still describe the real runtime outcome
 - verify skill ready state and action availability still match resource truth
 - verify silhouette hit feedback still only reacts to real incoming damage
+- verify each new combat impact fully resets the previous linger overlay instead of blending stale visuals into the next event
+- verify `block break` only appears when a block happened and damage still penetrated through
+- verify post-fight silhouette states keep winner and loser readable until the next fight starts
 - verify bot behavior still looks coherent against the updated formulas and skills
 - verify `Combat Rules` still matches live content and runtime behavior
+- verify generated skill facts still describe state-based payoff correctly
 
 ### 7. Required checks
 
@@ -192,4 +205,4 @@ Use this checklist whenever combat formulas, effects, resources, action rules, c
 
 ---
 
-> Last updated: 2026-03-14 12:52 MSK
+> Last updated: 2026-03-15 02:18 MSK

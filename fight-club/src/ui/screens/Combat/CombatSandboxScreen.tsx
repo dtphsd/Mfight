@@ -1,4 +1,4 @@
-import { useMemo, useState, type CSSProperties, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import type { CharacterStatName, CharacterStats } from "@/modules/character";
 import { combatZoneDamageModifiers, type CombatZone } from "@/modules/combat";
 import type { EquipmentSlot } from "@/modules/equipment";
@@ -66,6 +66,8 @@ export function CombatSandboxScreen() {
   const [inventoryOpen, setInventoryOpen] = useState(false);
   const [selectedEquipmentSlot, setSelectedEquipmentSlot] = useState<EquipmentSlot | null>(null);
   const [skillLoadoutOpen, setSkillLoadoutOpen] = useState(false);
+  const [deathFinisher, setDeathFinisher] = useState<null | { winner: "player" | "bot"; key: string }>(null);
+  const lastWinnerIdRef = useRef<string | null>(null);
 
   const playerEquipment = useMemo(
     () =>
@@ -91,21 +93,70 @@ export function CombatSandboxScreen() {
     sandbox.latestRoundEntries.length > 0
       ? sandbox.latestRoundEntries.map((entry) => `${entry.attackerName}: ${entry.commentary}`).join(" | ")
       : "No round resolved yet.";
+  const outcomeWinner = sandbox.combatPhase === "finished" ? deathFinisher?.winner ?? null : null;
+
+  useEffect(() => {
+    const winnerId = sandbox.combatState?.winnerId ?? null;
+
+    if (!winnerId || winnerId === lastWinnerIdRef.current) {
+      return;
+    }
+
+    lastWinnerIdRef.current = winnerId;
+    const winner =
+      winnerId === sandbox.playerSnapshot.characterId
+        ? "player"
+        : winnerId === sandbox.botSnapshot.characterId
+          ? "bot"
+          : null;
+
+    if (!winner) {
+      return;
+    }
+
+    setDeathFinisher({ winner, key: `${winnerId}-${sandbox.combatState?.round ?? "finish"}` });
+  }, [sandbox.botSnapshot.characterId, sandbox.combatState, sandbox.playerSnapshot.characterId]);
+
+  useEffect(() => {
+    if (sandbox.combatPhase !== "finished") {
+      lastWinnerIdRef.current = null;
+      setDeathFinisher(null);
+    }
+  }, [sandbox.combatPhase]);
 
   return (
     <section data-testid="combat-sandbox-screen" style={{ display: "grid", gap: "14px" }}>
-      <div style={{ ...shellStyle, padding: "16px", display: "grid", gap: "14px" }}>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "14px", alignItems: "start" }}>
-          <PlayerCombatPanel
-            sandbox={sandbox}
-            equipment={playerEquipment}
-            selectedEquipmentSlot={selectedEquipmentSlot}
-            onOpenBuilder={() => setBuilderOpen(true)}
-            onOpenBuildPresets={() => setBuildPresetsOpen(true)}
-            onOpenInventory={() => setInventoryOpen(true)}
-            onSelectEquipmentSlot={setSelectedEquipmentSlot}
-            onCloseEquipmentSlot={() => setSelectedEquipmentSlot(null)}
+      <div style={{ ...shellStyle, padding: "16px", display: "grid", gap: "14px", position: "relative", overflow: "hidden" }}>
+        {deathFinisher ? (
+          <div
+            key={deathFinisher.key}
+            className={`combat-death-scene-flash combat-death-scene-flash--${deathFinisher.winner}`}
+            style={{
+              position: "absolute",
+              inset: 0,
+              pointerEvents: "none",
+              zIndex: 0,
+            }}
           />
+        ) : null}
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "14px", alignItems: "start" }}>
+          <div
+            key={deathFinisher?.winner === "player" ? `${deathFinisher.key}-player-winner` : deathFinisher?.winner === "bot" ? `${deathFinisher.key}-player-loser` : "player-panel"}
+            className={resolveDeathFinisherClassName("player", deathFinisher?.winner ?? null)}
+            style={{ position: "relative", zIndex: 1 }}
+          >
+            <PlayerCombatPanel
+              sandbox={sandbox}
+              equipment={playerEquipment}
+              selectedEquipmentSlot={selectedEquipmentSlot}
+              onOpenBuilder={() => setBuilderOpen(true)}
+              onOpenBuildPresets={() => setBuildPresetsOpen(true)}
+              onOpenInventory={() => setInventoryOpen(true)}
+              onSelectEquipmentSlot={setSelectedEquipmentSlot}
+              onCloseEquipmentSlot={() => setSelectedEquipmentSlot(null)}
+              silhouetteState={outcomeWinner === "player" ? "victory" : outcomeWinner === "bot" ? "defeat" : null}
+            />
+          </div>
 
           <FightSetupPanel
             sandbox={sandbox}
@@ -116,11 +167,18 @@ export function CombatSandboxScreen() {
             onOpenSkillLoadout={() => setSkillLoadoutOpen(true)}
           />
 
-          <BotCombatPanel
-            sandbox={sandbox}
-            equipment={botEquipment}
-            onOpenBuildPresets={() => setBotBuildPresetsOpen(true)}
-          />
+          <div
+            key={deathFinisher?.winner === "bot" ? `${deathFinisher.key}-bot-winner` : deathFinisher?.winner === "player" ? `${deathFinisher.key}-bot-loser` : "bot-panel"}
+            className={resolveDeathFinisherClassName("bot", deathFinisher?.winner ?? null)}
+            style={{ position: "relative", zIndex: 1 }}
+          >
+            <BotCombatPanel
+              sandbox={sandbox}
+              equipment={botEquipment}
+              onOpenBuildPresets={() => setBotBuildPresetsOpen(true)}
+              silhouetteState={outcomeWinner === "bot" ? "victory" : outcomeWinner === "player" ? "defeat" : null}
+            />
+          </div>
         </div>
       </div>
 
@@ -203,6 +261,7 @@ function PlayerCombatPanel({
   onOpenInventory,
   onSelectEquipmentSlot,
   onCloseEquipmentSlot,
+  silhouetteState = null,
 }: {
   sandbox: CombatSandboxModel;
   equipment: Array<{ slot: EquipmentSlot; item: Item | null }>;
@@ -212,6 +271,7 @@ function PlayerCombatPanel({
   onOpenInventory: () => void;
   onSelectEquipmentSlot: (slot: EquipmentSlot) => void;
   onCloseEquipmentSlot: () => void;
+  silhouetteState?: "victory" | "defeat" | null;
 }) {
   return (
     <SidePanel
@@ -219,22 +279,28 @@ function PlayerCombatPanel({
       title={sandbox.playerCharacter.name}
       note={formatMaybeTitle(sandbox.metrics.weaponDamageType)}
       silhouette={
-        <CombatSilhouette
-          title="Player"
-          currentHp={sandbox.playerCombatant?.currentHp ?? sandbox.playerSnapshot.maxHp}
-          maxHp={sandbox.playerCombatant?.maxHp ?? sandbox.playerSnapshot.maxHp}
-          selectedDefenseZones={sandbox.selectedDefenseZones}
-          lastIncomingZone={sandbox.latestBotLogEntry?.attackZone ?? null}
-          lastOutgoingZone={sandbox.latestPlayerLogEntry?.attackZone ?? null}
-          incomingResult={sandbox.playerIncomingResult}
-          outgoingResult={sandbox.playerOutgoingResult}
-          interactive
-          zoneHighlights={buildZoneHighlights(sandbox.metrics.matchup.botZonePressure)}
-          activeEffects={sandbox.playerCombatant?.activeEffects ?? []}
-          equipmentSlots={equipment}
-          onEquipmentSlotClick={onSelectEquipmentSlot}
-          onDefenseToggle={sandbox.toggleDefenseZone}
-        />
+        <CombatOutcomeSilhouetteWrap side="player" state={silhouetteState}>
+          <CombatSilhouette
+            title="Player"
+            currentHp={sandbox.playerCombatant?.currentHp ?? sandbox.playerSnapshot.maxHp}
+            maxHp={sandbox.playerCombatant?.maxHp ?? sandbox.playerSnapshot.maxHp}
+            activeEffects={sandbox.playerCombatant?.activeEffects ?? []}
+            equipmentSlots={equipment}
+            figure="rush-chip"
+            mirrored
+            impactKey={
+              sandbox.playerIncomingResult &&
+              (sandbox.playerIncomingResult.finalDamage > 0 ||
+                sandbox.playerIncomingResult.blocked ||
+                sandbox.playerIncomingResult.dodged)
+                ? `${sandbox.playerIncomingResult.timestamp}-${sandbox.playerIncomingResult.finalDamage}-${sandbox.playerIncomingResult.type}`
+                : null
+            }
+            impactVariant={resolveImpactVariant(sandbox.playerIncomingResult)}
+            impactValue={resolveImpactValue(sandbox.playerIncomingResult)}
+            onEquipmentSlotClick={onSelectEquipmentSlot}
+          />
+        </CombatOutcomeSilhouetteWrap>
       }
       sidebar={
         <div style={{ display: "grid", gap: "8px", alignContent: "start", height: "100%" }}>
@@ -294,10 +360,12 @@ function BotCombatPanel({
   sandbox,
   equipment,
   onOpenBuildPresets,
+  silhouetteState = null,
 }: {
   sandbox: CombatSandboxModel;
   equipment: Array<{ slot: EquipmentSlot; item: Item | null }>;
   onOpenBuildPresets: () => void;
+  silhouetteState?: "victory" | "defeat" | null;
 }) {
   return (
     <SidePanel
@@ -305,21 +373,26 @@ function BotCombatPanel({
       title="Bot"
       note={formatMaybeTitle(sandbox.metrics.opponentWeaponDamageType)}
       silhouette={
-        <CombatSilhouette
-          title="Bot"
-          currentHp={sandbox.botCombatant?.currentHp ?? sandbox.botSnapshot.maxHp}
-          maxHp={sandbox.botCombatant?.maxHp ?? sandbox.botSnapshot.maxHp}
-          selectedAttackZone={sandbox.selectedAttackZone}
-          lastIncomingZone={sandbox.latestPlayerLogEntry?.attackZone ?? null}
-          lastOutgoingZone={sandbox.latestBotLogEntry?.attackZone ?? null}
-          incomingResult={sandbox.botIncomingResult}
-          outgoingResult={sandbox.botOutgoingResult}
-          interactive
-          zoneHighlights={buildZoneHighlights(sandbox.metrics.matchup.playerZonePressure)}
-          activeEffects={sandbox.botCombatant?.activeEffects ?? []}
-          equipmentSlots={equipment}
-          onAttackSelect={sandbox.setSelectedAttackZone}
-        />
+        <CombatOutcomeSilhouetteWrap side="bot" state={silhouetteState}>
+          <CombatSilhouette
+            title="Bot"
+            currentHp={sandbox.botCombatant?.currentHp ?? sandbox.botSnapshot.maxHp}
+            maxHp={sandbox.botCombatant?.maxHp ?? sandbox.botSnapshot.maxHp}
+            activeEffects={sandbox.botCombatant?.activeEffects ?? []}
+            equipmentSlots={equipment}
+            figure="vermin-tek"
+            impactKey={
+              sandbox.botIncomingResult &&
+              (sandbox.botIncomingResult.finalDamage > 0 ||
+                sandbox.botIncomingResult.blocked ||
+                sandbox.botIncomingResult.dodged)
+                ? `${sandbox.botIncomingResult.timestamp}-${sandbox.botIncomingResult.finalDamage}-${sandbox.botIncomingResult.type}`
+                : null
+            }
+            impactVariant={resolveImpactVariant(sandbox.botIncomingResult)}
+            impactValue={resolveImpactValue(sandbox.botIncomingResult)}
+          />
+        </CombatOutcomeSilhouetteWrap>
       }
       sidebar={<BotCombatPanelSidebar sandbox={sandbox} onOpenBuildPresets={onOpenBuildPresets} />}
       blocks={[]}
@@ -360,6 +433,92 @@ function FightSetupPanel({
 
         <CombatActionsPanel sandbox={sandbox} onOpenSkillLoadout={onOpenSkillLoadout} />
       </div>
+    </div>
+  );
+}
+
+function resolveDeathFinisherClassName(side: "player" | "bot", winner: "player" | "bot" | null) {
+  if (!winner) {
+    return undefined;
+  }
+
+  if (side === winner) {
+    return side === "player"
+      ? "combat-finish-panel combat-finish-panel--winner-left"
+      : "combat-finish-panel combat-finish-panel--winner-right";
+  }
+
+  return side === "player"
+    ? "combat-finish-panel combat-finish-panel--loser-left"
+    : "combat-finish-panel combat-finish-panel--loser-right";
+}
+
+function CombatOutcomeSilhouetteWrap({
+  side,
+  state,
+  children,
+}: {
+  side: "player" | "bot";
+  state: "victory" | "defeat" | null;
+  children: ReactNode;
+}) {
+  const className =
+    state === "victory"
+      ? side === "player"
+        ? "combat-postfight-silhouette combat-postfight-silhouette--victory-left"
+        : "combat-postfight-silhouette combat-postfight-silhouette--victory-right"
+      : state === "defeat"
+        ? side === "player"
+          ? "combat-postfight-silhouette combat-postfight-silhouette--defeat-left"
+          : "combat-postfight-silhouette combat-postfight-silhouette--defeat-right"
+        : undefined;
+
+  return (
+    <div style={{ position: "relative" }}>
+      <div className={className}>{children}</div>
+      {state === "defeat" ? (
+        <div
+          className="combat-outcome-stamp combat-outcome-stamp--defeat"
+          style={{
+            position: "absolute",
+            top: "44%",
+            left: "50%",
+            transform: "translate(-50%, -50%) rotate(-13deg)",
+            pointerEvents: "none",
+            zIndex: 5,
+          }}
+        >
+          DEFEAT
+        </div>
+      ) : null}
+      {state === "victory" ? (
+        <div
+          className="combat-outcome-stamp combat-outcome-stamp--victory"
+          style={{
+            position: "absolute",
+            top: "18%",
+            left: "50%",
+            transform: "translateX(-50%) rotate(-8deg)",
+            pointerEvents: "none",
+            zIndex: 5,
+          }}
+        >
+          Victory!
+        </div>
+      ) : null}
+      {state === "defeat" ? (
+        <div
+          style={{
+            position: "absolute",
+            inset: "54px 18px 40px",
+            borderRadius: "28px",
+            background:
+              "linear-gradient(180deg, rgba(8,8,8,0.08), rgba(8,8,8,0.34)), radial-gradient(circle at 50% 36%, rgba(255,86,86,0.08), transparent 34%)",
+            pointerEvents: "none",
+            zIndex: 4,
+          }}
+        />
+      ) : null}
     </div>
   );
 }
@@ -455,28 +614,53 @@ function AttackTargetRoundPanel({
     <MiniPanel title="Attack Target + Round">
       <div style={{ display: "grid", gap: "10px", height: "100%", alignContent: "space-between" }}>
         <div style={{ display: "grid", gap: "9px" }}>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(5, minmax(0, 1fr))", gap: "7px" }}>
-            {sandbox.zones.map((zone) => (
-              <button
-                key={zone}
-                type="button"
-                aria-label={`Select attack zone ${zone}`}
-                onClick={() => sandbox.setSelectedAttackZone(zone)}
-                style={{
-                  ...buttonStyle,
-                  ...(sandbox.selectedAttackZone === zone
-                    ? { background: "rgba(207,106,50,0.16)", border: "1px solid rgba(255,171,97,0.4)", color: "#ffe2c2" }
-                    : {}),
-                  padding: "11px 4px",
-                  fontSize: "10px",
-                  textTransform: "capitalize",
-                }}
-              >
-                {zone}
-              </button>
-            ))}
-          </div>
           <ResourceGrid resources={sandbox.playerResources} />
+          <div
+            style={{
+              ...panelStyle,
+              padding: "10px",
+              display: "grid",
+              gridTemplateColumns: "minmax(0, 1fr)",
+              gap: "8px",
+              alignItems: "start",
+            }}
+          >
+            <ZoneCircleRow
+              title="Attack"
+              zones={sandbox.zones}
+              selectedZones={[sandbox.selectedAttackZone]}
+              onSelectZone={sandbox.setSelectedAttackZone}
+              activeBackground="rgba(207,106,50,0.18)"
+              activeBorder="rgba(255,171,97,0.48)"
+              activeColor="#ffe2c2"
+              badgeBackground="rgba(255,171,97,0.14)"
+              badgeColor="#ffcf9a"
+              sectionBackground="linear-gradient(180deg, rgba(207,106,50,0.12), rgba(255,255,255,0.02))"
+              sectionBorder="rgba(255,171,97,0.16)"
+              titleColor="#ffcf9a"
+              selectedTransform="translateY(-1px) scale(1.02)"
+              selectedShadowTint="rgba(255,171,97,0.18)"
+              selectedInnerRing="rgba(255,227,192,0.16)"
+            />
+            <ZoneCircleRow
+              title="Block"
+              zones={sandbox.zones}
+              selectedZones={sandbox.selectedDefenseZones}
+              onSelectZone={sandbox.toggleDefenseZone}
+              multiSelect
+              activeBackground="rgba(76,143,255,0.18)"
+              activeBorder="rgba(122,187,255,0.48)"
+              activeColor="#dcefff"
+              badgeBackground="rgba(93,162,255,0.14)"
+              badgeColor="#9fd0ff"
+              sectionBackground="linear-gradient(180deg, rgba(76,143,255,0.12), rgba(255,255,255,0.02))"
+              sectionBorder="rgba(122,187,255,0.16)"
+              titleColor="#b7d5ff"
+              selectedTransform="translateY(0) scale(1.01)"
+              selectedShadowTint="rgba(122,187,255,0.16)"
+              selectedInnerRing="rgba(215,236,255,0.18)"
+            />
+          </div>
         </div>
         <div style={{ display: "grid", gap: "7px" }}>
           {sandbox.canPrepareNextRound ? (
@@ -507,6 +691,111 @@ function AttackTargetRoundPanel({
         </div>
       </div>
     </MiniPanel>
+  );
+}
+
+function ZoneCircleRow({
+  title,
+  zones,
+  selectedZones,
+  onSelectZone,
+  multiSelect = false,
+  activeBackground,
+  activeBorder,
+  activeColor,
+  badgeBackground,
+  badgeColor,
+  sectionBackground,
+  sectionBorder,
+  titleColor,
+  selectedTransform,
+  selectedShadowTint,
+  selectedInnerRing,
+}: {
+  title: string;
+  zones: CombatZone[];
+  selectedZones: CombatZone[];
+  onSelectZone: (zone: CombatZone) => void;
+  multiSelect?: boolean;
+  activeBackground: string;
+  activeBorder: string;
+  activeColor: string;
+  badgeBackground: string;
+  badgeColor: string;
+  sectionBackground: string;
+  sectionBorder: string;
+  titleColor: string;
+  selectedTransform: string;
+  selectedShadowTint: string;
+  selectedInnerRing: string;
+}) {
+  return (
+    <div
+      style={{
+        display: "grid",
+        gap: "6px",
+        alignContent: "start",
+        borderRadius: "14px",
+        padding: "8px",
+        background: sectionBackground,
+        border: `1px solid ${sectionBorder}`,
+      }}
+    >
+      <div style={{ display: "flex", justifyContent: "space-between", gap: "8px", alignItems: "center" }}>
+        <div style={{ fontSize: "9px", textTransform: "uppercase", letterSpacing: "0.1em", opacity: 0.9, color: titleColor, fontWeight: 800 }}>{title}</div>
+        <div
+          style={{
+            borderRadius: "999px",
+            padding: "2px 6px",
+            fontSize: "8px",
+            fontWeight: 700,
+            background: badgeBackground,
+            color: badgeColor,
+            border: `1px solid ${activeBorder}`,
+          }}
+          title={multiSelect ? selectedZones.map((zone) => formatMaybeTitle(zone)).join(", ") || "None" : formatMaybeTitle(selectedZones[0] ?? "none")}
+        >
+          {formatZoneSelectionSummary(selectedZones, multiSelect)}
+        </div>
+      </div>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(5, minmax(0, 1fr))", gap: "7px" }}>
+        {zones.map((zone) => {
+          const selected = selectedZones.includes(zone);
+
+          return (
+            <button
+              key={`${title}-${zone}`}
+              type="button"
+              aria-label={multiSelect ? `Toggle defense zone ${zone}` : `Select attack zone ${zone}`}
+              onClick={() => onSelectZone(zone)}
+              title={formatMaybeTitle(zone)}
+              style={{
+                width: "100%",
+                aspectRatio: "1 / 1",
+                borderRadius: "999px",
+                border: selected ? `1px solid ${activeBorder}` : "1px solid rgba(255,255,255,0.1)",
+                background: selected ? activeBackground : "rgba(255,255,255,0.03)",
+                color: selected ? activeColor : "#d9ccbc",
+                cursor: "pointer",
+                fontSize: "9px",
+                fontWeight: 800,
+                textTransform: "uppercase",
+                letterSpacing: "0.04em",
+                boxShadow: selected
+                  ? `0 0 18px ${selectedShadowTint}, inset 0 0 0 1px ${selectedInnerRing}`
+                  : "none",
+                transform: selected ? selectedTransform : "translateY(0) scale(1)",
+                transition: "transform 140ms ease, box-shadow 140ms ease, border-color 140ms ease, background 140ms ease",
+                display: "grid",
+                placeItems: "center",
+              }}
+            >
+              {zone.slice(0, 2)}
+            </button>
+          );
+        })}
+      </div>
+    </div>
   );
 }
 
@@ -648,7 +937,7 @@ function BotCombatPanelSidebar({
               {sandbox.botBuildPreset.label}
             </div>
             <div style={{ fontSize: "8px", lineHeight: 1.25, color: "#cbbba8" }}>
-              {sandbox.botBuildPreset.archetype} вЂў {sandbox.botBuildPreset.targetFightLength}
+              {sandbox.botBuildPreset.archetype} Р Р†Р вЂљРЎС› {sandbox.botBuildPreset.targetFightLength}
             </div>
           </div>
         </div>
@@ -1181,22 +1470,119 @@ function ResourceGrid({
   resources: { rage: number; guard: number; momentum: number; focus: number } | null;
 }) {
   const items = [
-    { key: "rage", label: "Rage", color: "#ee9abb" },
-    { key: "guard", label: "Guard", color: "#b7d5ff" },
-    { key: "momentum", label: "Momentum", color: "#f0a286" },
-    { key: "focus", label: "Focus", color: "#87e2cf" },
+    { key: "rage", label: "Rage", short: "R", icon: "✦", color: "#ee9abb" },
+    { key: "guard", label: "Guard", short: "G", icon: "⬢", color: "#b7d5ff" },
+    { key: "momentum", label: "Momentum", short: "M", icon: "➤", color: "#f0a286" },
+    { key: "focus", label: "Focus", short: "F", icon: "◌", color: "#87e2cf" },
   ] as const;
 
   return (
-    <div style={{ display: "grid", gridTemplateColumns: "repeat(4, minmax(0, 1fr))", gap: "5px" }}>
-      {items.map((item) => (
-        <div key={item.key} style={{ borderRadius: "10px", padding: "7px 4px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", textAlign: "center" }}>
-          <div style={{ fontSize: "7px", opacity: 0.72, color: item.color, textTransform: "uppercase" }}>{item.label}</div>
-          <div style={{ fontSize: "13px", fontWeight: 800 }}>{resources?.[item.key] ?? 0}</div>
+    <div
+      style={{
+        ...panelStyle,
+        padding: "9px 10px",
+        display: "grid",
+        gap: "7px",
+      }}
+    >
+      <div style={{ display: "flex", justifyContent: "space-between", gap: "8px", alignItems: "center" }}>
+        <div style={{ fontSize: "9px", textTransform: "uppercase", letterSpacing: "0.1em", opacity: 0.68 }}>Resource Gain</div>
+        <div
+          style={{
+            borderRadius: "999px",
+            padding: "2px 6px",
+            fontSize: "8px",
+            fontWeight: 700,
+            background: "rgba(255,255,255,0.06)",
+            color: "#e7d9c8",
+            border: "1px solid rgba(255,255,255,0.1)",
+          }}
+        >
+          {(resources?.rage ?? 0) + (resources?.guard ?? 0) + (resources?.momentum ?? 0) + (resources?.focus ?? 0)} stored
         </div>
-      ))}
+      </div>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, minmax(0, 1fr))", gap: "5px" }}>
+        {items.map((item) => {
+          const value = resources?.[item.key] ?? 0;
+          const progress = Math.min(1, value / 6);
+
+          return (
+            <div
+              key={item.key}
+              className={
+                value > 0
+                  ? `combat-resource-card combat-resource-card--charged combat-resource-card--${item.key}`
+                  : `combat-resource-card combat-resource-card--${item.key}`
+              }
+              style={{
+                borderRadius: "12px",
+                padding: "7px 6px",
+                background: "rgba(255,255,255,0.03)",
+                border: "1px solid rgba(255,255,255,0.08)",
+                textAlign: "center",
+                display: "grid",
+                gap: "6px",
+              }}
+              title={`${item.label}: ${value}`}
+            >
+              <div
+                style={{
+                  width: "32px",
+                  height: "32px",
+                  margin: "0 auto",
+                  borderRadius: "999px",
+                  display: "grid",
+                  placeItems: "center",
+                  background: `conic-gradient(${item.color} ${Math.max(progress * 360, value > 0 ? 30 : 0)}deg, rgba(255,255,255,0.08) 0deg)`,
+                  boxShadow: value > 0 ? `0 0 14px ${item.color}22` : "none",
+                }}
+              >
+                <div
+                  style={{
+                    width: "24px",
+                    height: "24px",
+                    borderRadius: "999px",
+                    background: "rgba(18,16,15,0.94)",
+                    border: "1px solid rgba(255,255,255,0.08)",
+                    display: "grid",
+                    placeItems: "center",
+                    color: item.color,
+                    fontSize: "11px",
+                    fontWeight: 900,
+                    lineHeight: 1,
+                    position: "relative",
+                  }}
+                >
+                  <span style={{ position: "absolute", inset: 0, display: "grid", placeItems: "center", fontSize: "10px", opacity: 0.28 }}>
+                    {item.icon}
+                  </span>
+                  <span style={{ position: "relative", zIndex: 1 }}>{item.short}</span>
+                </div>
+              </div>
+              <div style={{ fontSize: "13px", fontWeight: 800 }}>{value}</div>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
+}
+
+function formatZoneSelectionSummary(selectedZones: CombatZone[], multiSelect: boolean) {
+  if (selectedZones.length === 0) {
+    return "None";
+  }
+
+  if (!multiSelect) {
+    return formatMaybeTitle(selectedZones[0]);
+  }
+
+  const abbreviations = selectedZones.map((zone) => zone.slice(0, 2).toUpperCase());
+  if (abbreviations.length <= 3) {
+    return abbreviations.join(" / ");
+  }
+
+  return `${abbreviations.slice(0, 2).join(" / ")} +${abbreviations.length - 2}`;
 }
 
 function ActionRail({
@@ -1368,7 +1754,7 @@ function ActionButton({
           zIndex: 1,
         }}
       >
-        <span aria-hidden="true">{icon ?? "вЂў"}</span>
+        <span aria-hidden="true">{icon ?? "\u2022"}</span>
         {badge ? (
           <span
             style={{
@@ -1453,7 +1839,7 @@ function ActionButton({
                 opacity: 0.85,
               }}
             />
-            <div style={{ position: "relative", fontSize: "42px", lineHeight: 1 }}>{icon ?? "вЂў"}</div>
+            <div style={{ position: "relative", fontSize: "42px", lineHeight: 1 }}>{icon ?? "\u2022"}</div>
           </div>
           {description ? <div style={{ fontSize: "10px", lineHeight: 1.35, color: "#d7cbbc" }}>{description}</div> : null}
           {detailLines.length > 0 ? (
@@ -1728,44 +2114,28 @@ function SkillLoadoutPopover({
   );
 }
 
-function buildZoneHighlights(zonePressure: {
-  bestOpen: { zone: CombatZone };
-  worstOpen: { zone: CombatZone };
-  bestGuarded: { zone: CombatZone };
-  worstGuarded: { zone: CombatZone };
-  zones: Array<{ zone: CombatZone; openDamage: number; guardedDamage: number }>;
-}) {
-  const byZone = Object.fromEntries(zonePressure.zones.map((entry) => [entry.zone, { openDamage: entry.openDamage, guardedDamage: entry.guardedDamage }])) as Record<CombatZone, { openDamage: number; guardedDamage: number }>;
-  return {
-    [zonePressure.bestOpen.zone]: { ...byZone[zonePressure.bestOpen.zone], bestOpen: true },
-    [zonePressure.worstOpen.zone]: { ...byZone[zonePressure.worstOpen.zone], ...(zonePressure.worstOpen.zone === zonePressure.bestOpen.zone ? { bestOpen: true } : {}), worstOpen: true },
-    [zonePressure.bestGuarded.zone]: { ...byZone[zonePressure.bestGuarded.zone], ...(zonePressure.bestGuarded.zone === zonePressure.bestOpen.zone ? { bestOpen: true } : {}), ...(zonePressure.bestGuarded.zone === zonePressure.worstOpen.zone ? { worstOpen: true } : {}), bestGuarded: true },
-    [zonePressure.worstGuarded.zone]: { ...byZone[zonePressure.worstGuarded.zone], ...(zonePressure.worstGuarded.zone === zonePressure.bestOpen.zone ? { bestOpen: true } : {}), ...(zonePressure.worstGuarded.zone === zonePressure.worstOpen.zone ? { worstOpen: true } : {}), ...(zonePressure.worstGuarded.zone === zonePressure.bestGuarded.zone ? { bestGuarded: true } : {}), worstGuarded: true },
-  };
-}
-
 function getSkillIcon(skillName: string, iconHint?: string) {
   const normalizedName = skillName.toLowerCase();
   const normalizedHint = (iconHint ?? "").toLowerCase();
 
   if (normalizedHint.includes("shield") || normalizedName.includes("shield")) {
-    return "рџ›Ў";
+    return "\uD83D\uDEE1";
   }
 
   if (normalizedHint.includes("helmet") || normalizedHint.includes("cap") || normalizedName.includes("head")) {
-    return "рџЄ–";
+    return "\uD83E\uDE96";
   }
 
   if (normalizedHint.includes("armor") || normalizedHint.includes("vest") || normalizedHint.includes("jacket")) {
-    return "рџ¦є";
+    return "\uD83E\uDDBA";
   }
 
   if (normalizedHint.includes("glove") || normalizedHint.includes("gauntlet") || normalizedName.includes("grip")) {
-    return "рџ§¤";
+    return "\uD83E\uDDE4";
   }
 
   if (normalizedHint.includes("boot") || normalizedName.includes("step") || normalizedName.includes("kick")) {
-    return "рџҐѕ";
+    return "\uD83E\uDD7E";
   }
 
   if (
@@ -1775,53 +2145,54 @@ function getSkillIcon(skillName: string, iconHint?: string) {
     normalizedHint.includes("medallion") ||
     normalizedHint.includes("accessory")
   ) {
-    return "рџ’Ќ";
+    return "\uD83D\uDC8D";
   }
 
   if (normalizedHint.includes("dagger") || normalizedName.includes("pierc") || normalizedName.includes("lunge")) {
-    return "рџ—Ў";
+    return "\uD83D\uDDE1";
   }
 
   if (normalizedHint.includes("axe") || normalizedName.includes("cleave")) {
-    return "рџЄ“";
+    return "\uD83E\uDE93";
   }
 
   if (normalizedHint.includes("mace") || normalizedHint.includes("hammer") || normalizedName.includes("bash")) {
-    return "рџ”Ё";
+    return "\uD83D\uDD28";
   }
 
   if (normalizedHint.includes("sword") || normalizedName.includes("slash")) {
-    return "вљ”";
+    return "\u2694";
   }
 
   if (normalizedName.includes("shield")) {
-    return "рџ›Ў";
+    return "\uD83D\uDEE1";
   }
 
   if (normalizedName.includes("pierc") || normalizedName.includes("lunge") || normalizedName.includes("dagger")) {
-    return "рџ—Ў";
+    return "\uD83D\uDDE1";
   }
 
   if (normalizedName.includes("cleave") || normalizedName.includes("slash") || normalizedName.includes("sword")) {
-    return "вљ”";
+    return "\u2694";
   }
 
-  return "вњ¦";
+  return "\u2726";
 }
 
 function getConsumableIcon(itemName: string) {
   const normalizedName = itemName.toLowerCase();
 
   if (normalizedName.includes("potion")) {
-    return "рџ§Є";
+    return "\uD83E\uDDEA";
   }
 
   if (normalizedName.includes("bandage")) {
-    return "рџ©№";
+    return "\uD83E\uDE79";
   }
 
-  return "в—‰";
+  return "\u25C9";
 }
+
 
 function getActionVisual(label: string, iconHint?: string) {
   const normalized = label.toLowerCase();
@@ -2224,6 +2595,7 @@ function formatConsumableUsageLabel(usageMode: "replace_attack" | "with_attack")
   }
 }
 
+
 function resolveSelectedActionLabel(sandbox: ReturnType<typeof useCombatSandbox>) {
   const selectedAction = sandbox.selectedAction;
 
@@ -2236,6 +2608,42 @@ function resolveSelectedActionLabel(sandbox: ReturnType<typeof useCombatSandbox>
     default:
       return "Basic Attack";
   }
+}
+
+function resolveImpactVariant(result: CombatSandboxModel["playerIncomingResult"]) {
+  if (!result) {
+    return "hit" as const;
+  }
+
+  if (result.dodged) {
+    return "dodge" as const;
+  }
+
+  if (result.blocked && result.finalDamage > 0) {
+    return "block_break" as const;
+  }
+
+  if (result.blocked && result.finalDamage <= 0) {
+    return "block" as const;
+  }
+
+  if (result.crit) {
+    return "crit" as const;
+  }
+
+  if (result.blocked) {
+    return "block" as const;
+  }
+
+  return "hit" as const;
+}
+
+function resolveImpactValue(result: CombatSandboxModel["playerIncomingResult"]) {
+  if (!result) {
+    return null;
+  }
+
+  return result.finalDamage > 0 ? result.finalDamage : null;
 }
 
 function resolveSelectedActionSummary(sandbox: ReturnType<typeof useCombatSandbox>) {

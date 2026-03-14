@@ -1,6 +1,6 @@
 # UI / UX Refactor
 
-> Last updated: 2026-03-13 23:20 MSK
+> Last updated: 2026-03-14 16:36 MSK
 
 **Feature:** UI / UX Refactor  
 **Status:** 🟡 IN PROGRESS
@@ -57,11 +57,19 @@ Current state:
 
 UI / UX audit and phased roadmap are complete. `UI-002`, `UI-003`, and `UI-004` are finished. The active implementation steps are `UI-008` for structural decomposition and `UI-010` for the first visual polish slice.
 
+The next product-facing focus is a dedicated UX cleanup track for the combat loop:
+
+- `UI-011` - add a clear `Current Turn` focus block
+- `UI-012` - simplify round setup into a guided step-by-step action path
+- `UI-013` - reduce combat-screen noise and separate play vs analysis layers
+- `UI-014` - make states and payoff windows self-explanatory in combat UI
+- `UI-015` - unify build interactions into one clearer build center
+
 ---
 
 ## Следующий шаг
 
-Start decomposing the next heavyweight combat components now that `CombatSandboxScreen.tsx` has been converted into a section coordinator.
+Keep the structural refactor safe, but shift the next UX work toward a cleaner combat flow: add a `Current Turn` block, make round setup procedural, reduce noise, clarify state payoff windows, and simplify build interactions.
 
 ---
 
@@ -360,6 +368,34 @@ Suggested motion candidates:
 - `VP-M04` Damage / resource micro-feedback:
   - consider lightweight burst or tick animation for resource gain and loss, but only if it stays readable and does not spam the screen
 
+- `VP-M05` Combat impact language:
+  - keep a dedicated visual vocabulary for `hit`, `crit`, `block`, `dodge`, and `block break`
+  - separate short motion from longer linger overlays so new impacts do not inherit stale visuals
+  - keep finish states readable after combat ends without replacing the whole silhouette panel with a different UI card
+
+Latest live shape:
+
+- `CombatSilhouette` no longer owns all impact presentation directly
+- the motion layer now runs through:
+  - `src/ui/components/combat/combatImpactMotion.ts`
+  - `src/ui/components/combat/CombatImpactOverlay.tsx`
+  - `src/ui/components/combat/combat-motion.css`
+- live impact variants now include:
+  - `hit`
+  - `crit`
+  - `block`
+  - `dodge`
+  - `block_break`
+- post-fight states now keep both fighters on the board:
+  - winner stays slightly pushed forward
+  - loser collapses inside the frame instead of being replaced by a separate result card
+
+Motion safety notes:
+
+- each new impact now re-mounts the linger overlay so the next hit does not inherit the previous linger animation
+- short shake / spin motion and long-lived overlays are intentionally separated
+- the current behavior prefers readability over stacking multiple lingering effects at once
+
 ---
 
 ### Phase 6 - UI Test Safety Net
@@ -398,6 +434,66 @@ Expected effect:
 
 ---
 
+## UX Cleanup Track
+
+The next product-facing work should focus on making the combat loop easier to read and easier to execute, not on adding more surface complexity.
+
+### `UI-011` - Current Turn Block
+
+- create one obvious combat summary block for attack, target zone, defense, active skill or consumable, and readiness
+- primary files:
+  - `src/ui/screens/Combat/CombatSandboxScreen.tsx`
+  - `src/ui/hooks/useCombatSandbox.ts`
+
+### `UI-012` - Guided Round Setup
+
+- convert the current round controls into a visible sequence:
+  - choose attack
+  - choose target zone
+  - choose defense
+  - optionally add skill or consumable
+  - resolve round
+- primary files:
+  - `src/ui/screens/Combat/CombatSandboxScreen.tsx`
+  - `src/ui/hooks/useCombatSandbox.ts`
+  - `src/orchestration/combat/roundDraft.ts`
+
+### `UI-013` - Noise Reduction
+
+- make the main combat action area dominant and demote advanced metrics, secondary badges, and analysis-heavy surfaces
+- primary files:
+  - `src/ui/screens/Combat/CombatSandboxScreen.tsx`
+  - `src/ui/components/combat/BattleLogPanel.tsx`
+  - `src/styles.css`
+
+### `UI-014` - State And Payoff Guidance
+
+- make `Exposed`, `Staggered`, and payoff windows usable without requiring the player to remember docs
+- highlight empowered skills and surface short context hints near actions
+- primary files:
+  - `src/ui/screens/Combat/CombatSandboxScreen.tsx`
+  - `src/ui/components/combat/CombatSilhouette.tsx`
+  - `src/ui/components/combat/BattleLogPanel.tsx`
+
+### `UI-015` - Clearer Build Center
+
+- reduce modal hopping between builder, presets, inventory, equipment, and skills so build editing feels like one workflow
+- primary files:
+  - `src/ui/components/combat/BuilderPopover.tsx`
+  - `src/ui/components/combat/BuildPresetsPopover.tsx`
+  - `src/ui/components/combat/InventoryPopover.tsx`
+  - `src/ui/components/combat/EquipmentSlotPopover.tsx`
+
+### Suggested UX Cleanup Order
+
+1. `UI-011` - add the `Current Turn` block first
+2. `UI-012` - make round setup procedural
+3. `UI-013` - demote noise and analytics
+4. `UI-014` - surface state/payoff guidance
+5. `UI-015` - simplify the build flow after combat flow is clearer
+
+---
+
 ## Success Criteria
 
 - `CombatSandboxScreen.tsx` stops being the main monolith
@@ -409,4 +505,4 @@ Expected effect:
 
 ---
 
-> Last updated: 2026-03-13 22:33 MSK
+> Last updated: 2026-03-15 02:18 MSK

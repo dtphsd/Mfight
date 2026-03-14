@@ -225,8 +225,19 @@ This matrix turns the documented risk areas into explicit targets for `COMBAT-00
   - risk:
     - bot chooses impossible actions after rule changes
 - `RT-015` Combat Rules generated facts stay aligned with starter item skill facts
+- `RT-016` Named setup states still bridge correctly into payoff skills on the next valid turn
+- `RT-017` One-turn rider effects that expire on the target turn still remain visible in log/applied-effects even when they do not persist into the next round state
   - risk:
     - rules screen silently drifts from live content
+- `RT-018` New impact motion fully replaces the previous linger layer
+  - risk:
+    - `hit`, `crit`, `block`, `dodge`, or `block break` visually overlap and leave stale state on the next event
+- `RT-019` `block break` UI only appears on penetrated block outcomes
+  - risk:
+    - players see `BLOCK BREAK` on plain hits or on fully negated blocks
+- `RT-020` Post-fight winner / loser silhouette hold resets on the next fight
+  - risk:
+    - victory or defeat state leaks into the following combat start
 
 ### Practical order for `COMBAT-003`
 
@@ -270,4 +281,4 @@ Those gaps are tracked by:
 
 ---
 
-> Last updated: 2026-03-14 12:52 MSK
+> Last updated: 2026-03-15 02:18 MSK

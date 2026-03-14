@@ -1,0 +1,534 @@
+@keyframes combat-silhouette-impact {
+  0% {
+    transform: translate3d(0, 0, 0);
+    filter: brightness(1) saturate(1);
+  }
+
+  12% {
+    transform: translate3d(-7px, 1px, 0) rotate(-0.45deg);
+    filter: brightness(1.04) saturate(1.08);
+  }
+
+  28% {
+    transform: translate3d(6px, -1px, 0) rotate(0.35deg);
+    filter: brightness(1.08) saturate(1.14);
+  }
+
+  44% {
+    transform: translate3d(-5px, 0, 0) rotate(-0.28deg);
+    filter: brightness(1.05) saturate(1.1);
+  }
+
+  62% {
+    transform: translate3d(3px, 0, 0) rotate(0.18deg);
+    filter: brightness(1.03) saturate(1.05);
+  }
+
+  82% {
+    transform: translate3d(-1px, 0, 0);
+    filter: brightness(1.01) saturate(1.02);
+  }
+
+  100% {
+    transform: translate3d(0, 0, 0);
+    filter: brightness(1) saturate(1);
+  }
+}
+
+.combat-silhouette-impact {
+  will-change: transform, filter;
+}
+
+.combat-silhouette-impact--hit {
+  animation: combat-silhouette-impact 300ms cubic-bezier(0.22, 0.7, 0.24, 1);
+}
+
+.combat-silhouette-impact--crit {
+  animation: combat-silhouette-impact 380ms cubic-bezier(0.22, 0.7, 0.24, 1);
+}
+
+.combat-silhouette-impact--block_break {
+  animation: combat-silhouette-impact 460ms cubic-bezier(0.16, 0.76, 0.2, 1);
+}
+
+@keyframes combat-silhouette-block {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+    filter: brightness(1) saturate(1);
+  }
+
+  22% {
+    transform: translate3d(0, -1px, 0) scale(1.01);
+    filter: brightness(1.05) saturate(1.06);
+  }
+
+  48% {
+    transform: translate3d(0, 0, 0) scale(0.995);
+    filter: brightness(1.02) saturate(1.03);
+  }
+
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+    filter: brightness(1) saturate(1);
+  }
+}
+
+.combat-silhouette-impact--block {
+  animation: combat-silhouette-block 420ms ease-out;
+}
+
+@keyframes combat-silhouette-dodge {
+  0% {
+    transform: translate3d(0, 0, 0) rotate(0deg);
+    filter: brightness(1) saturate(1);
+  }
+
+  22% {
+    transform: translate3d(3px, -1px, 0) rotate(120deg);
+    filter: brightness(1.06) saturate(1.08);
+  }
+
+  48% {
+    transform: translate3d(0, 0, 0) rotate(260deg);
+    filter: brightness(1.08) saturate(1.1);
+  }
+
+  72% {
+    transform: translate3d(-2px, 0, 0) rotate(360deg);
+    filter: brightness(1.03) saturate(1.04);
+  }
+
+  100% {
+    transform: translate3d(0, 0, 0) rotate(360deg);
+    filter: brightness(1) saturate(1);
+  }
+}
+
+.combat-silhouette-impact--dodge {
+  animation: combat-silhouette-dodge 520ms cubic-bezier(0.2, 0.7, 0.22, 1);
+}
+
+@keyframes combat-silhouette-hit-flash {
+  0% {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+
+  18% {
+    opacity: 0.85;
+    transform: scale(1.02);
+  }
+
+  45% {
+    opacity: 0.3;
+    transform: scale(1.01);
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(1.04);
+  }
+}
+
+.combat-silhouette-hit-flash {
+  will-change: opacity, transform;
+}
+
+.combat-silhouette-hit-flash--hit {
+  animation: combat-silhouette-hit-flash 5s ease-out;
+}
+
+.combat-silhouette-hit-flash--crit {
+  animation: combat-silhouette-hit-flash 5s ease-out;
+}
+
+.combat-silhouette-hit-flash--block_break {
+  animation: combat-silhouette-hit-flash 5s ease-out;
+}
+
+@keyframes combat-silhouette-block-flash {
+  0% {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+
+  30% {
+    opacity: 0.72;
+    transform: scale(1.01);
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(1.03);
+  }
+}
+
+.combat-silhouette-hit-flash--block {
+  animation: combat-silhouette-block-flash 5s ease-out;
+}
+
+@keyframes combat-silhouette-dodge-flash {
+  0% {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+
+  18% {
+    opacity: 0.66;
+    transform: scale(1.02);
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(1.06);
+  }
+}
+
+.combat-silhouette-hit-flash--dodge {
+  animation: combat-silhouette-dodge-flash 5s ease-out;
+}
+
+@keyframes combat-silhouette-frame-glow {
+  0% {
+    opacity: 0;
+  }
+
+  10% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+
+.combat-silhouette-frame-glow {
+  animation: combat-silhouette-frame-glow 5s ease-out;
+  will-change: opacity;
+}
+
+.combat-silhouette-block-break-frame {
+  animation: combat-silhouette-frame-glow 5s ease-out;
+  will-change: opacity;
+}
+
+@keyframes combat-silhouette-block-sigil {
+  0% {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+
+  10% {
+    opacity: 0.95;
+    transform: scale(1);
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(1.04);
+  }
+}
+
+.combat-silhouette-block-sigil {
+  animation: combat-silhouette-block-sigil 5s ease-out;
+  will-change: opacity, transform;
+}
+
+@keyframes combat-silhouette-crit-sigil {
+  0% {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+
+  10% {
+    opacity: 0.96;
+    transform: scale(1);
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(1.05);
+  }
+}
+
+.combat-silhouette-crit-sigil {
+  animation: combat-silhouette-crit-sigil 5s ease-out;
+  will-change: opacity, transform;
+}
+
+@keyframes combat-silhouette-block-break-sigil {
+  0% {
+    opacity: 0;
+    transform: scale(0.92) rotate(-4deg);
+  }
+
+  10% {
+    opacity: 0.98;
+    transform: scale(1) rotate(0deg);
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(1.06) rotate(2deg);
+  }
+}
+
+.combat-silhouette-block-break-sigil {
+  animation: combat-silhouette-block-break-sigil 5s ease-out;
+  will-change: opacity, transform;
+}
+
+@keyframes combat-silhouette-impact-text {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, 6px) rotate(-14deg) scale(0.92);
+    letter-spacing: 0.12em;
+  }
+
+  12% {
+    opacity: 1;
+    transform: translate(-50%, 0) rotate(-12deg) scale(1);
+    letter-spacing: 0.18em;
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -22px) rotate(-10deg) scale(1.04);
+    letter-spacing: 0.22em;
+  }
+}
+
+.combat-silhouette-impact-text {
+  font-family: "Arial Black", Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
+  font-size: 24px;
+  line-height: 1;
+  font-style: italic;
+  font-weight: 900;
+  text-transform: uppercase;
+  text-shadow:
+    0 2px 0 rgba(18, 12, 11, 0.9),
+    0 8px 20px rgba(0, 0, 0, 0.42);
+  animation: combat-silhouette-impact-text 4s ease-out;
+  will-change: opacity, transform, letter-spacing;
+}
+
+.combat-silhouette-impact-text--hit {
+  color: #ffc7b7;
+  animation-duration: 4s;
+}
+
+.combat-silhouette-impact-text--crit {
+  color: #ffd2d2;
+  animation-duration: 4s;
+}
+
+.combat-silhouette-impact-text--block {
+  color: #d6eeff;
+  animation-duration: 4s;
+}
+
+.combat-silhouette-impact-text--block_break {
+  color: #ffbf7d;
+  animation-duration: 4s;
+}
+
+.combat-silhouette-impact-text--dodge {
+  color: #c8fff1;
+  animation-duration: 4s;
+}
+
+@keyframes combat-finish-winner-left {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+    filter: brightness(1) saturate(1);
+  }
+
+  38% {
+    transform: translate3d(42px, -4px, 0) scale(1.03);
+    filter: brightness(1.08) saturate(1.08);
+  }
+
+  100% {
+    transform: translate3d(18px, 0, 0) scale(1.01);
+    filter: brightness(1.02) saturate(1.02);
+  }
+}
+
+@keyframes combat-finish-winner-right {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+    filter: brightness(1) saturate(1);
+  }
+
+  38% {
+    transform: translate3d(-42px, -4px, 0) scale(1.03);
+    filter: brightness(1.08) saturate(1.08);
+  }
+
+  100% {
+    transform: translate3d(-18px, 0, 0) scale(1.01);
+    filter: brightness(1.02) saturate(1.02);
+  }
+}
+
+@keyframes combat-finish-loser-left {
+  0% {
+    transform: translate3d(0, 0, 0) rotate(0deg) scale(1);
+    opacity: 1;
+    filter: brightness(1) saturate(1);
+  }
+
+  24% {
+    transform: translate3d(-22px, 0, 0) rotate(-2deg) scale(0.99);
+    filter: brightness(1.08) saturate(1.08);
+  }
+
+  100% {
+    transform: translate3d(-34px, 16px, 0) rotate(-7deg) scale(0.96);
+    opacity: 1;
+    filter: brightness(0.94) saturate(0.9);
+  }
+}
+
+@keyframes combat-finish-loser-right {
+  0% {
+    transform: translate3d(0, 0, 0) rotate(0deg) scale(1);
+    opacity: 1;
+    filter: brightness(1) saturate(1);
+  }
+
+  24% {
+    transform: translate3d(22px, 0, 0) rotate(2deg) scale(0.99);
+    filter: brightness(1.08) saturate(1.08);
+  }
+
+  100% {
+    transform: translate3d(34px, 16px, 0) rotate(7deg) scale(0.96);
+    opacity: 1;
+    filter: brightness(0.94) saturate(0.9);
+  }
+}
+
+@keyframes combat-death-scene-flash-left {
+  0% {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+
+  16% {
+    opacity: 0.82;
+    transform: scale(1);
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(1.04);
+  }
+}
+
+@keyframes combat-death-scene-flash-right {
+  0% {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+
+  16% {
+    opacity: 0.82;
+    transform: scale(1);
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(1.04);
+  }
+}
+
+.combat-finish-panel {
+  will-change: transform, filter, opacity;
+}
+
+.combat-finish-panel--winner-left {
+  animation: combat-finish-winner-left 1150ms cubic-bezier(0.18, 0.82, 0.22, 1) forwards;
+}
+
+.combat-finish-panel--winner-right {
+  animation: combat-finish-winner-right 1150ms cubic-bezier(0.18, 0.82, 0.22, 1) forwards;
+}
+
+.combat-finish-panel--loser-left {
+  animation: combat-finish-loser-left 1150ms cubic-bezier(0.22, 0.7, 0.24, 1) forwards;
+}
+
+.combat-finish-panel--loser-right {
+  animation: combat-finish-loser-right 1150ms cubic-bezier(0.22, 0.7, 0.24, 1) forwards;
+}
+
+.combat-death-scene-flash {
+  border-radius: 28px;
+  will-change: opacity, transform;
+}
+
+.combat-death-scene-flash--player {
+  background:
+    radial-gradient(circle at 28% 46%, rgba(255, 146, 98, 0.26), transparent 24%),
+    radial-gradient(circle at 42% 48%, rgba(255, 92, 92, 0.16), transparent 28%),
+    linear-gradient(90deg, rgba(255, 140, 84, 0.1), transparent 44%);
+  animation: combat-death-scene-flash-left 1150ms ease-out forwards;
+}
+
+.combat-death-scene-flash--bot {
+  background:
+    radial-gradient(circle at 72% 46%, rgba(255, 146, 98, 0.26), transparent 24%),
+    radial-gradient(circle at 58% 48%, rgba(255, 92, 92, 0.16), transparent 28%),
+    linear-gradient(270deg, rgba(255, 140, 84, 0.1), transparent 44%);
+  animation: combat-death-scene-flash-right 1150ms ease-out forwards;
+}
+
+.combat-postfight-silhouette {
+  will-change: transform, filter, opacity;
+}
+
+.combat-postfight-silhouette--victory-left {
+  transform: translate3d(18px, 0, 0) scale(1.01);
+  filter: brightness(1.05) saturate(1.08);
+}
+
+.combat-postfight-silhouette--victory-right {
+  transform: translate3d(-18px, 0, 0) scale(1.01);
+  filter: brightness(1.05) saturate(1.08);
+}
+
+.combat-postfight-silhouette--defeat-left {
+  transform: translate3d(-32px, 34px, 0) rotate(-10deg) scale(0.92);
+  filter: grayscale(0.5) brightness(0.64) saturate(0.7);
+  opacity: 0.82;
+}
+
+.combat-postfight-silhouette--defeat-right {
+  transform: translate3d(32px, 34px, 0) rotate(10deg) scale(0.92);
+  filter: grayscale(0.5) brightness(0.64) saturate(0.7);
+  opacity: 0.82;
+}
+
+.combat-outcome-stamp {
+  font-style: italic;
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-shadow:
+    0 2px 0 rgba(18, 12, 11, 0.96),
+    0 12px 20px rgba(0, 0, 0, 0.36);
+}
+
+.combat-outcome-stamp--defeat {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 42px;
+  color: rgba(255, 164, 164, 0.96);
+}
+
+.combat-outcome-stamp--victory {
+  font-family: "Arial Black", Impact, Haettenschweiler, sans-serif;
+  font-size: 24px;
+  color: #fff0c7;
+}

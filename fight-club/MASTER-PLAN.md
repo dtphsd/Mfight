@@ -28,9 +28,9 @@
 | UI-005 | Rework build flow into one clear UX path | UX | 🔴 TODO | `features/ui-ux-refactor.md` | Merge presets, builder, inventory, and skills into one mental model |
 | UI-006 | Rework round setup into guided action flow | UX | 🔴 TODO | `features/ui-ux-refactor.md` | Make action selection procedural and easier to read |
 | UI-007 | Reduce combat screen information density | UX | 🔴 TODO | `features/ui-ux-refactor.md` | Demote advanced analytics and surface key actions first |
-| UI-008 | Split heavyweight combat components | UI Architecture | 🟡 IN PROGRESS | `features/ui-ux-refactor.md` | `CombatSilhouette` now has extracted header, hp bar, board shell, figure, zones layer, legend, equipment layer, and status-effects layer; next step is choosing the next heavyweight component or continuing with status-effect popup internals |
+| UI-008 | Split heavyweight combat components | UI Architecture | 🟡 IN PROGRESS | `features/ui-ux-refactor.md` | `CombatSilhouette` now has extracted header, hp bar, board shell, figure, equipment layer, status-effects layer, and a dedicated combat-motion sublayer (`combatImpactMotion.ts`, `CombatImpactOverlay.tsx`, `combat-motion.css`) |
 | UI-009 | Add UI contract tests for critical flows | QA / UI | 🔴 TODO | `features/ui-ux-refactor.md` | Protect build flow, action flow, and modal behavior during refactor |
-| UI-010 | Run visual polish pass across combat UI | Visual Design | 🟡 IN PROGRESS | `features/ui-ux-refactor.md` | `VP-M01`, `VP-M02`, and `VP-M03` are live; next motion decision is whether to add `VP-M04` micro-feedback or shift back to broader visual polish work |
+| UI-010 | Run visual polish pass across combat UI | Visual Design | 🟡 IN PROGRESS | `features/ui-ux-refactor.md` | `VP-M01`, `VP-M02`, and `VP-M03` are live; combat now also ships a layered impact-motion system for `hit`, `crit`, `block`, `dodge`, and `block break`, plus post-fight silhouette freeze states |
 | COMBAT-001 | Create complete combat design and rules reference | Combat Design / Docs | ✅ DONE | `features/combat-design-reference.md` | Source-of-truth combat reference now covers runtime model, formulas, passives, turn-order examples, verification rules, bot assumptions, and Combat Rules alignment |
 | COMBAT-002 | Document combat resolution pipeline and turn order | Combat Design / Docs | ✅ DONE | `features/combat-design-reference.md` | Combat pipeline docs now cover exact sequencing, edge cases, traceability, and a regression-test target matrix for follow-up QA work |
 | COMBAT-003 | Add composition regression tests for combat rules | Combat QA | 🟡 IN PROGRESS | `features/combat-design-reference.md` | Protect combinations like skills plus consumables, effects plus death, and block plus penetration from silent regressions |
@@ -403,6 +403,8 @@
 | v0.80 | Hunting No-Scroll Pass Tightened | Tightened `HUNT-008` further by leaning harder into tabbed panels, shorter copy, and tooltip-driven secondary context so the lodge is more aggressively tuned for one-screen use | `HUNT-008` |
 | v0.81 | Hunting HUD Compact Step Added | Tightened the right-side hunting HUD with smaller companion and haul cards so the one-screen layout wastes less vertical space in the snapshot rail | `HUNT-008` |
 | v0.82 | Hunting Tool Focus Slice Landed | Closed the main `HUNT-008` persistence/UI work and opened `HUNT-009` with a first hunting tool-focus layer that changes route yields, persists through the hunter profile, and is selectable from the profile tab | `HUNT-009` |
+| v0.83 | Combat Motion Layer Refactored | Split combat impact presentation into a dedicated motion helper, overlay component, and CSS layer so `CombatSilhouette` no longer owns all impact rendering details directly | `UI-008`, `UI-010` |
+| v0.84 | Combat Finish And Block-Break Motion Added | Added persistent post-fight silhouette states, `BLOCK BREAK` feedback for penetrated blocks, and hardened impact resets so each new combat event cleanly replaces the previous linger animation | `UI-010` |
 
 ---
 
@@ -417,4 +419,4 @@ When work changes state:
 
 ---
 
-> Last updated: 2026-03-14 20:17 MSK
+> Last updated: 2026-03-15 02:18 MSK

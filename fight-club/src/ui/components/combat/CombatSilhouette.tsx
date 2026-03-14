@@ -1,36 +1,30 @@
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
-import type { ActiveCombatEffect, CombatZone, RoundResult } from "@/modules/combat";
+import type { ActiveCombatEffect } from "@/modules/combat";
 import type { EquipmentSlot } from "@/modules/equipment";
 import type { Item } from "@/modules/inventory";
+import rushChipFigure from "@/assets/combat/Rush-Chip.jpg";
+import verminTekFigure from "@/assets/combat/Vermin-Tek.jpg";
+import { CombatImpactOverlay } from "@/ui/components/combat/CombatImpactOverlay";
 import { ItemPreviewPopover } from "@/ui/components/shared/ItemPreviewPopover";
 import { useAnchoredPopup } from "@/ui/hooks/useAnchoredPopup";
+import {
+  COMBAT_IMPACT_LINGER_DURATION_MS,
+  getCombatImpactMotionDurationMs,
+  type CombatImpactVariant,
+} from "./combatImpactMotion";
 
 interface CombatSilhouetteProps {
   title: string;
   currentHp: number;
   maxHp: number;
-  selectedAttackZone?: CombatZone | null;
-  selectedDefenseZones?: CombatZone[];
-  lastIncomingZone?: CombatZone | null;
-  lastOutgoingZone?: CombatZone | null;
-  incomingResult?: RoundResult | null;
-  outgoingResult?: RoundResult | null;
-  interactive?: boolean;
-  zoneHighlights?: Partial<Record<CombatZone, ZoneHighlightFlags>>;
   activeEffects?: ActiveCombatEffect[];
   equipmentSlots?: Array<{ slot: EquipmentSlot; item: Item | null }>;
+  figure: "rush-chip" | "vermin-tek";
+  mirrored?: boolean;
+  impactKey?: string | number | null;
+  impactVariant?: CombatImpactVariant;
+  impactValue?: number | null;
   onEquipmentSlotClick?: (slot: EquipmentSlot) => void;
-  onAttackSelect?: (zone: CombatZone) => void;
-  onDefenseToggle?: (zone: CombatZone) => void;
-}
-
-interface ZoneHighlightFlags {
-  bestOpen?: boolean;
-  worstOpen?: boolean;
-  bestGuarded?: boolean;
-  worstGuarded?: boolean;
-  openDamage?: number;
-  guardedDamage?: number;
 }
 
 type MarkerKey = "hit" | "block" | "crit" | "penetration" | "dodge";
@@ -41,14 +35,6 @@ interface MarkerDefinition {
   background: string;
   glow: string;
 }
-
-const zoneRects: Record<CombatZone, CSSProperties> = {
-  head: { top: 16, left: 74, width: 72, height: 42, borderRadius: 24 },
-  chest: { top: 70, left: 58, width: 104, height: 58, borderRadius: 24 },
-  belly: { top: 132, left: 64, width: 92, height: 48, borderRadius: 20 },
-  waist: { top: 184, left: 70, width: 80, height: 36, borderRadius: 18 },
-  legs: { top: 228, left: 58, width: 104, height: 104, borderRadius: 28 },
-};
 
 const markerDefinitions: Record<MarkerKey, MarkerDefinition> = {
   hit: {
@@ -97,53 +83,54 @@ export function CombatSilhouette({
   title,
   currentHp,
   maxHp,
-  selectedAttackZone,
-  selectedDefenseZones = [],
-  lastIncomingZone,
-  lastOutgoingZone,
-  incomingResult = null,
-  outgoingResult = null,
-  interactive = false,
-  zoneHighlights = {},
   activeEffects = [],
   equipmentSlots = [],
+  figure,
+  mirrored = false,
+  impactKey = null,
+  impactVariant = "hit",
+  impactValue = null,
   onEquipmentSlotClick,
-  onAttackSelect,
-  onDefenseToggle,
 }: CombatSilhouetteProps) {
   const [hoveredEquipmentSlot, setHoveredEquipmentSlot] = useState<EquipmentSlot | null>(null);
-  const [impactActive, setImpactActive] = useState(false);
+  const [motionActive, setMotionActive] = useState(false);
+  const [lingerActive, setLingerActive] = useState(false);
+  const [lingerToken, setLingerToken] = useState(0);
 
   useEffect(() => {
-    if (!incomingResult || incomingResult.finalDamage <= 0) {
+    if (!impactKey) {
       return;
     }
 
-    setImpactActive(true);
-    const timeoutId = window.setTimeout(() => setImpactActive(false), 220);
+    setMotionActive(false);
+    setLingerActive(false);
+    const frameId = window.requestAnimationFrame(() => {
+      setMotionActive(true);
+      setLingerActive(true);
+      setLingerToken((current) => current + 1);
+    });
+    const motionTimeoutId = window.setTimeout(() => setMotionActive(false), getCombatImpactMotionDurationMs(impactVariant));
+    const lingerTimeoutId = window.setTimeout(() => setLingerActive(false), COMBAT_IMPACT_LINGER_DURATION_MS);
 
-    return () => window.clearTimeout(timeoutId);
-  }, [incomingResult]);
+    return () => {
+      window.cancelAnimationFrame(frameId);
+      window.clearTimeout(motionTimeoutId);
+      window.clearTimeout(lingerTimeoutId);
+    };
+  }, [impactKey, impactVariant]);
 
   return (
     <div style={{ display: "grid", gap: "10px", justifyItems: "center", width: "220px", margin: "0 auto" }}>
       <SilhouetteHeader title={title} currentHp={currentHp} maxHp={maxHp} activeEffects={activeEffects} />
 
-      <SilhouetteBoard impactActive={impactActive}>
-        <SilhouetteFigure />
-        <SilhouetteZonesLayer
-          title={title}
-          selectedAttackZone={selectedAttackZone}
-          selectedDefenseZones={selectedDefenseZones}
-          lastIncomingZone={lastIncomingZone}
-          lastOutgoingZone={lastOutgoingZone}
-          incomingResult={incomingResult}
-          outgoingResult={outgoingResult}
-          interactive={interactive}
-          zoneHighlights={zoneHighlights}
-          onAttackSelect={onAttackSelect}
-          onDefenseToggle={onDefenseToggle}
-        />
+      <SilhouetteBoard
+        motionActive={motionActive}
+        lingerActive={lingerActive}
+        lingerToken={lingerToken}
+        impactVariant={impactVariant}
+        impactValue={impactValue}
+      >
+        <SilhouetteFigure figure={figure} mirrored={mirrored} />
 
         <SilhouetteEquipmentLayer
           equipmentSlots={equipmentSlots}
@@ -220,134 +207,105 @@ function SilhouetteHpBar({
 }
 
 function SilhouetteBoard({
+  motionActive = false,
+  lingerActive = false,
+  lingerToken = 0,
+  impactVariant = "hit",
+  impactValue = null,
   children,
-  impactActive = false,
 }: {
+  motionActive?: boolean;
+  lingerActive?: boolean;
+  lingerToken?: number;
+  impactVariant?: CombatImpactVariant;
+  impactValue?: number | null;
   children: ReactNode;
-  impactActive?: boolean;
 }) {
   return (
     <div
-      className={impactActive ? "combat-silhouette-impact" : undefined}
+      className={
+        motionActive
+          ? `combat-silhouette-impact combat-silhouette-impact--${impactVariant}`
+          : undefined
+      }
       style={{
         position: "relative",
         width: "220px",
         height: "360px",
         borderRadius: "28px",
         background:
-          "radial-gradient(circle at top, rgba(120,189,255,0.14), transparent 22%), radial-gradient(circle at bottom, rgba(255,179,108,0.08), transparent 24%), linear-gradient(180deg, rgba(255,255,255,0.075), rgba(255,255,255,0.025))",
+          "radial-gradient(circle at top, rgba(120,189,255,0.06), transparent 18%), radial-gradient(circle at bottom, rgba(255,179,108,0.04), transparent 20%), linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01))",
         border: "1px solid rgba(255,255,255,0.12)",
-        boxShadow: "inset 0 0 36px rgba(0,0,0,0.24), 0 18px 34px rgba(0,0,0,0.18)",
+        boxShadow: "inset 0 0 28px rgba(0,0,0,0.28), 0 18px 34px rgba(0,0,0,0.18)",
         overflow: "hidden",
       }}
     >
+      <CombatImpactOverlay
+        key={lingerToken}
+        lingerActive={lingerActive}
+        impactVariant={impactVariant}
+        impactValue={impactValue}
+      />
       {children}
     </div>
   );
 }
 
-function SilhouetteFigure() {
-  return (
-    <svg
-      viewBox="0 0 220 360"
-      width="220"
-      height="360"
-      style={{ position: "absolute", inset: 0, opacity: 0.38 }}
-    >
-      <path
-        d="M111 34c20 0 37 18 37 39 0 16-9 29-22 35 10 8 15 22 18 35l10 42c2 8 8 15 15 19l8 4-11 14-12-6-6 25 13 65-18 8-21-75h-8l-21 75-18-8 13-65-6-25-12 6-11-14 8-4c7-4 13-11 15-19l10-42c3-13 8-27 18-35-13-6-22-19-22-35 0-21 17-39 37-39Z"
-        fill="rgba(255,255,255,0.82)"
-      />
-    </svg>
-  );
-}
-
-function SilhouetteZonesLayer({
-  title,
-  selectedAttackZone,
-  selectedDefenseZones,
-  lastIncomingZone,
-  lastOutgoingZone,
-  incomingResult,
-  outgoingResult,
-  interactive,
-  zoneHighlights,
-  onAttackSelect,
-  onDefenseToggle,
+function SilhouetteFigure({
+  figure,
+  mirrored = false,
 }: {
-  title: string;
-  selectedAttackZone?: CombatZone | null;
-  selectedDefenseZones: CombatZone[];
-  lastIncomingZone?: CombatZone | null;
-  lastOutgoingZone?: CombatZone | null;
-  incomingResult: RoundResult | null;
-  outgoingResult: RoundResult | null;
-  interactive: boolean;
-  zoneHighlights: Partial<Record<CombatZone, ZoneHighlightFlags>>;
-  onAttackSelect?: (zone: CombatZone) => void;
-  onDefenseToggle?: (zone: CombatZone) => void;
+  figure: "rush-chip" | "vermin-tek";
+  mirrored?: boolean;
 }) {
+  const figureMeta =
+    figure === "rush-chip"
+      ? {
+          src: rushChipFigure,
+          width: 320,
+          height: 320,
+          translateY: "-46%",
+        }
+      : {
+          src: verminTekFigure,
+          width: 312,
+          height: 312,
+          translateY: "-45%",
+        };
+
   return (
-    <>
-      {(Object.entries(zoneRects) as Array<[CombatZone, CSSProperties]>).map(([zone, rect]) => {
-        const selectedAttack = selectedAttackZone === zone;
-        const selectedDefense = selectedDefenseZones.includes(zone);
-        const incoming = lastIncomingZone === zone;
-        const outgoing = lastOutgoingZone === zone;
-        const highlight = zoneHighlights[zone];
-        const zoneGlow = getZoneHighlightGlow(highlight);
-
-        return (
-          <button
-            key={zone}
-            type="button"
-            aria-label={`${title} zone ${zone}`}
-            onClick={() => {
-              if (!interactive) {
-                return;
-              }
-
-              onAttackSelect?.(zone);
-              onDefenseToggle?.(zone);
-            }}
-            style={{
-              position: "absolute",
-              ...rect,
-              border: selectedAttack
-                ? "2px solid #ffb36c"
-                : selectedDefense
-                  ? "2px solid #69dbc2"
-                  : incoming
-                    ? "2px solid #ff6b57"
-                    : outgoing
-                      ? "2px solid #e9d06b"
-                      : "1px solid rgba(255,255,255,0.14)",
-              background: selectedAttack
-                ? "rgba(255,179,108,0.24)"
-                : selectedDefense
-                  ? "rgba(105,219,194,0.2)"
-                  : incoming
-                    ? "rgba(255,107,87,0.24)"
-                    : outgoing
-                      ? "rgba(233,208,107,0.2)"
-                      : "rgba(255,255,255,0.05)",
-              cursor: interactive ? "pointer" : "default",
-              color: "#fff",
-              fontSize: "10px",
-              fontWeight: 700,
-              letterSpacing: "0.03em",
-              textTransform: "capitalize",
-              backdropFilter: "blur(3px)",
-              boxShadow: zoneGlow.boxShadow,
-            }}
-          >
-            {zone}
-            <ZoneMarkers zone={zone} incomingResult={incomingResult} outgoingResult={outgoingResult} />
-            <ZoneOutlookBadges zone={zone} highlight={highlight} />
-          </button>
-        );
-      })}
-    </>
+    <div style={{ position: "absolute", inset: 0, pointerEvents: "none" }}>
+      <div
+        style={{
+          position: "absolute",
+          left: "50%",
+          top: "50%",
+          width: `${figureMeta.width}px`,
+          height: `${figureMeta.height}px`,
+          transform: `translate(-50%, ${figureMeta.translateY})`,
+          overflow: "visible",
+          opacity: 0.96,
+          filter: "drop-shadow(0 26px 28px rgba(0,0,0,0.38)) saturate(1.04) contrast(1.06)",
+        }}
+      >
+        <img
+          src={figureMeta.src}
+          alt=""
+          aria-hidden="true"
+          draggable={false}
+          style={{
+            position: "absolute",
+            left: "50%",
+            top: "50%",
+            width: `${figureMeta.width}px`,
+            height: `${figureMeta.height}px`,
+            transform: `translate(-50%, -50%) scaleX(${mirrored ? -1 : 1})`,
+            userSelect: "none",
+            pointerEvents: "none",
+          }}
+        />
+      </div>
+    </div>
   );
 }
 
@@ -375,7 +333,7 @@ function SilhouetteEquipmentLayer({
   onEquipmentSlotClick?: (slot: EquipmentSlot) => void;
 }) {
   return (
-    <>
+    <div style={{ position: "absolute", inset: 0, opacity: 0.52 }}>
       {equipmentSlots.map(({ slot, item }) => (
         <EquipmentSlotButton
           key={slot}
@@ -387,7 +345,7 @@ function SilhouetteEquipmentLayer({
           onClick={() => onEquipmentSlotClick?.(slot)}
         />
       ))}
-    </>
+    </div>
   );
 }
 
@@ -801,112 +759,6 @@ function EquipmentItemPopover({
   );
 }
 
-function ZoneMarkers({
-  zone,
-  incomingResult,
-  outgoingResult,
-}: {
-  zone: CombatZone;
-  incomingResult: RoundResult | null;
-  outgoingResult: RoundResult | null;
-}) {
-  const outgoingMarkers = outgoingResult && outgoingResult.attackZone === zone ? getResultMarkers(outgoingResult) : [];
-  const incomingMarkers = incomingResult && incomingResult.attackZone === zone ? getResultMarkers(incomingResult) : [];
-  const markers = [
-    ...outgoingMarkers.map((marker) => ({ ...marker, side: "left" as const })),
-    ...incomingMarkers.map((marker) => ({ ...marker, side: "right" as const })),
-  ].slice(0, 4);
-
-  if (markers.length === 0) {
-    return null;
-  }
-
-  return (
-    <>
-      {markers.map((marker, index) => (
-        <span
-          key={`${marker.key}-${marker.side}-${index}`}
-          style={{
-            position: "absolute",
-            top: 4 + Math.floor(index / 2) * 18,
-            [marker.side === "left" ? "left" : "right"]: 4,
-            minWidth: "18px",
-            height: "18px",
-            padding: "0 4px",
-            borderRadius: "999px",
-            display: "inline-flex",
-            alignItems: "center",
-            justifyContent: "center",
-            fontSize: "11px",
-            lineHeight: 1,
-            background: marker.background,
-            boxShadow: `0 0 12px ${marker.glow}`,
-            border: "1px solid rgba(255,255,255,0.16)",
-          }}
-          title={marker.label}
-        >
-          {renderMarkerIcon(marker.key, 12)}
-        </span>
-      ))}
-    </>
-  );
-}
-
-function ZoneOutlookBadges({
-  zone,
-  highlight,
-}: {
-  zone: CombatZone;
-  highlight?: ZoneHighlightFlags;
-}) {
-  if (!highlight) {
-    return null;
-  }
-
-  const badges = [
-    highlight.bestOpen ? { key: "bo", label: "BO", side: "left" as const, top: 4, background: "rgba(232,72,72,0.22)", glow: "rgba(232,72,72,0.32)" } : null,
-    highlight.worstOpen ? { key: "wo", label: "WO", side: "left" as const, top: 24, background: "rgba(92,199,178,0.22)", glow: "rgba(92,199,178,0.3)" } : null,
-    highlight.bestGuarded ? { key: "bg", label: "BG", side: "right" as const, top: 4, background: "rgba(216,93,145,0.22)", glow: "rgba(216,93,145,0.32)" } : null,
-    highlight.worstGuarded ? { key: "wg", label: "WG", side: "right" as const, top: 24, background: "rgba(115,149,230,0.22)", glow: "rgba(115,149,230,0.32)" } : null,
-  ].filter((badge): badge is NonNullable<typeof badge> => badge !== null);
-
-  if (badges.length === 0) {
-    return null;
-  }
-
-  return (
-    <>
-      {badges.map((badge) => (
-        <span
-          key={badge.key}
-          style={{
-            position: "absolute",
-            top: badge.top,
-            [badge.side === "left" ? "left" : "right"]: 4,
-            minWidth: "17px",
-            height: "15px",
-            padding: "0 4px",
-            borderRadius: "999px",
-            display: "inline-flex",
-            alignItems: "center",
-            justifyContent: "center",
-            fontSize: "7px",
-            fontWeight: 700,
-            lineHeight: 1,
-            background: badge.background,
-          boxShadow: `0 0 12px ${badge.glow}`,
-          border: "1px solid rgba(255,255,255,0.14)",
-          color: "#fff8ed",
-        }}
-          title={getZoneBadgeTitle(badge.key, zone, highlight)}
-        >
-          {badge.label}
-        </span>
-      ))}
-    </>
-  );
-}
-
 function LegendIcon({ markerKey }: { markerKey: MarkerKey }) {
   const marker = markerDefinitions[markerKey];
 
@@ -929,74 +781,6 @@ function LegendIcon({ markerKey }: { markerKey: MarkerKey }) {
       <span style={{ color: "rgba(255,244,231,0.82)" }}>{marker.label}</span>
     </span>
   );
-}
-
-function getResultMarkers(result: RoundResult): MarkerDefinition[] {
-  if (result.dodged) {
-    return [markerDefinitions.dodge];
-  }
-
-  const markers: MarkerDefinition[] = [markerDefinitions.hit];
-
-  if (result.blocked) {
-    markers.push(markerDefinitions.block);
-  }
-
-  if (result.penetrated) {
-    markers.push(markerDefinitions.penetration);
-  }
-
-  if (result.crit) {
-    markers.push(markerDefinitions.crit);
-  }
-
-  return markers;
-}
-
-function getZoneHighlightGlow(highlight?: ZoneHighlightFlags) {
-  if (!highlight) {
-    return { boxShadow: "none" };
-  }
-
-  const glows: string[] = [];
-
-  if (highlight.bestOpen) {
-    glows.push("0 0 18px rgba(232,72,72,0.18)");
-  }
-
-  if (highlight.bestGuarded) {
-    glows.push("0 0 18px rgba(216,93,145,0.18)");
-  }
-
-  if (highlight.worstOpen) {
-    glows.push("inset 0 0 0 1px rgba(92,199,178,0.18)");
-  }
-
-  if (highlight.worstGuarded) {
-    glows.push("inset 0 0 0 1px rgba(115,149,230,0.18)");
-  }
-
-  return {
-    boxShadow: glows.length > 0 ? glows.join(", ") : "none",
-  };
-}
-
-function getZoneBadgeTitle(key: string, zone: CombatZone, highlight: ZoneHighlightFlags) {
-  const openDamage = highlight.openDamage ?? 0;
-  const guardedDamage = highlight.guardedDamage ?? 0;
-
-  switch (key) {
-    case "bo":
-      return `${zone}: best open target (${openDamage} open / ${guardedDamage} guarded)`;
-    case "wo":
-      return `${zone}: worst open target (${openDamage} open / ${guardedDamage} guarded)`;
-    case "bg":
-      return `${zone}: best guarded target (${openDamage} open / ${guardedDamage} guarded)`;
-    case "wg":
-      return `${zone}: worst guarded target (${openDamage} open / ${guardedDamage} guarded)`;
-    default:
-      return "";
-  }
 }
 
 function renderMarkerIcon(markerKey: MarkerKey, size: number): ReactNode {
@@ -1312,3 +1096,6 @@ function getHpColor(hpPercent: number) {
 
   return { from: "#c43b2a", to: "#ff7a60" };
 }
+
+
+

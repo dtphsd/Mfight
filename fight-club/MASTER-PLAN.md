@@ -1,6 +1,6 @@
 # MASTER-PLAN - Fight Club
 
-> Last updated: 2026-03-14 22:20 MSK
+> Last updated: 2026-03-14 22:40 MSK
 
 **Project:** Fight Club  
 **Scope:** active product planning, task tracking, and sprint history
@@ -49,7 +49,7 @@
 | HUNT-006 | Build first hunting UI shell and claim flow | Hunting UX | ✅ DONE | `features/hunting-mvp.md` | `HuntingScreen` and `useHuntingSandbox` now expose zone selection, start/resolve/claim flow, profile summary, pet summary, and shared inventory feedback |
 | HUNT-007 | Document hunting architecture and verification flow | Hunting Docs / Safety | ✅ DONE | `features/hunting-mvp.md` | Hunting runtime reference, reward bridge rules, architecture overview sync, and root doc alignment are now documented and validated |
 | HUNT-008 | Persist hunting state and offline return flow | Hunting Persistence | ✅ DONE | `features/hunting-mvp.md` | Hunting state now round-trips through the shared save envelope, restores route progress between sessions, and ships with a compact no-scroll lodge UI tuned around restored-session flow, route timing, and claim review |
-| HUNT-009 | Add first hunting tool focus layer | Hunting Gameplay | 🟡 IN PROGRESS | `features/hunting-mvp.md` | A first tool-focus layer is now live with route-specific yield bonuses, profile-level tool equip flow, and compact tool selection in the hunting profile tab |
+| HUNT-009 | Add first hunting tool focus layer | Hunting Gameplay | 🟡 IN PROGRESS | `features/hunting-mvp.md` | Tool focus is now live and route stances add the second route-planning lever through `Steady`, `Greedy`, and `Cautious` hunt styles |
 
 ---
 
@@ -231,6 +231,12 @@
 - fixed the hunting `Profile` tab crash for older saves created before `profile.tool` existed
 - added save normalization in `loadHuntingState(...)` so legacy hunting profiles automatically receive an empty tool loadout
 - added regression coverage for legacy hunting saves without the tool field
+
+### v0.84 - Hunting Route Stances Added
+
+- extended `HUNT-009` with `Steady`, `Greedy`, and `Cautious` route stances
+- connected stance bonuses to encounter pace, success rate, and payout behavior in `resolveHunt(...)`
+- exposed stance selection in the hunting profile tab and added test coverage for the risk-vs-reward tradeoff
 
 ### v0.24 - Motion Feedback Added To Visual Plan
 

@@ -1,19 +1,23 @@
 import { useEffect, useRef, useState } from "react";
 import { huntingGearCatalog } from "@/content/hunting/gear";
 import { huntingPetCatalog } from "@/content/hunting/pets";
+import { huntingRouteStances } from "@/content/hunting/routeStances";
 import { huntingToolCatalog } from "@/content/hunting/tools";
 import { huntingZones } from "@/content/hunting/zones";
 import {
   addHunterExperience,
+  addHuntingPetExperience,
   assignPetToHunter,
   claimHuntRewards,
   createHunterProfile,
   createIdleHuntState,
   equipHuntingGear,
   equipHuntingTool,
+  recordHuntingToolMastery,
   loadHuntingState,
   resolveHunt,
   saveHuntingState,
+  setHuntingRouteStance,
   startHunt,
   type HuntReward,
   type HuntState,
@@ -51,7 +55,9 @@ export function useHuntingSandbox() {
   const wasRestoredFromSave = persistedRef.current !== null;
   const [now, setNow] = useState(() => Date.now());
   const [profile, setProfile] = useState<HunterProfile>(() => persistedRef.current?.profile ?? createStarterHunterProfile());
-  const [pets] = useState<HuntingPet[]>(() => persistedRef.current?.pets ?? huntingPetCatalog.map((pet) => ({ ...pet })));
+  const [pets, setPets] = useState<HuntingPet[]>(() =>
+    persistedRef.current?.pets ?? huntingPetCatalog.map((pet) => ({ ...pet }))
+  );
   const [inventory, setInventory] = useState<Inventory>(() => persistedRef.current?.inventory ?? createInventory());
   const [huntState, setHuntState] = useState<HuntState>(() => persistedRef.current?.huntState ?? createIdleHuntState());
   const [selectedZoneId, setSelectedZoneId] = useState<string>(
@@ -157,8 +163,18 @@ export function useHuntingSandbox() {
     setLastClaimed(claimSummary);
     setRecentClaims((current) => [claimSummary, ...current].slice(0, 5));
 
+    if (claimed.data.claimedPetExperience > 0 && profile.activePetId) {
+      const petProgressed = addHuntingPetExperience(pets, profile.activePetId, claimed.data.claimedPetExperience);
+      if (petProgressed.success) {
+        setPets(petProgressed.data);
+      }
+    }
+
+    const masteryProgressedProfile = recordHuntingToolMastery(profile, earnedReward);
+    setProfile(masteryProgressedProfile);
+
     if (claimed.data.claimedExperience > 0) {
-      const progressed = addHunterExperience(profile, claimed.data.claimedExperience);
+      const progressed = addHunterExperience(masteryProgressedProfile, claimed.data.claimedExperience);
       if (progressed.success) {
         setProfile(progressed.data);
         if (selectedZone && !progressed.data.unlockedZoneIds.includes(selectedZone.id)) {
@@ -181,6 +197,16 @@ export function useHuntingSandbox() {
     return true;
   };
 
+  const setRouteStanceById = (routeStanceId: string) => {
+    const updated = setHuntingRouteStance(profile, routeStanceId);
+    if (!updated.success) {
+      return false;
+    }
+
+    setProfile(updated.data);
+    return true;
+  };
+
   return {
     profile,
     inventory,
@@ -196,11 +222,13 @@ export function useHuntingSandbox() {
     routeElapsedMs,
     routeRemainingMs,
     routeReadyToResolve,
+    routeStances: huntingRouteStances,
     toolCatalog: huntingToolCatalog,
     setSelectedZoneId,
     startSelectedHunt,
     resolveActiveHunt,
     claimActiveReward,
     equipToolByCode,
+    setRouteStanceById,
   };
 }

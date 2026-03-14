@@ -14,6 +14,8 @@ export interface HunterProfile {
   stats: HunterStats;
   gear: EquippedHuntingGear[];
   tool: EquippedHuntingTool;
+  toolMastery: Record<string, number>;
+  routeStanceId: string;
   activePetId: string | null;
   unlockedZoneIds: string[];
 }
@@ -30,6 +32,8 @@ export function createHunterProfile(name: string): HunterProfile {
     stats: defaultHunterStats,
     gear: createEmptyHuntingGearLoadout(),
     tool: createEmptyHuntingToolLoadout(),
+    toolMastery: {},
+    routeStanceId: "steady",
     activePetId: null,
     unlockedZoneIds: ["forest-edge"],
   };

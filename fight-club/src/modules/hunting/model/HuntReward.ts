@@ -3,6 +3,14 @@ export interface HuntRewardItem {
   quantity: number;
 }
 
+export interface HuntLogEntry {
+  id: string;
+  enemy: string;
+  outcome: "win" | "loss";
+  note: string;
+  loot: string | null;
+}
+
 export interface HuntRewardSummary {
   elapsedSeconds: number;
   encountersResolved: number;
@@ -15,6 +23,7 @@ export interface HuntReward {
   experience: number;
   petExperience: number;
   items: HuntRewardItem[];
+  log: HuntLogEntry[];
   summary: HuntRewardSummary;
 }
 
@@ -23,6 +32,7 @@ export const emptyHuntReward: HuntReward = {
   experience: 0,
   petExperience: 0,
   items: [],
+  log: [],
   summary: {
     elapsedSeconds: 0,
     encountersResolved: 0,

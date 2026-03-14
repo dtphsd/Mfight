@@ -72,6 +72,15 @@ export function addHunterExperience(profile: HunterProfile, amount: number): Hun
   };
 }
 
+export function getHunterLevelStepCost(level: number, levelStep: number) {
+  const curve = hunterLevelCurves.find((entry) => entry.level === level);
+  if (!curve) {
+    return null;
+  }
+
+  return curve.steps[levelStep] ?? null;
+}
+
 function unlockHunterZones(level: number, unlockedZoneIds: string[]) {
   const nextUnlocked = new Set(unlockedZoneIds);
 

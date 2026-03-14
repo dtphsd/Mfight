@@ -993,6 +993,61 @@ textarea {
   background: linear-gradient(180deg, rgba(120, 189, 255, 0.1), rgba(255, 255, 255, 0.03));
 }
 
+.hunting-lodge__hunt-log {
+  display: grid;
+  gap: 8px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.hunting-lodge__hunt-log-list {
+  display: grid;
+  gap: 8px;
+}
+
+.hunting-lodge__hunt-log-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.hunting-lodge__hunt-log-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: rgba(245, 241, 231, 0.96);
+}
+
+.hunting-lodge__hunt-log-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  margin-right: 6px;
+}
+
+.hunting-lodge__hunt-log-meta {
+  margin-top: 3px;
+  font-size: 11px;
+  line-height: 1.35;
+  color: rgba(244, 239, 227, 0.72);
+}
+
+.hunting-lodge__tag--success {
+  border-color: rgba(128, 209, 150, 0.34);
+  color: rgba(190, 239, 203, 0.96);
+}
+
+.hunting-lodge__tag--danger {
+  border-color: rgba(224, 120, 120, 0.34);
+  color: rgba(246, 198, 198, 0.96);
+}
+
 .hunting-lodge__session-banner {
   border-radius: 20px;
   border: 1px solid rgba(255, 201, 120, 0.16);
@@ -1063,6 +1118,38 @@ textarea {
   margin-top: 4px;
   color: rgba(244, 239, 227, 0.68);
   font-size: 11px;
+}
+
+.hunting-lodge__progress {
+  display: grid;
+  gap: 6px;
+}
+
+.hunting-lodge__progress--tool {
+  margin-top: 8px;
+}
+
+.hunting-lodge__progress-track {
+  position: relative;
+  overflow: hidden;
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.hunting-lodge__progress-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, rgba(255, 206, 130, 0.85), rgba(255, 150, 82, 0.92));
+}
+
+.hunting-lodge__progress-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 11px;
+  color: rgba(244, 239, 227, 0.72);
 }
 
 .hunting-lodge__gear-row {
@@ -1297,6 +1384,20 @@ textarea {
   gap: 6px;
 }
 
+.hunting-lodge--compact .hunting-lodge__hunt-log {
+  gap: 6px;
+  margin-top: 8px;
+  padding-top: 8px;
+}
+
+.hunting-lodge--compact .hunting-lodge__hunt-log-list {
+  gap: 6px;
+}
+
+.hunting-lodge--compact .hunting-lodge__hunt-log-row {
+  padding: 7px 8px;
+}
+
 .hunting-lodge--compact .hunting-lodge__tool-chip {
   padding: 8px 10px;
   border-radius: 10px;
@@ -1307,6 +1408,40 @@ textarea {
 }
 
 .hunting-lodge--compact .hunting-lodge__tool-meta {
+  font-size: 10px;
+}
+
+.hunting-lodge--compact .hunting-lodge__progress {
+  gap: 4px;
+}
+
+.hunting-lodge--compact .hunting-lodge__progress--tool {
+  margin-top: 6px;
+}
+
+.hunting-lodge--compact .hunting-lodge__progress-track {
+  height: 6px;
+}
+
+.hunting-lodge--compact .hunting-lodge__progress-meta {
+  font-size: 10px;
+}
+
+.hunting-lodge--compact .hunting-lodge__hunt-log-title {
+  font-size: 11px;
+}
+
+.hunting-lodge--compact .hunting-lodge__hunt-log-meta {
+  font-size: 10px;
+}
+
+.hunting-lodge--compact .hunting-lodge__hunt-log .hunting-lodge__section-tabs {
+  gap: 4px;
+  padding: 3px;
+}
+
+.hunting-lodge--compact .hunting-lodge__hunt-log .hunting-lodge__section-tab {
+  padding: 4px 8px;
   font-size: 10px;
 }
 

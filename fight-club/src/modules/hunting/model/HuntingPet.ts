@@ -35,5 +35,6 @@ export interface HuntingPet {
   rarity: ItemRarity;
   level: number;
   totalExperience: number;
+  levelProgress: number;
   traits: HuntingPetTraits;
 }

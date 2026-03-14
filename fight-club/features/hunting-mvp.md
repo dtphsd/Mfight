@@ -1,6 +1,6 @@
 # Hunting MVP
 
-> Last updated: 2026-03-14 22:20 MSK
+> Last updated: 2026-03-14 22:40 MSK
 
 **Feature:** Hunting MVP  
 **Status:** IN PROGRESS
@@ -89,6 +89,7 @@
 - `allocateHunterStatPoint(...)`
 - `equipHuntingGear(...)`
 - `equipHuntingTool(...)`
+- `setHuntingRouteStance(...)`
 - `assignPetToHunter(...)`
 - `useHuntingSandbox()`
 - `loadHuntingState(...)`
@@ -98,6 +99,7 @@
 - a dedicated hunting reward item catalog in `src/content/hunting/rewardItems.ts`
 - starter hunting gear and pet catalogs in `src/content/hunting/`
 - a first hunting tool catalog in `src/content/hunting/tools.ts`
+- a first hunting route-stance catalog in `src/content/hunting/routeStances.ts`
 - a first hunting screen shell in `src/ui/screens/Hunting/HuntingScreen.tsx`
 
 ---
@@ -207,6 +209,10 @@ The new systems slice now also covers:
 - test coverage confirming that a focused tool loadout boosts matching route resources compared to a baseline hunt
 - legacy hunting-save normalization so the profile tab remains safe for saves created before the tool layer existed
 - regression coverage confirming that old saves without `profile.tool` still load into a valid empty tool loadout
+- a second route-planning lever through `Steady`, `Greedy`, and `Cautious` hunt stances
+- resolver support for stance-driven pace, safety, and payout tradeoffs
+- compact stance selection in the hunting profile tab so route risk can be tuned without leaving the lodge
+- test coverage confirming that greedier stances can convert route risk into heavier payouts
 
 The new UI slice now also covers:
 

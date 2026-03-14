@@ -1,12 +1,15 @@
 import {
   addHunterExperience,
+  addHuntingPetExperience,
   allocateHunterStatPoint,
   assignPetToHunter,
   claimHuntRewards,
   createIdleHuntState,
   createHunterProfile,
   equipHuntingGear,
+  setHuntingRouteStance,
   equipHuntingTool,
+  recordHuntingToolMastery,
   resolveHunt,
   startHunt,
 } from "@/modules/hunting";
@@ -86,6 +89,7 @@ describe("hunting module", () => {
     expect(resolved.data.successCount).toBeGreaterThan(0);
     expect(resolved.data.pendingReward.currency).toBeGreaterThan(0);
     expect(resolved.data.pendingReward.experience).toBeGreaterThan(0);
+    expect(resolved.data.pendingReward.log.length).toBeGreaterThan(0);
     expect(resolved.data.pendingReward.summary.elapsedSeconds).toBe(15 * 60);
   });
 
@@ -324,5 +328,141 @@ describe("hunting module", () => {
     expect(getItemQuantity(boostedClaimed.data.inventory, "herbs")).toBeGreaterThanOrEqual(
       getItemQuantity(baseClaimed.data.inventory, "herbs")
     );
+  });
+
+  it("lets route stance trade safety for heavier payouts", () => {
+    const baseProfile = createHunterProfile("Scout");
+    const greedyProfileResult = setHuntingRouteStance(baseProfile, "greedy");
+    expect(greedyProfileResult.success).toBe(true);
+    if (!greedyProfileResult.success) {
+      return;
+    }
+
+    const cautiousProfileResult = setHuntingRouteStance(baseProfile, "cautious");
+    expect(cautiousProfileResult.success).toBe(true);
+    if (!cautiousProfileResult.success) {
+      return;
+    }
+
+    const greedyStarted = startHunt({
+      profile: greedyProfileResult.data,
+      currentState: createIdleHuntState(),
+      zone: huntingZones[0],
+      startedAt: 1_000,
+    });
+    expect(greedyStarted.success).toBe(true);
+    if (!greedyStarted.success) {
+      return;
+    }
+
+    const cautiousStarted = startHunt({
+      profile: cautiousProfileResult.data,
+      currentState: createIdleHuntState(),
+      zone: huntingZones[0],
+      startedAt: 1_000,
+    });
+    expect(cautiousStarted.success).toBe(true);
+    if (!cautiousStarted.success) {
+      return;
+    }
+
+    const greedyResolved = resolveHunt({
+      profile: greedyProfileResult.data,
+      huntState: greedyStarted.data,
+      zone: huntingZones[0],
+      resolvedAt: 1_000 + 15 * 60 * 1000,
+    });
+    expect(greedyResolved.success).toBe(true);
+    if (!greedyResolved.success) {
+      return;
+    }
+
+    const cautiousResolved = resolveHunt({
+      profile: cautiousProfileResult.data,
+      huntState: cautiousStarted.data,
+      zone: huntingZones[0],
+      resolvedAt: 1_000 + 15 * 60 * 1000,
+    });
+    expect(cautiousResolved.success).toBe(true);
+    if (!cautiousResolved.success) {
+      return;
+    }
+
+    expect(greedyResolved.data.successCount).toBeLessThanOrEqual(cautiousResolved.data.successCount);
+    expect(greedyResolved.data.pendingReward.currency).toBeGreaterThanOrEqual(cautiousResolved.data.pendingReward.currency);
+  });
+
+  it("records mastery progress for the equipped tool after a successful haul", () => {
+    const equipped = equipHuntingTool(createHunterProfile("Scout"), huntingToolCatalog[0]);
+    expect(equipped.success).toBe(true);
+    if (!equipped.success) {
+      return;
+    }
+
+    const started = startHunt({
+      profile: equipped.data,
+      currentState: createIdleHuntState(),
+      zone: huntingZones[0],
+      startedAt: 1_000,
+    });
+    expect(started.success).toBe(true);
+    if (!started.success) {
+      return;
+    }
+
+    const resolved = resolveHunt({
+      profile: equipped.data,
+      huntState: started.data,
+      zone: huntingZones[0],
+      resolvedAt: 1_000 + 15 * 60 * 1000,
+    });
+    expect(resolved.success).toBe(true);
+    if (!resolved.success) {
+      return;
+    }
+
+    const progressed = recordHuntingToolMastery(equipped.data, resolved.data.pendingReward);
+
+    expect(progressed.toolMastery["forager-satchel"]).toBeGreaterThan(0);
+  });
+
+  it("awards pet experience to the active companion after a claim", () => {
+    const withPet = assignPetToHunter(createHunterProfile("Scout"), huntingPetCatalog, "pet-wolf-scout");
+    expect(withPet.success).toBe(true);
+    if (!withPet.success) {
+      return;
+    }
+
+    const started = startHunt({
+      profile: withPet.data,
+      currentState: createIdleHuntState(),
+      zone: huntingZones[0],
+      startedAt: 1_000,
+    });
+    expect(started.success).toBe(true);
+    if (!started.success) {
+      return;
+    }
+
+    const resolved = resolveHunt({
+      profile: withPet.data,
+      huntState: started.data,
+      zone: huntingZones[0],
+      resolvedAt: 1_000 + 15 * 60 * 1000,
+      pets: huntingPetCatalog,
+    });
+    expect(resolved.success).toBe(true);
+    if (!resolved.success) {
+      return;
+    }
+
+    const petProgressed = addHuntingPetExperience(huntingPetCatalog, withPet.data.activePetId, resolved.data.pendingReward.petExperience);
+    expect(petProgressed.success).toBe(true);
+    if (!petProgressed.success) {
+      return;
+    }
+
+    const progressedPet = petProgressed.data.find((pet) => pet.id === "pet-wolf-scout");
+    expect(progressedPet?.totalExperience).toBeGreaterThan(0);
   });
 });

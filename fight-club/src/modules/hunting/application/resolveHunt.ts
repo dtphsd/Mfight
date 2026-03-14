@@ -1,9 +1,10 @@
-import { emptyHuntReward, type HuntReward } from "@/modules/hunting/model/HuntReward";
+import { getHuntingRouteStance } from "@/content/hunting/routeStances";
+import { emptyHuntReward, type HuntLogEntry, type HuntReward } from "@/modules/hunting/model/HuntReward";
 import type { HuntState } from "@/modules/hunting/model/HuntState";
 import { getEquippedHuntingGearBonuses } from "@/modules/hunting/model/HuntingGear";
 import type { HunterProfile } from "@/modules/hunting/model/HunterProfile";
 import { zeroHuntingPetTraits, type HuntingPet } from "@/modules/hunting/model/HuntingPet";
-import { getEquippedHuntingToolBonuses } from "@/modules/hunting/model/HuntingTool";
+import { getMasteredHuntingToolBonuses } from "@/modules/hunting/model/HuntingTool";
 import type { HuntingZone } from "@/modules/hunting/model/HuntingZone";
 
 export type ResolveHuntFailureReason = "hunt_not_active" | "zone_mismatch";
@@ -40,14 +41,23 @@ export function resolveHunt(input: ResolveHuntInput): ResolveHuntResult {
   const elapsedMs = Math.max(0, Math.min(resolvedAt - startedAt, input.huntState.durationMs));
   const elapsedSeconds = Math.floor(elapsedMs / 1000);
   const gearBonuses = getEquippedHuntingGearBonuses(input.profile.gear);
-  const toolBonuses = getEquippedHuntingToolBonuses(input.profile.tool);
+  const toolBonuses = getMasteredHuntingToolBonuses(
+    input.profile.tool,
+    input.profile.tool.item ? input.profile.toolMastery[input.profile.tool.item.itemCode] : 0
+  );
+  const routeStance = getHuntingRouteStance(input.profile.routeStanceId);
   const activePet = input.pets?.find((pet) => pet.id === input.profile.activePetId) ?? null;
   const petTraits = activePet?.traits ?? zeroHuntingPetTraits;
   const encounterIntervalSeconds = Math.max(
     20,
     Math.floor(
       (45 - input.profile.stats.speed * 2 - input.zone.dangerRating * 3) /
-        (1 + (gearBonuses.huntSpeedPercent + petTraits.huntSpeedPercent + toolBonuses.huntSpeedPercent) / 100)
+        (1 +
+          (gearBonuses.huntSpeedPercent +
+            petTraits.huntSpeedPercent +
+            toolBonuses.huntSpeedPercent -
+            routeStance.bonuses.encounterIntervalPercent) /
+            100)
     )
   );
   const encountersResolved = Math.floor(elapsedSeconds / encounterIntervalSeconds);
@@ -59,7 +69,8 @@ export function resolveHunt(input: ResolveHuntInput): ResolveHuntResult {
       input.profile.stats.power * 0.035 +
       input.profile.stats.speed * 0.02 +
       survivalScore * 0.025 -
-      input.zone.dangerRating * 0.09
+      input.zone.dangerRating * 0.09 +
+      routeStance.bonuses.successRateBonus
   );
   const successCount = Math.min(encountersResolved, Math.round(encountersResolved * successRate));
   const failureCount = Math.max(0, encountersResolved - successCount);
@@ -68,6 +79,7 @@ export function resolveHunt(input: ResolveHuntInput): ResolveHuntResult {
     gearBonuses,
     toolBonuses,
     petTraits,
+    routeStance,
     zone: input.zone,
     elapsedSeconds,
     encountersResolved,
@@ -92,8 +104,9 @@ export function resolveHunt(input: ResolveHuntInput): ResolveHuntResult {
 function buildHuntReward(input: {
   profile: HunterProfile;
   gearBonuses: ReturnType<typeof getEquippedHuntingGearBonuses>;
-  toolBonuses: ReturnType<typeof getEquippedHuntingToolBonuses>;
+  toolBonuses: ReturnType<typeof getMasteredHuntingToolBonuses>;
   petTraits: typeof zeroHuntingPetTraits;
+  routeStance: ReturnType<typeof getHuntingRouteStance>;
   zone: HuntingZone;
   elapsedSeconds: number;
   encountersResolved: number;
@@ -120,9 +133,19 @@ function buildHuntReward(input: {
   const experience = input.successCount * (6 + input.zone.dangerRating * 4);
   const petExperience = Math.floor(experience / 2);
   const rewardQuantityMultiplier =
-    1 + (input.gearBonuses.lootQuantityPercent + input.petTraits.rewardQuantityPercent + input.toolBonuses.rewardQuantityPercent) / 100;
+    1 +
+    (input.gearBonuses.lootQuantityPercent +
+      input.petTraits.rewardQuantityPercent +
+      input.toolBonuses.rewardQuantityPercent +
+      input.routeStance.bonuses.rewardQuantityPercent) /
+      100;
   const bonusRareDrops = Math.floor(
-    (input.successCount * (input.gearBonuses.rareDropPercent + input.petTraits.rareDropPercent + input.toolBonuses.rareDropPercent)) / 100
+    (input.successCount *
+      (input.gearBonuses.rareDropPercent +
+        input.petTraits.rareDropPercent +
+        input.toolBonuses.rareDropPercent +
+        input.routeStance.bonuses.rareDropPercent)) /
+      100
   );
   const items = input.zone.resourceTags
     .map((tag, index) => ({
@@ -138,12 +161,19 @@ function buildHuntReward(input: {
       ),
     }))
     .filter((entry) => entry.quantity > 0);
+  const log = buildHuntLog({
+    zone: input.zone,
+    successCount: input.successCount,
+    failureCount: input.failureCount,
+    items,
+  });
 
   return {
     currency,
     experience,
     petExperience,
     items,
+    log,
     summary: {
       elapsedSeconds: input.elapsedSeconds,
       encountersResolved: input.encountersResolved,
@@ -163,4 +193,45 @@ function getTargetedYieldMultiplier(tag: string, profile: HunterProfile) {
   }
 
   return 1 + profile.tool.item.bonuses.targetedYieldPercent / 100;
+}
+
+function buildHuntLog(input: {
+  zone: HuntingZone;
+  successCount: number;
+  failureCount: number;
+  items: HuntReward["items"];
+}): HuntLogEntry[] {
+  const encounterPool = getEncounterPool(input.zone.encounterProfileId);
+  const lootPool = input.items.flatMap((entry) => Array(Math.min(2, entry.quantity)).fill(entry.itemCode));
+  const entries: HuntLogEntry[] = [];
+  const totalEntries = Math.min(6, input.successCount + input.failureCount);
+
+  for (let index = 0; index < totalEntries; index += 1) {
+    const isSuccess = index < input.successCount;
+    const enemy = encounterPool[index % encounterPool.length];
+    const loot = isSuccess && lootPool.length ? lootPool[index % lootPool.length] : null;
+
+    entries.push({
+      id: `${input.zone.id}-${index}`,
+      enemy,
+      outcome: isSuccess ? "win" : "loss",
+      note: isSuccess ? `Won the skirmish against ${enemy}.` : `${enemy} forced the party to pull back.`,
+      loot: isSuccess ? loot : null,
+    });
+  }
+
+  return entries;
+}
+
+function getEncounterPool(encounterProfileId: string) {
+  switch (encounterProfileId) {
+    case "forest-edge-common":
+      return ["Brush Wolf", "Thorn Boar", "Briar Bandit"];
+    case "rocky-hills-common":
+      return ["Crag Hyena", "Stoneback Raider", "Dust Vulture"];
+    case "ruined-trail-common":
+      return ["Ruin Stalker", "Ashbone Scavenger", "Vault Shade"];
+    default:
+      return ["Wild Threat"];
+  }
 }

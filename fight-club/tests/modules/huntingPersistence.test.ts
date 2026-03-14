@@ -99,5 +99,6 @@ describe("hunting persistence", () => {
       slot: "kit",
       item: null,
     });
+    expect(loaded?.profile.routeStanceId).toBe("steady");
   });
 });

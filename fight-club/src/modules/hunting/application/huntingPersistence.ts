@@ -1,3 +1,4 @@
+import { getHuntingRouteStance } from "@/content/hunting/routeStances";
 import { saveSchema, type SaveFile } from "@/core/storage/saveSchema";
 import type { SaveRepository } from "@/core/storage/SaveRepository";
 import { saveGame } from "@/orchestration/saveGame";
@@ -75,6 +76,7 @@ function normalizeHuntingSaveState(hunting: HuntingSaveState): HuntingSaveState 
   return {
     ...hunting,
     profile: normalizeHunterProfile(hunting.profile),
+    pets: hunting.pets.map(normalizeHuntingPet),
   };
 }
 
@@ -82,5 +84,14 @@ function normalizeHunterProfile(profile: HunterProfile): HunterProfile {
   return {
     ...profile,
     tool: isRecord(profile.tool) && "slot" in profile.tool ? profile.tool : createEmptyHuntingToolLoadout(),
+    toolMastery: isRecord(profile.toolMastery) ? profile.toolMastery : {},
+    routeStanceId: getHuntingRouteStance(profile.routeStanceId).id,
+  };
+}
+
+function normalizeHuntingPet(pet: HuntingPet): HuntingPet {
+  return {
+    ...pet,
+    levelProgress: typeof pet.levelProgress === "number" ? pet.levelProgress : 0,
   };
 }

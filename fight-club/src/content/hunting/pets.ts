@@ -8,6 +8,7 @@ export const huntingPetCatalog: HuntingPet[] = [
     rarity: "common",
     level: 1,
     totalExperience: 0,
+    levelProgress: 0,
     traits: {
       huntSpeedPercent: 8,
       survivalPercent: 6,
@@ -22,6 +23,7 @@ export const huntingPetCatalog: HuntingPet[] = [
     rarity: "rare",
     level: 1,
     totalExperience: 0,
+    levelProgress: 0,
     traits: {
       huntSpeedPercent: 0,
       survivalPercent: 18,
@@ -36,6 +38,7 @@ export const huntingPetCatalog: HuntingPet[] = [
     rarity: "rare",
     level: 1,
     totalExperience: 0,
+    levelProgress: 0,
     traits: {
       huntSpeedPercent: 12,
       survivalPercent: 0,

@@ -1,6 +1,13 @@
 import { useEffect, useState } from "react";
 import { huntingZones } from "@/content/hunting/zones";
+import {
+  getHunterLevelStepCost,
+  getHuntingPetLevelStepCost,
+  getHuntingToolMasteryLevel,
+  getHuntingToolMasteryProgress,
+} from "@/modules/hunting";
 import { getItemQuantity } from "@/modules/inventory";
+import type { HuntLogEntry } from "@/modules/hunting/model/HuntReward";
 import { useGameApp } from "@/ui/hooks/useGameApp";
 import { useHuntingSandbox } from "@/ui/hooks/useHuntingSandbox";
 
@@ -9,11 +16,13 @@ interface HuntingScreenProps {
 }
 
 type ActivePanel = "routes" | "status" | "profile";
+type HuntLogFilter = "all" | "wins" | "losses" | "loot";
 
 export function HuntingScreen({ onBack }: HuntingScreenProps) {
   const { logger } = useGameApp();
   const [showLootPopup, setShowLootPopup] = useState(false);
   const [activePanel, setActivePanel] = useState<ActivePanel>("routes");
+  const [huntLogFilter, setHuntLogFilter] = useState<HuntLogFilter>("all");
   const {
     profile,
     inventory,
@@ -28,12 +37,14 @@ export function HuntingScreen({ onBack }: HuntingScreenProps) {
     routeElapsedMs,
     routeRemainingMs,
     routeReadyToResolve,
+    routeStances,
     toolCatalog,
     setSelectedZoneId,
     startSelectedHunt,
     resolveActiveHunt,
     claimActiveReward,
     equipToolByCode,
+    setRouteStanceById,
   } = useHuntingSandbox();
 
   const routeProgressPercent =
@@ -52,6 +63,17 @@ export function HuntingScreen({ onBack }: HuntingScreenProps) {
     { itemCode: "relic", label: "Relic", accent: "arcane" },
     { itemCode: "egg", label: "Egg", accent: "sun" },
   ];
+  const filteredPendingLog = filterHuntLog(huntState.pendingReward.log, huntLogFilter);
+  const filteredClaimedLog = filterHuntLog(lastClaimed?.reward.log ?? [], huntLogFilter);
+  const hunterStepCost = getHunterLevelStepCost(profile.level, profile.levelStep);
+  const hunterExpPercent = hunterStepCost ? Math.min(100, Math.max(0, (profile.levelProgress / hunterStepCost) * 100)) : 100;
+  const activePetStepCost = activePet ? getHuntingPetLevelStepCost(activePet.level) : null;
+  const activePetExpPercent =
+    activePet && activePetStepCost
+      ? Math.min(100, Math.max(0, (activePet.levelProgress / activePetStepCost) * 100))
+      : activePet
+        ? 100
+        : 0;
 
   useEffect(() => {
     if (!lastClaimed) {
@@ -213,6 +235,10 @@ export function HuntingScreen({ onBack }: HuntingScreenProps) {
               <span>Hunter {profile.name}</span>
               <span>Lv {profile.level}</span>
             </div>
+            <div className="hunting-lodge__hud-route-meta">
+              <span>Stance</span>
+              <span>{routeStances.find((entry) => entry.id === profile.routeStanceId)?.name ?? "Steady"}</span>
+            </div>
             <div className="hunting-lodge__hud-route-status">
               <div className="hunting-lodge__hud-route-state">{formatHuntStatus(huntState.status)}</div>
               <div className="hunting-lodge__hud-route-timer">{huntState.status === "hunting" ? formatDuration(routeRemainingMs) : huntState.status === "claimable" ? "Ready" : "Idle"}</div>
@@ -236,12 +262,50 @@ export function HuntingScreen({ onBack }: HuntingScreenProps) {
           </div>
 
           <div className="hunting-lodge__hud-card">
+            <div className="hunting-lodge__snapshot-label">Hunter EXP</div>
+            <div
+              className="hunting-lodge__progress"
+              title={
+                hunterStepCost
+                  ? `Level ${profile.level} step ${profile.levelStep + 1}: ${profile.levelProgress} / ${hunterStepCost} EXP`
+                  : "Current hunter level has reached the end of the configured progression curve."
+              }
+            >
+              <div className="hunting-lodge__progress-track">
+                <div className="hunting-lodge__progress-fill" style={{ width: `${hunterExpPercent}%` }} />
+              </div>
+              <div className="hunting-lodge__progress-meta">
+                <span>Next step</span>
+                <span>{hunterStepCost ? `${profile.levelProgress}/${hunterStepCost}` : "Capped"}</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="hunting-lodge__hud-card">
             <div className="hunting-lodge__snapshot-label">Companion</div>
             <div className="hunting-lodge__pet-name">{activePet ? activePet.name : "No pet assigned"}</div>
             <div className="hunting-lodge__hud-route-meta">
               <span>{activePet ? activePet.species : "No species"}</span>
               <span>{activePet ? activePet.rarity : "No rarity"}</span>
             </div>
+            {activePet ? (
+              <div
+                className="hunting-lodge__progress"
+                title={
+                  activePetStepCost
+                    ? `${activePet.name}: ${activePet.levelProgress} / ${activePetStepCost} pet EXP to level ${activePet.level + 1}`
+                    : `${activePet.name} has reached the end of the current pet level curve.`
+                }
+              >
+                <div className="hunting-lodge__progress-track">
+                  <div className="hunting-lodge__progress-fill" style={{ width: `${activePetExpPercent}%` }} />
+                </div>
+                <div className="hunting-lodge__progress-meta">
+                  <span>Pet EXP</span>
+                  <span>{activePetStepCost ? `${activePet.levelProgress}/${activePetStepCost}` : "Capped"}</span>
+                </div>
+              </div>
+            ) : null}
             {activePet ? (
               <div className="hunting-lodge__pet-traits">
                 <span className="hunting-lodge__tag" title="Companion hunt speed bonus">Speed +{activePet.traits.huntSpeedPercent}%</span>
@@ -464,6 +528,63 @@ export function HuntingScreen({ onBack }: HuntingScreenProps) {
                       </span>
                     ))}
                   </div>
+                  <div className="hunting-lodge__hunt-log">
+                    <div className="hunting-lodge__reward-head">
+                      <div className="hunting-lodge__section-label">Hunt Log</div>
+                      <div className="hunting-lodge__section-tabs" role="tablist" aria-label="Hunt log filter">
+                        {(["all", "wins", "losses", "loot"] as const).map((filter) => (
+                          <button
+                            key={filter}
+                            type="button"
+                            className={[
+                              "hunting-lodge__section-tab",
+                              huntLogFilter === filter ? "hunting-lodge__section-tab--active" : "",
+                            ]
+                              .filter(Boolean)
+                              .join(" ")}
+                            onClick={() => setHuntLogFilter(filter)}
+                          >
+                            {filter === "all"
+                              ? "All"
+                              : filter === "wins"
+                                ? "Wins"
+                                : filter === "losses"
+                                  ? "Losses"
+                                  : "Loot"}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="hunting-lodge__hunt-log-list">
+                      {filteredPendingLog.map((entry) => (
+                        <div key={entry.id} className="hunting-lodge__hunt-log-row">
+                          <div>
+                            <div className="hunting-lodge__hunt-log-title">
+                              <span className="hunting-lodge__hunt-log-icon" aria-hidden="true">
+                                {getHuntEnemyIcon(entry.enemy)}
+                              </span>
+                              {entry.enemy} · {entry.outcome === "win" ? "Victory" : "Retreat"}
+                            </div>
+                            <div className="hunting-lodge__hunt-log-meta">
+                              {entry.note}
+                              {entry.loot ? ` Loot: ${entry.loot}` : ""}
+                            </div>
+                          </div>
+                          <span
+                            className={[
+                              "hunting-lodge__tag",
+                              entry.outcome === "win" ? "hunting-lodge__tag--success" : "hunting-lodge__tag--danger",
+                            ]
+                              .filter(Boolean)
+                              .join(" ")}
+                          >
+                            {entry.outcome === "win" ? "Win" : "Loss"}
+                          </span>
+                        </div>
+                      ))}
+                      {filteredPendingLog.length === 0 ? <div className="hunting-lodge__empty">No entries for this filter.</div> : null}
+                    </div>
+                  </div>
                 </div>
               ) : lastClaimed ? (
                 <div className="hunting-lodge__reward-card hunting-lodge__reward-card--claimed">
@@ -480,6 +601,63 @@ export function HuntingScreen({ onBack }: HuntingScreenProps) {
                     <div>
                       <div className="hunting-lodge__reward-value">{lastClaimed.reward.items.length}</div>
                       <div className="hunting-lodge__reward-label">Loot Entries</div>
+                    </div>
+                  </div>
+                  <div className="hunting-lodge__hunt-log">
+                    <div className="hunting-lodge__reward-head">
+                      <div className="hunting-lodge__section-label">Hunt Log</div>
+                      <div className="hunting-lodge__section-tabs" role="tablist" aria-label="Last hunt log filter">
+                        {(["all", "wins", "losses", "loot"] as const).map((filter) => (
+                          <button
+                            key={filter}
+                            type="button"
+                            className={[
+                              "hunting-lodge__section-tab",
+                              huntLogFilter === filter ? "hunting-lodge__section-tab--active" : "",
+                            ]
+                              .filter(Boolean)
+                              .join(" ")}
+                            onClick={() => setHuntLogFilter(filter)}
+                          >
+                            {filter === "all"
+                              ? "All"
+                              : filter === "wins"
+                                ? "Wins"
+                                : filter === "losses"
+                                  ? "Losses"
+                                  : "Loot"}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="hunting-lodge__hunt-log-list">
+                      {filteredClaimedLog.map((entry) => (
+                        <div key={entry.id} className="hunting-lodge__hunt-log-row">
+                          <div>
+                            <div className="hunting-lodge__hunt-log-title">
+                              <span className="hunting-lodge__hunt-log-icon" aria-hidden="true">
+                                {getHuntEnemyIcon(entry.enemy)}
+                              </span>
+                              {entry.enemy} · {entry.outcome === "win" ? "Victory" : "Retreat"}
+                            </div>
+                            <div className="hunting-lodge__hunt-log-meta">
+                              {entry.note}
+                              {entry.loot ? ` Loot: ${entry.loot}` : ""}
+                            </div>
+                          </div>
+                          <span
+                            className={[
+                              "hunting-lodge__tag",
+                              entry.outcome === "win" ? "hunting-lodge__tag--success" : "hunting-lodge__tag--danger",
+                            ]
+                              .filter(Boolean)
+                              .join(" ")}
+                          >
+                            {entry.outcome === "win" ? "Win" : "Loss"}
+                          </span>
+                        </div>
+                      ))}
+                      {filteredClaimedLog.length === 0 ? <div className="hunting-lodge__empty">No entries for this filter.</div> : null}
                     </div>
                   </div>
                 </div>
@@ -504,6 +682,22 @@ export function HuntingScreen({ onBack }: HuntingScreenProps) {
                 <div className="hunting-lodge__stat-chip">Survival {profile.stats.survival}</div>
                 <div className="hunting-lodge__stat-chip">Fortune {profile.stats.fortune}</div>
               </div>
+              <div
+                className="hunting-lodge__progress"
+                title={
+                  hunterStepCost
+                    ? `Level ${profile.level} step ${profile.levelStep + 1}: ${profile.levelProgress} / ${hunterStepCost} EXP`
+                    : "Current hunter level has reached the end of the configured progression curve."
+                }
+              >
+                <div className="hunting-lodge__progress-track">
+                  <div className="hunting-lodge__progress-fill" style={{ width: `${hunterExpPercent}%` }} />
+                </div>
+                <div className="hunting-lodge__progress-meta">
+                  <span>Hunter EXP</span>
+                  <span>{hunterStepCost ? `${profile.levelProgress}/${hunterStepCost}` : "Capped"}</span>
+                </div>
+              </div>
               <div className="hunting-lodge__gear-list">
                 {profile.gear.map((entry) => (
                   <div key={entry.slot} className="hunting-lodge__gear-row" title={entry.item?.name ?? "Empty slot"}>
@@ -515,7 +709,11 @@ export function HuntingScreen({ onBack }: HuntingScreenProps) {
               <div className="hunting-lodge__tool-kit">
                 <div className="hunting-lodge__section-label">Tool Focus</div>
                 <div className="hunting-lodge__tool-grid">
-                  {toolCatalog.map((tool) => (
+                  {toolCatalog.map((tool) => {
+                    const masteryLevel = getHuntingToolMasteryLevel(profile.toolMastery[tool.itemCode] ?? 0);
+                    const masteryProgress = getHuntingToolMasteryProgress(profile.toolMastery[tool.itemCode] ?? 0);
+
+                    return (
                     <button
                       key={tool.itemCode}
                       type="button"
@@ -532,9 +730,43 @@ export function HuntingScreen({ onBack }: HuntingScreenProps) {
                         }
                       }}
                     >
-                      <span className="hunting-lodge__tool-name">{tool.name}</span>
+                      <span className="hunting-lodge__tool-name">
+                        {tool.name}
+                        {masteryLevel > 0 ? ` · M${masteryLevel}` : ""}
+                      </span>
                       <span className="hunting-lodge__tool-meta">
                         {tool.targetResourceTags.join(", ")} · +{tool.bonuses.targetedYieldPercent}%
+                      </span>
+                    </button>
+                    );
+                  })}
+                </div>
+              </div>
+              <div className="hunting-lodge__tool-kit">
+                <div className="hunting-lodge__section-label">Route Stance</div>
+                <div className="hunting-lodge__tool-grid">
+                  {routeStances.map((stance) => (
+                    <button
+                      key={stance.id}
+                      type="button"
+                      className={[
+                        "hunting-lodge__tool-chip",
+                        profile.routeStanceId === stance.id ? "hunting-lodge__tool-chip--active" : "",
+                      ]
+                        .filter(Boolean)
+                        .join(" ")}
+                      title={`${stance.name}: ${stance.description}`}
+                      onClick={() => {
+                        if (setRouteStanceById(stance.id)) {
+                          logger.info(`Selected hunting route stance ${stance.id}`);
+                        }
+                      }}
+                    >
+                      <span className="hunting-lodge__tool-name">{stance.name}</span>
+                      <span className="hunting-lodge__tool-meta">
+                        {stance.bonuses.rewardQuantityPercent >= 0 ? "+" : ""}
+                        {stance.bonuses.rewardQuantityPercent}% haul · {stance.bonuses.successRateBonus >= 0 ? "+" : ""}
+                        {Math.round(stance.bonuses.successRateBonus * 100)}% clear
                       </span>
                     </button>
                   ))}
@@ -603,6 +835,39 @@ function describeNextAction(status: string) {
     default:
       return "continue";
   }
+}
+
+function filterHuntLog(entries: HuntLogEntry[], filter: HuntLogFilter) {
+  switch (filter) {
+    case "wins":
+      return entries.filter((entry) => entry.outcome === "win");
+    case "losses":
+      return entries.filter((entry) => entry.outcome === "loss");
+    case "loot":
+      return entries.filter((entry) => entry.loot !== null);
+    default:
+      return entries;
+  }
+}
+
+function getHuntEnemyIcon(enemy: string) {
+  const value = enemy.toLowerCase();
+  if (value.includes("wolf") || value.includes("hyena")) {
+    return "\uD83D\uDC3A";
+  }
+  if (value.includes("boar") || value.includes("stoneback")) {
+    return "\uD83D\uDC17";
+  }
+  if (value.includes("vulture")) {
+    return "\uD83E\uDDA4";
+  }
+  if (value.includes("shade")) {
+    return "\uD83D\uDC7B";
+  }
+  if (value.includes("bandit") || value.includes("raider") || value.includes("scavenger")) {
+    return "\u2694";
+  }
+  return "\u2726";
 }
 
 function formatDuration(durationMs: number) {

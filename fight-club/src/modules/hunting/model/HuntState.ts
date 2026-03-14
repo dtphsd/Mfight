@@ -28,6 +28,7 @@ export const createIdleHuntState = (): HuntState => ({
     experience: 0,
     petExperience: 0,
     items: [],
+    log: [],
     summary: {
       elapsedSeconds: 0,
       encountersResolved: 0,

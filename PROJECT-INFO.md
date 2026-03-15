@@ -1,6 +1,6 @@
 # PROJECT-INFO - Fight Club
 
-> Last updated: 2026-03-14 22:20 MSK
+> Last updated: 2026-03-15 17:30 MSK
 
 **Project:** Fight Club  
 **Type:** browser-only SPA / combat sandbox  
@@ -30,6 +30,7 @@ The app root now also contains a local planning workflow:
 - `fight-club/docs/architecture/combat-design-reference.md` as the current source-of-truth combat runtime reference
 - `fight-club/docs/architecture/hunting-mvp-blueprint.md` as the original architecture blueprint for the autonomous hunting module
 - `fight-club/docs/architecture/hunting-runtime-reference.md` as the live hunting runtime reference and verification guide
+- `fight-club/ART/Avatars/` as the raw character-art source folder for combat silhouettes
 
 It has:
 
@@ -151,6 +152,7 @@ Effects are visible:
 
 - `Player | Fight Setup | Bot` layout
 - dedicated build presets popover for 7 curated archetypes
+- build preset browser is now compressed into a one-page `2 x 3` selector with avatar previews, stronger active-state styling, and color-zoned detail panels
 - builder popover
 - inventory popover
 - equipment slot popover
@@ -159,6 +161,9 @@ Effects are visible:
 - hover preview chrome is also starting to converge through `src/ui/components/shared/PreviewSurface.tsx` and `PreviewTag.tsx`
 - item-based hover preview shell is now also partially unified through `src/ui/components/shared/ItemPreviewPopover.tsx`
 - skill loadout popover
+- local profile mail icon with a mailbox mini modal for inbox reading, quick replies, and direct letters from another profile card
+- curated build presets now also switch the active combat silhouette to a matching character avatar
+- combat silhouette impact overlays now use one-shot pulses plus latched active-impact rendering so damage text and block/crit/break visuals do not reappear after fading out
 - rich hover cards for equipped items and inventory/equipment cards
 - prominent `Weapon Passive` block on weapon cards
 - prominent `Signature Skill` block on item cards and preset equipment previews
@@ -184,7 +189,7 @@ The sandbox now ships with 7 moderated build presets aimed at readable matchups 
 Each preset includes:
 
 - item loadout
-- recommended 5-skill panel
+- recommended 5-skill panel rendered as a compact strip inside the preset browser
 - recommended consumables
 - strengths / weaknesses and target fight length in the preset browser
 
@@ -282,12 +287,13 @@ Current validated state:
 
 - `npm run build` passes
 - `npm run test` passes
-- `npm run lint` passes
+- `npm run docs:validate` passes
+- `npm run lint` currently fails because generated `docs/.vitepress/.temp` and `docs/.vitepress/dist` artifacts are included, plus two existing source-level issues in `src/modules/hunting/application/huntingPersistence.ts` and `src/ui/screens/Hunting/HuntingScreen.tsx`
 - `npm run balance:matrix` passes and writes the current matchup matrix to `fight-club/docs/balance/`
 
 Current automated coverage count:
 
-- `18` test files
+- `21` test files / `143` tests
 
 ---
 
@@ -313,4 +319,4 @@ From repo root:
 
 ---
 
-> Last updated: 2026-03-14 18:08 MSK
+> Last updated: 2026-03-15 16:11 MSK

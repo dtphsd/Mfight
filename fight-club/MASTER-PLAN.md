@@ -1,6 +1,6 @@
 # MASTER-PLAN - Fight Club
 
-> Last updated: 2026-03-14 22:40 MSK
+> Last updated: 2026-03-15 03:05 MSK
 
 **Project:** Fight Club  
 **Scope:** active product planning, task tracking, and sprint history
@@ -77,6 +77,12 @@
 - `UI-013` - reduce combat-screen noise and separate play-now information from analysis and log-heavy information
 - `UI-014` - make `Exposed`, `Staggered`, and payoff windows self-explanatory directly in the combat UI
 - `UI-015` - reduce build-editing friction by moving presets, inventory, equipment, and skills toward one clearer build center
+
+| PROFILE-001 | Define profile model and modal architecture | Profile / Architecture | рџџЎ IN PROGRESS | `features/profile-modal.md` | Profile MVP is scoped as a local client-side social card with a dedicated profile meta model and a combat-opened modal entry point |
+| PROFILE-002 | Build first combat-integrated profile modal | Profile / UI | рџ”ґ TODO | `features/profile-modal.md` | Ship the first four-block profile modal from live combat data before expanding profile entry points |
+| PROFILE-003 | Add session battle record and showcase blocks | Profile / UX | рџ”ґ TODO | `features/profile-modal.md` | Track local fight results and render medals, gifts, and wall placeholders as part of the profile experience |
+| PROFILE-004 | Expand profile entry points beyond combat | Profile / Navigation | рџ”ґ TODO | `features/profile-modal.md` | Reuse the profile modal from menu and hunting surfaces once the first combat slice is stable |
+| PROFILE-005 | Formalize profile persistence and future social bridge | Profile / Future Systems | рџ”ґ TODO | `features/profile-modal.md` | Decide what profile data should persist locally and what should stay deferred until a real backend exists |
 
 ---
 
@@ -405,6 +411,7 @@
 | v0.82 | Hunting Tool Focus Slice Landed | Closed the main `HUNT-008` persistence/UI work and opened `HUNT-009` with a first hunting tool-focus layer that changes route yields, persists through the hunter profile, and is selectable from the profile tab | `HUNT-009` |
 | v0.83 | Combat Motion Layer Refactored | Split combat impact presentation into a dedicated motion helper, overlay component, and CSS layer so `CombatSilhouette` no longer owns all impact rendering details directly | `UI-008`, `UI-010` |
 | v0.84 | Combat Finish And Block-Break Motion Added | Added persistent post-fight silhouette states, `BLOCK BREAK` feedback for penetrated blocks, and hardened impact resets so each new combat event cleanly replaces the previous linger animation | `UI-010` |
+| v0.85 | Profile Modal Track Opened | Added a dedicated `Profile Modal` feature track, formalized `PROFILE-001` through `PROFILE-005`, and scoped the first release as a local client-side modal instead of a full social system | `PROFILE-001`, `PROFILE-002`, `PROFILE-003`, `PROFILE-004`, `PROFILE-005` |
 
 ---
 
@@ -419,4 +426,4 @@ When work changes state:
 
 ---
 
-> Last updated: 2026-03-15 02:18 MSK
+> Last updated: 2026-03-15 03:05 MSK

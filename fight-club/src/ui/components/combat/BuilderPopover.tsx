@@ -237,7 +237,7 @@ export function BuilderPopover({
                     border: "1px solid rgba(255,171,97,0.22)",
                   }}
                 >
-                  ⚒
+                  {"\u2692"}
                 </div>
                 <div style={{ display: "grid", gap: "2px" }}>
                   <div
@@ -329,7 +329,7 @@ export function BuilderPopover({
                           border: "1px solid rgba(255,171,97,0.18)",
                         }}
                       >
-                        ♞
+                        РІв„ўС›
                       </div>
                       <div style={{ fontSize: "9px", letterSpacing: "0.12em", textTransform: "uppercase", color: "#ffd8b3", fontWeight: 800 }}>
                         Curated Build Browser
@@ -1281,23 +1281,23 @@ function getSkillSlotIcon(sourceItemCode: string, skillName: string) {
   const normalizedName = skillName.toLowerCase();
 
   if (normalizedCode.includes("shield") || normalizedName.includes("shield")) {
-    return "🛡";
+    return "\uD83D\uDEE1";
   }
 
   if (normalizedCode.includes("helmet") || normalizedCode.includes("cap") || normalizedName.includes("head")) {
-    return "🪖";
+    return "\uD83E\uDE96";
   }
 
   if (normalizedCode.includes("armor") || normalizedCode.includes("vest") || normalizedCode.includes("jacket")) {
-    return "🦺";
+    return "\uD83E\uDDBA";
   }
 
   if (normalizedCode.includes("glove") || normalizedCode.includes("gauntlet") || normalizedName.includes("grip")) {
-    return "🧤";
+    return "\uD83E\uDDE4";
   }
 
   if (normalizedCode.includes("boot") || normalizedName.includes("step") || normalizedName.includes("kick")) {
-    return "🥾";
+    return "\uD83E\uDD7E";
   }
 
   if (
@@ -1307,26 +1307,26 @@ function getSkillSlotIcon(sourceItemCode: string, skillName: string) {
     normalizedCode.includes("medallion") ||
     normalizedCode.includes("accessory")
   ) {
-    return "💍";
+    return "\uD83D\uDC8D";
   }
 
   if (normalizedCode.includes("dagger") || normalizedName.includes("pierc") || normalizedName.includes("lunge")) {
-    return "🗡";
+    return "\uD83D\uDDE1";
   }
 
   if (normalizedCode.includes("axe") || normalizedName.includes("cleave")) {
-    return "🪓";
+    return "\uD83E\uDE93";
   }
 
   if (normalizedCode.includes("mace") || normalizedCode.includes("hammer") || normalizedName.includes("bash")) {
-    return "🔨";
+    return "\uD83D\uDD28";
   }
 
   if (normalizedCode.includes("sword") || normalizedName.includes("slash")) {
-    return "⚔";
+    return "\u2694";
   }
 
-  return "✦";
+  return "\u2726";
 }
 
 function getSkillSlotTone(sourceItemCode: string) {

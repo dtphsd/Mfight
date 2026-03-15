@@ -7,11 +7,13 @@ import { MainMenuScreen } from "@/ui/screens/MainMenu/MainMenuScreen";
 
 export function App() {
   const [screen, setScreen] = useState<"menu" | "combat" | "rules" | "hunting">("menu");
+  const [playerName, setPlayerName] = useState("Player");
 
   return (
     <AppShell>
       {screen === "menu" ? (
         <MainMenuScreen
+          playerName={playerName}
           onOpenCombatSandbox={() => setScreen("combat")}
           onOpenCombatRules={() => setScreen("rules")}
           onOpenHunting={() => setScreen("hunting")}
@@ -24,7 +26,10 @@ export function App() {
       ) : screen === "hunting" ? (
         <HuntingScreen onBack={() => setScreen("menu")} />
       ) : (
-        <CombatSandboxScreen />
+        <CombatSandboxScreen
+          playerName={playerName}
+          onPlayerNameChange={setPlayerName}
+        />
       )}
     </AppShell>
   );

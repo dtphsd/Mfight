@@ -1,0 +1,13 @@
+{
+  "name": "rat-fighter-idle",
+  "sourceVideo": "c:\\Users\\dtphs\\OneDrive\\animation_fight_ready_idle_948d7a1d-b870-4a7b-b3f8-9cfc80edc682_40f5266d-c6eb-4bbc-85c7-90f05b4b7d18.mp4",
+  "sheet": "rat-fighter-idle-spritesheet.png",
+  "frameWidth": 384,
+  "frameHeight": 224,
+  "columns": 6,
+  "rows": 5,
+  "frameCount": 29,
+  "fps": 16,
+  "durationSeconds": 1.8125,
+  "framesPath": "./frames/frame-%02d.png"
+}

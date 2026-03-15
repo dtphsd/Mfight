@@ -108,6 +108,7 @@ describe("CombatSandboxScreen", () => {
     fireEvent.click(screen.getAllByRole("button", { name: /Dagger \/ Crit/i }).at(-1)!);
     fireEvent.click(screen.getByRole("button", { name: "Apply Build" }));
 
+    expect(screen.getAllByTestId("combat-silhouette-image")[0].getAttribute("data-figure")).toBe("kitsune-bit");
     expect(screen.getByRole("button", { name: "Select Piercing Lunge" })).toBeTruthy();
     expect(screen.getByRole("button", { name: "Select Killer Focus" })).toBeTruthy();
   });
@@ -121,5 +122,43 @@ describe("CombatSandboxScreen", () => {
 
     expect(screen.getAllByText("Mace / Control").length).toBeGreaterThan(0);
     expect(screen.getAllByText("Blunt").length).toBeGreaterThan(0);
+  });
+
+  it("supports local profile mail from inbox replies and direct messages", () => {
+    render(<CombatSandboxScreen playerName="Courier" />);
+
+    fireEvent.click(screen.getAllByRole("button", { name: "Open character profile" })[0]);
+    fireEvent.click(screen.getByRole("button", { name: "Open personal mail" }));
+
+    expect(screen.getByText("Inbox and replies")).toBeTruthy();
+    expect(screen.getByText("Sparring request")).toBeTruthy();
+    fireEvent.click(screen.getByText("Sparring request"));
+
+    fireEvent.change(screen.getByLabelText("Mail body"), {
+      target: { value: "Reply confirmed. Meet me after the next round." },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Send Letter" }));
+
+    expect(screen.getAllByText("Re: Sparring request").length).toBeGreaterThan(0);
+    fireEvent.click(screen.getByRole("button", { name: "Close mailbox" }));
+    fireEvent.click(screen.getByRole("button", { name: "Close profile modal" }));
+
+    fireEvent.click(screen.getAllByRole("button", { name: "Open character profile" })[1]);
+    fireEvent.click(screen.getByRole("button", { name: "Write a letter to Arena Bot" }));
+
+    fireEvent.change(screen.getByLabelText("Mail subject"), {
+      target: { value: "Route notes" },
+    });
+    fireEvent.change(screen.getByLabelText("Mail body"), {
+      target: { value: "Your scouting notes are waiting in the local inbox service." },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Send Letter" }));
+    fireEvent.click(screen.getByRole("button", { name: "Close mailbox" }));
+    fireEvent.click(screen.getByRole("button", { name: "Close profile modal" }));
+
+    fireEvent.click(screen.getAllByRole("button", { name: "Open character profile" })[0]);
+    fireEvent.click(screen.getByRole("button", { name: "Open personal mail" }));
+
+    expect(screen.getAllByText("Route notes").length).toBeGreaterThan(0);
   });
 });

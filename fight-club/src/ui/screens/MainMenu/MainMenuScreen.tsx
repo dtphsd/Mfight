@@ -1,12 +1,18 @@
 import { useGameApp } from "@/ui/hooks/useGameApp";
 
 interface MainMenuScreenProps {
+  playerName: string;
   onOpenCombatSandbox: () => void;
   onOpenCombatRules: () => void;
   onOpenHunting: () => void;
 }
 
-export function MainMenuScreen({ onOpenCombatSandbox, onOpenCombatRules, onOpenHunting }: MainMenuScreenProps) {
+export function MainMenuScreen({
+  playerName,
+  onOpenCombatSandbox,
+  onOpenCombatRules,
+  onOpenHunting,
+}: MainMenuScreenProps) {
   const { logger } = useGameApp();
 
   return (
@@ -16,6 +22,7 @@ export function MainMenuScreen({ onOpenCombatSandbox, onOpenCombatRules, onOpenH
           <p className="main-menu__eyebrow">Combat Prototype</p>
           <h1 className="main-menu__title">Fight Club</h1>
           <div className="main-menu__subtitle-row">
+            <span className="main-menu__subtitle-pill">{playerName}</span>
             <span className="main-menu__subtitle-pill">Arena sandbox</span>
             <span className="main-menu__subtitle-pill">Readable combat feedback</span>
             <span className="main-menu__subtitle-pill">Deterministic loop</span>

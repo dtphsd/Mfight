@@ -1,6 +1,6 @@
 # Combat Formulas And Effects
 
-> Last updated: 2026-03-14 13:16 MSK
+> Last updated: 2026-03-14 14:58 MSK
 
 ## Resources
 
@@ -183,6 +183,14 @@ Design rule:
 - these states are intentionally readable and low-noise
 - they should create tactical windows, not hard crowd control
 - first-wave state-aware skills use the existing combat effect system instead of a separate state engine
+
+Current first-wave live examples:
+
+- `Opening Sense` and `Open Flank` apply `Exposed`
+- `Execution Arc` and `Hook Chop` gain payoff against `Exposed`
+- `Armor Crush` applies `Staggered`
+- `Crushing Blow` gains payoff against `Staggered`
+- `Shield Bash` now applies `Staggered` and a separate short resource-drain rider
 
 ---
 

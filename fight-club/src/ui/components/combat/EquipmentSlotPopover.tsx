@@ -43,7 +43,7 @@ export function EquipmentSlotPopover({
       position="absolute"
       placeItems="start center"
       padding="18px"
-      backdrop="rgba(7, 8, 12, 0.62)"
+      backdrop="rgba(7, 8, 12, 0.84)"
     >
       <ModalSurface
         style={{
@@ -59,7 +59,7 @@ export function EquipmentSlotPopover({
             borderBottom: "1px solid rgba(255,255,255,0.08)",
             display: "grid",
             gap: "10px",
-            background: "linear-gradient(180deg, rgba(62,128,199,0.14), rgba(255,255,255,0.02))",
+            background: "linear-gradient(180deg, rgb(31,51,72), rgb(18,22,30))",
           }}
         >
           <div style={{ display: "flex", justifyContent: "space-between", gap: "8px", alignItems: "center", flexWrap: "wrap" }}>
@@ -91,7 +91,7 @@ export function EquipmentSlotPopover({
                     borderRadius: "999px",
                     fontSize: "10px",
                     border: `1px solid ${slotTone.border}`,
-                    background: equippedItemCode ? slotTone.tint : "rgba(255,255,255,0.04)",
+                    background: equippedItemCode ? slotTone.tint : "rgb(35,38,45)",
                     color: equippedItemCode ? slotTone.text : "#d7d0c6",
                   }}
                 >

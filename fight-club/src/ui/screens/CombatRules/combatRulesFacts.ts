@@ -118,12 +118,12 @@ export function createStarterItemRows(locale: Locale) {
   });
 }
 
-export function createStarterSkillCallouts() {
+export function createStarterSkillCallouts(locale: Locale) {
   return getShowcasedSkillItems()
     .flatMap((item) =>
       (item.skills ?? []).map((skill) => ({
         label: skill.name,
-        value: `${skill.cost} ${skill.resourceType[0].toUpperCase()}${skill.resourceType.slice(1)}, x${skill.damageMultiplier} dmg, +${skill.critChanceBonus}% crit${formatSkillPenSuffix(skill.armorPenetrationPercentBonus)}${formatSkillEffectSuffix(skill.effects)}`,
+        value: `${skill.cost} ${skill.resourceType[0].toUpperCase()}${skill.resourceType.slice(1)}, x${skill.damageMultiplier} dmg, +${skill.critChanceBonus}% crit${formatSkillPenSuffix(skill.armorPenetrationPercentBonus)}${formatSkillEffectSuffix(skill.effects)}${formatSkillStateBonusSuffix(skill.stateBonuses, locale)}`,
         tone: resourceToneByType[skill.resourceType] ?? getItemTone(item.code as ShowcasedItemCode),
       }))
     );
@@ -157,6 +157,71 @@ function formatSkillEffectSuffix(
     .join("");
 }
 
+function formatSkillStateBonusSuffix(
+  stateBonuses:
+    | Array<{
+        requiredEffectId: string;
+        damageMultiplierBonus?: number;
+        critChanceBonus?: number;
+      }>
+    | undefined,
+  locale: Locale
+) {
+  if (!stateBonuses || stateBonuses.length === 0) {
+    return "";
+  }
+
+  return stateBonuses
+    .map((bonus) => {
+      const stateName =
+        bonus.requiredEffectId === "state-exposed"
+          ? "Exposed"
+          : bonus.requiredEffectId === "state-staggered"
+            ? "Staggered"
+            : bonus.requiredEffectId;
+      const payload = [
+        bonus.damageMultiplierBonus ? `+${Math.round(bonus.damageMultiplierBonus * 100)}% dmg` : null,
+        bonus.critChanceBonus ? `+${bonus.critChanceBonus}% crit` : null,
+      ]
+        .filter((value) => value !== null)
+        .join(", ");
+
+      return locale === "ru"
+        ? `, bonus vs ${stateName}${payload ? `: ${payload}` : ""}`
+        : `, bonus vs ${stateName}${payload ? `: ${payload}` : ""}`;
+    })
+    .join("");
+}
+
+function createStatePrimerCallouts(locale: Locale) {
+  return [
+    {
+      label: "Exposed",
+      value:
+        locale === "ru"
+          ? "2 хода, до 2 stacks: +8% incoming damage за stack. Это setup-окно под finishers."
+          : "2 turns, up to 2 stacks: +8% incoming damage per stack. This is a setup window for finishers.",
+      tone: "pierce" as const,
+    },
+    {
+      label: "Staggered",
+      value:
+        locale === "ru"
+          ? "2 хода, до 2 stacks: -6 block power и -4 dodge bonus за stack. Это anti-guard pressure."
+          : "2 turns, up to 2 stacks: -6 block power and -4 dodge bonus per stack. This creates anti-guard pressure.",
+      tone: "blunt" as const,
+    },
+    {
+      label: locale === "ru" ? "Setup -> Payoff" : "Setup -> Payoff",
+      value:
+        locale === "ru"
+          ? "Opening Sense и Open Flank создают Exposed, Armor Crush и Shield Bash создают Staggered, а payoff-skills усиливаются по этим окнам."
+          : "Opening Sense and Open Flank create Exposed, Armor Crush and Shield Bash create Staggered, and payoff skills get stronger during those windows.",
+      tone: "strength" as const,
+    },
+  ];
+}
+
 export function withGeneratedCombatRulesFacts(content: RuleSection[], locale: Locale): RuleSection[] {
   return content.map((section) => {
     if (section.id === "items" && section.table) {
@@ -172,7 +237,7 @@ export function withGeneratedCombatRulesFacts(content: RuleSection[], locale: Lo
     if (section.id === "skills") {
       return {
         ...section,
-        callouts: createStarterSkillCallouts(),
+        callouts: [...createStatePrimerCallouts(locale), ...createStarterSkillCallouts(locale)],
       };
     }
 

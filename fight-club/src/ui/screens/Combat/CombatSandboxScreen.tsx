@@ -1,15 +1,34 @@
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import type { CharacterStatName, CharacterStats } from "@/modules/character";
-import { combatZoneDamageModifiers, type CombatZone } from "@/modules/combat";
+import {
+  baseBlockPenetration,
+  baseCritChance,
+  baseDodgeChance,
+  critMultiplier,
+  combatChanceCaps,
+  combatFormulaConfig,
+  combatZoneDamageModifiers,
+  type CombatZone,
+} from "@/modules/combat";
 import type { EquipmentSlot } from "@/modules/equipment";
 import type { DamageProfile, Item } from "@/modules/inventory";
 import type { ArmorProfile } from "@/modules/inventory";
+import {
+  addProfileBattleResult,
+  countUnreadMailboxEntries,
+  createProfileMailboxes,
+  createProfileMeta,
+  markMailboxEntriesAsRead,
+  sendProfileMail,
+} from "@/modules/profile";
+import { totalProfileValue } from "@/orchestration/combat/combatPressure";
 import { BattleLogPanel } from "@/ui/components/combat/BattleLogPanel";
 import { BuildPresetsPopover } from "@/ui/components/combat/BuildPresetsPopover";
 import { BuilderPopover } from "@/ui/components/combat/BuilderPopover";
-import { CombatSilhouette } from "@/ui/components/combat/CombatSilhouette";
+import { CombatSilhouette, type CombatFigureId } from "@/ui/components/combat/CombatSilhouette";
 import { EquipmentSlotPopover } from "@/ui/components/combat/EquipmentSlotPopover";
 import { InventoryPopover } from "@/ui/components/combat/InventoryPopover";
+import { ProfileModal } from "@/ui/components/profile/ProfileModal";
 import { useCombatSandbox } from "@/ui/hooks/useCombatSandbox";
 
 const playerEquipmentSlots: EquipmentSlot[] = ["helmet", "armor", "mainHand", "offHand", "gloves", "accessory", "boots"];
@@ -56,18 +75,45 @@ const statMeta: Record<CharacterStatName, { short: string; color: string; backgr
   endurance: { short: "END", color: "#ebcf8b", background: "rgba(214,177,95,0.14)", border: "rgba(214,177,95,0.28)" },
 };
 
+const presetFigureById: Record<string, CombatFigureId> = {
+  "sword-bleed": "rush-chip",
+  "shield-guard": "quack-core",
+  "dagger-crit": "kitsune-bit",
+  "mace-control": "neo-scope",
+  "axe-pressure": "razor-boar",
+  "heavy-two-hand": "hound-drive",
+  "sustain-regen": "trash-flux",
+};
+
 type CombatSandboxModel = ReturnType<typeof useCombatSandbox>;
 
-export function CombatSandboxScreen() {
+export function CombatSandboxScreen({
+  playerName = "Player",
+  onPlayerNameChange = () => {},
+}: {
+  playerName?: string;
+  onPlayerNameChange?: (value: string) => void;
+}) {
   const sandbox = useCombatSandbox();
   const [builderOpen, setBuilderOpen] = useState(false);
   const [buildPresetsOpen, setBuildPresetsOpen] = useState(false);
   const [botBuildPresetsOpen, setBotBuildPresetsOpen] = useState(false);
   const [inventoryOpen, setInventoryOpen] = useState(false);
+  const [profileTarget, setProfileTarget] = useState<"player" | "bot" | null>(null);
   const [selectedEquipmentSlot, setSelectedEquipmentSlot] = useState<EquipmentSlot | null>(null);
   const [skillLoadoutOpen, setSkillLoadoutOpen] = useState(false);
   const [deathFinisher, setDeathFinisher] = useState<null | { winner: "player" | "bot"; key: string }>(null);
+  const [playerProfile, setPlayerProfile] = useState(() => createProfileMeta({ side: "player" }));
+  const [botProfile, setBotProfile] = useState(() => createProfileMeta({ side: "bot" }));
+  const [playerFigure, setPlayerFigure] = useState<CombatFigureId>("rush-chip");
+  const [mailboxes, setMailboxes] = useState(() =>
+    createProfileMailboxes({
+      playerName,
+      botName: "Arena Bot",
+    })
+  );
   const lastWinnerIdRef = useRef<string | null>(null);
+  const botFigure = resolvePresetFigure(sandbox.botBuildPresetId, "vermin-tek");
 
   const playerEquipment = useMemo(
     () =>
@@ -94,6 +140,10 @@ export function CombatSandboxScreen() {
       ? sandbox.latestRoundEntries.map((entry) => `${entry.attackerName}: ${entry.commentary}`).join(" | ")
       : "No round resolved yet.";
   const outcomeWinner = sandbox.combatPhase === "finished" ? deathFinisher?.winner ?? null : null;
+  const buildConfigured =
+    Object.values(sandbox.playerAllocations).some((value) => value > 0) ||
+    sandbox.equippedItems.some((entry) => entry.item) ||
+    sandbox.equippedSkillIds.length > 0;
 
   useEffect(() => {
     const winnerId = sandbox.combatState?.winnerId ?? null;
@@ -115,6 +165,8 @@ export function CombatSandboxScreen() {
     }
 
     setDeathFinisher({ winner, key: `${winnerId}-${sandbox.combatState?.round ?? "finish"}` });
+    setPlayerProfile((current) => addProfileBattleResult(current, winner === "player" ? "win" : "loss"));
+    setBotProfile((current) => addProfileBattleResult(current, winner === "bot" ? "win" : "loss"));
   }, [sandbox.botSnapshot.characterId, sandbox.combatState, sandbox.playerSnapshot.characterId]);
 
   useEffect(() => {
@@ -123,6 +175,25 @@ export function CombatSandboxScreen() {
       setDeathFinisher(null);
     }
   }, [sandbox.combatPhase]);
+
+  useEffect(() => {
+    setMailboxes((current) => ({
+      player: {
+        entries: current.player.entries.map((entry) => ({
+          ...entry,
+          fromName: entry.fromActorId === "player" ? playerName : entry.fromName,
+          toName: entry.toActorId === "player" ? playerName : entry.toName,
+        })),
+      },
+      bot: {
+        entries: current.bot.entries.map((entry) => ({
+          ...entry,
+          fromName: entry.fromActorId === "player" ? playerName : entry.fromName,
+          toName: entry.toActorId === "player" ? playerName : entry.toName,
+        })),
+      },
+    }));
+  }, [playerName]);
 
   return (
     <section data-testid="combat-sandbox-screen" style={{ display: "grid", gap: "14px" }}>
@@ -147,11 +218,15 @@ export function CombatSandboxScreen() {
           >
             <PlayerCombatPanel
               sandbox={sandbox}
+              playerName={playerName}
+              playerFigure={playerFigure}
+              buildConfigured={buildConfigured}
               equipment={playerEquipment}
               selectedEquipmentSlot={selectedEquipmentSlot}
               onOpenBuilder={() => setBuilderOpen(true)}
               onOpenBuildPresets={() => setBuildPresetsOpen(true)}
               onOpenInventory={() => setInventoryOpen(true)}
+              onOpenProfile={() => setProfileTarget("player")}
               onSelectEquipmentSlot={setSelectedEquipmentSlot}
               onCloseEquipmentSlot={() => setSelectedEquipmentSlot(null)}
               silhouetteState={outcomeWinner === "player" ? "victory" : outcomeWinner === "bot" ? "defeat" : null}
@@ -174,8 +249,10 @@ export function CombatSandboxScreen() {
           >
             <BotCombatPanel
               sandbox={sandbox}
+              botFigure={botFigure}
               equipment={botEquipment}
               onOpenBuildPresets={() => setBotBuildPresetsOpen(true)}
+              onOpenProfile={() => setProfileTarget("bot")}
               silhouetteState={outcomeWinner === "bot" ? "victory" : outcomeWinner === "player" ? "defeat" : null}
             />
           </div>
@@ -193,10 +270,17 @@ export function CombatSandboxScreen() {
           buildPresets={sandbox.buildPresets}
           onApplyBuild={(presetId) => {
             sandbox.applyPreset(presetId);
+            setPlayerFigure(resolvePresetFigure(presetId, "rush-chip"));
             setBuildPresetsOpen(false);
           }}
-          onApplyItemsOnly={sandbox.applyPresetItemsOnly}
-          onApplySkillsOnly={sandbox.applyPresetSkillsOnly}
+          onApplyItemsOnly={(presetId) => {
+            sandbox.applyPresetItemsOnly(presetId);
+            setPlayerFigure(resolvePresetFigure(presetId, "rush-chip"));
+          }}
+          onApplySkillsOnly={(presetId) => {
+            sandbox.applyPresetSkillsOnly(presetId);
+            setPlayerFigure(resolvePresetFigure(presetId, "rush-chip"));
+          }}
           onClose={() => setBuildPresetsOpen(false)}
         />
       ) : null}
@@ -221,8 +305,14 @@ export function CombatSandboxScreen() {
           metrics={sandbox.metrics}
           increaseStat={sandbox.increaseStat}
           decreaseStat={sandbox.decreaseStat}
-          applyPreset={sandbox.applyPreset}
-          resetBuild={sandbox.resetBuild}
+          applyPreset={(presetId) => {
+            sandbox.applyPreset(presetId);
+            setPlayerFigure(resolvePresetFigure(presetId, "rush-chip"));
+          }}
+          resetBuild={() => {
+            sandbox.resetBuild();
+            setPlayerFigure("rush-chip");
+          }}
           toggleEquippedSkill={sandbox.toggleEquippedSkill}
           onOpenBuildPresets={() => setBuildPresetsOpen(true)}
           onClose={() => setBuilderOpen(false)}
@@ -235,6 +325,97 @@ export function CombatSandboxScreen() {
           maxEquippedSkills={sandbox.maxEquippedSkills}
           onToggleSkill={sandbox.toggleEquippedSkill}
           onClose={() => setSkillLoadoutOpen(false)}
+        />
+      ) : null}
+
+      {profileTarget === "player" ? (
+        <ProfileModal
+          onClose={() => setProfileTarget(null)}
+          name={playerName}
+          level={sandbox.playerCharacter.level}
+          figure={playerFigure}
+          mirrored
+          currentHp={sandbox.playerCombatant?.currentHp ?? sandbox.playerSnapshot.maxHp}
+          maxHp={sandbox.playerCombatant?.maxHp ?? sandbox.playerSnapshot.maxHp}
+          activeEffects={sandbox.playerCombatant?.activeEffects ?? []}
+          equipmentSlots={playerEquipment}
+          profile={playerProfile}
+          baseStats={sandbox.playerSnapshot.stats}
+          derivedStats={buildProfileDerivedStats({
+            totalDamage: sandbox.metrics.totalDamage,
+            stats: sandbox.playerSnapshot.stats,
+            totalArmor: sandbox.metrics.totalArmor,
+            dodgeBonus: sandbox.playerSnapshot.dodgeChanceBonus,
+            critBonus: sandbox.playerSnapshot.critChanceBonus,
+            totalCritMultiplier: sandbox.metrics.totalCritMultiplier,
+            baseBlockPenetrationValue: sandbox.metrics.baseBlockPenetration,
+            armorPenetrationPercent: sandbox.playerSnapshot.armorPenetrationPercent,
+          })}
+          skillLabels={sandbox.equippedSkills.map((skill) => skill.name)}
+          isOwnProfile
+          onNameChange={onPlayerNameChange}
+          onMottoChange={(value) => setPlayerProfile((current) => ({ ...current, motto: value }))}
+          mailboxActorId="player"
+          mailboxEntries={mailboxes.player.entries}
+          unreadMailCount={countUnreadMailboxEntries(mailboxes, "player")}
+          onOpenMailbox={() => setMailboxes((current) => markMailboxEntriesAsRead(current, "player"))}
+          onSendMail={({ toActorId, toName, subject, body }) =>
+            setMailboxes((current) =>
+              sendProfileMail({
+                mailboxes: current,
+                fromActorId: "player",
+                fromName: playerName,
+                toActorId,
+                toName,
+                subject,
+                body,
+              })
+            )
+          }
+        />
+      ) : null}
+
+      {profileTarget === "bot" ? (
+        <ProfileModal
+          onClose={() => setProfileTarget(null)}
+          name="Arena Bot"
+          level={sandbox.botBuildPreset.targetFightLength === "long" ? 4 : 3}
+          figure={botFigure}
+          currentHp={sandbox.botCombatant?.currentHp ?? sandbox.botSnapshot.maxHp}
+          maxHp={sandbox.botCombatant?.maxHp ?? sandbox.botSnapshot.maxHp}
+          activeEffects={sandbox.botCombatant?.activeEffects ?? []}
+          equipmentSlots={botEquipment}
+          profile={botProfile}
+          baseStats={sandbox.botSnapshot.stats}
+          derivedStats={buildProfileDerivedStats({
+            totalDamage: sandbox.metrics.opponentTotalDamage,
+            stats: sandbox.botSnapshot.stats,
+            totalArmor: sandbox.metrics.opponentTotalArmor,
+            dodgeBonus: sandbox.botSnapshot.dodgeChanceBonus,
+            critBonus: sandbox.botSnapshot.critChanceBonus,
+            totalCritMultiplier: critMultiplier(sandbox.botSnapshot.stats.endurance) + sandbox.botSnapshot.critMultiplierBonus,
+            baseBlockPenetrationValue: baseBlockPenetration(sandbox.botSnapshot.stats.strength),
+            armorPenetrationPercent: sandbox.botSnapshot.armorPenetrationPercent,
+          })}
+          skillLabels={sandbox.botBuildPreset.skillLoadout.map(formatIdLabel)}
+          mailboxActorId="bot"
+          mailboxEntries={mailboxes.bot.entries}
+          unreadMailCount={countUnreadMailboxEntries(mailboxes, "bot")}
+          directMessageTarget={{ actorId: "bot", name: "Arena Bot" }}
+          onOpenMailbox={() => setMailboxes((current) => markMailboxEntriesAsRead(current, "bot"))}
+          onSendMail={({ toActorId, toName, subject, body }) =>
+            setMailboxes((current) =>
+              sendProfileMail({
+                mailboxes: current,
+                fromActorId: "player",
+                fromName: playerName,
+                toActorId,
+                toName,
+                subject,
+                body,
+              })
+            )
+          }
         />
       ) : null}
 
@@ -254,50 +435,51 @@ export function CombatSandboxScreen() {
 
 function PlayerCombatPanel({
   sandbox,
+  playerName,
+  playerFigure,
+  buildConfigured,
   equipment,
   selectedEquipmentSlot,
   onOpenBuilder,
   onOpenBuildPresets,
   onOpenInventory,
+  onOpenProfile,
   onSelectEquipmentSlot,
   onCloseEquipmentSlot,
   silhouetteState = null,
 }: {
   sandbox: CombatSandboxModel;
+  playerName: string;
+  playerFigure: CombatFigureId;
+  buildConfigured: boolean;
   equipment: Array<{ slot: EquipmentSlot; item: Item | null }>;
   selectedEquipmentSlot: EquipmentSlot | null;
   onOpenBuilder: () => void;
   onOpenBuildPresets: () => void;
   onOpenInventory: () => void;
+  onOpenProfile: () => void;
   onSelectEquipmentSlot: (slot: EquipmentSlot) => void;
   onCloseEquipmentSlot: () => void;
   silhouetteState?: "victory" | "defeat" | null;
 }) {
+  const impactEvent = useCombatImpactPulse(sandbox.playerIncomingResult);
+
   return (
     <SidePanel
-      eyebrow="Player"
-      title={sandbox.playerCharacter.name}
-      note={formatMaybeTitle(sandbox.metrics.weaponDamageType)}
       silhouette={
         <CombatOutcomeSilhouetteWrap side="player" state={silhouetteState}>
           <CombatSilhouette
-            title="Player"
+            title={playerName}
             currentHp={sandbox.playerCombatant?.currentHp ?? sandbox.playerSnapshot.maxHp}
             maxHp={sandbox.playerCombatant?.maxHp ?? sandbox.playerSnapshot.maxHp}
             activeEffects={sandbox.playerCombatant?.activeEffects ?? []}
             equipmentSlots={equipment}
-            figure="rush-chip"
+            figure={playerFigure}
             mirrored
-            impactKey={
-              sandbox.playerIncomingResult &&
-              (sandbox.playerIncomingResult.finalDamage > 0 ||
-                sandbox.playerIncomingResult.blocked ||
-                sandbox.playerIncomingResult.dodged)
-                ? `${sandbox.playerIncomingResult.timestamp}-${sandbox.playerIncomingResult.finalDamage}-${sandbox.playerIncomingResult.type}`
-                : null
-            }
-            impactVariant={resolveImpactVariant(sandbox.playerIncomingResult)}
-            impactValue={resolveImpactValue(sandbox.playerIncomingResult)}
+            onProfileClick={onOpenProfile}
+            impactKey={impactEvent?.key ?? null}
+            impactVariant={impactEvent?.variant ?? "hit"}
+            impactValue={impactEvent?.value ?? null}
             onEquipmentSlotClick={onSelectEquipmentSlot}
           />
         </CombatOutcomeSilhouetteWrap>
@@ -307,7 +489,25 @@ function PlayerCombatPanel({
           <MiniPanel title="Utility">
             <div style={{ display: "grid", gap: "6px" }}>
               <button type="button" aria-label="Open builder" onClick={onOpenBuilder} style={buttonStyle}>Builder</button>
-              <button type="button" aria-label="Open build presets" onClick={onOpenBuildPresets} style={buttonStyle}>Builds</button>
+              <button
+                type="button"
+                aria-label="Open build presets"
+                onClick={onOpenBuildPresets}
+                style={{
+                  ...buttonStyle,
+                  ...(!buildConfigured
+                    ? {
+                        border: "1px solid rgba(102, 224, 138, 0.5)",
+                        background: "linear-gradient(180deg, rgba(72, 154, 88, 0.28), rgba(39, 99, 51, 0.16))",
+                        color: "#d8ffe0",
+                        boxShadow: "0 0 0 rgba(90, 207, 122, 0)",
+                        animation: "build-attention-pulse 1.9s ease-in-out infinite",
+                      }
+                    : {}),
+                }}
+              >
+                Builds
+              </button>
               <button type="button" aria-label="Open inventory" onClick={onOpenInventory} style={buttonStyle}>Inventory</button>
             </div>
           </MiniPanel>
@@ -358,41 +558,41 @@ function PlayerCombatPanel({
 
 function BotCombatPanel({
   sandbox,
+  botFigure,
   equipment,
   onOpenBuildPresets,
+  onOpenProfile,
   silhouetteState = null,
 }: {
   sandbox: CombatSandboxModel;
+  botFigure: CombatFigureId;
   equipment: Array<{ slot: EquipmentSlot; item: Item | null }>;
   onOpenBuildPresets: () => void;
+  onOpenProfile: () => void;
   silhouetteState?: "victory" | "defeat" | null;
 }) {
+  const impactEvent = useCombatImpactPulse(sandbox.botIncomingResult);
+
   return (
     <SidePanel
-      eyebrow="Target"
-      title="Bot"
-      note={formatMaybeTitle(sandbox.metrics.opponentWeaponDamageType)}
       silhouette={
-        <CombatOutcomeSilhouetteWrap side="bot" state={silhouetteState}>
-          <CombatSilhouette
-            title="Bot"
-            currentHp={sandbox.botCombatant?.currentHp ?? sandbox.botSnapshot.maxHp}
-            maxHp={sandbox.botCombatant?.maxHp ?? sandbox.botSnapshot.maxHp}
-            activeEffects={sandbox.botCombatant?.activeEffects ?? []}
-            equipmentSlots={equipment}
-            figure="vermin-tek"
-            impactKey={
-              sandbox.botIncomingResult &&
-              (sandbox.botIncomingResult.finalDamage > 0 ||
-                sandbox.botIncomingResult.blocked ||
-                sandbox.botIncomingResult.dodged)
-                ? `${sandbox.botIncomingResult.timestamp}-${sandbox.botIncomingResult.finalDamage}-${sandbox.botIncomingResult.type}`
-                : null
-            }
-            impactVariant={resolveImpactVariant(sandbox.botIncomingResult)}
-            impactValue={resolveImpactValue(sandbox.botIncomingResult)}
-          />
-        </CombatOutcomeSilhouetteWrap>
+        <div style={{ display: "grid", gap: "8px" }}>
+          <CombatOutcomeSilhouetteWrap side="bot" state={silhouetteState}>
+            <CombatSilhouette
+              title="Bot"
+              currentHp={sandbox.botCombatant?.currentHp ?? sandbox.botSnapshot.maxHp}
+              maxHp={sandbox.botCombatant?.maxHp ?? sandbox.botSnapshot.maxHp}
+              activeEffects={sandbox.botCombatant?.activeEffects ?? []}
+              equipmentSlots={equipment}
+              figure={botFigure}
+              onProfileClick={onOpenProfile}
+              impactKey={impactEvent?.key ?? null}
+              impactVariant={impactEvent?.variant ?? "hit"}
+              impactValue={impactEvent?.value ?? null}
+            />
+          </CombatOutcomeSilhouetteWrap>
+          <ResourceGrid resources={sandbox.botResources} layout="row" showHeader={false} />
+        </div>
       }
       sidebar={<BotCombatPanelSidebar sandbox={sandbox} onOpenBuildPresets={onOpenBuildPresets} />}
       blocks={[]}
@@ -416,9 +616,7 @@ function FightSetupPanel({
   onOpenSkillLoadout: () => void;
 }) {
   return (
-    <div data-testid="fight-setup-panel" style={{ ...shellStyle, padding: "16px", display: "grid", gap: "14px", alignContent: "start" }}>
-      <PanelHeader eyebrow="Control Hub" title="Fight Setup" note={selectedActionLabel} />
-
+    <div data-testid="fight-setup-panel" style={{ ...shellStyle, padding: "16px", display: "grid", gap: "12px", alignContent: "start" }}>
       <div style={{ display: "grid", gap: "12px" }}>
         <div style={{ display: "grid", gridTemplateColumns: "minmax(0, 0.92fr) minmax(0, 1.08fr)", gap: "12px", alignItems: "stretch" }}>
           <FightControlsPanel
@@ -937,7 +1135,7 @@ function BotCombatPanelSidebar({
               {sandbox.botBuildPreset.label}
             </div>
             <div style={{ fontSize: "8px", lineHeight: 1.25, color: "#cbbba8" }}>
-              {sandbox.botBuildPreset.archetype} Р Р†Р вЂљРЎС› {sandbox.botBuildPreset.targetFightLength}
+              {sandbox.botBuildPreset.archetype} vs {sandbox.botBuildPreset.targetFightLength}
             </div>
           </div>
         </div>
@@ -952,7 +1150,6 @@ function BotCombatPanelSidebar({
             { label: "Type", value: formatMaybeTitle(sandbox.metrics.opponentWeaponDamageType) },
           ]}
         />
-        <ResourceGrid resources={sandbox.botResources} />
       </MiniPanel>
     </div>
   );
@@ -975,25 +1172,18 @@ function BattleLogSection({
 }
 
 function SidePanel({
-  eyebrow,
-  title,
-  note,
   silhouette,
   sidebar = null,
   blocks,
   overlay = null,
 }: {
-  eyebrow: string;
-  title: string;
-  note: string;
   silhouette: ReactNode;
   sidebar?: ReactNode;
   blocks: ReactNode[];
   overlay?: ReactNode;
 }) {
   return (
-    <div style={{ ...shellStyle, padding: "16px", display: "grid", gap: "12px", alignContent: "start" }}>
-      <PanelHeader eyebrow={eyebrow} title={title} note={note} />
+    <div style={{ ...shellStyle, padding: "16px", display: "grid", gap: "10px", alignContent: "start" }}>
       <div style={{ ...panelStyle, padding: "12px", position: "relative" }}>
         <div style={sidebar ? { display: "grid", gridTemplateColumns: "minmax(0, 1fr) 132px", gap: "12px", alignItems: "stretch" } : undefined}>
           {silhouette}
@@ -1003,18 +1193,6 @@ function SidePanel({
       </div>
       {blocks.length > 0 ? <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>{blocks.slice(0, 2)}</div> : null}
       {blocks.length > 2 ? blocks[2] : null}
-    </div>
-  );
-}
-
-function PanelHeader({ eyebrow, title, note }: { eyebrow: string; title: string; note: string }) {
-  return (
-    <div style={{ display: "grid", gap: "4px" }}>
-      <div style={{ fontSize: "10px", fontWeight: 800, letterSpacing: "0.12em", textTransform: "uppercase", opacity: 0.66, color: "#e1b98f" }}>{eyebrow}</div>
-      <div style={{ display: "flex", justifyContent: "space-between", gap: "8px", alignItems: "baseline", flexWrap: "wrap" }}>
-        <div style={{ fontSize: "19px", fontWeight: 800, lineHeight: 1.05 }}>{title}</div>
-        <div style={{ fontSize: "10px", opacity: 0.66, color: "rgba(255,244,231,0.72)" }}>{note}</div>
-      </div>
     </div>
   );
 }
@@ -1466,8 +1644,14 @@ function StatGrid({ stats }: { stats: CharacterStats }) {
 
 function ResourceGrid({
   resources,
+  compact = false,
+  layout = "grid",
+  showHeader = true,
 }: {
   resources: { rage: number; guard: number; momentum: number; focus: number } | null;
+  compact?: boolean;
+  layout?: "grid" | "row";
+  showHeader?: boolean;
 }) {
   const items = [
     { key: "rage", label: "Rage", short: "R", icon: "✦", color: "#ee9abb" },
@@ -1480,28 +1664,39 @@ function ResourceGrid({
     <div
       style={{
         ...panelStyle,
-        padding: "9px 10px",
+        padding: layout === "row" ? "6px 8px" : compact ? "8px" : "9px 10px",
         display: "grid",
-        gap: "7px",
+        gap: layout === "row" ? "5px" : "7px",
       }}
     >
-      <div style={{ display: "flex", justifyContent: "space-between", gap: "8px", alignItems: "center" }}>
-        <div style={{ fontSize: "9px", textTransform: "uppercase", letterSpacing: "0.1em", opacity: 0.68 }}>Resource Gain</div>
-        <div
-          style={{
-            borderRadius: "999px",
-            padding: "2px 6px",
-            fontSize: "8px",
-            fontWeight: 700,
-            background: "rgba(255,255,255,0.06)",
-            color: "#e7d9c8",
-            border: "1px solid rgba(255,255,255,0.1)",
-          }}
-        >
-          {(resources?.rage ?? 0) + (resources?.guard ?? 0) + (resources?.momentum ?? 0) + (resources?.focus ?? 0)} stored
+      {showHeader ? (
+        <div style={{ display: "flex", justifyContent: "space-between", gap: "8px", alignItems: "center" }}>
+          <div style={{ fontSize: "9px", textTransform: "uppercase", letterSpacing: "0.1em", opacity: 0.68 }}>
+            {compact ? "Resource" : "Resource Gain"}
+          </div>
+          <div
+            style={{
+              borderRadius: "999px",
+              padding: "2px 6px",
+              fontSize: "8px",
+              fontWeight: 700,
+              background: "rgba(255,255,255,0.06)",
+              color: "#e7d9c8",
+              border: "1px solid rgba(255,255,255,0.1)",
+            }}
+          >
+            {(resources?.rage ?? 0) + (resources?.guard ?? 0) + (resources?.momentum ?? 0) + (resources?.focus ?? 0)} stored
+          </div>
         </div>
-      </div>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, minmax(0, 1fr))", gap: "5px" }}>
+      ) : null}
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns:
+            layout === "row" ? "repeat(4, minmax(0, 1fr))" : compact ? "repeat(2, minmax(0, 1fr))" : "repeat(4, minmax(0, 1fr))",
+          gap: layout === "row" ? "4px" : compact ? "6px" : "5px",
+        }}
+      >
         {items.map((item) => {
           const value = resources?.[item.key] ?? 0;
           const progress = Math.min(1, value / 6);
@@ -1516,19 +1711,19 @@ function ResourceGrid({
               }
               style={{
                 borderRadius: "12px",
-                padding: "7px 6px",
+                padding: layout === "row" ? "5px 4px" : compact ? "6px 5px" : "7px 6px",
                 background: "rgba(255,255,255,0.03)",
                 border: "1px solid rgba(255,255,255,0.08)",
                 textAlign: "center",
                 display: "grid",
-                gap: "6px",
+                gap: layout === "row" ? "4px" : "6px",
               }}
               title={`${item.label}: ${value}`}
             >
               <div
                 style={{
-                  width: "32px",
-                  height: "32px",
+                  width: layout === "row" ? "24px" : compact ? "28px" : "32px",
+                  height: layout === "row" ? "24px" : compact ? "28px" : "32px",
                   margin: "0 auto",
                   borderRadius: "999px",
                   display: "grid",
@@ -1539,27 +1734,36 @@ function ResourceGrid({
               >
                 <div
                   style={{
-                    width: "24px",
-                    height: "24px",
+                    width: layout === "row" ? "16px" : compact ? "20px" : "24px",
+                    height: layout === "row" ? "16px" : compact ? "20px" : "24px",
                     borderRadius: "999px",
                     background: "rgba(18,16,15,0.94)",
                     border: "1px solid rgba(255,255,255,0.08)",
                     display: "grid",
                     placeItems: "center",
                     color: item.color,
-                    fontSize: "11px",
+                    fontSize: layout === "row" ? "8px" : compact ? "10px" : "11px",
                     fontWeight: 900,
                     lineHeight: 1,
                     position: "relative",
                   }}
                 >
-                  <span style={{ position: "absolute", inset: 0, display: "grid", placeItems: "center", fontSize: "10px", opacity: 0.28 }}>
+                  <span
+                    style={{
+                      position: "absolute",
+                      inset: 0,
+                      display: "grid",
+                      placeItems: "center",
+                      fontSize: layout === "row" ? "7px" : compact ? "9px" : "10px",
+                      opacity: 0.28,
+                    }}
+                  >
                     {item.icon}
                   </span>
                   <span style={{ position: "relative", zIndex: 1 }}>{item.short}</span>
                 </div>
               </div>
-              <div style={{ fontSize: "13px", fontWeight: 800 }}>{value}</div>
+              <div style={{ fontSize: layout === "row" ? "11px" : compact ? "12px" : "13px", fontWeight: 800 }}>{value}</div>
             </div>
           );
         })}
@@ -2595,6 +2799,9 @@ function formatConsumableUsageLabel(usageMode: "replace_attack" | "with_attack")
   }
 }
 
+function resolvePresetFigure(presetId: string, fallback: CombatFigureId): CombatFigureId {
+  return presetFigureById[presetId] ?? fallback;
+}
 
 function resolveSelectedActionLabel(sandbox: ReturnType<typeof useCombatSandbox>) {
   const selectedAction = sandbox.selectedAction;
@@ -2644,6 +2851,81 @@ function resolveImpactValue(result: CombatSandboxModel["playerIncomingResult"]) 
   }
 
   return result.finalDamage > 0 ? result.finalDamage : null;
+}
+
+function useCombatImpactPulse(result: CombatSandboxModel["playerIncomingResult"]) {
+  const [event, setEvent] = useState<null | { key: string; variant: ReturnType<typeof resolveImpactVariant>; value: number | null }>(
+    null
+  );
+  const lastKeyRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    const rawKey =
+      result && (result.finalDamage > 0 || result.blocked || result.dodged)
+        ? `${result.timestamp}-${result.attackerId}-${result.finalDamage}-${result.type}-${result.crit ? "crit" : "normal"}-${result.blocked ? "block" : "open"}-${result.dodged ? "dodge" : "land"}`
+        : null;
+
+    if (!rawKey) {
+      debugCombatImpact("skip", { reason: "no-impact", result });
+      return;
+    }
+
+    if (lastKeyRef.current === rawKey) {
+      debugCombatImpact("skip", { reason: "duplicate-key", key: rawKey, result });
+      return;
+    }
+
+    lastKeyRef.current = rawKey;
+    const nextEvent = {
+      key: rawKey,
+      variant: resolveImpactVariant(result),
+      value: resolveImpactValue(result),
+    };
+
+    debugCombatImpact("emit", nextEvent);
+    setEvent(nextEvent);
+
+    const timeoutId = window.setTimeout(() => {
+      setEvent((current) => {
+        if (current?.key === rawKey) {
+          debugCombatImpact("clear", { key: rawKey });
+          return null;
+        }
+
+        return current;
+      });
+    }, 0);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [result]);
+
+  return event;
+}
+
+function debugCombatImpact(stage: "emit" | "clear" | "skip", payload: unknown) {
+  if (!isCombatImpactDebugEnabled()) {
+    return;
+  }
+
+  console.debug("[combat-impact]", stage, payload);
+}
+
+function isCombatImpactDebugEnabled() {
+  if (typeof window === "undefined") {
+    return false;
+  }
+
+  const debugFlag = (window as Window & { __FIGHT_CLUB_DEBUG_IMPACTS__?: unknown }).__FIGHT_CLUB_DEBUG_IMPACTS__;
+
+  if (debugFlag === true) {
+    return true;
+  }
+
+  try {
+    return window.localStorage.getItem("fight-club-debug-impacts") === "true";
+  } catch {
+    return false;
+  }
 }
 
 function resolveSelectedActionSummary(sandbox: ReturnType<typeof useCombatSandbox>) {
@@ -2712,3 +2994,47 @@ function resolveSelectedActionTags(sandbox: ReturnType<typeof useCombatSandbox>)
 
   return tags;
 }
+
+function buildProfileDerivedStats(input: {
+  totalDamage: number;
+  stats: CharacterStats;
+  totalArmor: number;
+  dodgeBonus: number;
+  critBonus: number;
+  totalCritMultiplier: number;
+  baseBlockPenetrationValue: number;
+  armorPenetrationPercent: DamageProfile;
+}) {
+  const totalDodge = baseDodgeChance(input.stats.agility) + input.dodgeBonus;
+  const totalCrit = baseCritChance(input.stats.rage) + input.critBonus;
+  const antiDodge = Math.min(
+    combatChanceCaps.dodgeChance,
+    Math.max(0, input.stats.agility * combatFormulaConfig.attackerAgilityDodgePenaltyFactor)
+  );
+  const antiCrit = Math.min(
+    combatChanceCaps.baseCritChance,
+    Math.max(0, input.stats.rage * combatFormulaConfig.defenderRageCritPenaltyFactor)
+  );
+  const totalArmorPenetration = totalProfileValue(input.armorPenetrationPercent);
+
+  return [
+    { label: "Damage", value: String(input.totalDamage), helper: "Current total damage after weapon, stat and gear bonuses." },
+    { label: "Armor", value: String(input.totalArmor), helper: "Total armor across all damage types." },
+    { label: "Dodge", value: `${totalDodge}%`, helper: `Base ${baseDodgeChance(input.stats.agility)}% + bonuses ${input.dodgeBonus}%.` },
+    { label: "Crit Chance", value: `${totalCrit}%`, helper: `Base ${baseCritChance(input.stats.rage)}% + bonuses ${input.critBonus}%.` },
+    { label: "Anti-Dodge", value: `${antiDodge}%`, helper: "How much enemy dodge is suppressed by your agility." },
+    { label: "Anti-Crit", value: `${antiCrit}%`, helper: "How much enemy crit chance is suppressed by your rage." },
+    { label: "Crit Damage", value: `x${input.totalCritMultiplier.toFixed(2)}`, helper: "Base multiplier plus endurance and gear bonuses." },
+    { label: "Block Penetration", value: `${input.baseBlockPenetrationValue}%`, helper: "Base pressure through guarded hits from strength." },
+    { label: "Armor Pen", value: `${totalArmorPenetration}%`, helper: "Combined item-based armor penetration profile." },
+  ];
+}
+
+function formatIdLabel(value: string) {
+  return value
+    .split("-")
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" ");
+}
+

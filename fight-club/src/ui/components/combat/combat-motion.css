@@ -131,7 +131,9 @@
 }
 
 .combat-silhouette-hit-flash {
+  opacity: 0;
   will-change: opacity, transform;
+  animation-fill-mode: forwards;
 }
 
 .combat-silhouette-hit-flash--hit {
@@ -203,12 +205,16 @@
 }
 
 .combat-silhouette-frame-glow {
-  animation: combat-silhouette-frame-glow 5s ease-out;
+  opacity: 0;
+  animation: combat-silhouette-frame-glow 2.5s ease-out;
+  animation-fill-mode: forwards;
   will-change: opacity;
 }
 
 .combat-silhouette-block-break-frame {
-  animation: combat-silhouette-frame-glow 5s ease-out;
+  opacity: 0;
+  animation: combat-silhouette-frame-glow 2.5s ease-out;
+  animation-fill-mode: forwards;
   will-change: opacity;
 }
 
@@ -230,7 +236,9 @@
 }
 
 .combat-silhouette-block-sigil {
-  animation: combat-silhouette-block-sigil 5s ease-out;
+  opacity: 0;
+  animation: combat-silhouette-block-sigil 2.5s ease-out;
+  animation-fill-mode: forwards;
   will-change: opacity, transform;
 }
 
@@ -252,7 +260,9 @@
 }
 
 .combat-silhouette-crit-sigil {
-  animation: combat-silhouette-crit-sigil 5s ease-out;
+  opacity: 0;
+  animation: combat-silhouette-crit-sigil 2.5s ease-out;
+  animation-fill-mode: forwards;
   will-change: opacity, transform;
 }
 
@@ -274,7 +284,9 @@
 }
 
 .combat-silhouette-block-break-sigil {
-  animation: combat-silhouette-block-break-sigil 5s ease-out;
+  opacity: 0;
+  animation: combat-silhouette-block-break-sigil 2.5s ease-out;
+  animation-fill-mode: forwards;
   will-change: opacity, transform;
 }
 
@@ -305,36 +317,38 @@
   font-style: italic;
   font-weight: 900;
   text-transform: uppercase;
+  opacity: 0;
   text-shadow:
     0 2px 0 rgba(18, 12, 11, 0.9),
     0 8px 20px rgba(0, 0, 0, 0.42);
-  animation: combat-silhouette-impact-text 4s ease-out;
+  animation: combat-silhouette-impact-text 2s ease-out;
+  animation-fill-mode: forwards;
   will-change: opacity, transform, letter-spacing;
 }
 
 .combat-silhouette-impact-text--hit {
   color: #ffc7b7;
-  animation-duration: 4s;
+  animation-duration: 2s;
 }
 
 .combat-silhouette-impact-text--crit {
   color: #ffd2d2;
-  animation-duration: 4s;
+  animation-duration: 2s;
 }
 
 .combat-silhouette-impact-text--block {
   color: #d6eeff;
-  animation-duration: 4s;
+  animation-duration: 2s;
 }
 
 .combat-silhouette-impact-text--block_break {
   color: #ffbf7d;
-  animation-duration: 4s;
+  animation-duration: 2s;
 }
 
 .combat-silhouette-impact-text--dodge {
   color: #c8fff1;
-  animation-duration: 4s;
+  animation-duration: 2s;
 }
 
 @keyframes combat-finish-winner-left {

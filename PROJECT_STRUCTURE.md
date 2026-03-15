@@ -1,6 +1,6 @@
 # PROJECT_STRUCTURE - Fight Club
 
-> Last updated: 2026-03-14 22:20 MSK
+> Last updated: 2026-03-15 17:30 MSK
 
 **Project root:** `c:/Users/dtphs/.vscode/Project`
 
@@ -21,6 +21,7 @@ Main app tree:
 
 ```text
 fight-club/
+|-- ART/                   # Raw art source files for avatars and future visual assets
 |-- features/              # Feature-level task and change tracking docs
 |-- MASTER-PLAN.md         # Global master plan for active tasks and sprint history
 |-- docs/                  # Local project notes, backup points, and balance artifacts
@@ -42,6 +43,7 @@ fight-club/
 Notes:
 
 - `dist/` is generated output, never source
+- `ART/Avatars/` now stores the raw `.png` source portraits; `src/assets/combat/*.jpg` are the compressed runtime silhouettes
 - `vite.config.js` / `vitest.config.js` and matching `.d.ts` files are generated beside the TypeScript sources
 - `docs/balance/` stores generated preset matchup reports
 - `docs/backup-points/` now stores both documentation markers and restorable UI baseline snapshots
@@ -160,6 +162,10 @@ Storage fact:
 
 - character models and stat allocation logic
 
+### `profile`
+
+- local profile meta, battle record, showcase content, and lightweight mailbox helpers
+
 ### `combat`
 
 - combat state, snapshots, zones, resources, skills, round actions, round results
@@ -235,6 +241,7 @@ Current preset fact:
 
 - `combatSandboxConfigs.ts` now holds 7 curated build presets with recommended skill panels and consumables
 - `combatSandboxSupport.ts` now clips bot stat allocations to the current player allocation budget in sandbox flow
+- `BuildPresetsPopover.tsx` now renders those presets in a compact one-page `2 x 3` browser with avatar previews and color-zoned details
 
 ---
 
@@ -242,11 +249,11 @@ Current preset fact:
 
 ### `components/combat`
 
-- `CombatSilhouette.tsx` - silhouette, body zones, equipment slot buttons, status effects above HP
+- `CombatSilhouette.tsx` - silhouette, body zones, equipment slot buttons, status effects above HP, and latched one-shot impact overlays
 - `BattleLogPanel.tsx` - battle log UI
 - `battleLogFormatting.ts` - battle log formatter
 - `BuilderPopover.tsx` - build and matchup panel
-- `BuildPresetsPopover.tsx` - dedicated curated build browser and preset applier
+- `BuildPresetsPopover.tsx` - dedicated curated build browser and preset applier with compact `2 x 3` layout and styled detail zones
 - `InventoryPopover.tsx` - inventory browser
 - `EquipmentSlotPopover.tsx` - slot gear manager
 - `ItemPresentationCard.tsx` - full item card with prominent `Weapon Passive` and `Signature Skill` blocks
@@ -283,6 +290,7 @@ Backup artifacts intentionally kept:
 - `Combat/CombatSandboxScreen.tsx`
 - `CombatRules/CombatRulesScreen.tsx`
 - `Hunting/HuntingScreen.tsx`
+- `components/profile/ProfileModal.tsx` - local profile card with mailbox mini modal, reply flow, and direct letters
 - `CombatRules/combatRulesContent.ts` - localized Combat Codex content
 - `CombatRules/combatRulesFacts.ts` - generated item/skill facts from live starter content
 
@@ -293,6 +301,7 @@ Current UI facts:
 - hunting is now accessible from the main menu through `Hunting Lodge`
 - hunting has its own live UI shell, separate from combat sandbox
 - status effects live above HP to avoid spending extra vertical space
+- combat impact text and block/crit/break visuals now use one-shot pulse wiring plus fade-safe CSS so overlays do not reappear after their animation ends
 - hover popups for items and effects are now part of the real live UI contract
 - item cards and preset equipment previews surface weapon passives and key item skills as primary feature blocks
 - `src/ui/components/shared/` now exists as the first extracted UI-foundation layer for `UI-002`
@@ -359,4 +368,4 @@ Current status:
 
 ---
 
-> Last updated: 2026-03-14 18:08 MSK
+> Last updated: 2026-03-15 16:11 MSK

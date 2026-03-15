@@ -8,9 +8,8 @@ interface PreviewSurfaceProps {
 const baseStyle: CSSProperties = {
   borderRadius: "18px",
   border: "1px solid rgba(255,255,255,0.12)",
-  background:
-    "linear-gradient(180deg, rgba(25,22,27,0.98), rgba(14,13,18,0.98)), radial-gradient(circle at top, rgba(255,214,164,0.08), transparent 32%)",
-  boxShadow: "0 24px 40px rgba(0,0,0,0.34)",
+  background: "linear-gradient(180deg, rgb(27,24,29), rgb(16,15,20))",
+  boxShadow: "0 24px 40px rgba(0,0,0,0.42)",
   padding: "8px",
 };
 

@@ -54,7 +54,7 @@ export function InventoryPopover({
             borderBottom: "1px solid rgba(255,255,255,0.08)",
             display: "grid",
             gap: "10px",
-            background: "linear-gradient(180deg, rgba(62,128,199,0.14), rgba(255,255,255,0.02))",
+            background: "linear-gradient(180deg, rgb(31,51,72), rgb(18,22,30))",
           }}
         >
           <div style={{ display: "flex", justifyContent: "space-between", gap: "12px", alignItems: "start", flexWrap: "wrap" }}>
@@ -140,7 +140,7 @@ export function InventoryPopover({
                                   borderRadius: "999px",
                                   padding: "3px 7px",
                                   fontSize: "9px",
-                                  background: equipped ? "rgba(255,255,255,0.14)" : "rgba(255,255,255,0.08)",
+                                  background: equipped ? "rgb(58,64,76)" : "rgb(34,37,44)",
                                   border: "1px solid rgba(255,255,255,0.12)",
                                 }}
                               >
@@ -194,7 +194,7 @@ function SummaryPill({ label, value }: { label: string; value: string }) {
     <PanelCard
       style={{
         padding: "8px 10px",
-        background: "rgba(255,255,255,0.045)",
+        background: "rgb(32,35,42)",
         display: "grid",
         gap: "2px",
       }}

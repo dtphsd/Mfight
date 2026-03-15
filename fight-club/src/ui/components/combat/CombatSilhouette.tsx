@@ -2,7 +2,13 @@ import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 
 import type { ActiveCombatEffect } from "@/modules/combat";
 import type { EquipmentSlot } from "@/modules/equipment";
 import type { Item } from "@/modules/inventory";
+import houndDriveFigure from "@/assets/combat/Hound-Drive.jpg";
+import kitsuneBitFigure from "@/assets/combat/Kitsune-Bit.jpg";
+import neoScopeFigure from "@/assets/combat/Neo-Scope.jpg";
+import quackCoreFigure from "@/assets/combat/Quack-Core.jpg";
+import razorBoarFigure from "@/assets/combat/Razor-Boar.jpg";
 import rushChipFigure from "@/assets/combat/Rush-Chip.jpg";
+import trashFluxFigure from "@/assets/combat/Trash-Flux.jpg";
 import verminTekFigure from "@/assets/combat/Vermin-Tek.jpg";
 import { CombatImpactOverlay } from "@/ui/components/combat/CombatImpactOverlay";
 import { ItemPreviewPopover } from "@/ui/components/shared/ItemPreviewPopover";
@@ -13,61 +19,30 @@ import {
   type CombatImpactVariant,
 } from "./combatImpactMotion";
 
+export type CombatFigureId =
+  | "hound-drive"
+  | "kitsune-bit"
+  | "neo-scope"
+  | "quack-core"
+  | "razor-boar"
+  | "rush-chip"
+  | "trash-flux"
+  | "vermin-tek";
+
 interface CombatSilhouetteProps {
   title: string;
   currentHp: number;
   maxHp: number;
   activeEffects?: ActiveCombatEffect[];
   equipmentSlots?: Array<{ slot: EquipmentSlot; item: Item | null }>;
-  figure: "rush-chip" | "vermin-tek";
+  figure: CombatFigureId;
   mirrored?: boolean;
   impactKey?: string | number | null;
   impactVariant?: CombatImpactVariant;
   impactValue?: number | null;
   onEquipmentSlotClick?: (slot: EquipmentSlot) => void;
+  onProfileClick?: () => void;
 }
-
-type MarkerKey = "hit" | "block" | "crit" | "penetration" | "dodge";
-
-interface MarkerDefinition {
-  key: MarkerKey;
-  label: string;
-  background: string;
-  glow: string;
-}
-
-const markerDefinitions: Record<MarkerKey, MarkerDefinition> = {
-  hit: {
-    key: "hit",
-    label: "hit",
-    background: "rgba(255,179,108,0.22)",
-    glow: "rgba(255,179,108,0.35)",
-  },
-  block: {
-    key: "block",
-    label: "block",
-    background: "rgba(105,219,194,0.2)",
-    glow: "rgba(105,219,194,0.34)",
-  },
-  crit: {
-    key: "crit",
-    label: "crit",
-    background: "rgba(232,72,72,0.22)",
-    glow: "rgba(232,72,72,0.34)",
-  },
-  penetration: {
-    key: "penetration",
-    label: "penetration",
-    background: "rgba(196,59,42,0.22)",
-    glow: "rgba(196,59,42,0.34)",
-  },
-  dodge: {
-    key: "dodge",
-    label: "dodge",
-    background: "rgba(90,192,255,0.22)",
-    glow: "rgba(90,192,255,0.35)",
-  },
-};
 
 const equipmentSlotPositions: Record<EquipmentSlot, CSSProperties> = {
   helmet: { top: 8, left: 2 },
@@ -91,19 +66,35 @@ export function CombatSilhouette({
   impactVariant = "hit",
   impactValue = null,
   onEquipmentSlotClick,
+  onProfileClick,
 }: CombatSilhouetteProps) {
   const [hoveredEquipmentSlot, setHoveredEquipmentSlot] = useState<EquipmentSlot | null>(null);
   const [motionActive, setMotionActive] = useState(false);
   const [lingerActive, setLingerActive] = useState(false);
   const [lingerToken, setLingerToken] = useState(0);
+  const [activeImpact, setActiveImpact] = useState<{ variant: CombatImpactVariant; value: number | null }>({
+    variant: impactVariant,
+    value: impactValue,
+  });
+  const lastImpactKeyRef = useRef<string | number | null>(null);
 
   useEffect(() => {
     if (!impactKey) {
+      lastImpactKeyRef.current = null;
       return;
     }
 
+    if (lastImpactKeyRef.current === impactKey) {
+      return;
+    }
+
+    lastImpactKeyRef.current = impactKey;
     setMotionActive(false);
     setLingerActive(false);
+    setActiveImpact({
+      variant: impactVariant,
+      value: impactValue,
+    });
     const frameId = window.requestAnimationFrame(() => {
       setMotionActive(true);
       setLingerActive(true);
@@ -127,8 +118,9 @@ export function CombatSilhouette({
         motionActive={motionActive}
         lingerActive={lingerActive}
         lingerToken={lingerToken}
-        impactVariant={impactVariant}
-        impactValue={impactValue}
+        impactVariant={activeImpact.variant}
+        impactValue={activeImpact.value}
+        onProfileClick={onProfileClick}
       >
         <SilhouetteFigure figure={figure} mirrored={mirrored} />
 
@@ -140,7 +132,6 @@ export function CombatSilhouette({
         />
       </SilhouetteBoard>
 
-      <SilhouetteLegend />
     </div>
   );
 }
@@ -212,6 +203,7 @@ function SilhouetteBoard({
   lingerToken = 0,
   impactVariant = "hit",
   impactValue = null,
+  onProfileClick,
   children,
 }: {
   motionActive?: boolean;
@@ -219,6 +211,7 @@ function SilhouetteBoard({
   lingerToken?: number;
   impactVariant?: CombatImpactVariant;
   impactValue?: number | null;
+  onProfileClick?: () => void;
   children: ReactNode;
 }) {
   return (
@@ -240,6 +233,36 @@ function SilhouetteBoard({
         overflow: "hidden",
       }}
     >
+      {onProfileClick ? (
+        <button
+          type="button"
+          aria-label="Open character profile"
+          onClick={onProfileClick}
+          title="Open profile"
+          style={{
+            position: "absolute",
+            top: "10px",
+            left: "50%",
+            transform: "translateX(-50%)",
+            width: "22px",
+            height: "22px",
+            borderRadius: "999px",
+            border: "1px solid rgba(255,255,255,0.18)",
+            background: "linear-gradient(180deg, rgba(22,23,28,0.92), rgba(12,13,17,0.92))",
+            color: "#f5e7d4",
+            fontSize: "12px",
+            fontWeight: 800,
+            lineHeight: 1,
+            display: "grid",
+            placeItems: "center",
+            cursor: "pointer",
+            zIndex: 6,
+            boxShadow: "0 8px 18px rgba(0,0,0,0.28), inset 0 1px 0 rgba(255,255,255,0.05)",
+          }}
+        >
+          i
+        </button>
+      ) : null}
       <CombatImpactOverlay
         key={lingerToken}
         lingerActive={lingerActive}
@@ -255,23 +278,10 @@ function SilhouetteFigure({
   figure,
   mirrored = false,
 }: {
-  figure: "rush-chip" | "vermin-tek";
+  figure: CombatFigureId;
   mirrored?: boolean;
 }) {
-  const figureMeta =
-    figure === "rush-chip"
-      ? {
-          src: rushChipFigure,
-          width: 320,
-          height: 320,
-          translateY: "-46%",
-        }
-      : {
-          src: verminTekFigure,
-          width: 312,
-          height: 312,
-          translateY: "-45%",
-        };
+  const figureMeta = figureMetas[figure];
 
   return (
     <div style={{ position: "absolute", inset: 0, pointerEvents: "none" }}>
@@ -289,6 +299,8 @@ function SilhouetteFigure({
         }}
       >
         <img
+          data-testid="combat-silhouette-image"
+          data-figure={figure}
           src={figureMeta.src}
           alt=""
           aria-hidden="true"
@@ -309,17 +321,56 @@ function SilhouetteFigure({
   );
 }
 
-function SilhouetteLegend() {
-  return (
-    <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", justifyContent: "center", fontSize: "11px", opacity: 0.82 }}>
-      <LegendIcon markerKey="hit" />
-      <LegendIcon markerKey="block" />
-      <LegendIcon markerKey="crit" />
-      <LegendIcon markerKey="penetration" />
-      <LegendIcon markerKey="dodge" />
-    </div>
-  );
-}
+const figureMetas: Record<CombatFigureId, { src: string; width: number; height: number; translateY: string }> = {
+  "hound-drive": {
+    src: houndDriveFigure,
+    width: 318,
+    height: 318,
+    translateY: "-45%",
+  },
+  "kitsune-bit": {
+    src: kitsuneBitFigure,
+    width: 318,
+    height: 318,
+    translateY: "-46%",
+  },
+  "neo-scope": {
+    src: neoScopeFigure,
+    width: 318,
+    height: 318,
+    translateY: "-45%",
+  },
+  "quack-core": {
+    src: quackCoreFigure,
+    width: 318,
+    height: 318,
+    translateY: "-45%",
+  },
+  "razor-boar": {
+    src: razorBoarFigure,
+    width: 320,
+    height: 320,
+    translateY: "-45%",
+  },
+  "rush-chip": {
+    src: rushChipFigure,
+    width: 320,
+    height: 320,
+    translateY: "-46%",
+  },
+  "trash-flux": {
+    src: trashFluxFigure,
+    width: 320,
+    height: 320,
+    translateY: "-45%",
+  },
+  "vermin-tek": {
+    src: verminTekFigure,
+    width: 312,
+    height: 312,
+    translateY: "-45%",
+  },
+};
 
 function SilhouetteEquipmentLayer({
   equipmentSlots,
@@ -759,47 +810,6 @@ function EquipmentItemPopover({
   );
 }
 
-function LegendIcon({ markerKey }: { markerKey: MarkerKey }) {
-  const marker = markerDefinitions[markerKey];
-
-  return (
-    <span style={{ display: "inline-flex", alignItems: "center", gap: "6px", padding: "4px 8px", borderRadius: "999px", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}>
-      <span
-        style={{
-          minWidth: "20px",
-          height: "20px",
-          borderRadius: "999px",
-          background: "rgba(255,255,255,0.08)",
-          display: "inline-flex",
-          alignItems: "center",
-          justifyContent: "center",
-          border: "1px solid rgba(255,255,255,0.14)",
-        }}
-      >
-        {renderMarkerIcon(markerKey, 12)}
-      </span>
-      <span style={{ color: "rgba(255,244,231,0.82)" }}>{marker.label}</span>
-    </span>
-  );
-}
-
-function renderMarkerIcon(markerKey: MarkerKey, size: number): ReactNode {
-  switch (markerKey) {
-    case "hit":
-      return <SwordIcon size={size} />;
-    case "block":
-      return <ShieldIcon size={size} />;
-    case "crit":
-      return <BloodDropIcon size={size} />;
-    case "penetration":
-      return <BrokenShieldIcon size={size} />;
-    case "dodge":
-      return <DodgeIcon size={size} />;
-    default:
-      return null;
-  }
-}
-
 function renderEquipmentSlotIcon(slot: EquipmentSlot, size: number): ReactNode {
   switch (slot) {
     case "mainHand":
@@ -1017,70 +1027,6 @@ function ShieldIcon({ size }: { size: number }) {
         strokeLinejoin="round"
       />
       <path d="M12 4.4v14.8" stroke="#d9fff8" strokeWidth="1.2" opacity="0.7" />
-    </svg>
-  );
-}
-
-function BrokenShieldIcon({ size }: { size: number }) {
-  return (
-    <svg viewBox="0 0 24 24" width={size} height={size} aria-hidden="true">
-      <path d="M12 2 5 5v6c0 5.1 2.8 8.7 7 11 4.2-2.3 7-5.9 7-11V5l-7-3Z" fill="#ff6e63" opacity="0.25" />
-      <path
-        d="M12 2 5 5v6c0 5.1 2.8 8.7 7 11V2Z"
-        fill="#ff8978"
-        stroke="#ffd7cf"
-        strokeWidth="1.2"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M12 2v20c4.2-2.3 7-5.9 7-11V5l-7-3Z"
-        fill="#c43b2a"
-        stroke="#ffd7cf"
-        strokeWidth="1.2"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M12.2 4.8 10.1 9.4l1.7 1.6-2.4 3.2 1.4 1.4-1.8 3.4"
-        fill="none"
-        stroke="#fff0ec"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
-function BloodDropIcon({ size }: { size: number }) {
-  return (
-    <svg viewBox="0 0 24 24" width={size} height={size} aria-hidden="true">
-      <path
-        d="M12 3c2.7 4 5.5 7 5.5 10.6A5.5 5.5 0 1 1 6.5 13.6C6.5 10 9.3 7 12 3Z"
-        fill="#f06262"
-        stroke="#ffd1d1"
-        strokeWidth="1.1"
-      />
-      <circle cx="10.5" cy="15" r="1.2" fill="#ffd8d8" opacity="0.8" />
-    </svg>
-  );
-}
-
-function DodgeIcon({ size }: { size: number }) {
-  return (
-    <svg viewBox="0 0 24 24" width={size} height={size} aria-hidden="true">
-      <path
-        d="M12 4c4.8 0 8 2.7 8 6.7S16.8 17.4 12 20c-4.8-2.6-8-5.3-8-9.3S7.2 4 12 4Z"
-        fill="none"
-        stroke="#8bd1ff"
-        strokeWidth="1.4"
-      />
-      <path
-        d="M12 7.2c2.6 0 4.3 1.4 4.3 3.5S14.6 14.9 12 16.4c-2.6-1.5-4.3-3.3-4.3-5.7S9.4 7.2 12 7.2Z"
-        fill="none"
-        stroke="#d9f3ff"
-        strokeWidth="1.2"
-      />
-      <circle cx="12" cy="10.8" r="1.4" fill="#d9f3ff" />
     </svg>
   );
 }

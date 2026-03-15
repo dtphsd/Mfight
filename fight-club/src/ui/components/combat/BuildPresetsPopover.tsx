@@ -1,8 +1,15 @@
-import { useMemo, useState, type CSSProperties } from "react";
-
+import { useMemo, useState, type CSSProperties, type ReactNode } from "react";
 import { starterItems } from "@/content/items/starterItems";
-import { getWeaponClassPassivePreview } from "@/modules/combat/config/combatWeaponPassives";
+import type { CombatSkill } from "@/modules/combat";
+import type { Item } from "@/modules/inventory";
 import type { CombatBuildPreset } from "@/orchestration/combat/combatSandboxConfigs";
+import rushChipFigure from "@/assets/combat/Rush-Chip.jpg";
+import kitsuneBitFigure from "@/assets/combat/Kitsune-Bit.jpg";
+import quackCoreFigure from "@/assets/combat/Quack-Core.jpg";
+import neoScopeFigure from "@/assets/combat/Neo-Scope.jpg";
+import razorBoarFigure from "@/assets/combat/Razor-Boar.jpg";
+import houndDriveFigure from "@/assets/combat/Hound-Drive.jpg";
+import trashFluxFigure from "@/assets/combat/Trash-Flux.jpg";
 import { ActionButton } from "@/ui/components/shared/ActionButton";
 import { ModalOverlay } from "@/ui/components/shared/ModalOverlay";
 import { ModalSurface } from "@/ui/components/shared/ModalSurface";
@@ -16,11 +23,65 @@ interface BuildPresetsPopoverProps {
   onClose: () => void;
 }
 
-const secondaryButtonStyle: CSSProperties = {
-  padding: "8px 12px",
-  color: "#fff2df",
+const figureByPresetId: Record<string, string> = {
+  "sword-bleed": rushChipFigure,
+  "shield-guard": quackCoreFigure,
+  "dagger-crit": kitsuneBitFigure,
+  "mace-control": neoScopeFigure,
+  "axe-pressure": razorBoarFigure,
+  "heavy-two-hand": houndDriveFigure,
+  "sustain-regen": trashFluxFigure,
+};
+
+const presetToneByArchetype: Record<string, { accent: string; border: string; soft: string }> = {
+  Pressure: { accent: "#f0a286", border: "rgba(229,115,79,0.34)", soft: "rgba(229,115,79,0.14)" },
+  Defense: { accent: "#b7d5ff", border: "rgba(92,149,227,0.34)", soft: "rgba(92,149,227,0.14)" },
+  Burst: { accent: "#ee9abb", border: "rgba(216,93,145,0.34)", soft: "rgba(216,93,145,0.14)" },
+  Control: { accent: "#ccc0ff", border: "rgba(130,111,213,0.34)", soft: "rgba(130,111,213,0.14)" },
+  Tempo: { accent: "#ffcf8a", border: "rgba(214,177,95,0.34)", soft: "rgba(214,177,95,0.14)" },
+  Heavy: { accent: "#f2c3a7", border: "rgba(176,126,96,0.34)", soft: "rgba(176,126,96,0.14)" },
+  Sustain: { accent: "#87e2cf", border: "rgba(92,199,178,0.34)", soft: "rgba(92,199,178,0.14)" },
+};
+
+const zoneStyles = {
+  equipment: {
+    border: "rgba(164, 138, 112, 0.24)",
+    background: "linear-gradient(180deg, rgba(57,45,37,0.34), rgba(26,22,19,0.4))",
+    glow: "rgba(214,177,95,0.08)",
+  },
+  skills: {
+    border: "rgba(118, 124, 198, 0.24)",
+    background: "linear-gradient(180deg, rgba(34,36,62,0.34), rgba(20,21,34,0.4))",
+    glow: "rgba(130,111,213,0.10)",
+  },
+  consumables: {
+    border: "rgba(184, 144, 74, 0.24)",
+    background: "linear-gradient(180deg, rgba(64,48,26,0.34), rgba(30,24,15,0.42))",
+    glow: "rgba(214,177,95,0.10)",
+  },
+  insight: {
+    border: "rgba(109, 127, 160, 0.24)",
+    background: "linear-gradient(180deg, rgba(29,35,45,0.34), rgba(18,22,30,0.42))",
+    glow: "rgba(92,149,227,0.08)",
+  },
+};
+
+const statToneByName: Record<string, { label: string; color: string; glow: string }> = {
+  strength: { label: "STR", color: "#f0a286", glow: "rgba(229,115,79,0.22)" },
+  agility: { label: "AGI", color: "#87e2cf", glow: "rgba(92,199,178,0.22)" },
+  rage: { label: "RAG", color: "#ee9abb", glow: "rgba(216,93,145,0.22)" },
+  endurance: { label: "END", color: "#ebcf8b", glow: "rgba(214,177,95,0.22)" },
+};
+
+const closeButtonStyle: CSSProperties = {
+  padding: "6px 10px",
+  borderRadius: "999px",
+  border: "1px solid rgba(255,255,255,0.14)",
+  background: "rgba(255,255,255,0.04)",
+  color: "#fff6ea",
+  cursor: "pointer",
   fontSize: "10px",
-  fontWeight: 700,
+  fontWeight: 800,
 };
 
 export function BuildPresetsPopover({
@@ -30,51 +91,47 @@ export function BuildPresetsPopover({
   onApplySkillsOnly,
   onClose,
 }: BuildPresetsPopoverProps) {
+  void onApplyItemsOnly;
+  void onApplySkillsOnly;
   const [selectedPresetId, setSelectedPresetId] = useState(buildPresets[0]?.id ?? "");
+  const [hoveredSkillId, setHoveredSkillId] = useState<string | null>(null);
+  const [hoveredConsumableCode, setHoveredConsumableCode] = useState<string | null>(null);
 
-  const itemByCode = useMemo(
-    () => new Map(starterItems.map((entry) => [entry.item.code, entry.item])),
-    []
-  );
-  const skillById = useMemo(
-    () =>
-      new Map(
-        starterItems.flatMap((entry) =>
-          (entry.item.skills ?? []).map((skill) => [skill.id, { skill, item: entry.item }] as const)
-        )
-      ),
-    []
-  );
+  const itemByCode = useMemo(() => new Map(starterItems.map((entry) => [entry.item.code, entry.item])), []);
+  const skillById = useMemo(() => {
+    const pairs: Array<[string, CombatSkill]> = [];
 
-  const selectedPreset = buildPresets.find((preset) => preset.id === selectedPresetId) ?? buildPresets[0] ?? null;
+    for (const entry of starterItems) {
+      for (const skill of entry.item.skills ?? []) {
+        pairs.push([skill.id, skill]);
+      }
+    }
 
-  if (!selectedPreset) {
-    return null;
-  }
+    return new Map(pairs);
+  }, []);
+
+  const activePreset = buildPresets.find((preset) => preset.id === selectedPresetId) ?? buildPresets[0] ?? null;
+  const activeTone = getPresetTone(activePreset?.archetype);
+  const activeSkill = activePreset ? skillById.get(hoveredSkillId ?? activePreset.skillLoadout[0] ?? "") ?? null : null;
+  const activeConsumable = activePreset ? itemByCode.get(hoveredConsumableCode ?? activePreset.consumables[0] ?? "") ?? null : null;
 
   return (
-    <ModalOverlay
-      onClose={onClose}
-      closeLabel="Close build presets popover"
-      zIndex={45}
-      backdrop="rgba(7, 8, 12, 0.76)"
-    >
+    <ModalOverlay onClose={onClose} closeLabel="Close build presets popover" zIndex={45} backdrop="rgba(7, 8, 12, 0.76)">
       <ModalSurface
         style={{
           width: "min(1180px, 100%)",
-          maxHeight: "min(820px, calc(100vh - 36px))",
-          borderRadius: "24px",
-          background:
-            "linear-gradient(180deg, rgba(23,20,18,0.98), rgba(11,10,9,0.98)), radial-gradient(circle at top, rgba(255,188,118,0.08), transparent 28%)",
-          boxShadow: "0 28px 72px rgba(0,0,0,0.48)",
+          maxHeight: "min(760px, calc(100vh - 24px))",
           display: "grid",
           gridTemplateRows: "auto minmax(0, 1fr)",
+          background:
+            "linear-gradient(180deg, rgba(24,20,19,0.985), rgba(12,11,10,0.985)), radial-gradient(circle at top, rgba(255,188,118,0.10), transparent 30%)",
+          boxShadow: "0 28px 72px rgba(0,0,0,0.5)",
           fontFamily: "'Trebuchet MS', 'Segoe UI', sans-serif",
         }}
       >
         <div
           style={{
-            padding: "14px 16px 12px",
+            padding: "10px 14px 9px",
             borderBottom: "1px solid rgba(255,255,255,0.08)",
             background: "linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02))",
             display: "grid",
@@ -83,394 +140,375 @@ export function BuildPresetsPopover({
         >
           <div style={{ display: "flex", justifyContent: "space-between", gap: "12px", alignItems: "start", flexWrap: "wrap" }}>
             <div style={{ display: "grid", gap: "4px" }}>
-              <div style={{ fontSize: "9px", fontWeight: 800, letterSpacing: "0.18em", color: "#d8c7b1", textTransform: "uppercase" }}>
-                Build Presets
+              <div style={{ fontSize: "10px", fontWeight: 800, letterSpacing: "0.16em", textTransform: "uppercase", color: "#d8c7b1" }}>
+                Curated Presets
               </div>
-              <div style={{ display: "flex", gap: "10px", alignItems: "center", flexWrap: "wrap" }}>
-                <div
-                  style={{
-                    width: "38px",
-                    height: "38px",
-                    borderRadius: "12px",
-                    display: "grid",
-                    placeItems: "center",
-                    fontSize: "22px",
-                    background: "linear-gradient(180deg, rgba(255,171,97,0.18), rgba(207,106,50,0.08))",
-                    border: "1px solid rgba(255,171,97,0.22)",
-                    boxShadow: "inset 0 1px 0 rgba(255,255,255,0.06)",
-                  }}
-                >
-                  ♞
-                </div>
-                <div style={{ display: "grid", gap: "2px" }}>
-                  <div style={{ fontSize: "24px", fontWeight: 900, color: "#fff7ea", lineHeight: 0.96, letterSpacing: "0.01em" }}>
-                    Arena Archetypes
-                  </div>
-                  <div style={{ fontSize: "10px", color: "#d7c3ad", textTransform: "uppercase", letterSpacing: "0.12em" }}>
-                    curated starter builds
-                  </div>
-                </div>
-              </div>
-              <div style={{ fontSize: "11px", lineHeight: 1.35, color: "#cabfb0", maxWidth: "760px" }}>
-                Six moderated presets tuned for readable fights, clearer matchup testing, and a target pace around fifteen rounds.
+              <div style={{ fontSize: "20px", fontWeight: 900, color: "#fff7ea", lineHeight: 0.98 }}>Arena Archetypes</div>
+              <div style={{ fontSize: "10px", lineHeight: 1.28, color: "#cabfb0", maxWidth: "760px" }}>
+                One-page build sheet with compact gear, mini previews, and quick action buttons for applying the full setup or only parts of it.
               </div>
             </div>
-            <ActionButton type="button" onClick={onClose} tone="secondary" style={secondaryButtonStyle}>
+            <button type="button" onClick={onClose} style={closeButtonStyle}>
               Close
-            </ActionButton>
+            </button>
           </div>
-        </div>
 
-        <div style={{ overflowY: "auto", padding: "12px 16px 16px" }}>
-          <div style={{ display: "grid", gridTemplateColumns: "290px minmax(0, 1fr)", gap: "12px", alignItems: "start" }}>
-            <div style={{ display: "grid", gap: "8px" }}>
-              {buildPresets.map((preset) => {
-                const selected = preset.id === selectedPreset.id;
-                const tone = getArchetypeTone(preset.archetype);
-                return (
-                  <button
-                    key={preset.id}
-                    type="button"
-                    onClick={() => setSelectedPresetId(preset.id)}
+          {activePreset ? (
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "74px minmax(0, 1fr) auto",
+                gap: "10px",
+                alignItems: "center",
+                padding: "8px 10px",
+                borderRadius: "16px",
+                background: `linear-gradient(180deg, ${activeTone.soft}, rgba(255,255,255,0.03))`,
+                border: `1px solid ${activeTone.border}`,
+              }}
+            >
+              <img
+                src={figureByPresetId[activePreset.id] ?? rushChipFigure}
+                alt={activePreset.label}
+                style={{
+                  width: "74px",
+                  height: "74px",
+                  objectFit: "cover",
+                  borderRadius: "14px",
+                  border: `1px solid ${activeTone.border}`,
+                  boxShadow: `0 16px 32px rgba(0,0,0,0.24), 0 0 0 2px ${activeTone.soft}`,
+                }}
+              />
+              <div style={{ display: "grid", gap: "5px", minWidth: 0 }}>
+                <div style={{ display: "flex", gap: "8px", alignItems: "center", flexWrap: "wrap" }}>
+                  <div style={{ fontSize: "16px", fontWeight: 900, color: "#fff4e7", lineHeight: 1.02 }}>{activePreset.label}</div>
+                  <span
                     style={{
-                      borderRadius: "16px",
-                      padding: "10px",
-                      border: selected ? `1px solid ${tone.border}` : "1px solid rgba(255,255,255,0.08)",
-                      background: selected
-                        ? `linear-gradient(180deg, ${tone.surface}, rgba(255,255,255,0.03))`
-                        : "rgba(255,255,255,0.03)",
-                      textAlign: "left",
-                      color: "#fff2df",
-                      cursor: "pointer",
-                      display: "grid",
-                      gap: "6px",
-                      boxShadow: selected ? `0 10px 24px ${tone.shadow}` : "none",
+                      borderRadius: "999px",
+                      padding: "3px 7px",
+                      fontSize: "8px",
+                      fontWeight: 800,
+                      color: activeTone.accent,
+                      background: activeTone.soft,
+                      border: `1px solid ${activeTone.border}`,
+                      textTransform: "uppercase",
+                      letterSpacing: "0.08em",
                     }}
                   >
-                    <div style={{ display: "flex", justifyContent: "space-between", gap: "8px", alignItems: "start" }}>
-                      <div style={{ display: "grid", gridTemplateColumns: "34px minmax(0, 1fr)", gap: "8px", alignItems: "start", flex: 1 }}>
-                        <div
-                          style={{
-                            width: "34px",
-                            height: "34px",
-                            borderRadius: "11px",
-                            display: "grid",
-                            placeItems: "center",
-                            fontSize: "18px",
-                            background: selected ? tone.surface : "rgba(255,255,255,0.05)",
-                            border: `1px solid ${selected ? tone.border : "rgba(255,255,255,0.08)"}`,
-                          }}
-                        >
-                          {getPresetIcon(preset.id, preset.archetype)}
-                        </div>
-                        <div style={{ display: "grid", gap: "2px" }}>
-                          <div style={{ fontSize: "14px", fontWeight: 900, lineHeight: 1.02 }}>{preset.label}</div>
-                          <div style={{ fontSize: "9px", opacity: 0.72, textTransform: "uppercase", letterSpacing: "0.12em", color: selected ? tone.text : "#d5c2ad" }}>
-                            {preset.archetype}
-                          </div>
-                          <div style={{ display: "flex", gap: "4px", flexWrap: "wrap", marginTop: "1px" }}>
-                            {preset.tags.slice(0, 2).map((tag) => (
-                              <span
-                                key={`${preset.id}-${tag}-compact`}
-                                style={{
-                                  borderRadius: "999px",
-                                  padding: "2px 6px",
-                                  fontSize: "8px",
-                                  background: "rgba(255,255,255,0.05)",
-                                  border: "1px solid rgba(255,255,255,0.08)",
-                                  color: "#efe2d3",
-                                }}
-                              >
-                                {tag}
-                              </span>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-                      <div
-                        style={{
-                          borderRadius: "999px",
-                          padding: "3px 7px",
-                          fontSize: "8px",
-                          fontWeight: 800,
-                          background: selected ? tone.surface : "rgba(255,171,97,0.10)",
-                          border: `1px solid ${selected ? tone.border : "rgba(255,171,97,0.24)"}`,
-                          color: selected ? tone.text : "#ffd9b1",
-                          whiteSpace: "nowrap",
-                        }}
-                      >
-                        {preset.targetFightLength}
-                      </div>
-                    </div>
-                    <div style={{ fontSize: "10px", lineHeight: 1.3, color: "#d9cbbb" }}>{preset.description}</div>
-                    <PresetBarRow presetId={preset.id} archetype={preset.archetype} compact />
-                    <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
-                      {preset.tags.map((tag) => (
-                        <span
-                          key={`${preset.id}-${tag}`}
-                          style={{
-                            borderRadius: "999px",
-                            padding: "3px 7px",
-                            fontSize: "8px",
-                            background: "rgba(255,255,255,0.05)",
-                            border: "1px solid rgba(255,255,255,0.08)",
-                            color: "#efe2d3",
-                          }}
-                        >
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
-
-            <div style={{ display: "grid", gap: "10px" }}>
-              <PanelCard
-                style={{
-                  display: "grid",
-                  gap: "8px",
-                }}
-              >
-                <div style={{ display: "flex", justifyContent: "space-between", gap: "10px", alignItems: "start", flexWrap: "wrap" }}>
-                  <div style={{ display: "grid", gap: "4px" }}>
-                    <div style={{ display: "flex", gap: "10px", alignItems: "center", flexWrap: "wrap" }}>
-                      <div
-                        style={{
-                          width: "38px",
-                          height: "38px",
-                          borderRadius: "12px",
-                          display: "grid",
-                          placeItems: "center",
-                          fontSize: "20px",
-                          background: getArchetypeTone(selectedPreset.archetype).surface,
-                          border: `1px solid ${getArchetypeTone(selectedPreset.archetype).border}`,
-                        }}
-                      >
-                        {getPresetIcon(selectedPreset.id, selectedPreset.archetype)}
-                      </div>
-                      <div style={{ display: "grid", gap: "1px" }}>
-                        <div style={{ fontSize: "24px", fontWeight: 900, color: "#fff6e7", lineHeight: 0.98 }}>{selectedPreset.label}</div>
-                        <div style={{ fontSize: "9px", letterSpacing: "0.14em", textTransform: "uppercase", color: getArchetypeTone(selectedPreset.archetype).text }}>
-                          {selectedPreset.archetype}
-                        </div>
-                      </div>
-                    </div>
-                    <div style={{ fontSize: "10px", color: "#d8c7b1", lineHeight: 1.3, maxWidth: "640px" }}>{selectedPreset.description}</div>
-                  </div>
-                  <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
-                    <ActionButton type="button" onClick={() => onApplyItemsOnly(selectedPreset.id)} tone="secondary" style={secondaryButtonStyle}>
-                      Apply Items Only
-                    </ActionButton>
-                    <ActionButton type="button" onClick={() => onApplySkillsOnly(selectedPreset.id)} tone="secondary" style={secondaryButtonStyle}>
-                      Apply Skills Only
-                    </ActionButton>
-                    <ActionButton
-                      type="button"
-                      onClick={() => onApplyBuild(selectedPreset.id)}
-                      tone="primary"
+                    {activePreset.archetype}
+                  </span>
+                </div>
+                <div style={{ fontSize: "10px", lineHeight: 1.22, color: "#dacbbb" }}>{clampText(activePreset.description, 112)}</div>
+                <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
+                  {activePreset.tags.map((tag) => (
+                    <span
+                      key={`header-${tag}`}
                       style={{
-                        ...secondaryButtonStyle,
-                        border: "1px solid rgba(255,171,97,0.34)",
-                        background: "linear-gradient(180deg, rgba(221,122,68,0.32), rgba(207,106,50,0.14))",
-                        color: "#ffe2c2",
+                        borderRadius: "999px",
+                        padding: "2px 6px",
+                        fontSize: "7px",
+                        border: `1px solid ${activeTone.border}`,
+                        background: `linear-gradient(180deg, ${activeTone.soft}, rgba(255,255,255,0.03))`,
+                        color: "#efe2d3",
                       }}
                     >
-                      Apply Build
-                    </ActionButton>
-                  </div>
+                      {tag}
+                    </span>
+                  ))}
                 </div>
+              </div>
+              <div style={{ display: "grid", gap: "6px", justifyItems: "end", alignSelf: "stretch" }}>
+                <SummaryPill label="Fight" value={activePreset.targetFightLength} />
+                <SummaryPill label="Loadout" value={`${activePreset.loadout.length} items`} />
+              </div>
+            </div>
+          ) : null}
+        </div>
+        <div
+          style={{
+            overflowY: "auto",
+            padding: "10px 14px 12px",
+            display: "grid",
+            gridTemplateColumns: "404px minmax(0, 1fr)",
+            gap: "10px",
+            alignItems: "start",
+          }}
+        >
+          <div style={{ display: "grid", gap: "8px" }}>
+            <MiniSectionTitle title="Presets" note="Compact selector" />
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: "8px" }}>
+            {buildPresets.map((preset) => {
+              const tone = getPresetTone(preset.archetype);
+              const selected = preset.id === activePreset?.id;
 
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(4, minmax(0, 1fr))", gap: "6px" }}>
-                  <PresetMetric label="Archetype" value={selectedPreset.archetype} />
-                  <PresetMetric label="Fight Length" value={selectedPreset.targetFightLength} />
-                  <PresetMetric label="Skills" value={`${selectedPreset.skillLoadout.length}/5`} />
-                  <PresetMetric label="Consumables" value={String(selectedPreset.consumables.length)} />
-                </div>
-                <PresetBarRow presetId={selectedPreset.id} archetype={selectedPreset.archetype} />
-              </PanelCard>
-
-              <div style={{ display: "grid", gridTemplateColumns: "minmax(0, 1.08fr) minmax(0, 0.92fr)", gap: "10px" }}>
-                <PanelCard
+              return (
+                <button
+                  key={preset.id}
+                  type="button"
+                  onClick={() => {
+                    setSelectedPresetId(preset.id);
+                    setHoveredSkillId(null);
+                    setHoveredConsumableCode(null);
+                  }}
+                  aria-pressed={selected}
+                  aria-label={preset.label}
                   style={{
+                    textAlign: "left",
                     display: "grid",
-                    gap: "10px",
+                    gridTemplateColumns: "48px minmax(0, 1fr)",
+                    gap: "8px",
+                    padding: "7px",
+                    borderRadius: "14px",
+                    cursor: "pointer",
+                    border: `2px solid ${selected ? tone.border : "rgba(255,255,255,0.1)"}`,
+                    background: selected
+                      ? `linear-gradient(180deg, ${tone.soft}, rgba(255,255,255,0.05) 54%, rgba(0,0,0,0.12))`
+                      : "linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02))",
+                    color: "#fff6ea",
+                    minHeight: "88px",
+                    boxShadow: selected
+                      ? `0 0 0 1px rgba(255,255,255,0.04) inset, 0 12px 24px rgba(0,0,0,0.24), 0 0 28px ${tone.soft}`
+                      : "0 10px 18px rgba(0,0,0,0.18)",
                   }}
                 >
-                  <SectionLabel label="Equipment" icon="⚒" />
-                  <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: "6px" }}>
-                    {selectedPreset.loadout.map((itemCode) => {
-                      const item = itemByCode.get(itemCode);
-                      const passive = getWeaponClassPassivePreview(item?.equip?.weaponClass ?? null);
-                      const signatureSkill = item?.skills?.[0] ?? null;
-                      return (
+                  <img
+                    src={figureByPresetId[preset.id] ?? rushChipFigure}
+                    alt=""
+                    aria-hidden="true"
+                    style={{
+                      width: "42px",
+                      height: "42px",
+                      objectFit: "cover",
+                      borderRadius: "10px",
+                      border: `1px solid ${selected ? tone.border : "rgba(255,255,255,0.14)"}`,
+                      boxShadow: selected ? `0 0 0 2px ${tone.soft}` : "none",
+                    }}
+                  />
+                  <div style={{ display: "grid", gap: "5px", minWidth: 0 }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", gap: "8px", alignItems: "start" }}>
+                      <div style={{ display: "grid", gap: "2px", minWidth: 0 }}>
+                        <div style={{ fontSize: "11px", fontWeight: 900, lineHeight: 1.02 }}>{preset.label}</div>
                         <div
-                          key={`${selectedPreset.id}-${itemCode}`}
                           style={{
-                            borderRadius: "12px",
-                            padding: "9px",
-                            background: "rgba(255,255,255,0.03)",
-                            border: "1px solid rgba(255,255,255,0.08)",
-                            display: "grid",
-                            gridTemplateColumns: "30px minmax(0, 1fr)",
-                            gap: "8px",
+                            fontSize: "8px",
+                            fontWeight: 800,
+                            letterSpacing: "0.12em",
+                            textTransform: "uppercase",
+                            color: tone.accent,
                           }}
                         >
-                          <div
-                            style={{
-                              width: "30px",
-                              height: "30px",
-                              borderRadius: "10px",
-                              display: "grid",
-                              placeItems: "center",
-                              fontSize: "16px",
-                              background: "rgba(255,255,255,0.04)",
-                              border: "1px solid rgba(255,255,255,0.08)",
-                            }}
-                          >
-                            {getItemIcon(itemCode)}
-                          </div>
-                          <div style={{ display: "grid", gap: "2px" }}>
-                            <div style={{ fontSize: "10px", fontWeight: 800, color: "#fff1df", lineHeight: 1.15 }}>{item?.name ?? formatTitle(itemCode)}</div>
-                            <div style={{ fontSize: "8px", opacity: 0.68, textTransform: "uppercase", letterSpacing: "0.08em" }}>{formatTitle(item?.equip?.slot ?? itemCode)}</div>
-                            <div style={{ fontSize: "9px", color: "#d8c7b1", lineHeight: 1.22 }}>{item?.description ?? "No item description."}</div>
-                            {passive ? (
-                              <div
-                                style={{
-                                  marginTop: "4px",
-                                  borderRadius: "10px",
-                                  padding: "6px 7px",
-                                  background: "rgba(229,115,79,0.10)",
-                                  border: "1px solid rgba(255,171,97,0.20)",
-                                  display: "grid",
-                                  gap: "2px",
-                                }}
-                              >
-                                <div style={{ fontSize: "8px", fontWeight: 800, color: "#ffd4b0", textTransform: "uppercase", letterSpacing: "0.08em" }}>
-                                  Passive: {passive.name}
-                                </div>
-                                <div style={{ fontSize: "9px", color: "#f0dec9", lineHeight: 1.22 }}>{passive.effect}</div>
-                                <div style={{ fontSize: "8px", color: "#d9c0a7", lineHeight: 1.22 }}>
-                                  {passive.trigger} • {passive.duration} • {passive.stacks}
-                                </div>
-                              </div>
-                            ) : null}
-                            {signatureSkill ? (
-                              <div
-                                style={{
-                                  marginTop: "4px",
-                                  borderRadius: "10px",
-                                  padding: "6px 7px",
-                                  background: "rgba(92,199,178,0.10)",
-                                  border: "1px solid rgba(92,199,178,0.20)",
-                                  display: "grid",
-                                  gap: "2px",
-                                }}
-                              >
-                                <div style={{ fontSize: "8px", fontWeight: 800, color: "#b8f4e8", textTransform: "uppercase", letterSpacing: "0.08em" }}>
-                                  Skill: {signatureSkill.name}
-                                </div>
-                                <div style={{ fontSize: "9px", color: "#e2fbf5", lineHeight: 1.22 }}>{signatureSkill.description}</div>
-                                <div style={{ fontSize: "8px", color: "#c4e8e0", lineHeight: 1.22 }}>
-                                  {signatureSkill.cost} {formatResource(signatureSkill.resourceType)} • Damage x{signatureSkill.damageMultiplier.toFixed(2)}
-                                  {signatureSkill.effects?.length ? ` • ${signatureSkill.effects[0].name} ${signatureSkill.effects[0].durationTurns}T` : ""}
-                                </div>
-                              </div>
-                            ) : null}
-                          </div>
+                          {preset.archetype}
                         </div>
-                      );
-                    })}
+                      </div>
+                      <span style={{ fontSize: "8px", color: "#cbb8a5", whiteSpace: "nowrap" }}>{shortFightLength(preset.targetFightLength)}</span>
+                    </div>
+                    <div style={{ fontSize: "8px", lineHeight: 1.14, color: "#ccbcae" }}>{clampText(preset.description, 44)}</div>
+                    <div style={{ display: "grid", gap: "3px" }}>
+                      {Object.entries(preset.allocations).map(([statName, value]) => (
+                        <CompactStatBar key={`${preset.id}-${statName}`} statName={statName} value={value} />
+                      ))}
+                    </div>
                   </div>
+                </button>
+              );
+            })}
+            </div>
+          </div>
 
-                  <SectionLabel label="Recommended Skills" icon="✦" />
-                  <div style={{ display: "grid", gap: "6px" }}>
-                    {selectedPreset.skillLoadout.map((skillId, index) => {
-                      const entry = skillById.get(skillId);
+          <div style={{ display: "grid", gap: "8px" }}>
+            <div style={{ display: "grid", gridTemplateColumns: "minmax(0, 1fr) auto", gap: "8px", alignItems: "start" }}>
+              <div style={{ display: "grid", gap: "7px" }}>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(108px, 1fr))", gap: "6px" }}>
+                  <MetricCard label="Damage Plan" value={activePreset ? resolveDamagePlan(activePreset) : "None"} tone={activeTone.accent} />
+                  <MetricCard label="Defense" value={activePreset ? resolveDefensePlan(activePreset) : "None"} tone="#b7d5ff" />
+                  <MetricCard label="Skill Kit" value={activePreset ? `${activePreset.skillLoadout.length} equipped` : "0 equipped"} tone="#ee9abb" />
+                  <MetricCard label="Consumables" value={activePreset ? `${activePreset.consumables.length} slots` : "0 slots"} tone="#ebcf8b" />
+                </div>
+                {activePreset ? (
+                  <PanelCard
+                    style={{
+                      padding: "7px 8px",
+                      background: "rgba(255,255,255,0.025)",
+                      display: "grid",
+                      gridTemplateColumns: "repeat(auto-fit, minmax(210px, 1fr))",
+                      gap: "6px",
+                    }}
+                  >
+                    <InlineListBlock title="Strengths" items={activePreset.strengths} accent="#87e2cf" />
+                    <InlineListBlock title="Weaknesses" items={activePreset.weaknesses} accent="#f0a286" />
+                  </PanelCard>
+                ) : null}
+              </div>
+              <div style={{ display: "grid", gap: "8px", justifyItems: "end" }}>
+                <ActionButton type="button" tone="primary" onClick={() => activePreset && onApplyBuild(activePreset.id)} style={{ minWidth: "118px", fontSize: "10px", padding: "7px 10px" }}>
+                  Apply Build
+                </ActionButton>
+              </div>
+            </div>
+
+            <div style={{ display: "grid", gridTemplateColumns: "minmax(0, 1.1fr) minmax(280px, 0.9fr)", gap: "10px", alignItems: "start" }}>
+              <div style={{ display: "grid", gap: "6px" }}>
+                <PanelCard
+                  style={{
+                    padding: "8px",
+                    display: "grid",
+                    gap: "6px",
+                    background: zoneStyles.equipment.background,
+                    border: `1px solid ${zoneStyles.equipment.border}`,
+                    boxShadow: `inset 0 1px 0 rgba(255,255,255,0.03), 0 0 24px ${zoneStyles.equipment.glow}`,
+                  }}
+                >
+                  <MiniSectionTitle title="Equipment" note="Compact loadout" />
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(3, minmax(0, 1fr))", gap: "6px" }}>
+                    {activePreset?.loadout.map((itemCode) => <CompactItemCard key={itemCode} item={itemByCode.get(itemCode) ?? null} />)}
+                  </div>
+                </PanelCard>
+
+                <PanelCard
+                  style={{
+                    padding: "8px",
+                    display: "grid",
+                    gap: "6px",
+                    background: zoneStyles.skills.background,
+                    border: `1px solid ${zoneStyles.skills.border}`,
+                    boxShadow: `inset 0 1px 0 rgba(255,255,255,0.03), 0 0 24px ${zoneStyles.skills.glow}`,
+                  }}
+                >
+                  <MiniSectionTitle title="Skills" note="Combat strip" />
+                  <div style={{ display: "flex", gap: "5px", flexWrap: "wrap" }}>
+                    {activePreset?.skillLoadout.map((skillId) => {
+                      const skill = skillById.get(skillId) ?? null;
+                      const active = (hoveredSkillId ?? activePreset.skillLoadout[0]) === skillId;
+
                       return (
-                        <div
-                          key={`${selectedPreset.id}-${skillId}`}
+                        <button
+                          key={skillId}
+                          type="button"
+                          onMouseEnter={() => setHoveredSkillId(skillId)}
+                          onFocus={() => setHoveredSkillId(skillId)}
+                          onMouseLeave={() => setHoveredSkillId(null)}
                           style={{
-                            borderRadius: "12px",
-                            padding: "9px",
-                            background: "rgba(255,255,255,0.03)",
-                            border: "1px solid rgba(255,255,255,0.08)",
                             display: "grid",
-                            gap: "4px",
+                            gap: "1px",
+                            textAlign: "left",
+                            minWidth: "94px",
+                            padding: "5px 7px",
+                            borderRadius: "12px",
+                            border: `1px solid ${active ? activeTone.border : "rgba(255,255,255,0.08)"}`,
+                            background: active
+                              ? `linear-gradient(180deg, ${activeTone.soft}, rgba(255,255,255,0.04))`
+                              : "linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02))",
+                            color: "#fff7ea",
+                            cursor: "pointer",
+                            boxShadow: active ? `0 0 16px ${activeTone.soft}` : "none",
                           }}
                         >
-                          <div style={{ display: "flex", justifyContent: "space-between", gap: "8px", alignItems: "start" }}>
-                            <div style={{ display: "grid", gridTemplateColumns: "22px minmax(0, 1fr)", gap: "8px", flex: 1, alignItems: "start" }}>
-                              <div style={{ fontSize: "14px", lineHeight: 1 }}>{getItemIcon(entry?.item.code ?? skillId)}</div>
-                              <div style={{ fontSize: "10px", fontWeight: 800, color: "#fff1df", lineHeight: 1.15 }}>
-                                Slot {index + 1}: {entry?.skill.name ?? formatTitle(skillId)}
-                              </div>
-                            </div>
-                            <div style={{ fontSize: "8px", opacity: 0.7, whiteSpace: "nowrap" }}>
-                              {entry ? `${entry.skill.cost} ${formatResource(entry.skill.resourceType)}` : "Unavailable"}
-                            </div>
-                          </div>
-                          <div style={{ fontSize: "8px", opacity: 0.72, textTransform: "uppercase", letterSpacing: "0.08em" }}>{entry?.item.name ?? "Unknown source"}</div>
-                          <div style={{ fontSize: "9px", color: "#d8c7b1", lineHeight: 1.22 }}>
-                            {entry?.skill.description ?? "Recommended preset skill."}
-                          </div>
-                        </div>
+                          <span style={{ fontSize: "9px", fontWeight: 800, lineHeight: 1.02 }}>{skill?.name ?? formatIdLabel(skillId)}</span>
+                        </button>
                       );
                     })}
                   </div>
                 </PanelCard>
 
-                <div style={{ display: "grid", gap: "12px" }}>
-                  <PanelCard
-                    style={{
-                      display: "grid",
-                      gap: "8px",
-                    }}
-                  >
-                    <SectionLabel label="Consumables" icon="🧪" />
-                    <div style={{ display: "grid", gap: "6px" }}>
-                      {selectedPreset.consumables.map((itemCode) => {
-                        const item = itemByCode.get(itemCode);
-                        return (
-                          <div
-                            key={`${selectedPreset.id}-${itemCode}`}
+                <PanelCard
+                  style={{
+                    padding: "8px",
+                    display: "grid",
+                    gap: "6px",
+                    background: zoneStyles.consumables.background,
+                    border: `1px solid ${zoneStyles.consumables.border}`,
+                    boxShadow: `inset 0 1px 0 rgba(255,255,255,0.03), 0 0 24px ${zoneStyles.consumables.glow}`,
+                  }}
+                >
+                  <MiniSectionTitle title="Consumables" note="Shrunk to quick slots" />
+                  <div style={{ display: "flex", gap: "5px", flexWrap: "wrap" }}>
+                    {activePreset?.consumables.map((itemCode) => {
+                      const item = itemByCode.get(itemCode) ?? null;
+                      const active = (hoveredConsumableCode ?? activePreset.consumables[0]) === itemCode;
+
+                      return (
+                        <button
+                          key={itemCode}
+                          type="button"
+                          onMouseEnter={() => setHoveredConsumableCode(itemCode)}
+                          onFocus={() => setHoveredConsumableCode(itemCode)}
+                          onMouseLeave={() => setHoveredConsumableCode(null)}
+                          style={{
+                            display: "flex",
+                            gap: "6px",
+                            alignItems: "center",
+                            padding: "5px 7px",
+                            borderRadius: "12px",
+                            border: `1px solid ${active ? "rgba(214,177,95,0.46)" : "rgba(255,255,255,0.08)"}`,
+                            background: active
+                              ? "linear-gradient(180deg, rgba(214,177,95,0.16), rgba(255,255,255,0.03))"
+                              : "linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02))",
+                            color: "#fff7ea",
+                            cursor: "pointer",
+                            boxShadow: active ? "0 0 18px rgba(214,177,95,0.16)" : "none",
+                          }}
+                        >
+                          <span
                             style={{
-                              borderRadius: "12px",
-                              padding: "9px",
-                              background: "rgba(255,255,255,0.03)",
-                              border: "1px solid rgba(255,255,255,0.08)",
+                              width: "20px",
+                              height: "20px",
+                              borderRadius: "999px",
                               display: "grid",
-                              gridTemplateColumns: "28px minmax(0, 1fr)",
-                              gap: "8px",
+                              placeItems: "center",
+                              fontSize: "10px",
+                              background: "rgba(255,255,255,0.08)",
+                              border: "1px solid rgba(255,255,255,0.08)",
                             }}
                           >
-                            <div style={{ fontSize: "16px", lineHeight: 1, display: "grid", placeItems: "center" }}>{getItemIcon(itemCode)}</div>
-                            <div style={{ display: "grid", gap: "2px" }}>
-                              <div style={{ fontSize: "10px", fontWeight: 800, color: "#fff1df" }}>{item?.name ?? formatTitle(itemCode)}</div>
-                              <div style={{ fontSize: "8px", opacity: 0.68, textTransform: "uppercase", letterSpacing: "0.08em" }}>
-                                {item?.consumableEffect ? formatUsageMode(item.consumableEffect.usageMode) : "Support item"}
-                              </div>
-                              <div style={{ fontSize: "9px", color: "#d8c7b1", lineHeight: 1.22 }}>{item?.description ?? "Recommended consumable."}</div>
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </PanelCard>
+                            {getConsumableIcon(item)}
+                          </span>
+                          <span style={{ fontSize: "9px", fontWeight: 800 }}>{item?.name ?? formatIdLabel(itemCode)}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </PanelCard>
+              </div>
 
-                  <PanelCard
-                    style={{
-                      display: "grid",
-                      gap: "8px",
-                    }}
-                  >
-                    <SectionLabel label="Strengths" icon="▲" />
-                    <ListBlock items={selectedPreset.strengths} tone="good" />
-                    <SectionLabel label="Weaknesses" icon="▼" />
-                    <ListBlock items={selectedPreset.weaknesses} tone="risk" />
-                  </PanelCard>
-                </div>
+              <div style={{ display: "grid", gap: "6px" }}>
+                <HoverCard
+                  title={activeSkill?.name ?? "Preset skill"}
+                  subtitle={activeSkill ? `${formatResource(activeSkill.resourceType)} cost ${activeSkill.cost}` : "Hover a skill chip"}
+                  accent={activeTone.accent}
+                  body={
+                    activeSkill ? (
+                      <>
+                        <div>{activeSkill.description}</div>
+                        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, minmax(0, 1fr))", gap: "6px" }}>
+                          <MiniInfo label="Damage" value={`x${activeSkill.damageMultiplier.toFixed(2)}`} />
+                          <MiniInfo label="Crit" value={`+${activeSkill.critChanceBonus}%`} />
+                          <MiniInfo label="States" value={String(activeSkill.effects?.length ?? 0)} />
+                        </div>
+                      </>
+                    ) : (
+                      <div>Move the pointer over a recommended skill to inspect the mini tooltip card.</div>
+                    )
+                  }
+                />
+
+                <HoverCard
+                  title={activeConsumable?.name ?? "Preset consumable"}
+                  subtitle={activeConsumable ? formatUsageMode(activeConsumable) : "Hover a consumable chip"}
+                  accent="#ebcf8b"
+                  body={
+                    activeConsumable ? (
+                      <>
+                        <div>{activeConsumable.description}</div>
+                        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, minmax(0, 1fr))", gap: "6px" }}>
+                          <MiniInfo label="Heal" value={String(activeConsumable.consumableEffect?.heal ?? 0)} />
+                          <MiniInfo label="Resource" value={formatResourceRestore(activeConsumable)} />
+                          <MiniInfo label="Mode" value={formatUsageModeShort(activeConsumable)} />
+                        </div>
+                      </>
+                    ) : (
+                      <div>Hover a consumable chip to inspect its quick info card.</div>
+                    )
+                  }
+                />
               </div>
             </div>
           </div>
@@ -480,304 +518,336 @@ export function BuildPresetsPopover({
   );
 }
 
-function PresetMetric({ label, value }: { label: string; value: string }) {
+function MiniSectionTitle({ title, note }: { title: string; note: string }) {
   return (
-    <PanelCard
-      style={{
-        padding: "8px 9px",
-        background: "rgba(255,255,255,0.03)",
-        display: "grid",
-        gap: "3px",
-      }}
-    >
-      <div style={{ fontSize: "8px", opacity: 0.68, textTransform: "uppercase", letterSpacing: "0.08em" }}>{label}</div>
-      <div style={{ fontSize: "13px", fontWeight: 800, color: "#fff1df", lineHeight: 1.05 }}>{value}</div>
-    </PanelCard>
+    <div style={{ display: "flex", justifyContent: "space-between", gap: "10px", alignItems: "baseline", flexWrap: "wrap" }}>
+      <div style={{ fontSize: "10px", fontWeight: 800, letterSpacing: "0.12em", textTransform: "uppercase", color: "#dbc5ae" }}>{title}</div>
+      <div style={{ fontSize: "9px", color: "#aa9888" }}>{note}</div>
+    </div>
   );
 }
 
-function PresetBarRow({
-  presetId,
-  archetype,
-  compact = false,
-}: {
-  presetId: string;
-  archetype: string;
-  compact?: boolean;
-}) {
-  const stats = getPresetStatProfile(presetId, archetype);
-
+function SummaryPill({ label, value }: { label: string; value: string }) {
   return (
     <div
       style={{
         display: "grid",
-        gridTemplateColumns: compact ? "1fr 1fr" : "repeat(4, minmax(0, 1fr))",
-        gap: compact ? "4px 8px" : "6px",
+        gap: "2px",
+        minWidth: "94px",
+        padding: "6px 8px",
+        borderRadius: "12px",
+        background: "rgba(12,11,10,0.32)",
+        border: "1px solid rgba(255,255,255,0.08)",
       }}
     >
-      {stats.map((entry) => (
-        <PresetBar key={`${presetId}-${entry.label}`} label={entry.label} value={entry.value} compact={compact} />
-      ))}
+      <div style={{ fontSize: "8px", textTransform: "uppercase", letterSpacing: "0.1em", color: "#cdb9a4" }}>{label}</div>
+      <div style={{ fontSize: "10px", fontWeight: 800, color: "#fff6ea" }}>{value}</div>
     </div>
   );
 }
 
-function PresetBar({
-  label,
-  value,
-  compact = false,
-}: {
-  label: string;
-  value: number;
-  compact?: boolean;
-}) {
+function MetricCard({ label, value, tone }: { label: string; value: string; tone: string }) {
   return (
-    <div style={{ display: "grid", gap: compact ? "2px" : "3px" }}>
-      <div style={{ display: "flex", justifyContent: "space-between", gap: "6px", alignItems: "center" }}>
-        <span style={{ fontSize: compact ? "8px" : "9px", opacity: 0.7, textTransform: "uppercase", letterSpacing: "0.08em" }}>
-          {label}
-        </span>
-        <span style={{ fontSize: compact ? "8px" : "9px", fontWeight: 800, color: "#f3e2cf" }}>{value}/5</span>
+    <PanelCard
+      style={{
+        padding: "7px 8px",
+        display: "grid",
+        gap: "2px",
+        background: "linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.025))",
+        border: "1px solid rgba(255,255,255,0.1)",
+        boxShadow: "inset 0 1px 0 rgba(255,255,255,0.03)",
+      }}
+    >
+      <div style={{ fontSize: "8px", textTransform: "uppercase", letterSpacing: "0.1em", color: "#cdb9a4" }}>{label}</div>
+      <div style={{ fontSize: "11px", fontWeight: 900, color: tone }}>{value}</div>
+    </PanelCard>
+  );
+}
+
+function InlineListBlock({ title, items, accent }: { title: string; items: string[]; accent: string }) {
+  return (
+    <div style={{ display: "grid", gap: "4px" }}>
+      <div style={{ fontSize: "8px", textTransform: "uppercase", letterSpacing: "0.1em", color: accent }}>{title}</div>
+      <div style={{ display: "flex", gap: "5px", flexWrap: "wrap" }}>
+        {items.map((item) => (
+          <span
+            key={`${title}-${item}`}
+            style={{
+              borderRadius: "999px",
+              padding: "4px 7px",
+              fontSize: "9px",
+              lineHeight: 1.2,
+              border: "1px solid rgba(255,255,255,0.08)",
+              background: "rgba(255,255,255,0.04)",
+              color: "#f1e4d5",
+            }}
+          >
+            {item}
+          </span>
+        ))}
       </div>
-      <div
-        style={{
-          height: compact ? "5px" : "6px",
-          borderRadius: "999px",
-          overflow: "hidden",
-          background: "rgba(255,255,255,0.06)",
-          border: "1px solid rgba(255,255,255,0.06)",
-        }}
-      >
-        <div
-          style={{
-            width: `${Math.max(0, Math.min(5, value)) * 20}%`,
-            height: "100%",
-            background: resolveBarGradient(label),
-            boxShadow: "0 0 12px rgba(255,171,97,0.16)",
-          }}
-        />
+    </div>
+  );
+}
+
+function CompactStatBar({ statName, value }: { statName: string; value: number }) {
+  const statTone = statToneByName[statName];
+  const width = `${Math.max(16, Math.min(100, value * 20))}%`;
+
+  return (
+    <div style={{ display: "grid", gridTemplateColumns: "32px 1fr 18px", gap: "6px", alignItems: "center" }}>
+      <div style={{ fontSize: "7px", fontWeight: 800, letterSpacing: "0.08em", color: statTone?.color ?? "#fff7ea" }}>{statTone?.label ?? statName}</div>
+      <div style={{ height: "5px", borderRadius: "999px", background: "rgba(255,255,255,0.08)", overflow: "hidden" }}>
+        <div style={{ width, height: "100%", borderRadius: "999px", background: `linear-gradient(90deg, ${statTone?.glow ?? "rgba(255,255,255,0.2)"}, ${statTone?.color ?? "#fff7ea"})` }} />
       </div>
+      <div style={{ fontSize: "8px", color: "#d7c2ae", textAlign: "right" }}>{value}</div>
     </div>
   );
 }
 
-function SectionLabel({ label, icon }: { label: string; icon?: string }) {
-  return (
-    <div style={{ display: "flex", gap: "6px", alignItems: "center", fontSize: "9px", textTransform: "uppercase", opacity: 0.78, letterSpacing: "0.12em" }}>
-      {icon ? <span style={{ fontSize: "11px", opacity: 0.92 }}>{icon}</span> : null}
-      <span>{label}</span>
-    </div>
-  );
-}
-
-function ListBlock({ items, tone }: { items: string[]; tone: "good" | "risk" }) {
-  const colors =
-    tone === "good"
-      ? { border: "rgba(92,199,178,0.2)", bg: "rgba(92,199,178,0.06)", dot: "#87e2cf" }
-      : { border: "rgba(229,115,79,0.2)", bg: "rgba(229,115,79,0.06)", dot: "#f0a286" };
+function CompactItemCard({ item }: { item: Item | null }) {
+  if (!item) {
+    return <PanelCard style={{ padding: "8px 9px", background: "rgba(255,255,255,0.02)", color: "#bfae9d" }}>Missing item</PanelCard>;
+  }
 
   return (
-    <div style={{ display: "grid", gap: "6px" }}>
-      {items.map((item) => (
-        <div
-          key={item}
+    <PanelCard
+      style={{
+        padding: "6px 7px",
+        display: "grid",
+        gap: "3px",
+        background: "linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02))",
+        border: "1px solid rgba(255,255,255,0.1)",
+      }}
+    >
+      <div style={{ display: "flex", justifyContent: "space-between", gap: "8px", alignItems: "start" }}>
+        <div style={{ display: "grid", gap: "2px" }}>
+          <div style={{ fontSize: "10px", fontWeight: 800, color: "#fff6ea", lineHeight: 1.02 }}>{item.name}</div>
+          <div style={{ fontSize: "7px", textTransform: "uppercase", letterSpacing: "0.08em", color: "#cdb9a4" }}>
+            {item.equip ? formatSlot(item.equip.slot) : item.type}
+          </div>
+        </div>
+        <span
           style={{
-            borderRadius: "11px",
-            padding: "8px 9px",
-            border: `1px solid ${colors.border}`,
-            background: colors.bg,
-            display: "grid",
-            gridTemplateColumns: "8px minmax(0, 1fr)",
-            gap: "8px",
-            alignItems: "start",
+            borderRadius: "999px",
+            padding: "2px 5px",
+            fontSize: "7px",
+            background: "rgba(255,255,255,0.05)",
+            border: "1px solid rgba(255,255,255,0.08)",
+            color: "#ead9c8",
           }}
         >
-          <span
-            aria-hidden="true"
-            style={{
-              width: "8px",
-              height: "8px",
-              borderRadius: "999px",
-              marginTop: "4px",
-              background: colors.dot,
-            }}
-          />
-          <span style={{ fontSize: "9px", lineHeight: 1.28, color: "#e9dccd" }}>{item}</span>
-        </div>
-      ))}
+          {getItemIcon(item)}
+        </span>
+      </div>
+      <div style={{ fontSize: "8px", lineHeight: 1.08, color: "#cab8a6" }}>{clampText(item.description, 42)}</div>
+    </PanelCard>
+  );
+}
+
+function HoverCard({
+  title,
+  subtitle,
+  accent,
+  body,
+}: {
+  title: string;
+  subtitle: string;
+  accent: string;
+  body: ReactNode;
+}) {
+  return (
+    <PanelCard
+      style={{
+        padding: "9px",
+        display: "grid",
+        gap: "6px",
+        background: zoneStyles.insight.background,
+        border: `1px solid ${zoneStyles.insight.border}`,
+        boxShadow: `inset 0 1px 0 rgba(255,255,255,0.03), 0 0 24px ${zoneStyles.insight.glow}`,
+      }}
+    >
+      <div style={{ display: "grid", gap: "3px" }}>
+        <div style={{ fontSize: "12px", fontWeight: 900, color: "#fff7ea", lineHeight: 1.04 }}>{title}</div>
+        <div style={{ fontSize: "8px", textTransform: "uppercase", letterSpacing: "0.1em", color: accent }}>{subtitle}</div>
+      </div>
+      <div style={{ fontSize: "10px", lineHeight: 1.28, color: "#d7c8b8", display: "grid", gap: "6px" }}>{body}</div>
+    </PanelCard>
+  );
+}
+
+function MiniInfo({ label, value }: { label: string; value: string }) {
+  return (
+    <div
+      style={{
+        display: "grid",
+        gap: "2px",
+        padding: "6px 7px",
+        borderRadius: "10px",
+        background: "rgba(255,255,255,0.03)",
+        border: "1px solid rgba(255,255,255,0.07)",
+      }}
+    >
+      <div style={{ fontSize: "7px", textTransform: "uppercase", letterSpacing: "0.08em", color: "#b9a791" }}>{label}</div>
+      <div style={{ fontSize: "10px", fontWeight: 800, color: "#fff4e7" }}>{value}</div>
     </div>
   );
 }
 
-function getPresetIcon(presetId: string, archetype: string) {
-  if (presetId.includes("shield") || archetype.toLowerCase().includes("defense")) {
-    return "🛡";
-  }
-  if (presetId.includes("dagger") || archetype.toLowerCase().includes("burst")) {
-    return "🗡";
-  }
-  if (presetId.includes("mace") || archetype.toLowerCase().includes("control")) {
-    return "🔨";
-  }
-  if (presetId.includes("axe") || archetype.toLowerCase().includes("tempo")) {
-    return "🪓";
-  }
-  if (presetId.includes("heavy") || archetype.toLowerCase().includes("heavy")) {
-    return "⚔";
-  }
-  if (presetId.includes("sustain")) {
-    return "🧪";
-  }
-  return "⚔";
+function getPresetTone(archetype?: string | null) {
+  return presetToneByArchetype[archetype ?? ""] ?? {
+    accent: "#ffe2c2",
+    border: "rgba(255,171,97,0.24)",
+    soft: "rgba(255,171,97,0.10)",
+  };
 }
 
-function getPresetStatProfile(presetId: string, archetype: string) {
-  const normalizedId = presetId.toLowerCase();
-  const normalizedArchetype = archetype.toLowerCase();
-
-  if (normalizedId.includes("shield") || normalizedArchetype.includes("defense")) {
-    return [
-      { label: "Damage", value: 2 },
-      { label: "Armor", value: 5 },
-      { label: "Control", value: 4 },
-      { label: "Sustain", value: 4 },
-    ];
-  }
-
-  if (normalizedId.includes("dagger") || normalizedArchetype.includes("burst")) {
-    return [
-      { label: "Damage", value: 4 },
-      { label: "Armor", value: 2 },
-      { label: "Burst", value: 5 },
-      { label: "Tempo", value: 4 },
-    ];
-  }
-
-  if (normalizedId.includes("mace") || normalizedArchetype.includes("control")) {
-    return [
-      { label: "Damage", value: 3 },
-      { label: "Armor", value: 4 },
-      { label: "Control", value: 5 },
-      { label: "Sustain", value: 3 },
-    ];
-  }
-
-  if (normalizedId.includes("axe") || normalizedArchetype.includes("tempo")) {
-    return [
-      { label: "Damage", value: 4 },
-      { label: "Armor", value: 2 },
-      { label: "Burst", value: 3 },
-      { label: "Tempo", value: 5 },
-    ];
-  }
-
-  if (normalizedId.includes("heavy") || normalizedArchetype.includes("heavy")) {
-    return [
-      { label: "Damage", value: 5 },
-      { label: "Armor", value: 2 },
-      { label: "Burst", value: 4 },
-      { label: "Tempo", value: 2 },
-    ];
-  }
-
-  if (normalizedId.includes("sustain")) {
-    return [
-      { label: "Damage", value: 2 },
-      { label: "Armor", value: 4 },
-      { label: "Control", value: 2 },
-      { label: "Sustain", value: 5 },
-    ];
-  }
-
-  return [
-    { label: "Damage", value: 4 },
-    { label: "Armor", value: 3 },
-    { label: "Control", value: 2 },
-    { label: "Sustain", value: 3 },
-  ];
+function clampText(text: string, maxLength: number) {
+  return text.length <= maxLength ? text : `${text.slice(0, maxLength - 1).trimEnd()}...`;
 }
 
-function resolveBarGradient(label: string) {
-  switch (label) {
-    case "Damage":
-    case "Burst":
-      return "linear-gradient(90deg, #e5734f, #f4b48f)";
-    case "Armor":
-      return "linear-gradient(90deg, #6e9de8, #b8d4ff)";
-    case "Control":
-      return "linear-gradient(90deg, #8b77e5, #cbc1ff)";
-    case "Tempo":
-      return "linear-gradient(90deg, #56c8ab, #95f0d7)";
-    case "Sustain":
-      return "linear-gradient(90deg, #d6b15f, #f0d89c)";
+function resolveDamagePlan(preset: CombatBuildPreset) {
+  if (preset.tags.includes("Crit")) {
+    return "Crit spike";
+  }
+  if (preset.tags.includes("Bleed")) {
+    return "Bleed ramp";
+  }
+  if (preset.tags.includes("Heavy")) {
+    return "Heavy punish";
+  }
+  if (preset.tags.includes("Control")) {
+    return "Control drain";
+  }
+
+  return "Stable tempo";
+}
+
+function resolveDefensePlan(preset: CombatBuildPreset) {
+  if (preset.archetype === "Defense" || preset.archetype === "Sustain") {
+    return "High stability";
+  }
+  if (preset.loadout.includes("oak-shield")) {
+    return "Shield cover";
+  }
+  if (preset.archetype === "Burst") {
+    return "Light defense";
+  }
+
+  return "Balanced cover";
+}
+
+function shortFightLength(value: string) {
+  return value.replace(" rounds", "r");
+}
+
+function getItemIcon(item: Item) {
+  if (item.type === "weapon") {
+    return "ATK";
+  }
+  if (item.type === "shield") {
+    return "DEF";
+  }
+  if (item.type === "consumable") {
+    return "USE";
+  }
+  if (item.type === "accessory") {
+    return "MOD";
+  }
+
+  return "GEAR";
+}
+
+function getConsumableIcon(item: Item | null) {
+  if (!item) {
+    return "+";
+  }
+  if ((item.consumableEffect?.heal ?? 0) > 0) {
+    return "HP";
+  }
+
+  return "FX";
+}
+
+function formatSlot(slot: string) {
+  switch (slot) {
+    case "mainHand":
+      return "Main Hand";
+    case "offHand":
+      return "Off Hand";
+    case "helmet":
+      return "Helmet";
+    case "armor":
+      return "Armor";
+    case "gloves":
+      return "Gloves";
+    case "boots":
+      return "Boots";
+    case "accessory":
+      return "Accessory";
     default:
-      return "linear-gradient(90deg, #d48b61, #efc4a6)";
+      return formatIdLabel(slot);
   }
 }
 
-function getArchetypeTone(archetype: string) {
-  const normalized = archetype.toLowerCase();
-  if (normalized.includes("defense")) {
-    return { surface: "rgba(92,149,227,0.14)", border: "rgba(92,149,227,0.28)", text: "#b7d5ff", shadow: "rgba(92,149,227,0.12)" };
-  }
-  if (normalized.includes("burst")) {
-    return { surface: "rgba(216,93,145,0.14)", border: "rgba(216,93,145,0.28)", text: "#ee9abb", shadow: "rgba(216,93,145,0.12)" };
-  }
-  if (normalized.includes("control")) {
-    return { surface: "rgba(130,111,213,0.14)", border: "rgba(130,111,213,0.28)", text: "#cdc1ff", shadow: "rgba(130,111,213,0.12)" };
-  }
-  if (normalized.includes("tempo")) {
-    return { surface: "rgba(92,199,178,0.14)", border: "rgba(92,199,178,0.28)", text: "#87e2cf", shadow: "rgba(92,199,178,0.12)" };
-  }
-  if (normalized.includes("heavy")) {
-    return { surface: "rgba(214,177,95,0.14)", border: "rgba(214,177,95,0.28)", text: "#ebcf8b", shadow: "rgba(214,177,95,0.12)" };
-  }
-  if (normalized.includes("sustain")) {
-    return { surface: "rgba(126,171,222,0.14)", border: "rgba(126,171,222,0.28)", text: "#cae0ff", shadow: "rgba(126,171,222,0.12)" };
-  }
-  return { surface: "rgba(229,115,79,0.14)", border: "rgba(229,115,79,0.28)", text: "#f0a286", shadow: "rgba(229,115,79,0.12)" };
-}
-
-function getItemIcon(itemCode: string) {
-  const normalized = itemCode.toLowerCase();
-  if (normalized.includes("shield")) return "🛡";
-  if (normalized.includes("dagger")) return "🗡";
-  if (normalized.includes("axe")) return "🪓";
-  if (normalized.includes("mace")) return "🔨";
-  if (normalized.includes("great") || normalized.includes("sword")) return "⚔";
-  if (normalized.includes("cap") || normalized.includes("helmet")) return "⛑";
-  if (normalized.includes("vest") || normalized.includes("jacket") || normalized.includes("armor")) return "🦺";
-  if (normalized.includes("gloves")) return "🧤";
-  if (normalized.includes("boots")) return "🥾";
-  if (normalized.includes("charm") || normalized.includes("earring") || normalized.includes("medallion")) return "💠";
-  if (normalized.includes("potion")) return "🧪";
-  if (normalized.includes("bandage")) return "🩹";
-  return "◈";
-}
-
-function formatTitle(value: string) {
+function formatIdLabel(value: string) {
   return value
-    .replace(/([a-z])([A-Z])/g, "$1 $2")
-    .replace(/-/g, " ")
-    .replace(/_/g, " ")
-    .replace(/\b\w/g, (char) => char.toUpperCase());
+    .split("-")
+    .map((part) => part.slice(0, 1).toUpperCase() + part.slice(1))
+    .join(" ");
 }
 
-function formatResource(resource: string) {
+function formatResource(resource: CombatSkill["resourceType"]) {
   switch (resource) {
     case "momentum":
       return "Momentum";
     case "focus":
       return "Focus";
-    case "guard":
-      return "Guard";
     case "rage":
       return "Rage";
     default:
-      return formatTitle(resource);
+      return formatIdLabel(resource);
   }
 }
 
-function formatUsageMode(mode: "replace_attack" | "with_attack") {
-  return mode === "with_attack" ? "Use With Attack" : "Use Instead Of Attack";
+function formatResourceRestore(item: Item) {
+  const restore = item.consumableEffect?.resourceRestore;
+
+  if (!restore) {
+    return "None";
+  }
+
+  const first = Object.entries(restore).find(([, value]) => typeof value === "number" && value > 0);
+
+  if (!first) {
+    return "None";
+  }
+
+  return `${formatResource(first[0] as CombatSkill["resourceType"])} +${String(first[1])}`;
+}
+
+function formatUsageMode(item: Item) {
+  const usageMode = item.consumableEffect?.usageMode;
+
+  if (usageMode === "with_attack") {
+    return "Used with attack";
+  }
+  if (usageMode === "replace_attack") {
+    return "Replaces attack";
+  }
+
+  return "Preset consumable";
+}
+
+function formatUsageModeShort(item: Item) {
+  const usageMode = item.consumableEffect?.usageMode;
+
+  if (usageMode === "with_attack") {
+    return "Linked";
+  }
+  if (usageMode === "replace_attack") {
+    return "Stand-alone";
+  }
+
+  return "Basic";
 }

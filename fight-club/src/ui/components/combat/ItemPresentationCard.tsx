@@ -27,70 +27,69 @@ const tonePalette: Record<SectionTone, { label: string; accent: string; text: st
     label: "Offense",
     accent: "#ff9f7a",
     text: "#ffd6c7",
-    background: "rgba(186, 74, 46, 0.16)",
+    background: "rgb(62, 34, 30)",
   },
   defense: {
     label: "Defense",
     accent: "#7fb9ff",
     text: "#d8ebff",
-    background: "rgba(79, 128, 196, 0.16)",
+    background: "rgb(30, 39, 55)",
   },
   attributes: {
     label: "Attributes",
     accent: "#dabb6f",
     text: "#f5e4af",
-    background: "rgba(161, 126, 48, 0.16)",
+    background: "rgb(55, 45, 26)",
   },
   utility: {
     label: "Utility",
     accent: "#7fd3c7",
     text: "#d7fff8",
-    background: "rgba(55, 134, 122, 0.16)",
+    background: "rgb(24, 48, 44)",
   },
 };
 
 const rarityPalette: Record<Item["rarity"], { background: string; text: string; border: string }> = {
   common: {
-    background: "rgba(210, 203, 192, 0.1)",
+    background: "rgb(56, 52, 48)",
     text: "#e8e0d4",
-    border: "rgba(210, 203, 192, 0.2)",
+    border: "rgb(98, 92, 84)",
   },
   rare: {
-    background: "rgba(120, 189, 255, 0.12)",
+    background: "rgb(39, 53, 71)",
     text: "#bfe3ff",
-    border: "rgba(120, 189, 255, 0.24)",
+    border: "rgb(74, 104, 137)",
   },
   epic: {
-    background: "rgba(180, 116, 255, 0.14)",
+    background: "rgb(54, 38, 71)",
     text: "#dcc3ff",
-    border: "rgba(180, 116, 255, 0.26)",
+    border: "rgb(102, 74, 135)",
   },
   legendary: {
-    background: "rgba(255, 186, 107, 0.14)",
+    background: "rgb(72, 51, 27)",
     text: "#ffe0b3",
-    border: "rgba(255, 186, 107, 0.28)",
+    border: "rgb(144, 108, 60)",
   },
 };
 
 const itemTypePalette: Record<Item["type"], TagTone> = {
-  weapon: { background: "rgba(229,115,79,0.16)", border: "rgba(229,115,79,0.28)", text: "#f0a286" },
-  shield: { background: "rgba(92,149,227,0.16)", border: "rgba(92,149,227,0.28)", text: "#b7d5ff" },
-  helmet: { background: "rgba(214,177,95,0.16)", border: "rgba(214,177,95,0.28)", text: "#ebcf8b" },
-  armor: { background: "rgba(176,126,96,0.16)", border: "rgba(176,126,96,0.28)", text: "#f2c3a7" },
-  boots: { background: "rgba(115,149,230,0.16)", border: "rgba(115,149,230,0.28)", text: "#b8cbff" },
-  gloves: { background: "rgba(92,199,178,0.16)", border: "rgba(92,199,178,0.28)", text: "#87e2cf" },
-  accessory: { background: "rgba(130,111,213,0.16)", border: "rgba(130,111,213,0.28)", text: "#ccc0ff" },
-  consumable: { background: "rgba(92,199,178,0.16)", border: "rgba(92,199,178,0.28)", text: "#87e2cf" },
-  material: { background: "rgba(255,255,255,0.08)", border: "rgba(255,255,255,0.14)", text: "#ddd3c5" },
+  weapon: { background: "rgb(66, 38, 32)", border: "rgb(119, 70, 59)", text: "#f0a286" },
+  shield: { background: "rgb(33, 46, 66)", border: "rgb(66, 94, 134)", text: "#b7d5ff" },
+  helmet: { background: "rgb(67, 55, 31)", border: "rgb(123, 101, 58)", text: "#ebcf8b" },
+  armor: { background: "rgb(63, 45, 37)", border: "rgb(108, 77, 63)", text: "#f2c3a7" },
+  boots: { background: "rgb(34, 45, 66)", border: "rgb(70, 90, 133)", text: "#b8cbff" },
+  gloves: { background: "rgb(26, 51, 46)", border: "rgb(57, 106, 97)", text: "#87e2cf" },
+  accessory: { background: "rgb(44, 38, 72)", border: "rgb(83, 72, 132)", text: "#ccc0ff" },
+  consumable: { background: "rgb(26, 51, 46)", border: "rgb(57, 106, 97)", text: "#87e2cf" },
+  material: { background: "rgb(48, 48, 52)", border: "rgb(88, 88, 96)", text: "#ddd3c5" },
 };
 
 const cardStyle: CSSProperties = {
   borderRadius: "16px",
   padding: "12px",
-  background:
-    "linear-gradient(180deg, rgba(29,24,20,0.98), rgba(16,14,20,0.98)), radial-gradient(circle at top, rgba(255,214,164,0.08), transparent 32%)",
+  background: "linear-gradient(180deg, rgb(30,25,21), rgb(17,15,21))",
   border: "1px solid rgba(255,255,255,0.08)",
-  boxShadow: "inset 0 1px 0 rgba(255,255,255,0.04), 0 14px 28px rgba(0,0,0,0.2)",
+  boxShadow: "inset 0 1px 0 rgba(255,255,255,0.04), 0 14px 28px rgba(0,0,0,0.28)",
   display: "grid",
   gap: "12px",
 };
@@ -244,8 +243,8 @@ function ItemSection({
                     display: "inline-flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    background: "rgba(255,255,255,0.08)",
-                    border: "1px solid rgba(255,255,255,0.08)",
+                    background: "rgb(56, 52, 48)",
+                    border: "1px solid rgb(78, 74, 70)",
                     flexShrink: 0,
                   }}
                 >
@@ -300,8 +299,8 @@ function MutedTag({ label, palette }: { label: string; palette?: TagTone }) {
         padding: "4px 8px",
         fontSize: "10px",
         color: palette?.text ?? "#ddd3c5",
-        background: palette?.background ?? "rgba(255,255,255,0.06)",
-        border: `1px solid ${palette?.border ?? "rgba(255,255,255,0.08)"}`,
+        background: palette?.background ?? "rgb(48, 48, 52)",
+        border: `1px solid ${palette?.border ?? "rgb(88, 88, 96)"}`,
       }}
     >
       {label}

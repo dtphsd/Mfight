@@ -1,5 +1,5 @@
 import { getHuntingRouteStance } from "@/content/hunting/routeStances";
-import { saveSchema, type SaveFile } from "@/core/storage/saveSchema";
+import { saveSchema } from "@/core/storage/saveSchema";
 import type { SaveRepository } from "@/core/storage/SaveRepository";
 import { saveGame } from "@/orchestration/saveGame";
 import type { Inventory } from "@/modules/inventory";

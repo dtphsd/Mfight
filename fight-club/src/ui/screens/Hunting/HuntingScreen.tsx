@@ -4,7 +4,6 @@ import {
   getHunterLevelStepCost,
   getHuntingPetLevelStepCost,
   getHuntingToolMasteryLevel,
-  getHuntingToolMasteryProgress,
 } from "@/modules/hunting";
 import { getItemQuantity } from "@/modules/inventory";
 import type { HuntLogEntry } from "@/modules/hunting/model/HuntReward";
@@ -711,8 +710,6 @@ export function HuntingScreen({ onBack }: HuntingScreenProps) {
                 <div className="hunting-lodge__tool-grid">
                   {toolCatalog.map((tool) => {
                     const masteryLevel = getHuntingToolMasteryLevel(profile.toolMastery[tool.itemCode] ?? 0);
-                    const masteryProgress = getHuntingToolMasteryProgress(profile.toolMastery[tool.itemCode] ?? 0);
-
                     return (
                     <button
                       key={tool.itemCode}

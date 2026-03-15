@@ -1,6 +1,6 @@
 # PROJECT-INFO - Fight Club
 
-> Last updated: 2026-03-15 17:30 MSK
+> Last updated: 2026-03-15 20:32 MSK
 
 **Project:** Fight Club  
 **Type:** browser-only SPA / combat sandbox  
@@ -288,7 +288,7 @@ Current validated state:
 - `npm run build` passes
 - `npm run test` passes
 - `npm run docs:validate` passes
-- `npm run lint` currently fails because generated `docs/.vitepress/.temp` and `docs/.vitepress/dist` artifacts are included, plus two existing source-level issues in `src/modules/hunting/application/huntingPersistence.ts` and `src/ui/screens/Hunting/HuntingScreen.tsx`
+- `npm run lint` passes
 - `npm run balance:matrix` passes and writes the current matchup matrix to `fight-club/docs/balance/`
 
 Current automated coverage count:
@@ -319,4 +319,4 @@ From repo root:
 
 ---
 
-> Last updated: 2026-03-15 16:11 MSK
+> Last updated: 2026-03-15 20:32 MSK

@@ -1,10 +1,12 @@
 import { createId } from "@/core/ids/createId";
 import type { Random } from "@/core/rng/Random";
 import {
+  armorRange,
   baseDamage,
   blockPenetration,
   critChance,
   critMultiplier,
+  damageRange,
   dodgeChance,
 } from "@/modules/combat/services/combatFormulas";
 import type { CombatantState } from "@/modules/combat/model/CombatantState";
@@ -31,7 +33,6 @@ import {
   combatChanceCaps,
   combatDamageTypes,
   combatProfileMixConfig,
-  combatGenericZoneDefenseProfiles,
   combatResourceRewards,
   combatWeaponClassProfiles,
   combatZoneDamageModifiers,
@@ -45,6 +46,7 @@ import {
   type DamageProfile,
   type DamageType,
   type WeaponClass,
+  type ZoneArmorProfile,
   zeroDamageProfile,
 } from "@/modules/inventory";
 
@@ -58,7 +60,8 @@ type CombatFailureReason =
   | "combatant_not_found"
   | "duplicate_defense_zones"
   | "dead_combatant_action"
-  | "insufficient_resources";
+  | "insufficient_resources"
+  | "skill_on_cooldown";
 
 export function resolveRound(
   state: CombatState,
@@ -214,6 +217,10 @@ function resolveAttack(
   const selectedSkillStateBonus = getCombatSkillStateBonus(selectedSkill, defender.activeEffects);
   const resourceCost = selectedSkill ? selectedSkill.cost : 0;
 
+  if (selectedSkill && getCombatantSkillCooldown(preparedAttacker, selectedSkill.id) > 0) {
+    throw new Error("skill_on_cooldown");
+  }
+
   if (selectedSkill && preparedAttacker.resources[selectedSkill.resourceType] < resourceCost) {
     throw new Error("insufficient_resources");
   }
@@ -289,6 +296,7 @@ function resolveAttack(
     effectiveDefender,
     effectivePreparedAttacker.attackZone!,
     isBlocked,
+    random,
     sumDamageProfiles(
       sumDamageProfiles(
         selectedSkill?.armorPenetrationPercentBonus ?? zeroDamageProfile,
@@ -309,7 +317,7 @@ function resolveAttack(
     const penetrationRoll = random.int(0, 99);
 
     if (penetrationRoll >= penetrationRate) {
-      const blockedPercent = clampPercent(combatBlockConfig.baseBlockedPercent + defender.blockPowerBonus);
+      const blockedPercent = rollBlockedPercent(defender, random);
 
       result.type = "block";
       result.blocked = true;
@@ -338,17 +346,19 @@ function resolveAttack(
   if (critRoll < critRate) {
       result.type = "crit";
       result.crit = true;
-      result.attackerResourceGain = { rage: combatResourceRewards.critAttackerRage };
+    result.attackerResourceGain = { rage: combatResourceRewards.critAttackerRage };
       resolvedProfile = scaleProfile(
         resolvedProfile,
-      critMultiplier(effectivePreparedAttacker.stats.endurance) + effectivePreparedAttacker.critMultiplierBonus
+      critMultiplier(effectivePreparedAttacker.stats.rage, effectivePreparedAttacker.stats.endurance) +
+        effectivePreparedAttacker.critMultiplierBonus
     );
     result.messages.push("crit");
     result.commentary = "Attacker fully committed to the hit";
   }
 
-  result.damage = totalProfileValue(resolvedProfile);
-  result.finalDamage = Math.floor(result.damage);
+  const rolledDamage = rollDamageValue(totalProfileValue(resolvedProfile), random);
+  result.damage = rolledDamage;
+  result.finalDamage = Math.floor(rolledDamage);
 
   if (selectedSkillStateBonus.triggeredBonusCount > 0) {
     result.messages.push("state_bonus");
@@ -379,6 +389,7 @@ function resolveAttack(
       selectedSkill ? { [selectedSkill.resourceType]: selectedSkill.cost } : {},
       result.attackerResourceGain
     ),
+    skillCooldowns: setCombatantSkillCooldown(preparedAttacker.skillCooldowns, selectedSkill),
   };
 
   const effectApplication = applySkillEffects({
@@ -569,47 +580,44 @@ function applyArmorMitigation(
   defender: CombatantState,
   zone: CombatZone,
   isDefended: boolean,
+  random: Random,
   skillArmorPenetrationPercentBonus: DamageProfile
 ): DamageProfile {
-  const effectiveArmor = getZoneAdjustedArmorProfile(zone, defender, defender.blockPowerBonus, isDefended);
+  const totalAttack = totalProfileValue(attackProfile);
+  const effectiveArmor = getZoneAdjustedArmorValue(zone, defender, defender.blockPowerBonus, isDefended);
+  const primaryDamageType = getPrimaryDamageType(attackProfile);
+  const mitigatedDamage = mitigateDamage(
+    totalAttack,
+    effectiveArmor,
+    random,
+    attacker.armorPenetrationFlat[primaryDamageType],
+    attacker.armorPenetrationPercent[primaryDamageType] + skillArmorPenetrationPercentBonus[primaryDamageType]
+  );
 
-  return {
-    slash: mitigateDamageType(
-      attackProfile.slash,
-      effectiveArmor.slash,
-      attacker.armorPenetrationFlat.slash,
-      attacker.armorPenetrationPercent.slash + skillArmorPenetrationPercentBonus.slash
-    ),
-    pierce: mitigateDamageType(
-      attackProfile.pierce,
-      effectiveArmor.pierce,
-      attacker.armorPenetrationFlat.pierce,
-      attacker.armorPenetrationPercent.pierce + skillArmorPenetrationPercentBonus.pierce
-    ),
-    blunt: mitigateDamageType(
-      attackProfile.blunt,
-      effectiveArmor.blunt,
-      attacker.armorPenetrationFlat.blunt,
-      attacker.armorPenetrationPercent.blunt + skillArmorPenetrationPercentBonus.blunt
-    ),
-    chop: mitigateDamageType(
-      attackProfile.chop,
-      effectiveArmor.chop,
-      attacker.armorPenetrationFlat.chop,
-      attacker.armorPenetrationPercent.chop + skillArmorPenetrationPercentBonus.chop
-    ),
-  };
+  if (totalAttack <= 0 || mitigatedDamage <= 0) {
+    return {
+      slash: 0,
+      pierce: 0,
+      blunt: 0,
+      chop: 0,
+    };
+  }
+
+  const mitigationFactor = mitigatedDamage / totalAttack;
+  return scaleProfile(attackProfile, mitigationFactor);
 }
 
-function mitigateDamageType(
+function mitigateDamage(
   attackValue: number,
   armorValue: number,
+  random: Random,
   penetrationFlat: number,
   penetrationPercent: number
 ) {
+  const rolledArmor = rollArmorValue(armorValue, random);
   const effectiveArmor = Math.max(
     0,
-    armorValue - penetrationFlat - armorValue * (penetrationPercent / 100)
+    rolledArmor - penetrationFlat - rolledArmor * (penetrationPercent / 100)
   );
 
   return Math.max(0, attackValue - effectiveArmor);
@@ -652,47 +660,38 @@ function getPrimaryDamageType(profile: DamageProfile): DamageType {
   , combatDamageTypes[0]);
 }
 
-function getZoneAdjustedArmorProfile(
+function getZoneAdjustedArmorValue(
   zone: CombatZone,
   defender: CombatantState,
   blockPowerBonus: number,
   isDefended: boolean
-): ArmorProfile {
+): number {
+  const zoneArmor = defender.zoneArmor ?? { head: 0, chest: 0, belly: 0, waist: 0, legs: 0 };
   if (!isDefended) {
-    return defender.armor;
+    return zoneArmor[zone];
   }
 
-  const focusProfile = getDefenseZoneFocusProfile(zone, defender.armorBySlot);
+  const focusArmor = getDefenseZoneFocusValue(zone, defender.zoneArmorBySlot ?? {});
   const focusStrength = 1 + Math.max(0, blockPowerBonus) / combatBlockConfig.focusStrengthDivisor;
 
-  return {
-    slash: defender.armor.slash + focusProfile.slash * focusStrength,
-    pierce: defender.armor.pierce + focusProfile.pierce * focusStrength,
-    blunt: defender.armor.blunt + focusProfile.blunt * focusStrength,
-    chop: defender.armor.chop + focusProfile.chop * focusStrength,
-  };
+  return zoneArmor[zone] + focusArmor * focusStrength;
 }
 
-function getDefenseZoneFocusProfile(
+function getDefenseZoneFocusValue(
   zone: CombatZone,
-  armorBySlot: Partial<Record<EquipmentSlot, ArmorProfile>>
-): ArmorProfile {
+  zoneArmorBySlot: Partial<Record<EquipmentSlot, ZoneArmorProfile>>
+): number {
   const zoneSlots = getZoneDefenseSlots(zone);
 
-  return zoneSlots.reduce<ArmorProfile>(
-    (profile, { slot, weight }) => {
-      const slotArmor = armorBySlot[slot];
+  return zoneSlots.reduce(
+    (total, { slot, weight }) => {
+      const slotArmor = zoneArmorBySlot[slot];
 
       if (!slotArmor) {
-        return profile;
+        return total;
       }
 
-      return {
-        slash: profile.slash + slotArmor.slash * weight,
-        pierce: profile.pierce + slotArmor.pierce * weight,
-        blunt: profile.blunt + slotArmor.blunt * weight,
-        chop: profile.chop + slotArmor.chop * weight,
-      };
+      return total + slotArmor[zone] * weight;
     },
     getGenericZoneDefenseProfile(zone)
   );
@@ -702,8 +701,19 @@ function getZoneDefenseSlots(zone: CombatZone): Array<{ slot: EquipmentSlot; wei
   return combatZoneDefenseSlots[zone];
 }
 
-function getGenericZoneDefenseProfile(zone: CombatZone): ArmorProfile {
-  return combatGenericZoneDefenseProfiles[zone];
+function getGenericZoneDefenseProfile(zone: CombatZone): number {
+  switch (zone) {
+    case "head":
+      return 1;
+    case "chest":
+      return 1;
+    case "belly":
+      return 1;
+    case "waist":
+      return 0;
+    case "legs":
+      return 0;
+  }
 }
 
 function getStyleDistribution(
@@ -739,8 +749,45 @@ function clampChance(value: number) {
   return Math.min(combatChanceCaps.chance, Math.max(0, Math.round(value)));
 }
 
-function clampPercent(value: number) {
-  return Math.min(combatChanceCaps.percent, Math.max(0, Math.round(value)));
+function clampBlockPercent(value: number) {
+  return Math.min(combatBlockConfig.maxBlockedPercent, Math.max(40, Math.round(value)));
+}
+
+function rollBlockedPercent(defender: CombatantState, random: Random) {
+  const strongBlockChance = clampChance(
+    combatBlockConfig.baseStrongBlockChance +
+      defender.stats.endurance * combatBlockConfig.enduranceToStrongBlockChanceFactor +
+      defender.blockPowerBonus * combatBlockConfig.blockPowerToStrongBlockChanceFactor
+  );
+  const strongBlockRoll = random.int(0, 99);
+  const strongBlock = strongBlockRoll < strongBlockChance;
+
+  const minBlockedPercent = strongBlock
+    ? combatBlockConfig.strongBlockThresholdPercent
+    : combatBlockConfig.baseBlockedPercent;
+  const maxBlockedPercent = strongBlock
+    ? combatBlockConfig.maxBlockedPercent
+    : combatBlockConfig.strongBlockThresholdPercent - 1;
+
+  return clampBlockPercent(random.int(minBlockedPercent, maxBlockedPercent));
+}
+
+function rollDamageValue(value: number, random: Random) {
+  const range = damageRange(value);
+  if (range.max <= range.min) {
+    return range.min;
+  }
+
+  return random.int(range.min, range.max);
+}
+
+function rollArmorValue(value: number, random: Random) {
+  const range = armorRange(value);
+  if (range.max <= range.min) {
+    return range.min;
+  }
+
+  return random.int(range.min, range.max);
 }
 
 function getCombatSkillStateBonus(
@@ -812,10 +859,19 @@ function getCombatEffectModifiers(effects: ActiveCombatEffect[]): CombatEffectMo
 }
 
 function applyCombatEffectModifiers(combatant: CombatantState, modifiers: CombatEffectModifiers): CombatantState {
+  const averageArmorBonus = Math.floor(totalProfileValue(modifiers.armorFlatBonus) / combatDamageTypes.length);
+
   return {
     ...combatant,
     damage: sumDamageProfiles(combatant.damage, modifiers.damageFlatBonus),
     armor: sumArmorProfiles(combatant.armor, modifiers.armorFlatBonus),
+    zoneArmor: {
+      head: (combatant.zoneArmor?.head ?? 0) + averageArmorBonus,
+      chest: (combatant.zoneArmor?.chest ?? 0) + averageArmorBonus,
+      belly: (combatant.zoneArmor?.belly ?? 0) + averageArmorBonus,
+      waist: (combatant.zoneArmor?.waist ?? 0) + averageArmorBonus,
+      legs: (combatant.zoneArmor?.legs ?? 0) + averageArmorBonus,
+    },
     critChanceBonus: combatant.critChanceBonus + modifiers.critChanceBonus,
     dodgeChanceBonus: combatant.dodgeChanceBonus + modifiers.dodgeChanceBonus,
     blockChanceBonus: combatant.blockChanceBonus + modifiers.blockChanceBonus,
@@ -859,6 +915,7 @@ function processTurnStartEffects(combatant: CombatantState): {
     currentHp: nextHp,
     resources: addCombatResources(combatant.resources, resourceGain),
     activeEffects: remainingEffects,
+    skillCooldowns: tickCombatantSkillCooldowns(combatant.skillCooldowns),
   };
 
   if (totalDamage === 0 && totalHeal === 0 && expiredEffects.length === 0 && isZeroResourceState(resourceGain)) {
@@ -1076,6 +1133,32 @@ function buildTurnStartEffectCommentary(effects: ActiveCombatEffect[], totalDama
   }
 
   return parts.join(" and ");
+}
+
+function getCombatantSkillCooldown(combatant: CombatantState, skillId: string) {
+  return combatant.skillCooldowns?.[skillId] ?? 0;
+}
+
+function setCombatantSkillCooldown(
+  currentCooldowns: CombatantState["skillCooldowns"],
+  skill: CombatSkill | null | undefined
+) {
+  if (!skill || typeof skill.cooldownTurns !== "number" || skill.cooldownTurns <= 0) {
+    return currentCooldowns ?? {};
+  }
+
+  return {
+    ...(currentCooldowns ?? {}),
+    [skill.id]: skill.cooldownTurns,
+  };
+}
+
+function tickCombatantSkillCooldowns(currentCooldowns: CombatantState["skillCooldowns"]) {
+  return Object.fromEntries(
+    Object.entries(currentCooldowns ?? {})
+      .map(([skillId, turns]) => [skillId, Math.max(0, Number(turns) - 1)] as const)
+      .filter(([, turns]) => turns > 0)
+  );
 }
 
 function normalizeError(error: unknown): CombatFailureReason {

@@ -16,13 +16,19 @@ interface EquipmentSlotPopoverProps {
 }
 
 const slotToneBySlot: Record<EquipmentSlot, { icon: string; tint: string; border: string; text: string }> = {
-  mainHand: { icon: "⚔", tint: "rgba(229,115,79,0.16)", border: "rgba(229,115,79,0.34)", text: "#f0a286" },
-  offHand: { icon: "🛡", tint: "rgba(92,149,227,0.16)", border: "rgba(92,149,227,0.34)", text: "#b7d5ff" },
-  helmet: { icon: "🪖", tint: "rgba(214,177,95,0.16)", border: "rgba(214,177,95,0.34)", text: "#ebcf8b" },
-  armor: { icon: "🦺", tint: "rgba(176,126,96,0.16)", border: "rgba(176,126,96,0.34)", text: "#f2c3a7" },
-  gloves: { icon: "🧤", tint: "rgba(92,199,178,0.16)", border: "rgba(92,199,178,0.34)", text: "#87e2cf" },
-  accessory: { icon: "💍", tint: "rgba(130,111,213,0.16)", border: "rgba(130,111,213,0.34)", text: "#ccc0ff" },
-  boots: { icon: "🥾", tint: "rgba(115,149,230,0.16)", border: "rgba(115,149,230,0.34)", text: "#b8cbff" },
+  mainHand: { icon: "W", tint: "rgba(229,115,79,0.16)", border: "rgba(229,115,79,0.34)", text: "#f0a286" },
+  offHand: { icon: "O", tint: "rgba(92,149,227,0.16)", border: "rgba(92,149,227,0.34)", text: "#b7d5ff" },
+  helmet: { icon: "H", tint: "rgba(214,177,95,0.16)", border: "rgba(214,177,95,0.34)", text: "#ebcf8b" },
+  shirt: { icon: "S", tint: "rgba(196,164,112,0.14)", border: "rgba(196,164,112,0.34)", text: "#e9d1a2" },
+  armor: { icon: "A", tint: "rgba(176,126,96,0.16)", border: "rgba(176,126,96,0.34)", text: "#f2c3a7" },
+  bracers: { icon: "B", tint: "rgba(80,176,160,0.16)", border: "rgba(80,176,160,0.34)", text: "#9ee8d8" },
+  belt: { icon: "T", tint: "rgba(160,116,74,0.16)", border: "rgba(160,116,74,0.34)", text: "#e3bf9a" },
+  pants: { icon: "P", tint: "rgba(94,123,180,0.16)", border: "rgba(94,123,180,0.34)", text: "#c7d8ff" },
+  boots: { icon: "F", tint: "rgba(115,149,230,0.16)", border: "rgba(115,149,230,0.34)", text: "#b8cbff" },
+  gloves: { icon: "G", tint: "rgba(92,199,178,0.16)", border: "rgba(92,199,178,0.34)", text: "#87e2cf" },
+  ring: { icon: "R", tint: "rgba(130,111,213,0.16)", border: "rgba(130,111,213,0.34)", text: "#ccc0ff" },
+  ring2: { icon: "R", tint: "rgba(154,128,226,0.16)", border: "rgba(154,128,226,0.34)", text: "#ddd1ff" },
+  earring: { icon: "E", tint: "rgba(120,168,255,0.16)", border: "rgba(120,168,255,0.34)", text: "#cfe2ff" },
 };
 
 export function EquipmentSlotPopover({
@@ -75,6 +81,7 @@ export function EquipmentSlotPopover({
                     background: slotTone.tint,
                     border: `1px solid ${slotTone.border}`,
                     fontSize: "18px",
+                    fontWeight: 800,
                   }}
                 >
                   {slotTone.icon}
@@ -192,13 +199,25 @@ function formatEquipmentSlot(slot: EquipmentSlot) {
       return "Off Hand";
     case "helmet":
       return "Helmet";
+    case "shirt":
+      return "Shirt";
     case "armor":
       return "Armor";
+    case "bracers":
+      return "Bracers";
+    case "belt":
+      return "Belt";
+    case "pants":
+      return "Pants";
     case "boots":
       return "Boots";
     case "gloves":
       return "Gloves";
-    case "accessory":
-      return "Accessory";
+    case "ring":
+      return "Ring";
+    case "ring2":
+      return "Ring II";
+    case "earring":
+      return "Earring";
   }
 }

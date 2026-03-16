@@ -12,4 +12,21 @@ export default defineConfig({
       "@": path.resolve(rootDir, "./src"),
     },
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes("node_modules")) {
+            if (id.includes("react") || id.includes("scheduler")) {
+              return "react-vendor";
+            }
+            if (id.includes("zod")) {
+              return "data-vendor";
+            }
+            return "vendor";
+          }
+        },
+      },
+    },
+  },
 });

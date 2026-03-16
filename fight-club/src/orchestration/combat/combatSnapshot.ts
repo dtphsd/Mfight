@@ -5,9 +5,10 @@ import type {
   CombatBonuses,
   DamageProfile,
   DamageType,
+  ZoneArmorProfile,
   WeaponClass,
 } from "@/modules/inventory";
-import { zeroArmorProfile, zeroCombatBonuses, zeroDamageProfile } from "@/modules/inventory";
+import { zeroArmorProfile, zeroCombatBonuses, zeroDamageProfile, zeroZoneArmorProfile } from "@/modules/inventory";
 
 export interface CombatSnapshot {
   characterId: string;
@@ -16,7 +17,9 @@ export interface CombatSnapshot {
   maxHp: number;
   damage: DamageProfile;
   armor: ArmorProfile;
+  zoneArmor?: ZoneArmorProfile;
   armorBySlot: Partial<Record<EquipmentSlot, ArmorProfile>>;
+  zoneArmorBySlot?: Partial<Record<EquipmentSlot, ZoneArmorProfile>>;
   critChanceBonus: number;
   critMultiplierBonus: number;
   dodgeChanceBonus: number;
@@ -34,7 +37,9 @@ export interface CombatSnapshotBuilderInput {
   percentBonuses: Character["baseStats"][];
   baseDamage?: DamageProfile;
   baseArmor?: ArmorProfile;
+  baseZoneArmor?: ZoneArmorProfile;
   armorBySlot?: Partial<Record<EquipmentSlot, ArmorProfile>>;
+  zoneArmorBySlot?: Partial<Record<EquipmentSlot, ZoneArmorProfile>>;
   combatBonuses?: CombatBonuses;
   preferredDamageType?: DamageType | null;
   weaponClass?: WeaponClass | null;
@@ -55,6 +60,16 @@ export function cloneArmorProfile(profile: ArmorProfile = zeroArmorProfile): Arm
     pierce: profile.pierce,
     blunt: profile.blunt,
     chop: profile.chop,
+  };
+}
+
+export function cloneZoneArmorProfile(profile: ZoneArmorProfile = zeroZoneArmorProfile): ZoneArmorProfile {
+  return {
+    head: profile.head,
+    chest: profile.chest,
+    belly: profile.belly,
+    waist: profile.waist,
+    legs: profile.legs,
   };
 }
 

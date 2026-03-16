@@ -185,7 +185,9 @@ function selectSkill(
   }
 
   const affordableSkills = availableSkills.filter(
-    (skill) => attackerCombatant.resources[skill.resourceType] >= skill.cost
+    (skill) =>
+      attackerCombatant.resources[skill.resourceType] >= skill.cost &&
+      ((attackerCombatant.skillCooldowns ?? {})[skill.id] ?? 0) <= 0
   );
 
   if (affordableSkills.length === 0) {

@@ -2,7 +2,6 @@ import {
   baseDamage,
   combatBlockConfig,
   combatZones,
-  combatGenericZoneDefenseProfiles,
   combatProfileMixConfig,
   combatWeaponClassProfiles,
   combatZoneDamageModifiers,
@@ -11,7 +10,7 @@ import {
   type CombatSnapshot,
   type CombatZone,
 } from "@/modules/combat";
-import type { ArmorProfile, DamageProfile, DamageType } from "@/modules/inventory";
+import type { ArmorProfile, DamageProfile, DamageType, ZoneArmorProfile } from "@/modules/inventory";
 
 export function totalProfileValue(profile: DamageProfile | ArmorProfile) {
   return profile.slash + profile.pierce + profile.blunt + profile.chop;
@@ -55,34 +54,13 @@ function estimateZoneDamage(
   isDefended: boolean
 ) {
   const attackProfile = calculatePreviewAttackProfile(attacker, zone);
-  const effectiveArmor = getPreviewZoneArmorProfile(zone, defender, isDefended);
+  const totalAttack = totalProfileValue(attackProfile);
+  const effectiveArmor = getPreviewZoneArmorValue(zone, defender, isDefended);
+  const damageType = resolveDisplayDamageType(attacker.preferredDamageType, attackProfile);
+  const penetrationFlat = damageType ? attacker.armorPenetrationFlat[damageType] : 0;
+  const penetrationPercent = damageType ? attacker.armorPenetrationPercent[damageType] : 0;
 
-  return totalProfileValue({
-    slash: mitigatePreviewDamageType(
-      attackProfile.slash,
-      effectiveArmor.slash,
-      attacker.armorPenetrationFlat.slash,
-      attacker.armorPenetrationPercent.slash
-    ),
-    pierce: mitigatePreviewDamageType(
-      attackProfile.pierce,
-      effectiveArmor.pierce,
-      attacker.armorPenetrationFlat.pierce,
-      attacker.armorPenetrationPercent.pierce
-    ),
-    blunt: mitigatePreviewDamageType(
-      attackProfile.blunt,
-      effectiveArmor.blunt,
-      attacker.armorPenetrationFlat.blunt,
-      attacker.armorPenetrationPercent.blunt
-    ),
-    chop: mitigatePreviewDamageType(
-      attackProfile.chop,
-      effectiveArmor.chop,
-      attacker.armorPenetrationFlat.chop,
-      attacker.armorPenetrationPercent.chop
-    ),
-  });
+  return mitigatePreviewDamage(totalAttack, effectiveArmor, penetrationFlat, penetrationPercent);
 }
 
 function calculatePreviewAttackProfile(attacker: CombatSnapshot, zone: CombatZone): DamageProfile {
@@ -113,42 +91,34 @@ function calculatePreviewAttackProfile(attacker: CombatSnapshot, zone: CombatZon
   };
 }
 
-function getPreviewZoneArmorProfile(zone: CombatZone, defender: CombatSnapshot, isDefended: boolean): ArmorProfile {
+function getPreviewZoneArmorValue(zone: CombatZone, defender: CombatSnapshot, isDefended: boolean): number {
+  const zoneArmor = defender.zoneArmor ?? { head: 0, chest: 0, belly: 0, waist: 0, legs: 0 };
   if (!isDefended) {
-    return defender.armor;
+    return zoneArmor[zone];
   }
 
-  const focusProfile = getPreviewDefenseZoneFocusProfile(zone, defender.armorBySlot);
+  const focusArmor = getPreviewDefenseZoneFocusValue(zone, defender.zoneArmorBySlot ?? {});
   const focusStrength = 1 + Math.max(0, defender.blockPowerBonus) / combatBlockConfig.focusStrengthDivisor;
 
-  return {
-    slash: defender.armor.slash + focusProfile.slash * focusStrength,
-    pierce: defender.armor.pierce + focusProfile.pierce * focusStrength,
-    blunt: defender.armor.blunt + focusProfile.blunt * focusStrength,
-    chop: defender.armor.chop + focusProfile.chop * focusStrength,
-  };
+  return zoneArmor[zone] + focusArmor * focusStrength;
 }
 
-function getPreviewDefenseZoneFocusProfile(
+function getPreviewDefenseZoneFocusValue(
   zone: CombatZone,
-  armorBySlot: CombatSnapshot["armorBySlot"]
-): ArmorProfile {
+  zoneArmorBySlot: CombatSnapshot["zoneArmorBySlot"]
+): number {
   const zoneSlots = getPreviewDefenseSlots(zone);
+  const slotProfiles = zoneArmorBySlot ?? {};
 
-  return zoneSlots.reduce<ArmorProfile>(
-    (profile, { slot, weight }) => {
-      const slotArmor = armorBySlot[slot];
+  return zoneSlots.reduce(
+    (total, { slot, weight }) => {
+      const slotArmor = slotProfiles[slot];
 
       if (!slotArmor) {
-        return profile;
+        return total;
       }
 
-      return {
-        slash: profile.slash + slotArmor.slash * weight,
-        pierce: profile.pierce + slotArmor.pierce * weight,
-        blunt: profile.blunt + slotArmor.blunt * weight,
-        chop: profile.chop + slotArmor.chop * weight,
-      };
+      return total + getZoneArmorValue(slotArmor, zone) * weight;
     },
     getPreviewGenericZoneArmor(zone)
   );
@@ -158,8 +128,19 @@ function getPreviewDefenseSlots(zone: CombatZone) {
   return combatZoneDefenseSlots[zone];
 }
 
-function getPreviewGenericZoneArmor(zone: CombatZone): ArmorProfile {
-  return combatGenericZoneDefenseProfiles[zone];
+function getPreviewGenericZoneArmor(zone: CombatZone): number {
+  switch (zone) {
+    case "head":
+      return 1;
+    case "chest":
+      return 1;
+    case "belly":
+      return 1;
+    case "waist":
+      return 0;
+    case "legs":
+      return 0;
+  }
 }
 
 function getPreviewStyleDistribution(
@@ -214,7 +195,7 @@ function normalizePreviewProfile(profile: DamageProfile): DamageProfile {
   };
 }
 
-function mitigatePreviewDamageType(
+function mitigatePreviewDamage(
   attackValue: number,
   armorValue: number,
   penetrationFlat: number,
@@ -222,4 +203,8 @@ function mitigatePreviewDamageType(
 ) {
   const effectiveArmor = Math.max(0, armorValue - penetrationFlat - armorValue * (penetrationPercent / 100));
   return Math.max(0, attackValue - effectiveArmor);
+}
+
+function getZoneArmorValue(profile: ZoneArmorProfile, zone: CombatZone) {
+  return profile[zone];
 }

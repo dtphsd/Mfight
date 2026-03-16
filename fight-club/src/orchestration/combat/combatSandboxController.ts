@@ -166,6 +166,18 @@ export function resolveSandboxRound(input: SandboxRoundFlowInput): ResolveRoundR
     };
   }
 
+  const selectedSkillCooldown = selectedSkill ? ((playerCombatant.skillCooldowns ?? {})[selectedSkill.id] ?? 0) : 0;
+
+  if (selectedSkill && selectedSkillCooldown > 0) {
+    return {
+      success: false,
+      combatPhase: input.combatPhase,
+      botLastPlan: null,
+      botLastAction: null,
+      roundError: `${selectedSkill.name} is on cooldown for ${selectedSkillCooldown} more turn${selectedSkillCooldown === 1 ? "" : "s"}.`,
+    };
+  }
+
   const resolvingPhase = phaseWhileResolving();
   const playerAction = buildPlayerRoundAction({
     attackerId: playerCombatant.id,

@@ -6,10 +6,16 @@ export function createEquipment(): Equipment {
       mainHand: null,
       offHand: null,
       helmet: null,
+      shirt: null,
       armor: null,
+      bracers: null,
+      belt: null,
+      pants: null,
       boots: null,
       gloves: null,
-      accessory: null,
+      ring: null,
+      ring2: null,
+      earring: null,
     },
   };
 }

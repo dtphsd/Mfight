@@ -1,10 +1,17 @@
 # Fight Club Docs
 
-> Last updated: 2026-03-14 12:26 MSK
+> Last updated: 2026-03-16 02:42 MSK
 
 This folder is the GitBook-ready documentation set for the `Fight Club` project.
 
 Use it as the main reading path when onboarding, reviewing architecture, planning safe changes, or checking live combat behavior against the code.
+
+The current docs baseline now reflects:
+
+- Battle Kings item imports through `BazaBK/`
+- zone-based armor and roll-based block
+- cooldown-aware combat skills
+- synchronized `Combat Rules` content and verification guidance
 
 ---
 
@@ -51,6 +58,8 @@ For GitBook navigation, use [SUMMARY.md](./SUMMARY.md).
   - generated balance reports such as `latest-build-matrix.md`
 - `backup-points/`
   - recovery checkpoints and preserved rollback artifacts
+- `../BazaBK/`
+  - local source pages, images, parsed catalogs, and generation inputs for combat item imports
 
 These operational folders are useful for engineering work, but they are not the primary GitBook reading flow.
 
@@ -75,7 +84,11 @@ These operational folders are useful for engineering work, but they are not the 
   - `src/ui/screens/Combat/CombatSandboxScreen.tsx`
 - player-facing rules:
   - `src/ui/screens/CombatRules/`
+- source-data pipeline:
+  - `BazaBK/`
+  - `scripts/parse-bazakbk-pages.mjs`
+  - `scripts/generate-bazakbk-starter-items.mjs`
 
 ---
 
-> Last updated: 2026-03-14 12:26 MSK
+> Last updated: 2026-03-16 02:42 MSK

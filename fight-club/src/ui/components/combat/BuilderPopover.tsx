@@ -112,14 +112,14 @@ const statMeta: Record<
   rage: {
     label: "Rage",
     short: "RAG",
-    effect: "Critical strike chance",
+    effect: "Critical chance and crit damage",
     color: "#d85d91",
     tint: "rgba(216,93,145,0.14)",
   },
   endurance: {
     label: "Endurance",
     short: "END",
-    effect: "Max HP and crit multiplier",
+    effect: "Max HP and stronger block rolls",
     color: "#d6b15f",
     tint: "rgba(214,177,95,0.14)",
   },
@@ -1160,6 +1160,38 @@ function buildSkillFactRows(skill: CombatSkill) {
     );
   }
 
+  if (typeof skill.cooldownTurns === "number") {
+    rows.push({
+      label: "Cooldown",
+      value: `${skill.cooldownTurns} turn${skill.cooldownTurns === 1 ? "" : "s"}.`,
+      color: "#b8cbff",
+    });
+  }
+
+  if (typeof skill.requirements?.minLevel === "number") {
+    rows.push({
+      label: "Level",
+      value: `Requires level ${skill.requirements.minLevel}.`,
+      color: "#ebcf8b",
+    });
+  }
+
+  if (skill.requirements?.notes?.length) {
+    rows.push({
+      label: "Needs",
+      value: skill.requirements.notes.join(" | "),
+      color: "#ebcf8b",
+    });
+  }
+
+  if (skill.unlock) {
+    rows.push({
+      label: "Unlock",
+      value: formatSkillUnlock(skill),
+      color: "#87e2cf",
+    });
+  }
+
   if (rows.length === 1) {
     rows.push({
       label: "Extra",
@@ -1246,6 +1278,18 @@ function formatEffectSummary(effect: {
   return parts.join(" ");
 }
 
+function formatSkillUnlock(skill: CombatSkill) {
+  if (!skill.unlock) {
+    return "Default.";
+  }
+
+  const label = formatSkillUnlockKind(skill.unlock.kind);
+  const source = skill.unlock.sourceName ? ` via ${skill.unlock.sourceName}` : "";
+  const note = skill.unlock.note ? ` ${skill.unlock.note}` : "";
+
+  return `${label}${source}.${note}`.trim();
+}
+
 function formatSignedValue(value: number) {
   return value > 0 ? `+${value}` : `${value}`;
 }
@@ -1274,6 +1318,21 @@ function formatResourceDelta(resourceDelta: Record<string, number | undefined> |
     .map(([resource, value]) => `${formatResourceName(resource)} ${formatSignedValue(Number(value))} each turn.`);
 
   return parts.join(" ");
+}
+
+function formatSkillUnlockKind(kind: NonNullable<CombatSkill["unlock"]>["kind"]) {
+  switch (kind) {
+    case "item":
+      return "Item";
+    case "book":
+      return "Book";
+    case "trainer":
+      return "Trainer";
+    case "quest":
+      return "Quest";
+    case "default":
+      return "Default";
+  }
 }
 
 function getSkillSlotIcon(sourceItemCode: string, skillName: string) {

@@ -24,7 +24,12 @@ export const combatChanceCaps = {
 
 export const combatBlockConfig = {
   penetrationArmorDivisor: 3.2,
-  baseBlockedPercent: 34,
+  baseBlockedPercent: 40,
+  maxBlockedPercent: 70,
+  strongBlockThresholdPercent: 55,
+  baseStrongBlockChance: 18,
+  enduranceToStrongBlockChanceFactor: 4,
+  blockPowerToStrongBlockChanceFactor: 1,
   focusStrengthDivisor: 160,
   basePenetrationFloor: 10,
   basePenetrationStart: 20,
@@ -42,7 +47,7 @@ export const combatResourceRewards = {
 
 export const combatProgressionConfig = {
   baseHp: 100,
-  enduranceHpFactor: 10,
+  enduranceHpFactor: 8,
   minStatValue: 1,
   minPercentValue: -100,
   maxPercentValue: 1000,
@@ -55,10 +60,13 @@ export const combatFormulaConfig = {
   critBase: 3,
   rageToBaseCritFactor: 3,
   defenderRageCritPenaltyFactor: 2,
-  critMultiplierBase: 1.5,
-  enduranceToCritMultiplierFactor: 0.03,
-  baseDamage: 10,
-  strengthToBaseDamageFactor: 1.5,
+  critMultiplierBase: 1.35,
+  rageToCritMultiplierFactor: 0.03,
+  enduranceToCritMultiplierFactor: 0.01,
+  baseDamage: 8,
+  strengthToBaseDamageFactor: 1.2,
+  damageRollMinFactor: 0.85,
+  damageRollMaxFactor: 1.15,
 } as const;
 
 export const combatProfileMixConfig = {
@@ -81,27 +89,37 @@ export const combatBotPlannerConfig = {
 export const combatZoneDefenseSlots: Record<CombatZone, Array<{ slot: EquipmentSlot; weight: number }>> = {
   head: [
     { slot: "helmet", weight: 1.2 },
+    { slot: "earring", weight: 0.22 },
     { slot: "offHand", weight: 0.7 },
     { slot: "armor", weight: 0.15 },
   ],
   chest: [
     { slot: "armor", weight: 1.2 },
+    { slot: "shirt", weight: 0.55 },
     { slot: "offHand", weight: 0.65 },
+    { slot: "bracers", weight: 0.12 },
     { slot: "gloves", weight: 0.15 },
   ],
   belly: [
     { slot: "armor", weight: 0.95 },
+    { slot: "shirt", weight: 0.35 },
+    { slot: "belt", weight: 0.28 },
     { slot: "offHand", weight: 0.3 },
-    { slot: "accessory", weight: 0.1 },
+    { slot: "ring", weight: 0.08 },
+    { slot: "ring2", weight: 0.1 },
   ],
   waist: [
     { slot: "armor", weight: 0.55 },
+    { slot: "belt", weight: 0.6 },
+    { slot: "pants", weight: 0.4 },
     { slot: "offHand", weight: 0.2 },
-    { slot: "accessory", weight: 0.15 },
+    { slot: "ring", weight: 0.08 },
+    { slot: "ring2", weight: 0.15 },
     { slot: "gloves", weight: 0.1 },
   ],
   legs: [
     { slot: "boots", weight: 1.15 },
+    { slot: "pants", weight: 0.7 },
     { slot: "armor", weight: 0.2 },
   ],
 };

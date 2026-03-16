@@ -727,9 +727,6 @@ function resolveDefensePlan(preset: CombatBuildPreset) {
   if (preset.archetype === "Defense" || preset.archetype === "Sustain") {
     return "High stability";
   }
-  if (preset.loadout.includes("oak-shield")) {
-    return "Shield cover";
-  }
   if (preset.archetype === "Burst") {
     return "Light defense";
   }
@@ -751,7 +748,7 @@ function getItemIcon(item: Item) {
   if (item.type === "consumable") {
     return "USE";
   }
-  if (item.type === "accessory") {
+  if (item.type === "ring" || item.type === "ring2" || item.type === "earring") {
     return "MOD";
   }
 
@@ -783,8 +780,12 @@ function formatSlot(slot: string) {
       return "Gloves";
     case "boots":
       return "Boots";
-    case "accessory":
-      return "Accessory";
+    case "ring":
+      return "Ring";
+    case "ring2":
+      return "Ring II";
+    case "earring":
+      return "Earring";
     default:
       return formatIdLabel(slot);
   }

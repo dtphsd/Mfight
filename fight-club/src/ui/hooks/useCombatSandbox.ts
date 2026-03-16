@@ -100,7 +100,9 @@ export function useCombatSandbox() {
     percentBonuses: equipmentBonuses.percentBonuses,
     baseDamage: equipmentBonuses.baseDamage,
     baseArmor: equipmentBonuses.baseArmor,
+    baseZoneArmor: equipmentBonuses.baseZoneArmor,
     armorBySlot: equipmentBonuses.armorBySlot,
+    zoneArmorBySlot: equipmentBonuses.zoneArmorBySlot,
     combatBonuses: equipmentBonuses.combatBonuses,
     preferredDamageType: equipmentBonuses.preferredDamageType,
     weaponClass: equipmentBonuses.mainHandWeaponClass,
@@ -111,7 +113,9 @@ export function useCombatSandbox() {
     percentBonuses: botEquipmentBonuses.percentBonuses,
     baseDamage: botEquipmentBonuses.baseDamage,
     baseArmor: botEquipmentBonuses.baseArmor,
+    baseZoneArmor: botEquipmentBonuses.baseZoneArmor,
     armorBySlot: botEquipmentBonuses.armorBySlot,
+    zoneArmorBySlot: botEquipmentBonuses.zoneArmorBySlot,
     combatBonuses: botEquipmentBonuses.combatBonuses,
     preferredDamageType: botEquipmentBonuses.preferredDamageType,
     weaponClass: botEquipmentBonuses.mainHandWeaponClass,
@@ -119,6 +123,8 @@ export function useCombatSandbox() {
   const botAvailableSkills = botEquipmentBonuses.skills.filter((skill) =>
     selectedBotPreset.skillLoadout.includes(skill.id)
   );
+  const currentPlayerCombatant =
+    combatState?.combatants.find((combatant) => combatant.id === playerSnapshot.characterId) ?? null;
 
   useEffect(() => {
     setCombatState(null);
@@ -137,8 +143,16 @@ export function useCombatSandbox() {
   }, [equipment, inventory]);
 
   useEffect(() => {
-    setRoundDraft((current) => reconcileSandboxRoundDraftSelections(current, availableSkills, availableConsumables));
-  }, [equipment, inventory, equippedSkillIds]);
+    setRoundDraft((current) =>
+      reconcileSandboxRoundDraftSelections(
+        current,
+        availableSkills,
+        availableConsumables,
+        currentPlayerCombatant?.resources,
+        currentPlayerCombatant?.skillCooldowns
+      )
+    );
+  }, [equipment, inventory, equippedSkillIds, currentPlayerCombatant]);
 
   function increaseStat(statName: CharacterStatName) {
     if (playerCharacter.unspentStatPoints <= 0) {
@@ -209,7 +223,13 @@ export function useCombatSandbox() {
 
     setCombatPhase(result.combatPhase);
     setRoundDraft((current) =>
-      reconcileSandboxRoundDraftSelections(current, availableSkills, availableConsumables, playerCombatant?.resources)
+      reconcileSandboxRoundDraftSelections(
+        current,
+        availableSkills,
+        availableConsumables,
+        playerCombatant?.resources,
+        playerCombatant?.skillCooldowns
+      )
     );
     setRoundError(result.roundError);
   }

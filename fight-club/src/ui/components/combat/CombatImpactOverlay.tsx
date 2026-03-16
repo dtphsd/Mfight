@@ -34,7 +34,9 @@ export function CombatImpactOverlay({
               ? "radial-gradient(circle at 50% 45%, rgba(255,64,64,0.32), rgba(255,96,96,0.13) 34%, transparent 74%)"
               : impactVariant === "block_break"
                 ? "radial-gradient(circle at 50% 45%, rgba(164,216,255,0.3), rgba(255,255,255,0.14) 26%, rgba(122,190,255,0.08) 40%, transparent 76%)"
-              : impactVariant === "block"
+              : impactVariant === "penetration"
+                ? "radial-gradient(circle at 50% 42%, rgba(255,208,128,0.22), rgba(255,164,72,0.12) 22%, transparent 52%), linear-gradient(90deg, transparent 28%, rgba(255,176,92,0.2) 50%, transparent 72%)"
+                : impactVariant === "block"
                 ? "radial-gradient(circle at 50% 45%, rgba(120,190,255,0.22), rgba(120,190,255,0.08) 34%, transparent 74%)"
                 : impactVariant === "dodge"
                   ? "radial-gradient(circle at 50% 45%, rgba(116,241,214,0.18), rgba(116,241,214,0.07) 34%, transparent 74%)"
@@ -46,6 +48,7 @@ export function CombatImpactOverlay({
       />
       {impactVariant === "crit" ? <CritImpactFrame /> : null}
       {impactVariant === "block_break" ? <BlockBreakImpactFrame /> : null}
+      {impactVariant === "penetration" ? <PenetrationImpactFrame /> : null}
       {impactVariant === "block" ? <BlockImpactFrame /> : null}
       <ImpactText impactVariant={impactVariant} impactValue={impactValue} />
     </>
@@ -116,6 +119,32 @@ function BlockBreakImpactFrame() {
         style={sigilContainerStyle}
       >
         <FrameBlockBreakSigil />
+      </div>
+    </>
+  );
+}
+
+function PenetrationImpactFrame() {
+  return (
+    <>
+      <div
+        className="combat-silhouette-penetration-frame"
+        style={{
+          position: "absolute",
+          inset: 0,
+          borderRadius: "28px",
+          border: "2px solid rgba(255,183,94,0.92)",
+          boxShadow:
+            "0 0 0 1px rgba(255,229,187,0.24), 0 0 18px rgba(255,156,61,0.22), inset 0 0 14px rgba(255,156,61,0.1)",
+          pointerEvents: "none",
+          zIndex: 2,
+        }}
+      />
+      <div
+        className="combat-silhouette-penetration-sigil"
+        style={sigilContainerStyle}
+      >
+        <FramePenetrationSigil />
       </div>
     </>
   );
@@ -237,6 +266,45 @@ function FrameBlockBreakSigil() {
         d="M83 20 66 42M95 46 72 56M91 79 70 72M35 97 49 79"
         stroke="rgba(255,196,196,0.74)"
         strokeWidth="2"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
+function FramePenetrationSigil() {
+  return (
+    <svg viewBox="0 0 120 120" width="132" height="132" aria-hidden="true">
+      <defs>
+        <linearGradient id="penetration-core" x1="18%" y1="0%" x2="82%" y2="100%">
+          <stop offset="0%" stopColor="#fff0cc" />
+          <stop offset="38%" stopColor="#ffc36a" />
+          <stop offset="100%" stopColor="#e9741b" />
+        </linearGradient>
+        <radialGradient id="penetration-glow" cx="50%" cy="48%" r="58%">
+          <stop offset="0%" stopColor="rgba(255,235,196,0.88)" />
+          <stop offset="42%" stopColor="rgba(255,170,76,0.3)" />
+          <stop offset="100%" stopColor="rgba(255,170,76,0)" />
+        </radialGradient>
+      </defs>
+      <ellipse cx="60" cy="60" rx="24" ry="44" fill="url(#penetration-glow)" />
+      <path
+        d="M60 14 72 38 67 38 77 58 71 58 82 84 64 72 60 106 56 72 38 84 49 58 43 58 53 38 48 38Z"
+        fill="url(#penetration-core)"
+        stroke="#fff5e5"
+        strokeWidth="2"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M60 18 60 96"
+        stroke="rgba(255,247,230,0.72)"
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
+      <path
+        d="M47 38h26M43 58h34"
+        stroke="rgba(255,231,194,0.46)"
+        strokeWidth="1.4"
         strokeLinecap="round"
       />
     </svg>

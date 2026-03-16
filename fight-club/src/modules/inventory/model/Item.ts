@@ -9,10 +9,16 @@ export type ItemType =
   | "weapon"
   | "shield"
   | "helmet"
+  | "shirt"
   | "armor"
+  | "bracers"
+  | "belt"
+  | "pants"
   | "boots"
   | "gloves"
-  | "accessory"
+  | "ring"
+  | "ring2"
+  | "earring"
   | "consumable"
   | "material";
 
@@ -28,10 +34,17 @@ export type EquipmentItemSlot =
   | "mainHand"
   | "offHand"
   | "helmet"
+  | "shirt"
   | "armor"
+  | "bracers"
+  | "belt"
+  | "pants"
   | "boots"
   | "gloves"
-  | "accessory";
+  | "ring"
+  | "ring2"
+  | "earring"
+;
 
 export type Handedness = "one_hand" | "two_hand" | "off_hand_only";
 
@@ -46,11 +59,18 @@ export type WeaponClass =
 
 export type ArmorClass =
   | "helmet"
+  | "shirt"
   | "armor"
+  | "bracers"
+  | "belt"
+  | "pants"
   | "boots"
   | "gloves"
   | "shield"
-  | "accessory";
+  | "ring"
+  | "ring2"
+  | "earring"
+;
 
 export type DamageType = "slash" | "pierce" | "blunt" | "chop";
 
@@ -66,6 +86,14 @@ export interface ArmorProfile {
   pierce: number;
   blunt: number;
   chop: number;
+}
+
+export interface ZoneArmorProfile {
+  head: number;
+  chest: number;
+  belly: number;
+  waist: number;
+  legs: number;
 }
 
 export interface CombatBonuses {
@@ -89,6 +117,17 @@ export interface EquipRules {
   armorClass?: ArmorClass;
 }
 
+export interface ItemSourceMeta {
+  mass?: number | null;
+  durability?: { current: number; max: number } | null;
+  requirements?: string[];
+  effects?: string[];
+  properties?: string[];
+  features?: string[];
+  imageFileName?: string | null;
+  imageSrc?: string | null;
+}
+
 export interface ConsumableEffect {
   usageMode: "replace_attack" | "with_attack";
   heal: number;
@@ -108,6 +147,14 @@ export const zeroArmorProfile: ArmorProfile = {
   pierce: 0,
   blunt: 0,
   chop: 0,
+};
+
+export const zeroZoneArmorProfile: ZoneArmorProfile = {
+  head: 0,
+  chest: 0,
+  belly: 0,
+  waist: 0,
+  legs: 0,
 };
 
 export const zeroCombatBonuses: CombatBonuses = {
@@ -139,9 +186,11 @@ export interface Item {
   consumableEffect?: ConsumableEffect | null;
   baseDamage: DamageProfile;
   baseArmor: ArmorProfile;
+  baseZoneArmor?: ZoneArmorProfile;
   combatBonuses: CombatBonuses;
   skills?: CombatSkill[];
   statBonuses: CharacterStats;
   flatBonuses: CharacterStats;
   percentBonuses: CharacterStats;
+  sourceMeta?: ItemSourceMeta;
 }

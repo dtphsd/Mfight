@@ -89,7 +89,8 @@ export function reconcileSandboxRoundDraftSelections(
   draft: RoundDraft,
   availableSkills: Array<{ id: string; resourceType?: CombatResourceType; cost?: number }>,
   availableConsumables: Array<{ item: { code: string; consumableEffect?: { usageMode: "replace_attack" | "with_attack" } | null } }>,
-  currentResources?: CombatResources | null
+  currentResources?: CombatResources | null,
+  currentSkillCooldowns?: Record<string, number> | null
 ): RoundDraft {
   const selectedSkillId = getRoundDraftSelectedSkillId(draft);
   const selectedConsumableCode = getRoundDraftSelectedConsumableCode(draft);
@@ -102,6 +103,10 @@ export function reconcileSandboxRoundDraftSelections(
     }
 
     if (currentResources && selectedSkill.resourceType && typeof selectedSkill.cost === "number" && currentResources[selectedSkill.resourceType] < selectedSkill.cost) {
+      return clearRoundDraftSelections(draft);
+    }
+
+    if (currentSkillCooldowns && (currentSkillCooldowns[selectedSkill.id] ?? 0) > 0) {
       return clearRoundDraftSelections(draft);
     }
 

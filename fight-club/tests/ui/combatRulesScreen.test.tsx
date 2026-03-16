@@ -3,14 +3,14 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import { CombatRulesScreen } from "@/ui/screens/CombatRules/CombatRulesScreen";
 
 describe("CombatRulesScreen", () => {
-  it("renders core sections and item table in russian by default", () => {
+  it("renders core sections and the generated item table in russian by default", () => {
     render(<CombatRulesScreen onBack={() => {}} onOpenCombatSandbox={() => {}} />);
 
     expect(screen.getByRole("heading", { name: "Библиотека правил боевой системы" })).toBeTruthy();
     expect(screen.getByRole("heading", { name: "Как проходит раунд" })).toBeTruthy();
     expect(screen.getByRole("heading", { name: "Предметы и экипировка" })).toBeTruthy();
-    expect(screen.getByText("Skill и цена")).toBeTruthy();
-    expect(screen.getByText("Training Sword")).toBeTruthy();
+    expect(screen.getByText("Навык и цена")).toBeTruthy();
+    expect(screen.getAllByRole("row").length).toBeGreaterThan(1);
   });
 
   it("switches to english content", () => {

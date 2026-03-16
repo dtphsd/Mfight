@@ -1,0 +1,3189 @@
+[
+  {
+    "itemId": 163,
+    "name": "Браслет Защиты",
+    "categoryGroup": "armor",
+    "categoryKey": "bracers",
+    "slot": "bracers",
+    "weaponFamily": null,
+    "sourceFile": "armor_bracers.html",
+    "mass": 1,
+    "prices": {
+      "кр": 60
+    },
+    "durability": {
+      "current": 0,
+      "max": 30
+    },
+    "requirements": [
+      "Уровень: 6",
+      "Сила: 30",
+      "Выносливость: 25"
+    ],
+    "effects": [
+      "Защита от урона: +35",
+      "Броня головы: 1-9",
+      "Броня корпуса: 1-9",
+      "Броня пояса: 1-9",
+      "Броня ног: 1-9"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/braslet8.gif",
+    "imageFileName": "braslet8.gif",
+    "rawText": "Браслет Защиты\n\n (Масса: 1.00)\nЦена: 60.00 кр.\nДолговечность: 0/30\nТребуется минимальное:\n• Уровень: 6\n• Сила: 30\n• Выносливость: 25\nДействует на:\n• Защита от урона: +35\n• Броня головы: 1-9\n• Броня корпуса: 1-9\n• Броня пояса: 1-9\n• Броня ног: 1-9"
+  },
+  {
+    "itemId": 164,
+    "name": "Стальные Наручи",
+    "categoryGroup": "armor",
+    "categoryKey": "bracers",
+    "slot": "bracers",
+    "weaponFamily": null,
+    "sourceFile": "armor_bracers.html",
+    "mass": 1,
+    "prices": {
+      "кр": 61
+    },
+    "durability": {
+      "current": 0,
+      "max": 40
+    },
+    "requirements": [
+      "Уровень: 6",
+      "Сила: 15",
+      "Интуиция: 15",
+      "Выносливость: 15"
+    ],
+    "effects": [
+      "Сила: +2",
+      "Мф. критического удара (%): +10",
+      "Мф. против критического удара (%): +15",
+      "Защита от урона: +25"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/braslet11.gif",
+    "imageFileName": "braslet11.gif",
+    "rawText": "Стальные Наручи\n\n (Масса: 1.00)\nЦена: 61.00 кр.\nДолговечность: 0/40\nТребуется минимальное:\n• Уровень: 6\n• Сила: 15\n• Интуиция: 15\n• Выносливость: 15\nДействует на:\n• Сила: +2\n• Мф. критического удара (%): +10\n• Мф. против критического удара (%): +15\n• Защита от урона: +25"
+  },
+  {
+    "itemId": 165,
+    "name": "Наручи Силы",
+    "categoryGroup": "armor",
+    "categoryKey": "bracers",
+    "slot": "bracers",
+    "weaponFamily": null,
+    "sourceFile": "armor_bracers.html",
+    "mass": 1,
+    "prices": {
+      "кр": 62
+    },
+    "durability": {
+      "current": 0,
+      "max": 60
+    },
+    "requirements": [
+      "Уровень: 6",
+      "Сила: 15",
+      "Выносливость: 15"
+    ],
+    "effects": [
+      "Сила: +6",
+      "Мф. мощности дробящего урона: +5"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/braslet23.gif",
+    "imageFileName": "braslet23.gif",
+    "rawText": "Наручи Силы\n\n (Масса: 1.00)\nЦена: 62.00 кр.\nДолговечность: 0/60\nТребуется минимальное:\n• Уровень: 6\n• Сила: 15\n• Выносливость: 15\nДействует на:\n• Сила: +6\n• Мф. мощности дробящего урона: +5"
+  },
+  {
+    "itemId": 166,
+    "name": "Изящный Браслет Парирования",
+    "categoryGroup": "armor",
+    "categoryKey": "bracers",
+    "slot": "bracers",
+    "weaponFamily": null,
+    "sourceFile": "armor_bracers.html",
+    "mass": 1,
+    "prices": {
+      "кр": 79
+    },
+    "durability": {
+      "current": 0,
+      "max": 30
+    },
+    "requirements": [
+      "Уровень: 7",
+      "Сила: 15",
+      "Ловкость: 30",
+      "Выносливость: 15"
+    ],
+    "effects": [
+      "Мф. парирования (%): +10",
+      "Защита от урона: +15"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/braslet3.gif",
+    "imageFileName": "braslet3.gif",
+    "rawText": "Изящный Браслет Парирования\n\n (Масса: 1.00)\nЦена: 79.00 кр.\nДолговечность: 0/30\nТребуется минимальное:\n• Уровень: 7\n• Сила: 15\n• Ловкость: 30\n• Выносливость: 15\nДействует на:\n• Мф. парирования (%): +10\n• Защита от урона: +15"
+  },
+  {
+    "itemId": 167,
+    "name": "Наручи Лезвий",
+    "categoryGroup": "armor",
+    "categoryKey": "bracers",
+    "slot": "bracers",
+    "weaponFamily": null,
+    "sourceFile": "armor_bracers.html",
+    "mass": 1,
+    "prices": {
+      "кр": 79
+    },
+    "durability": {
+      "current": 0,
+      "max": 30
+    },
+    "requirements": [
+      "Уровень: 7",
+      "Сила: 20",
+      "Ловкость: 20",
+      "Интуиция: 20",
+      "Выносливость: 10"
+    ],
+    "effects": [
+      "Сила: +2",
+      "Мф. против увертывания (%): +5",
+      "Мф. мощности рубящего урона: +20"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/braslet16.gif",
+    "imageFileName": "braslet16.gif",
+    "rawText": "Наручи Лезвий\n\n (Масса: 1.00)\nЦена: 79.00 кр.\nДолговечность: 0/30\nТребуется минимальное:\n• Уровень: 7\n• Сила: 20\n• Ловкость: 20\n• Интуиция: 20\n• Выносливость: 10\nДействует на:\n• Сила: +2\n• Мф. против увертывания (%): +5\n• Мф. мощности рубящего урона: +20"
+  },
+  {
+    "itemId": 168,
+    "name": "Черные Наручи",
+    "categoryGroup": "armor",
+    "categoryKey": "bracers",
+    "slot": "bracers",
+    "weaponFamily": null,
+    "sourceFile": "armor_bracers.html",
+    "mass": 1,
+    "prices": {
+      "кр": 79
+    },
+    "durability": {
+      "current": 0,
+      "max": 30
+    },
+    "requirements": [
+      "Уровень: 7",
+      "Сила: 15",
+      "Ловкость: 35",
+      "Интуиция: 35",
+      "Выносливость: 15"
+    ],
+    "effects": [
+      "Сила: +4",
+      "Ловкость: +2",
+      "Интуиция: +2",
+      "Мастерство владения оружием: +1"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/braslet21.gif",
+    "imageFileName": "braslet21.gif",
+    "rawText": "Черные Наручи\n\n (Масса: 1.00)\nЦена: 79.00 кр.\nДолговечность: 0/30\nТребуется минимальное:\n• Уровень: 7\n• Сила: 15\n• Ловкость: 35\n• Интуиция: 35\n• Выносливость: 15\nДействует на:\n• Сила: +4\n• Ловкость: +2\n• Интуиция: +2\n• Мастерство владения оружием: +1"
+  },
+  {
+    "itemId": 169,
+    "name": "Лесной Браслет",
+    "categoryGroup": "armor",
+    "categoryKey": "bracers",
+    "slot": "bracers",
+    "weaponFamily": null,
+    "sourceFile": "armor_bracers.html",
+    "mass": 1,
+    "prices": {
+      "кр": 80
+    },
+    "durability": {
+      "current": 0,
+      "max": 40
+    },
+    "requirements": [
+      "Уровень: 7",
+      "Сила: 25",
+      "Выносливость: 25"
+    ],
+    "effects": [
+      "Интуиция: +2",
+      "Мф. против критического удара (%): +15",
+      "Мф. против увертывания (%): +15",
+      "Защита от урона: +25",
+      "Защита от магии воздуха: +10",
+      "Защита от магии воды: +10",
+      "Защита от магии земли: +10",
+      "Дополнительная информация:",
+      "Часть комплекта: Комплект Лесной• 13: Мф. против критического удара (%): +25",
+      "Защита от урона: +30",
+      "Мф. против увертывания (%): +25",
+      "Защита от магии воздуха: +15",
+      "Защита от магии воды: +15",
+      "Защита от магии земли: +15"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/braslet2.gif",
+    "imageFileName": "braslet2.gif",
+    "rawText": "Лесной Браслет\n\n (Масса: 1.00)\nЦена: 80.00 кр.\nДолговечность: 0/40\nТребуется минимальное:\n• Уровень: 7\n• Сила: 25\n• Выносливость: 25\nДействует на:\n• Интуиция: +2\n• Мф. против критического удара (%): +15\n• Мф. против увертывания (%): +15\n• Защита от урона: +25\n• Защита от магии воздуха: +10\n• Защита от магии воды: +10\n• Защита от магии земли: +10\nДополнительная информация:\n• Часть комплекта: Комплект Лесной• 13: Мф. против критического удара (%): +25\n Защита от урона: +30\n Мф. против увертывания (%): +25\n Защита от магии воздуха: +15\n Защита от магии воды: +15\n Защита от магии земли: +15"
+  },
+  {
+    "itemId": 170,
+    "name": "Наручи Жернова",
+    "categoryGroup": "armor",
+    "categoryKey": "bracers",
+    "slot": "bracers",
+    "weaponFamily": null,
+    "sourceFile": "armor_bracers.html",
+    "mass": 1,
+    "prices": {
+      "кр": 80
+    },
+    "durability": {
+      "current": 0,
+      "max": 30
+    },
+    "requirements": [
+      "Уровень: 7",
+      "Сила: 30",
+      "Выносливость: 30"
+    ],
+    "effects": [
+      "Мастерство владения дубинами, молотами: +1",
+      "Уровень жизни (HP): +18",
+      "Мф. мощности крит. удара (%): +10",
+      "Мф. мощности дробящего урона: +10",
+      "Дополнительная информация:",
+      "Часть комплекта: Комплект Жернова• 3: Мастерство владения дубинами, молотами: +1",
+      "Мф. мощности дробящего урона: +5"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/braslet12.gif",
+    "imageFileName": "braslet12.gif",
+    "rawText": "Наручи Жернова\n\n (Масса: 1.00)\nЦена: 80.00 кр.\nДолговечность: 0/30\nТребуется минимальное:\n• Уровень: 7\n• Сила: 30\n• Выносливость: 30\nДействует на:\n• Мастерство владения дубинами, молотами: +1\n• Уровень жизни (HP): +18\n• Мф. мощности крит. удара (%): +10\n• Мф. мощности дробящего урона: +10\nДополнительная информация:\n• Часть комплекта: Комплект Жернова• 3: Мастерство владения дубинами, молотами: +1\n Мф. мощности дробящего урона: +5"
+  },
+  {
+    "itemId": 171,
+    "name": "Наручи Ищущего",
+    "categoryGroup": "armor",
+    "categoryKey": "bracers",
+    "slot": "bracers",
+    "weaponFamily": null,
+    "sourceFile": "armor_bracers.html",
+    "mass": 1,
+    "prices": {
+      "кр": 80
+    },
+    "durability": {
+      "current": 0,
+      "max": 30
+    },
+    "requirements": [
+      "Уровень: 7",
+      "Сила: 15",
+      "Выносливость: 15",
+      "Интеллект: 25",
+      "Мудрость: 30"
+    ],
+    "effects": [
+      "Интеллект: +2",
+      "Уровень жизни (HP): +30",
+      "Уровень маны: +60",
+      "Защита от урона: +10"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/braslet29.gif",
+    "imageFileName": "braslet29.gif",
+    "rawText": "Наручи Ищущего\n\n (Масса: 1.00)\nЦена: 80.00 кр.\nДолговечность: 0/30\nТребуется минимальное:\n• Уровень: 7\n• Сила: 15\n• Выносливость: 15\n• Интеллект: 25\n• Мудрость: 30\nДействует на:\n• Интеллект: +2\n• Уровень жизни (HP): +30\n• Уровень маны: +60\n• Защита от урона: +10"
+  },
+  {
+    "itemId": 172,
+    "name": "Энергетический Браслет",
+    "categoryGroup": "armor",
+    "categoryKey": "bracers",
+    "slot": "bracers",
+    "weaponFamily": null,
+    "sourceFile": "armor_bracers.html",
+    "mass": 1,
+    "prices": {
+      "кр": 80
+    },
+    "durability": {
+      "current": 0,
+      "max": 30
+    },
+    "requirements": [
+      "Уровень: 7",
+      "Сила: 10",
+      "Выносливость: 10",
+      "Мудрость: 25"
+    ],
+    "effects": [
+      "Интеллект: +1",
+      "Уровень маны: +100",
+      "Защита от урона: +10"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/braslet5.gif",
+    "imageFileName": "braslet5.gif",
+    "rawText": "Энергетический Браслет\n\n (Масса: 1.00)\nЦена: 80.00 кр.\nДолговечность: 0/30\nТребуется минимальное:\n• Уровень: 7\n• Сила: 10\n• Выносливость: 10\n• Мудрость: 25\nДействует на:\n• Интеллект: +1\n• Уровень маны: +100\n• Защита от урона: +10"
+  },
+  {
+    "itemId": 173,
+    "name": "Браслет Острия",
+    "categoryGroup": "armor",
+    "categoryKey": "bracers",
+    "slot": "bracers",
+    "weaponFamily": null,
+    "sourceFile": "armor_bracers.html",
+    "mass": 1,
+    "prices": {
+      "кр": 91
+    },
+    "durability": {
+      "current": 0,
+      "max": 30
+    },
+    "requirements": [
+      "Уровень: 7",
+      "Ловкость: 30",
+      "Интуиция: 30"
+    ],
+    "effects": [
+      "Сила: +1",
+      "Мастерство владения ножами, кинжалами: +1",
+      "Мф. мощности колющего урона: +25"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/braslet19.gif",
+    "imageFileName": "braslet19.gif",
+    "rawText": "Браслет Острия\n\n (Масса: 1.00)\nЦена: 91.00 кр.\nДолговечность: 0/30\nТребуется минимальное:\n• Уровень: 7\n• Ловкость: 30\n• Интуиция: 30\nДействует на:\n• Сила: +1\n• Мастерство владения ножами, кинжалами: +1\n• Мф. мощности колющего урона: +25"
+  },
+  {
+    "itemId": 174,
+    "name": "Браслет Царапин",
+    "categoryGroup": "armor",
+    "categoryKey": "bracers",
+    "slot": "bracers",
+    "weaponFamily": null,
+    "sourceFile": "armor_bracers.html",
+    "mass": 1,
+    "prices": {
+      "кр": 92
+    },
+    "durability": {
+      "current": 0,
+      "max": 40
+    },
+    "requirements": [
+      "Уровень: 7",
+      "Сила: 20",
+      "Ловкость: 20",
+      "Интуиция: 20",
+      "Выносливость: 20"
+    ],
+    "effects": [
+      "Мф. мощности крит. удара (%): +10",
+      "Мф. мощности урона: +10"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/braslet22.gif",
+    "imageFileName": "braslet22.gif",
+    "rawText": "Браслет Царапин\n\n (Масса: 1.00)\nЦена: 92.00 кр.\nДолговечность: 0/40\nТребуется минимальное:\n• Уровень: 7\n• Сила: 20\n• Ловкость: 20\n• Интуиция: 20\n• Выносливость: 20\nДействует на:\n• Мф. мощности крит. удара (%): +10\n• Мф. мощности урона: +10"
+  },
+  {
+    "itemId": 175,
+    "name": "Браслеты Валентая",
+    "categoryGroup": "armor",
+    "categoryKey": "bracers",
+    "slot": "bracers",
+    "weaponFamily": null,
+    "sourceFile": "armor_bracers.html",
+    "mass": 2,
+    "prices": {
+      "кр": 101
+    },
+    "durability": {
+      "current": 0,
+      "max": 20
+    },
+    "requirements": [
+      "Уровень: 7",
+      "Интеллект: 30",
+      "Мудрость: 30"
+    ],
+    "effects": [
+      "Интеллект: +5",
+      "Уровень жизни (HP): +12",
+      "Мф. против критического удара (%): +25",
+      "Защита от урона: +10",
+      "Мф. мощности магии стихий: +5"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/braslet34_2.gif",
+    "imageFileName": "braslet34_2.gif",
+    "rawText": "Браслеты Валентая\n\n (Масса: 2.00)\nЦена: 101.00 кр.\nДолговечность: 0/20\nТребуется минимальное:\n• Уровень: 7\n• Интеллект: 30\n• Мудрость: 30\nДействует на:\n• Интеллект: +5\n• Уровень жизни (HP): +12\n• Мф. против критического удара (%): +25\n• Защита от урона: +10\n• Мф. мощности магии стихий: +5"
+  },
+  {
+    "itemId": 176,
+    "name": "Наручи Валентая",
+    "categoryGroup": "armor",
+    "categoryKey": "bracers",
+    "slot": "bracers",
+    "weaponFamily": null,
+    "sourceFile": "armor_bracers.html",
+    "mass": 2,
+    "prices": {
+      "кр": 103
+    },
+    "durability": {
+      "current": 0,
+      "max": 20
+    },
+    "requirements": [
+      "Уровень: 7",
+      "Сила: 25",
+      "Ловкость: 10",
+      "Интуиция: 10",
+      "Выносливость: 25"
+    ],
+    "effects": [
+      "Сила: +2",
+      "Ловкость: +2",
+      "Интуиция: +2",
+      "Уровень жизни (HP): +12",
+      "Мф. критического удара (%): +10",
+      "Мф. против критического удара (%): +10",
+      "Мф. увертывания (%): +10",
+      "Мф. против увертывания (%): +10",
+      "Защита от урона: +15",
+      "Защита от магии: +10"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/braslet35_2.gif",
+    "imageFileName": "braslet35_2.gif",
+    "rawText": "Наручи Валентая\n\n (Масса: 2.00)\nЦена: 103.00 кр.\nДолговечность: 0/20\nТребуется минимальное:\n• Уровень: 7\n• Сила: 25\n• Ловкость: 10\n• Интуиция: 10\n• Выносливость: 25\nДействует на:\n• Сила: +2\n• Ловкость: +2\n• Интуиция: +2\n• Уровень жизни (HP): +12\n• Мф. критического удара (%): +10\n• Мф. против критического удара (%): +10\n• Мф. увертывания (%): +10\n• Мф. против увертывания (%): +10\n• Защита от урона: +15\n• Защита от магии: +10"
+  },
+  {
+    "itemId": 399,
+    "name": "Браслет Укола",
+    "categoryGroup": "armor",
+    "categoryKey": "bracers",
+    "slot": "bracers",
+    "weaponFamily": null,
+    "sourceFile": "armor_bracers.html",
+    "mass": 2,
+    "prices": {
+      "кр": 5
+    },
+    "durability": {
+      "current": 0,
+      "max": 10
+    },
+    "requirements": [
+      "Уровень: 2",
+      "Сила: 12",
+      "Выносливость: 12"
+    ],
+    "effects": [
+      "Максимальный урон: +2"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/braslet1.gif",
+    "imageFileName": "braslet1.gif",
+    "rawText": "Браслет Укола\n\n (Масса: 2.00)\nЦена: 5.00 кр.\nДолговечность: 0/10\nТребуется минимальное:\n• Уровень: 2\n• Сила: 12\n• Выносливость: 12\nДействует на:\n• Максимальный урон: +2"
+  },
+  {
+    "itemId": 400,
+    "name": "Металлический Браслет",
+    "categoryGroup": "armor",
+    "categoryKey": "bracers",
+    "slot": "bracers",
+    "weaponFamily": null,
+    "sourceFile": "armor_bracers.html",
+    "mass": 1,
+    "prices": {
+      "кр": 13
+    },
+    "durability": {
+      "current": 0,
+      "max": 30
+    },
+    "requirements": [
+      "Уровень: 2",
+      "Сила: 10",
+      "Выносливость: 10"
+    ],
+    "effects": [
+      "Броня головы: 1-6",
+      "Броня корпуса: 1-6",
+      "Броня пояса: 1-6",
+      "Броня ног: 1-6"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/braslet13.gif",
+    "imageFileName": "braslet13.gif",
+    "rawText": "Металлический Браслет\n\n (Масса: 1.00)\nЦена: 13.00 кр.\nДолговечность: 0/30\nТребуется минимальное:\n• Уровень: 2\n• Сила: 10\n• Выносливость: 10\nДействует на:\n• Броня головы: 1-6\n• Броня корпуса: 1-6\n• Броня пояса: 1-6\n• Броня ног: 1-6"
+  },
+  {
+    "itemId": 401,
+    "name": "Браслет Удержания",
+    "categoryGroup": "armor",
+    "categoryKey": "bracers",
+    "slot": "bracers",
+    "weaponFamily": null,
+    "sourceFile": "armor_bracers.html",
+    "mass": 1,
+    "prices": {
+      "кр": 14
+    },
+    "durability": {
+      "current": 0,
+      "max": 20
+    },
+    "requirements": [
+      "Уровень: 2",
+      "Сила: 8",
+      "Ловкость: 6",
+      "Выносливость: 8"
+    ],
+    "effects": [
+      "Сила: +1",
+      "Мф. против увертывания (%): +10"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/braslet20.gif",
+    "imageFileName": "braslet20.gif",
+    "rawText": "Браслет Удержания\n\n (Масса: 1.00)\nЦена: 14.00 кр.\nДолговечность: 0/20\nТребуется минимальное:\n• Уровень: 2\n• Сила: 8\n• Ловкость: 6\n• Выносливость: 8\nДействует на:\n• Сила: +1\n• Мф. против увертывания (%): +10"
+  },
+  {
+    "itemId": 402,
+    "name": "Наручи Здравия",
+    "categoryGroup": "armor",
+    "categoryKey": "bracers",
+    "slot": "bracers",
+    "weaponFamily": null,
+    "sourceFile": "armor_bracers.html",
+    "mass": 1,
+    "prices": {
+      "кр": 21
+    },
+    "durability": {
+      "current": 0,
+      "max": 30
+    },
+    "requirements": [
+      "Уровень: 3",
+      "Сила: 12",
+      "Выносливость: 12"
+    ],
+    "effects": [
+      "Уровень жизни (HP): +33"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/braslet18.gif",
+    "imageFileName": "braslet18.gif",
+    "rawText": "Наручи Здравия\n\n (Масса: 1.00)\nЦена: 21.00 кр.\nДолговечность: 0/30\nТребуется минимальное:\n• Уровень: 3\n• Сила: 12\n• Выносливость: 12\nДействует на:\n• Уровень жизни (HP): +33"
+  },
+  {
+    "itemId": 403,
+    "name": "Браслет Гнева",
+    "categoryGroup": "armor",
+    "categoryKey": "bracers",
+    "slot": "bracers",
+    "weaponFamily": null,
+    "sourceFile": "armor_bracers.html",
+    "mass": 1,
+    "prices": {
+      "кр": 30
+    },
+    "durability": {
+      "current": 0,
+      "max": 30
+    },
+    "requirements": [
+      "Уровень: 4",
+      "Сила: 10",
+      "Интуиция: 15",
+      "Выносливость: 10"
+    ],
+    "effects": [
+      "Сила: +2",
+      "Мф. критического удара (%): +15",
+      "Мф. против увертывания (%): +10"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/braslet6.gif",
+    "imageFileName": "braslet6.gif",
+    "rawText": "Браслет Гнева\n\n (Масса: 1.00)\nЦена: 30.00 кр.\nДолговечность: 0/30\nТребуется минимальное:\n• Уровень: 4\n• Сила: 10\n• Интуиция: 15\n• Выносливость: 10\nДействует на:\n• Сила: +2\n• Мф. критического удара (%): +15\n• Мф. против увертывания (%): +10"
+  },
+  {
+    "itemId": 404,
+    "name": "Наручи Ухода",
+    "categoryGroup": "armor",
+    "categoryKey": "bracers",
+    "slot": "bracers",
+    "weaponFamily": null,
+    "sourceFile": "armor_bracers.html",
+    "mass": 5,
+    "prices": {
+      "кр": 30
+    },
+    "durability": {
+      "current": 0,
+      "max": 30
+    },
+    "requirements": [
+      "Уровень: 4",
+      "Сила: 10",
+      "Ловкость: 15",
+      "Выносливость: 10"
+    ],
+    "effects": [
+      "Ловкость: +2",
+      "Мф. против критического удара (%): +10",
+      "Мф. увертывания (%): +25"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/braslet9.gif",
+    "imageFileName": "braslet9.gif",
+    "rawText": "Наручи Ухода\n\n (Масса: 5.00)\nЦена: 30.00 кр.\nДолговечность: 0/30\nТребуется минимальное:\n• Уровень: 4\n• Сила: 10\n• Ловкость: 15\n• Выносливость: 10\nДействует на:\n• Ловкость: +2\n• Мф. против критического удара (%): +10\n• Мф. увертывания (%): +25"
+  },
+  {
+    "itemId": 405,
+    "name": "Наручи Ученика",
+    "categoryGroup": "armor",
+    "categoryKey": "bracers",
+    "slot": "bracers",
+    "weaponFamily": null,
+    "sourceFile": "armor_bracers.html",
+    "mass": 1,
+    "prices": {
+      "кр": 30
+    },
+    "durability": {
+      "current": 0,
+      "max": 30
+    },
+    "requirements": [
+      "Уровень: 4",
+      "Интеллект: 20"
+    ],
+    "effects": [
+      "Уровень жизни (HP): +12",
+      "Уровень маны: +35"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/braslet26.gif",
+    "imageFileName": "braslet26.gif",
+    "rawText": "Наручи Ученика\n\n (Масса: 1.00)\nЦена: 30.00 кр.\nДолговечность: 0/30\nТребуется минимальное:\n• Уровень: 4\n• Интеллект: 20\nДействует на:\n• Уровень жизни (HP): +12\n• Уровень маны: +35"
+  },
+  {
+    "itemId": 406,
+    "name": "Наручи Валентая",
+    "categoryGroup": "armor",
+    "categoryKey": "bracers",
+    "slot": "bracers",
+    "weaponFamily": null,
+    "sourceFile": "armor_bracers.html",
+    "mass": 2,
+    "prices": {
+      "кр": 49
+    },
+    "durability": {
+      "current": 0,
+      "max": 20
+    },
+    "requirements": [
+      "Уровень: 4",
+      "Сила: 15",
+      "Ловкость: 5",
+      "Интуиция: 5",
+      "Выносливость: 15"
+    ],
+    "effects": [
+      "Сила: +1",
+      "Ловкость: +1",
+      "Интуиция: +1",
+      "Уровень жизни (HP): +6",
+      "Мф. критического удара (%): +5",
+      "Мф. против критического удара (%): +5",
+      "Мф. увертывания (%): +5",
+      "Мф. против увертывания (%): +5",
+      "Защита от урона: +10"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/braslet35_2.gif",
+    "imageFileName": "braslet35_2.gif",
+    "rawText": "Наручи Валентая\n\n (Масса: 2.00)\nЦена: 49.00 кр.\nДолговечность: 0/20\nТребуется минимальное:\n• Уровень: 4\n• Сила: 15\n• Ловкость: 5\n• Интуиция: 5\n• Выносливость: 15\nДействует на:\n• Сила: +1\n• Ловкость: +1\n• Интуиция: +1\n• Уровень жизни (HP): +6\n• Мф. критического удара (%): +5\n• Мф. против критического удара (%): +5\n• Мф. увертывания (%): +5\n• Мф. против увертывания (%): +5\n• Защита от урона: +10"
+  },
+  {
+    "itemId": 407,
+    "name": "Браслеты Валентая",
+    "categoryGroup": "armor",
+    "categoryKey": "bracers",
+    "slot": "bracers",
+    "weaponFamily": null,
+    "sourceFile": "armor_bracers.html",
+    "mass": 2,
+    "prices": {
+      "кр": 54
+    },
+    "durability": {
+      "current": 0,
+      "max": 20
+    },
+    "requirements": [
+      "Уровень: 4",
+      "Интеллект: 15"
+    ],
+    "effects": [
+      "Уровень жизни (HP): +18",
+      "Уровень маны: +24",
+      "Мф. против критического удара (%): +20"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/braslet34_2.gif",
+    "imageFileName": "braslet34_2.gif",
+    "rawText": "Браслеты Валентая\n\n (Масса: 2.00)\nЦена: 54.00 кр.\nДолговечность: 0/20\nТребуется минимальное:\n• Уровень: 4\n• Интеллект: 15\nДействует на:\n• Уровень жизни (HP): +18\n• Уровень маны: +24\n• Мф. против критического удара (%): +20"
+  },
+  {
+    "itemId": 408,
+    "name": "Наручи Талантов",
+    "categoryGroup": "armor",
+    "categoryKey": "bracers",
+    "slot": "bracers",
+    "weaponFamily": null,
+    "sourceFile": "armor_bracers.html",
+    "mass": 2,
+    "prices": {
+      "кр": 61
+    },
+    "durability": {
+      "current": 0,
+      "max": 30
+    },
+    "requirements": [
+      "Уровень: 4",
+      "Сила: 10",
+      "Ловкость: 10",
+      "Интуиция: 10",
+      "Выносливость: 10"
+    ],
+    "effects": [
+      "Сила: +3",
+      "Ловкость: +2",
+      "Интуиция: +2",
+      "Уровень жизни (HP): +18"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/braslet10.gif",
+    "imageFileName": "braslet10.gif",
+    "rawText": "Наручи Талантов\n\n (Масса: 2.00)\nЦена: 61.00 кр.\nДолговечность: 0/30\nТребуется минимальное:\n• Уровень: 4\n• Сила: 10\n• Ловкость: 10\n• Интуиция: 10\n• Выносливость: 10\nДействует на:\n• Сила: +3\n• Ловкость: +2\n• Интуиция: +2\n• Уровень жизни (HP): +18"
+  },
+  {
+    "itemId": 409,
+    "name": "Наручи Пружин",
+    "categoryGroup": "armor",
+    "categoryKey": "bracers",
+    "slot": "bracers",
+    "weaponFamily": null,
+    "sourceFile": "armor_bracers.html",
+    "mass": 2,
+    "prices": {
+      "кр": 40
+    },
+    "durability": {
+      "current": 0,
+      "max": 30
+    },
+    "requirements": [
+      "Уровень: 5",
+      "Сила: 20",
+      "Интуиция: 21",
+      "Выносливость: 20"
+    ],
+    "effects": [
+      "Сила: +2",
+      "Мф. критического удара (%): +20",
+      "Мф. против критического удара (%): +10",
+      "Мф. против увертывания (%): +10"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/naruchi81.gif",
+    "imageFileName": "naruchi81.gif",
+    "rawText": "Наручи Пружин\n\n (Масса: 2.00)\nЦена: 40.00 кр.\nДолговечность: 0/30\nТребуется минимальное:\n• Уровень: 5\n• Сила: 20\n• Интуиция: 21\n• Выносливость: 20\nДействует на:\n• Сила: +2\n• Мф. критического удара (%): +20\n• Мф. против критического удара (%): +10\n• Мф. против увертывания (%): +10"
+  },
+  {
+    "itemId": 410,
+    "name": "Зеленые Наручи",
+    "categoryGroup": "armor",
+    "categoryKey": "bracers",
+    "slot": "bracers",
+    "weaponFamily": null,
+    "sourceFile": "armor_bracers.html",
+    "mass": 1,
+    "prices": {
+      "кр": 45
+    },
+    "durability": {
+      "current": 0,
+      "max": 30
+    },
+    "requirements": [
+      "Уровень: 5",
+      "Выносливость: 10",
+      "Интеллект: 25"
+    ],
+    "effects": [
+      "Интеллект: +1",
+      "Уровень жизни (HP): +21",
+      "Уровень маны: +40"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/braslet28.gif",
+    "imageFileName": "braslet28.gif",
+    "rawText": "Зеленые Наручи\n\n (Масса: 1.00)\nЦена: 45.00 кр.\nДолговечность: 0/30\nТребуется минимальное:\n• Уровень: 5\n• Выносливость: 10\n• Интеллект: 25\nДействует на:\n• Интеллект: +1\n• Уровень жизни (HP): +21\n• Уровень маны: +40"
+  },
+  {
+    "itemId": 534,
+    "name": "Наручи Безрассудства",
+    "categoryGroup": "armor",
+    "categoryKey": "bracers",
+    "slot": "bracers",
+    "weaponFamily": null,
+    "sourceFile": "armor_bracers.html",
+    "mass": 1,
+    "prices": {
+      "кр": 108
+    },
+    "durability": {
+      "current": 0,
+      "max": 40
+    },
+    "requirements": [
+      "Уровень: 8",
+      "Сила: 15",
+      "Выносливость: 15",
+      "Интеллект: 25",
+      "Мудрость: 30"
+    ],
+    "effects": [
+      "Интеллект: +5",
+      "Уровень жизни (HP): +27",
+      "Уровень маны: +40",
+      "Мф. мощности магии стихий: +5",
+      "Дополнительная информация:",
+      "Часть комплекта: Комплект Безрассудства• 3: Интеллект: +4",
+      "5: Мастерство владения магией стихий: +1",
+      "7: Понижение защиты от магии: +3"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/braslet40.gif",
+    "imageFileName": "braslet40.gif",
+    "rawText": "Наручи Безрассудства\n\n (Масса: 1.00)\nЦена: 108.00 кр.\nДолговечность: 0/40\nТребуется минимальное:\n• Уровень: 8\n• Сила: 15\n• Выносливость: 15\n• Интеллект: 25\n• Мудрость: 30\nДействует на:\n• Интеллект: +5\n• Уровень жизни (HP): +27\n• Уровень маны: +40\n• Мф. мощности магии стихий: +5\nДополнительная информация:\n• Часть комплекта: Комплект Безрассудства• 3: Интеллект: +4\n• 5: Мастерство владения магией стихий: +1\n• 7: Понижение защиты от магии: +3"
+  },
+  {
+    "itemId": 535,
+    "name": "Браслет Богатыря",
+    "categoryGroup": "armor",
+    "categoryKey": "bracers",
+    "slot": "bracers",
+    "weaponFamily": null,
+    "sourceFile": "armor_bracers.html",
+    "mass": 1,
+    "prices": {
+      "кр": 109
+    },
+    "durability": {
+      "current": 0,
+      "max": 50
+    },
+    "requirements": [
+      "Уровень: 8",
+      "Сила: 30",
+      "Интуиция: 30",
+      "Выносливость: 30"
+    ],
+    "effects": [
+      "Сила: +1",
+      "Мастерство владения дубинами, молотами: +1",
+      "Мф. критического удара (%): +25",
+      "Мф. мощности крит. удара (%): +5",
+      "Мф. мощности дробящего урона: +20"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/braslet7.gif",
+    "imageFileName": "braslet7.gif",
+    "rawText": "Браслет Богатыря\n\n (Масса: 1.00)\nЦена: 109.00 кр.\nДолговечность: 0/50\nТребуется минимальное:\n• Уровень: 8\n• Сила: 30\n• Интуиция: 30\n• Выносливость: 30\nДействует на:\n• Сила: +1\n• Мастерство владения дубинами, молотами: +1\n• Мф. критического удара (%): +25\n• Мф. мощности крит. удара (%): +5\n• Мф. мощности дробящего урона: +20"
+  },
+  {
+    "itemId": 536,
+    "name": "Кузнечный Браслет",
+    "categoryGroup": "armor",
+    "categoryKey": "bracers",
+    "slot": "bracers",
+    "weaponFamily": null,
+    "sourceFile": "armor_bracers.html",
+    "mass": 2,
+    "prices": {
+      "кр": 109
+    },
+    "durability": {
+      "current": 0,
+      "max": 60
+    },
+    "requirements": [
+      "Уровень: 8",
+      "Сила: 35",
+      "Выносливость: 35"
+    ],
+    "effects": [
+      "Сила: +4",
+      "Уровень жизни (HP): +33",
+      "Мф. против увертывания (%): +15",
+      "Мф. мощности дробящего урона: +10",
+      "Защита от магии огня: +15",
+      "Защита от магии воздуха: +15"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/braslet14.gif",
+    "imageFileName": "braslet14.gif",
+    "rawText": "Кузнечный Браслет\n\n (Масса: 2.00)\nЦена: 109.00 кр.\nДолговечность: 0/60\nТребуется минимальное:\n• Уровень: 8\n• Сила: 35\n• Выносливость: 35\nДействует на:\n• Сила: +4\n• Уровень жизни (HP): +33\n• Мф. против увертывания (%): +15\n• Мф. мощности дробящего урона: +10\n• Защита от магии огня: +15\n• Защита от магии воздуха: +15"
+  },
+  {
+    "itemId": 537,
+    "name": "Браслет Заката",
+    "categoryGroup": "armor",
+    "categoryKey": "bracers",
+    "slot": "bracers",
+    "weaponFamily": null,
+    "sourceFile": "armor_bracers.html",
+    "mass": 1,
+    "prices": {
+      "кр": 110
+    },
+    "durability": {
+      "current": 0,
+      "max": 30
+    },
+    "requirements": [
+      "Уровень: 8",
+      "Сила: 30",
+      "Интуиция: 35",
+      "Выносливость: 30"
+    ],
+    "effects": [
+      "Сила: +2",
+      "Мастерство владения оружием: +2",
+      "Мф. критического удара (%): +20",
+      "Мф. мощности крит. удара (%): +15",
+      "Дополнительная информация:",
+      "Часть комплекта: Комплект Заката• 4: Мф. критического удара (%): +25",
+      "8: Мф. против критического удара (%): +20",
+      "Мф. против увертывания (%): +25",
+      "12: Уровень жизни (HP): +50"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/braslet4.gif",
+    "imageFileName": "braslet4.gif",
+    "rawText": "Браслет Заката\n\n (Масса: 1.00)\nЦена: 110.00 кр.\nДолговечность: 0/30\nТребуется минимальное:\n• Уровень: 8\n• Сила: 30\n• Интуиция: 35\n• Выносливость: 30\nДействует на:\n• Сила: +2\n• Мастерство владения оружием: +2\n• Мф. критического удара (%): +20\n• Мф. мощности крит. удара (%): +15\nДополнительная информация:\n• Часть комплекта: Комплект Заката• 4: Мф. критического удара (%): +25\n• 8: Мф. против критического удара (%): +20\n Мф. против увертывания (%): +25\n• 12: Уровень жизни (HP): +50"
+  },
+  {
+    "itemId": 538,
+    "name": "Браслет Палача",
+    "categoryGroup": "armor",
+    "categoryKey": "bracers",
+    "slot": "bracers",
+    "weaponFamily": null,
+    "sourceFile": "armor_bracers.html",
+    "mass": 5,
+    "prices": {
+      "кр": 110
+    },
+    "durability": {
+      "current": 0,
+      "max": 50
+    },
+    "requirements": [
+      "Уровень: 8",
+      "Ловкость: 20",
+      "Интуиция: 25"
+    ],
+    "effects": [
+      "Сила: +2",
+      "Мастерство владения топорами, секирами: +1",
+      "Мф. против критического удара (%): +5",
+      "Мф. против увертывания (%): +10",
+      "Мф. мощности рубящего урона: +25"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/braslet15.gif",
+    "imageFileName": "braslet15.gif",
+    "rawText": "Браслет Палача\n\n (Масса: 5.00)\nЦена: 110.00 кр.\nДолговечность: 0/50\nТребуется минимальное:\n• Уровень: 8\n• Ловкость: 20\n• Интуиция: 25\nДействует на:\n• Сила: +2\n• Мастерство владения топорами, секирами: +1\n• Мф. против критического удара (%): +5\n• Мф. против увертывания (%): +10\n• Мф. мощности рубящего урона: +25"
+  },
+  {
+    "itemId": 539,
+    "name": "Браслет Сквозных Ран",
+    "categoryGroup": "armor",
+    "categoryKey": "bracers",
+    "slot": "bracers",
+    "weaponFamily": null,
+    "sourceFile": "armor_bracers.html",
+    "mass": 1,
+    "prices": {
+      "кр": 110
+    },
+    "durability": {
+      "current": 0,
+      "max": 50
+    },
+    "requirements": [
+      "Уровень: 8",
+      "Ловкость: 32",
+      "Интуиция: 25"
+    ],
+    "effects": [
+      "Ловкость: +2",
+      "Мастерство владения ножами, кинжалами: +1",
+      "Мф. против критического удара (%): +5",
+      "Мф. увертывания (%): +15",
+      "Мф. мощности колющего урона: +25"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/braslet17.gif",
+    "imageFileName": "braslet17.gif",
+    "rawText": "Браслет Сквозных Ран\n\n (Масса: 1.00)\nЦена: 110.00 кр.\nДолговечность: 0/50\nТребуется минимальное:\n• Уровень: 8\n• Ловкость: 32\n• Интуиция: 25\nДействует на:\n• Ловкость: +2\n• Мастерство владения ножами, кинжалами: +1\n• Мф. против критического удара (%): +5\n• Мф. увертывания (%): +15\n• Мф. мощности колющего урона: +25"
+  },
+  {
+    "itemId": 540,
+    "name": "Наручи Огненной Зари",
+    "categoryGroup": "armor",
+    "categoryKey": "bracers",
+    "slot": "bracers",
+    "weaponFamily": null,
+    "sourceFile": "armor_bracers.html",
+    "mass": 1,
+    "prices": {
+      "кр": 110
+    },
+    "durability": {
+      "current": 0,
+      "max": 40
+    },
+    "requirements": [
+      "Уровень: 8",
+      "Сила: 25",
+      "Ловкость: 25",
+      "Интуиция: 25",
+      "Выносливость: 25"
+    ],
+    "effects": [
+      "Сила: +4",
+      "Мастерство владения оружием: +1",
+      "Уровень жизни (HP): +33",
+      "Мф. против критического удара (%): +25",
+      "Мф. против увертывания (%): +25",
+      "Защита от магии стихий: +10",
+      "Дополнительная информация:",
+      "Часть комплекта: Комплект Огненной Зари• 4: Мф. против критического удара (%): +20",
+      "8: Мф. парирования (%): +5",
+      "12: Уровень жизни (HP): +50"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/braslet30.gif",
+    "imageFileName": "braslet30.gif",
+    "rawText": "Наручи Огненной Зари\n\n (Масса: 1.00)\nЦена: 110.00 кр.\nДолговечность: 0/40\nТребуется минимальное:\n• Уровень: 8\n• Сила: 25\n• Ловкость: 25\n• Интуиция: 25\n• Выносливость: 25\nДействует на:\n• Сила: +4\n• Мастерство владения оружием: +1\n• Уровень жизни (HP): +33\n• Мф. против критического удара (%): +25\n• Мф. против увертывания (%): +25\n• Защита от магии стихий: +10\nДополнительная информация:\n• Часть комплекта: Комплект Огненной Зари• 4: Мф. против критического удара (%): +20\n• 8: Мф. парирования (%): +5\n• 12: Уровень жизни (HP): +50"
+  },
+  {
+    "itemId": 586,
+    "name": "Wrist Bands of Strength",
+    "categoryGroup": "armor",
+    "categoryKey": "bracers",
+    "slot": "bracers",
+    "weaponFamily": null,
+    "sourceFile": "armor_bracers.html",
+    "mass": 2,
+    "prices": {
+      "кр": 19,
+      "екр": 4
+    },
+    "durability": {
+      "current": 0,
+      "max": 20
+    },
+    "requirements": [
+      "Уровень: 2",
+      "Сила: 9",
+      "Выносливость: 9"
+    ],
+    "effects": [
+      "Сила: +1",
+      "Мф. против критического удара (%): +10",
+      "Мф. против увертывания (%): +15"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/naruchi200.gif",
+    "imageFileName": "naruchi200.gif",
+    "rawText": "Wrist Bands of Strength\n\n (Масса: 2.00)\nЦена: 19.00 кр.\nЦена: 4.00 екр.\nДолговечность: 0/20\nТребуется минимальное:\n• Уровень: 2\n• Сила: 9\n• Выносливость: 9\nДействует на:\n• Сила: +1\n• Мф. против критического удара (%): +10\n• Мф. против увертывания (%): +15"
+  },
+  {
+    "itemId": 587,
+    "name": "Bands of Deceit",
+    "categoryGroup": "armor",
+    "categoryKey": "bracers",
+    "slot": "bracers",
+    "weaponFamily": null,
+    "sourceFile": "armor_bracers.html",
+    "mass": 2,
+    "prices": {
+      "кр": 40,
+      "екр": 8
+    },
+    "durability": {
+      "current": 0,
+      "max": 30
+    },
+    "requirements": [
+      "Уровень: 5",
+      "Сила: 20",
+      "Ловкость: 20",
+      "Выносливость: 20"
+    ],
+    "effects": [
+      "Ловкость: +2",
+      "Уровень жизни (HP): +18",
+      "Мф. против критического удара (%): +15",
+      "Мф. увертывания (%): +25",
+      "Мф. против увертывания (%): +5"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/naruchi205.gif",
+    "imageFileName": "naruchi205.gif",
+    "rawText": "Bands of Deceit\n\n (Масса: 2.00)\nЦена: 40.00 кр.\nЦена: 8.00 екр.\nДолговечность: 0/30\nТребуется минимальное:\n• Уровень: 5\n• Сила: 20\n• Ловкость: 20\n• Выносливость: 20\nДействует на:\n• Ловкость: +2\n• Уровень жизни (HP): +18\n• Мф. против критического удара (%): +15\n• Мф. увертывания (%): +25\n• Мф. против увертывания (%): +5"
+  },
+  {
+    "itemId": 588,
+    "name": "Disturbing Bands",
+    "categoryGroup": "armor",
+    "categoryKey": "bracers",
+    "slot": "bracers",
+    "weaponFamily": null,
+    "sourceFile": "armor_bracers.html",
+    "mass": 2,
+    "prices": {
+      "кр": 60,
+      "екр": 12
+    },
+    "durability": {
+      "current": 0,
+      "max": 30
+    },
+    "requirements": [
+      "Уровень: 6",
+      "Сила: 25",
+      "Интуиция: 4",
+      "Выносливость: 25"
+    ],
+    "effects": [
+      "Сила: +1",
+      "Интуиция: +1",
+      "Уровень жизни (HP): +24",
+      "Мф. критического удара (%): +20",
+      "Мф. против критического удара (%): +10",
+      "Мф. мощности крит. удара (%): +5",
+      "Мф. против увертывания (%): +15"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/naruchi206.gif",
+    "imageFileName": "naruchi206.gif",
+    "rawText": "Disturbing Bands\n\n (Масса: 2.00)\nЦена: 60.00 кр.\nЦена: 12.00 екр.\nДолговечность: 0/30\nТребуется минимальное:\n• Уровень: 6\n• Сила: 25\n• Интуиция: 4\n• Выносливость: 25\nДействует на:\n• Сила: +1\n• Интуиция: +1\n• Уровень жизни (HP): +24\n• Мф. критического удара (%): +20\n• Мф. против критического удара (%): +10\n• Мф. мощности крит. удара (%): +5\n• Мф. против увертывания (%): +15"
+  },
+  {
+    "itemId": 589,
+    "name": "Bands of Fear",
+    "categoryGroup": "armor",
+    "categoryKey": "bracers",
+    "slot": "bracers",
+    "weaponFamily": null,
+    "sourceFile": "armor_bracers.html",
+    "mass": 2,
+    "prices": {
+      "кр": 80,
+      "екр": 16
+    },
+    "durability": {
+      "current": 0,
+      "max": 50
+    },
+    "requirements": [
+      "Уровень: 7",
+      "Сила: 15",
+      "Ловкость: 30",
+      "Интуиция: 30",
+      "Выносливость: 15"
+    ],
+    "effects": [
+      "Сила: +3",
+      "Мф. критического удара (%): +25",
+      "Мф. мощности крит. удара (%): +15",
+      "Мф. увертывания (%): +25",
+      "Дополнительная информация:",
+      "Часть комплекта: Комплект Ужаса• 13: Мф. парирования (%): +",
+      "Мф. контрудара (%): +5",
+      "Мф. мощности крит. удара (%): +20"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/naruchi203.gif",
+    "imageFileName": "naruchi203.gif",
+    "rawText": "Bands of Fear\n\n (Масса: 2.00)\nЦена: 80.00 кр.\nЦена: 16.00 екр.\nДолговечность: 0/50\nТребуется минимальное:\n• Уровень: 7\n• Сила: 15\n• Ловкость: 30\n• Интуиция: 30\n• Выносливость: 15\nДействует на:\n• Сила: +3\n• Мф. критического удара (%): +25\n• Мф. мощности крит. удара (%): +15\n• Мф. увертывания (%): +25\nДополнительная информация:\n• Часть комплекта: Комплект Ужаса• 13: Мф. парирования (%): +\n Мф. контрудара (%): +5\n Мф. мощности крит. удара (%): +20"
+  },
+  {
+    "itemId": 590,
+    "name": "Bands of Oblivion",
+    "categoryGroup": "armor",
+    "categoryKey": "bracers",
+    "slot": "bracers",
+    "weaponFamily": null,
+    "sourceFile": "armor_bracers.html",
+    "mass": 2,
+    "prices": {
+      "кр": 80,
+      "екр": 16
+    },
+    "durability": {
+      "current": 0,
+      "max": 50
+    },
+    "requirements": [
+      "Уровень: 7",
+      "Сила: 35",
+      "Выносливость: 35"
+    ],
+    "effects": [
+      "Защита от урона: +40",
+      "Защита от магии стихий: +20",
+      "Броня головы: 1-12",
+      "Броня корпуса: 1-12",
+      "Броня пояса: 1-12",
+      "Броня ног: 1-12",
+      "Дополнительная информация:",
+      "Часть комплекта: Комплект Забвения• 13: Защита от урона: +75",
+      "Защита от магии: +75"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/naruchi204.gif",
+    "imageFileName": "naruchi204.gif",
+    "rawText": "Bands of Oblivion\n\n (Масса: 2.00)\nЦена: 80.00 кр.\nЦена: 16.00 екр.\nДолговечность: 0/50\nТребуется минимальное:\n• Уровень: 7\n• Сила: 35\n• Выносливость: 35\nДействует на:\n• Защита от урона: +40\n• Защита от магии стихий: +20\n• Броня головы: 1-12\n• Броня корпуса: 1-12\n• Броня пояса: 1-12\n• Броня ног: 1-12\nДополнительная информация:\n• Часть комплекта: Комплект Забвения• 13: Защита от урона: +75\n Защита от магии: +75"
+  },
+  {
+    "itemId": 591,
+    "name": "DarkSteel Bands",
+    "categoryGroup": "armor",
+    "categoryKey": "bracers",
+    "slot": "bracers",
+    "weaponFamily": null,
+    "sourceFile": "armor_bracers.html",
+    "mass": 1,
+    "prices": {
+      "кр": 80,
+      "екр": 16
+    },
+    "durability": {
+      "current": 0,
+      "max": 40
+    },
+    "requirements": [
+      "Уровень: 7",
+      "Сила: 25",
+      "Ловкость: 10",
+      "Интуиция: 25",
+      "Выносливость: 25"
+    ],
+    "effects": [
+      "Сила: +4",
+      "Уровень жизни (HP): +33",
+      "Мф. критического удара (%): +15",
+      "Мф. против критического удара (%): +20",
+      "Мф. мощности крит. удара (%): +5",
+      "Мф. против увертывания (%): +15",
+      "Дополнительная информация:",
+      "Часть комплекта: Комплект Темной Стали• 13: Мф. против критического удара (%): +20",
+      "Мф. критического удара (%): +30",
+      "Мф. мощности крит. удара (%): +5",
+      "Мф. против увертывания (%): +15"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/naruchi201.gif",
+    "imageFileName": "naruchi201.gif",
+    "rawText": "DarkSteel Bands\n\n (Масса: 1.00)\nЦена: 80.00 кр.\nЦена: 16.00 екр.\nДолговечность: 0/40\nТребуется минимальное:\n• Уровень: 7\n• Сила: 25\n• Ловкость: 10\n• Интуиция: 25\n• Выносливость: 25\nДействует на:\n• Сила: +4\n• Уровень жизни (HP): +33\n• Мф. критического удара (%): +15\n• Мф. против критического удара (%): +20\n• Мф. мощности крит. удара (%): +5\n• Мф. против увертывания (%): +15\nДополнительная информация:\n• Часть комплекта: Комплект Темной Стали• 13: Мф. против критического удара (%): +20\n Мф. критического удара (%): +30\n Мф. мощности крит. удара (%): +5\n Мф. против увертывания (%): +15"
+  },
+  {
+    "itemId": 592,
+    "name": "Golden Bands",
+    "categoryGroup": "armor",
+    "categoryKey": "bracers",
+    "slot": "bracers",
+    "weaponFamily": null,
+    "sourceFile": "armor_bracers.html",
+    "mass": 2,
+    "prices": {
+      "кр": 81,
+      "екр": 16
+    },
+    "durability": {
+      "current": 0,
+      "max": 50
+    },
+    "requirements": [
+      "Уровень: 7",
+      "Сила: 25",
+      "Ловкость: 30",
+      "Выносливость: 25"
+    ],
+    "effects": [
+      "Ловкость: +2",
+      "Интуиция: +2",
+      "Мф. против критического удара (%): +20",
+      "Мф. увертывания (%): +35",
+      "Мф. против увертывания (%): +35",
+      "Мф. парирования (%): +3",
+      "Дополнительная информация:",
+      "Часть комплекта: Комплект Золота• 13: Мф. парирования (%): +10",
+      "Мф. контрудара (%): +15"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/naruchi202.gif",
+    "imageFileName": "naruchi202.gif",
+    "rawText": "Golden Bands\n\n (Масса: 2.00)\nЦена: 81.00 кр.\nЦена: 16.00 екр.\nДолговечность: 0/50\nТребуется минимальное:\n• Уровень: 7\n• Сила: 25\n• Ловкость: 30\n• Выносливость: 25\nДействует на:\n• Ловкость: +2\n• Интуиция: +2\n• Мф. против критического удара (%): +20\n• Мф. увертывания (%): +35\n• Мф. против увертывания (%): +35\n• Мф. парирования (%): +3\nДополнительная информация:\n• Часть комплекта: Комплект Золота• 13: Мф. парирования (%): +10\n Мф. контрудара (%): +15"
+  },
+  {
+    "itemId": 593,
+    "name": "Desert Bands",
+    "categoryGroup": "armor",
+    "categoryKey": "bracers",
+    "slot": "bracers",
+    "weaponFamily": null,
+    "sourceFile": "armor_bracers.html",
+    "mass": 2,
+    "prices": {
+      "кр": 110,
+      "екр": 22
+    },
+    "durability": {
+      "current": 0,
+      "max": 30
+    },
+    "requirements": [
+      "Уровень: 8",
+      "Сила: 25",
+      "Ловкость: 40",
+      "Интуиция: 20",
+      "Выносливость: 25"
+    ],
+    "effects": [
+      "Ловкость: +1",
+      "Уровень жизни (HP): +45",
+      "Мф. против критического удара (%): +25",
+      "Мф. увертывания (%): +30",
+      "Мф. против увертывания (%): +25",
+      "Мф. контрудара (%): +5",
+      "Мф. парирования (%): +2",
+      "Защита от магии стихий: +20",
+      "Дополнительная информация:",
+      "Часть комплекта: Комплект Странника• 5: Мастерство владения оружием: +1",
+      "Уровень жизни (HP): +33",
+      "9: Защита от магии: +20",
+      "13: Защита от урона: +20"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/naruchi208.gif",
+    "imageFileName": "naruchi208.gif",
+    "rawText": "Desert Bands\n\n (Масса: 2.00)\nЦена: 110.00 кр.\nЦена: 22.00 екр.\nДолговечность: 0/30\nТребуется минимальное:\n• Уровень: 8\n• Сила: 25\n• Ловкость: 40\n• Интуиция: 20\n• Выносливость: 25\nДействует на:\n• Ловкость: +1\n• Уровень жизни (HP): +45\n• Мф. против критического удара (%): +25\n• Мф. увертывания (%): +30\n• Мф. против увертывания (%): +25\n• Мф. контрудара (%): +5\n• Мф. парирования (%): +2\n• Защита от магии стихий: +20\nДополнительная информация:\n• Часть комплекта: Комплект Странника• 5: Мастерство владения оружием: +1\n Уровень жизни (HP): +33\n• 9: Защита от магии: +20\n• 13: Защита от урона: +20"
+  },
+  {
+    "itemId": 594,
+    "name": "Smashing Bands",
+    "categoryGroup": "armor",
+    "categoryKey": "bracers",
+    "slot": "bracers",
+    "weaponFamily": null,
+    "sourceFile": "armor_bracers.html",
+    "mass": 2,
+    "prices": {
+      "кр": 110,
+      "екр": 22
+    },
+    "durability": {
+      "current": 0,
+      "max": 30
+    },
+    "requirements": [
+      "Уровень: 8",
+      "Сила: 30",
+      "Ловкость: 20",
+      "Интуиция: 30",
+      "Выносливость: 30"
+    ],
+    "effects": [
+      "Сила: +2",
+      "Уровень жизни (HP): +45",
+      "Мф. критического удара (%): +25",
+      "Мф. против критического удара (%): +30",
+      "Мф. мощности крит. удара (%): +5",
+      "Мф. против увертывания (%): +25",
+      "Защита от магии стихий: +20",
+      "Дополнительная информация:",
+      "Часть комплекта: Комплект Сокрушения• 5: Мастерство владения оружием: +1",
+      "8: Уровень жизни (HP): +33",
+      "11: Защита от магии: +20",
+      "13: Защита от урона: +20"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/naruchi207.gif",
+    "imageFileName": "naruchi207.gif",
+    "rawText": "Smashing Bands\n\n (Масса: 2.00)\nЦена: 110.00 кр.\nЦена: 22.00 екр.\nДолговечность: 0/30\nТребуется минимальное:\n• Уровень: 8\n• Сила: 30\n• Ловкость: 20\n• Интуиция: 30\n• Выносливость: 30\nДействует на:\n• Сила: +2\n• Уровень жизни (HP): +45\n• Мф. критического удара (%): +25\n• Мф. против критического удара (%): +30\n• Мф. мощности крит. удара (%): +5\n• Мф. против увертывания (%): +25\n• Защита от магии стихий: +20\nДополнительная информация:\n• Часть комплекта: Комплект Сокрушения• 5: Мастерство владения оружием: +1\n• 8: Уровень жизни (HP): +33\n• 11: Защита от магии: +20\n• 13: Защита от урона: +20"
+  },
+  {
+    "itemId": 595,
+    "name": "Airy Cuffs of Haughtiness",
+    "categoryGroup": "armor",
+    "categoryKey": "bracers",
+    "slot": "bracers",
+    "weaponFamily": null,
+    "sourceFile": "armor_bracers.html",
+    "mass": 1,
+    "prices": {
+      "кр": 130,
+      "екр": 22
+    },
+    "durability": {
+      "current": 0,
+      "max": 30
+    },
+    "requirements": [
+      "Уровень: 8",
+      "Интеллект: 25",
+      "Мудрость: 50"
+    ],
+    "effects": [
+      "Понижение защиты от магии воздуха: +1",
+      "Интеллект: +3",
+      "Уровень жизни (HP): +15",
+      "Уровень маны: +70",
+      "Мф. мощности магии воздуха: +3",
+      "Защита от урона: +5",
+      "Защита от магии стихий: +25",
+      "Дополнительная информация:",
+      "Часть комплекта: Комплект Надменности• 5: Уровень маны: +25",
+      "Уровень жизни (HP): +25",
+      "7: Мф. против критического удара (%): +25",
+      "Мастерство владения магией стихий: +1",
+      "9: Защита от урона: +25",
+      "Защита от магии: +25"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/braslet210.gif",
+    "imageFileName": "braslet210.gif",
+    "rawText": "Airy Cuffs of Haughtiness\n\n (Масса: 1.00)\nЦена: 130.00 кр.\nЦена: 22.00 екр.\nДолговечность: 0/30\nТребуется минимальное:\n• Уровень: 8\n• Интеллект: 25\n• Мудрость: 50\nДействует на:\n• Понижение защиты от магии воздуха: +1\n• Интеллект: +3\n• Уровень жизни (HP): +15\n• Уровень маны: +70\n• Мф. мощности магии воздуха: +3\n• Защита от урона: +5\n• Защита от магии стихий: +25\nДополнительная информация:\n• Часть комплекта: Комплект Надменности• 5: Уровень маны: +25\n Уровень жизни (HP): +25\n• 7: Мф. против критического удара (%): +25\n Мастерство владения магией стихий: +1\n• 9: Защита от урона: +25\n Защита от магии: +25"
+  },
+  {
+    "itemId": 596,
+    "name": "Earthen Cuffs of Haughtiness",
+    "categoryGroup": "armor",
+    "categoryKey": "bracers",
+    "slot": "bracers",
+    "weaponFamily": null,
+    "sourceFile": "armor_bracers.html",
+    "mass": 1,
+    "prices": {
+      "кр": 130,
+      "екр": 22
+    },
+    "durability": {
+      "current": 0,
+      "max": 30
+    },
+    "requirements": [
+      "Уровень: 8",
+      "Интеллект: 25",
+      "Мудрость: 50"
+    ],
+    "effects": [
+      "Понижение защиты от магии земли: +1",
+      "Интеллект: +3",
+      "Уровень жизни (HP): +35",
+      "Уровень маны: +50",
+      "Мф. мощности магии земли: +3",
+      "Защита от урона: +20",
+      "Защита от магии стихий: +10",
+      "Дополнительная информация:",
+      "Часть комплекта: Комплект Надменности• 5: Уровень маны: +25",
+      "Уровень жизни (HP): +25",
+      "7: Мф. против критического удара (%): +25",
+      "Мастерство владения магией стихий: +1",
+      "9: Защита от урона: +25",
+      "Защита от магии: +25"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/braslet212.gif",
+    "imageFileName": "braslet212.gif",
+    "rawText": "Earthen Cuffs of Haughtiness\n\n (Масса: 1.00)\nЦена: 130.00 кр.\nЦена: 22.00 екр.\nДолговечность: 0/30\nТребуется минимальное:\n• Уровень: 8\n• Интеллект: 25\n• Мудрость: 50\nДействует на:\n• Понижение защиты от магии земли: +1\n• Интеллект: +3\n• Уровень жизни (HP): +35\n• Уровень маны: +50\n• Мф. мощности магии земли: +3\n• Защита от урона: +20\n• Защита от магии стихий: +10\nДополнительная информация:\n• Часть комплекта: Комплект Надменности• 5: Уровень маны: +25\n Уровень жизни (HP): +25\n• 7: Мф. против критического удара (%): +25\n Мастерство владения магией стихий: +1\n• 9: Защита от урона: +25\n Защита от магии: +25"
+  },
+  {
+    "itemId": 597,
+    "name": "Fiery Cuffs of Haughtiness",
+    "categoryGroup": "armor",
+    "categoryKey": "bracers",
+    "slot": "bracers",
+    "weaponFamily": null,
+    "sourceFile": "armor_bracers.html",
+    "mass": 1,
+    "prices": {
+      "кр": 130,
+      "екр": 22
+    },
+    "durability": {
+      "current": 0,
+      "max": 30
+    },
+    "requirements": [
+      "Уровень: 8",
+      "Интеллект: 25",
+      "Мудрость: 50"
+    ],
+    "effects": [
+      "Понижение защиты от магии огня: +1",
+      "Интеллект: +3",
+      "Уровень жизни (HP): +20",
+      "Уровень маны: +65",
+      "Мф. мощности магии огня: +3",
+      "Защита от урона: +10",
+      "Защита от магии стихий: +20",
+      "Дополнительная информация:",
+      "Часть комплекта: Комплект Надменности• 5: Уровень маны: +25",
+      "Уровень жизни (HP): +25",
+      "7: Мф. против критического удара (%): +25",
+      "Мастерство владения магией стихий: +1",
+      "9: Защита от урона: +25",
+      "Защита от магии: +25"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/braslet211.gif",
+    "imageFileName": "braslet211.gif",
+    "rawText": "Fiery Cuffs of Haughtiness\n\n (Масса: 1.00)\nЦена: 130.00 кр.\nЦена: 22.00 екр.\nДолговечность: 0/30\nТребуется минимальное:\n• Уровень: 8\n• Интеллект: 25\n• Мудрость: 50\nДействует на:\n• Понижение защиты от магии огня: +1\n• Интеллект: +3\n• Уровень жизни (HP): +20\n• Уровень маны: +65\n• Мф. мощности магии огня: +3\n• Защита от урона: +10\n• Защита от магии стихий: +20\nДополнительная информация:\n• Часть комплекта: Комплект Надменности• 5: Уровень маны: +25\n Уровень жизни (HP): +25\n• 7: Мф. против критического удара (%): +25\n Мастерство владения магией стихий: +1\n• 9: Защита от урона: +25\n Защита от магии: +25"
+  },
+  {
+    "itemId": 598,
+    "name": "Icy Cuffs of Haughtiness",
+    "categoryGroup": "armor",
+    "categoryKey": "bracers",
+    "slot": "bracers",
+    "weaponFamily": null,
+    "sourceFile": "armor_bracers.html",
+    "mass": 1,
+    "prices": {
+      "кр": 130,
+      "екр": 22
+    },
+    "durability": {
+      "current": 0,
+      "max": 30
+    },
+    "requirements": [
+      "Уровень: 8",
+      "Интеллект: 25",
+      "Мудрость: 50"
+    ],
+    "effects": [
+      "Понижение защиты от магии воды: +1",
+      "Интеллект: +3",
+      "Уровень жизни (HP): +30",
+      "Уровень маны: +55",
+      "Мф. мощности магии воды: +3",
+      "Защита от урона: +15",
+      "Защита от магии стихий: +15",
+      "Дополнительная информация:",
+      "Часть комплекта: Комплект Надменности• 5: Уровень маны: +25",
+      "Уровень жизни (HP): +25",
+      "7: Мф. против критического удара (%): +25",
+      "Мастерство владения магией стихий: +1",
+      "9: Защита от урона: +25",
+      "Защита от магии: +25"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/braslet209.gif",
+    "imageFileName": "braslet209.gif",
+    "rawText": "Icy Cuffs of Haughtiness\n\n (Масса: 1.00)\nЦена: 130.00 кр.\nЦена: 22.00 екр.\nДолговечность: 0/30\nТребуется минимальное:\n• Уровень: 8\n• Интеллект: 25\n• Мудрость: 50\nДействует на:\n• Понижение защиты от магии воды: +1\n• Интеллект: +3\n• Уровень жизни (HP): +30\n• Уровень маны: +55\n• Мф. мощности магии воды: +3\n• Защита от урона: +15\n• Защита от магии стихий: +15\nДополнительная информация:\n• Часть комплекта: Комплект Надменности• 5: Уровень маны: +25\n Уровень жизни (HP): +25\n• 7: Мф. против критического удара (%): +25\n Мастерство владения магией стихий: +1\n• 9: Защита от урона: +25\n Защита от магии: +25"
+  },
+  {
+    "itemId": 1137,
+    "name": "Наручи Злодеяний",
+    "categoryGroup": "armor",
+    "categoryKey": "bracers",
+    "slot": "bracers",
+    "weaponFamily": null,
+    "sourceFile": "armor_bracers.html",
+    "mass": 2,
+    "prices": {
+      "кр": 140
+    },
+    "durability": {
+      "current": 0,
+      "max": 40
+    },
+    "requirements": [
+      "Уровень: 9",
+      "Сила: 25",
+      "Ловкость: 50",
+      "Интуиция: 40",
+      "Выносливость: 30"
+    ],
+    "effects": [
+      "Ловкость: +2",
+      "Интуиция: +2",
+      "Мастерство владения оружием: +1",
+      "Уровень жизни (HP): +12",
+      "Мф. критического удара (%): +50",
+      "Мф. против критического удара (%): +15",
+      "Мф. контрудара (%): +15",
+      "Дополнительная информация:",
+      "Часть комплекта: Комплект Злодеяний• 5: Мф. увертывания (%): +50",
+      "8: Мф. увертывания (%): +50",
+      "Мф. против критического удара (%): +50",
+      "10: Мф. увертывания (%): +50",
+      "Мф. против критического удара (%): +50",
+      "Уровень жизни (HP): +66",
+      "12: Мф. увертывания (%): +50",
+      "Мф. против критического удара (%): +50",
+      "Уровень жизни (HP): +66",
+      "Мастерство владения ножами, кинжалами: +2"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/braslet31.gif",
+    "imageFileName": "braslet31.gif",
+    "rawText": "Наручи Злодеяний\n\n (Масса: 2.00)\nЦена: 140.00 кр.\nДолговечность: 0/40\nТребуется минимальное:\n• Уровень: 9\n• Сила: 25\n• Ловкость: 50\n• Интуиция: 40\n• Выносливость: 30\nДействует на:\n• Ловкость: +2\n• Интуиция: +2\n• Мастерство владения оружием: +1\n• Уровень жизни (HP): +12\n• Мф. критического удара (%): +50\n• Мф. против критического удара (%): +15\n• Мф. контрудара (%): +15\nДополнительная информация:\n• Часть комплекта: Комплект Злодеяний• 5: Мф. увертывания (%): +50\n• 8: Мф. увертывания (%): +50\n Мф. против критического удара (%): +50\n• 10: Мф. увертывания (%): +50\n Мф. против критического удара (%): +50\n Уровень жизни (HP): +66\n• 12: Мф. увертывания (%): +50\n Мф. против критического удара (%): +50\n Уровень жизни (HP): +66\n Мастерство владения ножами, кинжалами: +2"
+  },
+  {
+    "itemId": 1150,
+    "name": "Наручи Паука",
+    "categoryGroup": "armor",
+    "categoryKey": "bracers",
+    "slot": "bracers",
+    "weaponFamily": null,
+    "sourceFile": "armor_bracers.html",
+    "mass": 2,
+    "prices": {
+      "кр": 140
+    },
+    "durability": {
+      "current": 0,
+      "max": 30
+    },
+    "requirements": [
+      "Уровень: 9",
+      "Сила: 30",
+      "Ловкость: 50",
+      "Интуиция: 15",
+      "Выносливость: 30"
+    ],
+    "effects": [
+      "Интеллект: +1",
+      "Уровень жизни (HP): +18",
+      "Мф. против критического удара (%): +25",
+      "Мф. против увертывания (%): +25",
+      "Мф. мощности урона: +15",
+      "Дополнительная информация:",
+      "Часть комплекта: Комплект Паука• 5: Мф. против критического удара (%): +35",
+      "9: Мф. против увертывания (%): +25",
+      "Мф. парирования (%): +5",
+      "11: Мастерство владения оружием: +1",
+      "13: Уровень жизни (HP): +33",
+      "Мастерство владения оружием: +1"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/naruchi76.gif",
+    "imageFileName": "naruchi76.gif",
+    "rawText": "Наручи Паука\n\n (Масса: 2.00)\nЦена: 140.00 кр.\nДолговечность: 0/30\nТребуется минимальное:\n• Уровень: 9\n• Сила: 30\n• Ловкость: 50\n• Интуиция: 15\n• Выносливость: 30\nДействует на:\n• Интеллект: +1\n• Уровень жизни (HP): +18\n• Мф. против критического удара (%): +25\n• Мф. против увертывания (%): +25\n• Мф. мощности урона: +15\nДополнительная информация:\n• Часть комплекта: Комплект Паука• 5: Мф. против критического удара (%): +35\n• 9: Мф. против увертывания (%): +25\n Мф. парирования (%): +5\n• 11: Мастерство владения оружием: +1\n• 13: Уровень жизни (HP): +33\n Мастерство владения оружием: +1"
+  },
+  {
+    "itemId": 1178,
+    "name": "Браслет Кровавой Луны",
+    "categoryGroup": "armor",
+    "categoryKey": "bracers",
+    "slot": "bracers",
+    "weaponFamily": null,
+    "sourceFile": "armor_bracers.html",
+    "mass": 2,
+    "prices": {
+      "кр": 140
+    },
+    "durability": {
+      "current": 0,
+      "max": 40
+    },
+    "requirements": [
+      "Уровень: 9",
+      "Сила: 30",
+      "Ловкость: 15",
+      "Интуиция: 50",
+      "Выносливость: 30"
+    ],
+    "effects": [
+      "Сила: +3",
+      "Мастерство владения оружием: +2",
+      "Мф. критического удара (%): +25",
+      "Мф. против критического удара (%): +10",
+      "Мф. мощности крит. удара (%): +20",
+      "Дополнительная информация:",
+      "Часть комплекта: Комплект Кровавой Луны• 5: Мф. против увертывания (%): +35",
+      "9: Мф. против критического удара (%): +25",
+      "Мф. критического удара (%): +25",
+      "11: Уровень жизни (HP): +66",
+      "13: Защита от магии: +25"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/braslet24.gif",
+    "imageFileName": "braslet24.gif",
+    "rawText": "Браслет Кровавой Луны\n\n (Масса: 2.00)\nЦена: 140.00 кр.\nДолговечность: 0/40\nТребуется минимальное:\n• Уровень: 9\n• Сила: 30\n• Ловкость: 15\n• Интуиция: 50\n• Выносливость: 30\nДействует на:\n• Сила: +3\n• Мастерство владения оружием: +2\n• Мф. критического удара (%): +25\n• Мф. против критического удара (%): +10\n• Мф. мощности крит. удара (%): +20\nДополнительная информация:\n• Часть комплекта: Комплект Кровавой Луны• 5: Мф. против увертывания (%): +35\n• 9: Мф. против критического удара (%): +25\n Мф. критического удара (%): +25\n• 11: Уровень жизни (HP): +66\n• 13: Защита от магии: +25"
+  },
+  {
+    "itemId": 1210,
+    "name": "Наручи Решимости",
+    "categoryGroup": "armor",
+    "categoryKey": "bracers",
+    "slot": "bracers",
+    "weaponFamily": null,
+    "sourceFile": "armor_bracers.html",
+    "mass": 2,
+    "prices": {
+      "кр": 140
+    },
+    "durability": {
+      "current": 0,
+      "max": 50
+    },
+    "requirements": [
+      "Уровень: 9",
+      "Интеллект: 40",
+      "Мудрость: 50"
+    ],
+    "effects": [
+      "Интеллект: +2",
+      "Уровень жизни (HP): +60",
+      "Уровень маны: +120",
+      "Защита от магии: +10",
+      "Дополнительная информация:",
+      "Часть комплекта: Комплект Решимости [9]• 3: Мф. мощности магии стихий: +12",
+      "5: Понижение защиты от магии: +2",
+      "7: При касте, с вероятностью 5% увеличивает ваш мф. мощности магии стихий на следующий каст (%): +50"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/braslet27.gif",
+    "imageFileName": "braslet27.gif",
+    "rawText": "Наручи Решимости\n\n (Масса: 2.00)\nЦена: 140.00 кр.\nДолговечность: 0/50\nТребуется минимальное:\n• Уровень: 9\n• Интеллект: 40\n• Мудрость: 50\nДействует на:\n• Интеллект: +2\n• Уровень жизни (HP): +60\n• Уровень маны: +120\n• Защита от магии: +10\nДополнительная информация:\n• Часть комплекта: Комплект Решимости [9]• 3: Мф. мощности магии стихий: +12\n• 5: Понижение защиты от магии: +2\n• 7: При касте, с вероятностью 5% увеличивает ваш мф. мощности магии стихий на следующий каст (%): +50"
+  },
+  {
+    "itemId": 1239,
+    "name": "Наручи Адаптации",
+    "categoryGroup": "armor",
+    "categoryKey": "bracers",
+    "slot": "bracers",
+    "weaponFamily": null,
+    "sourceFile": "armor_bracers.html",
+    "mass": 2,
+    "prices": {
+      "кр": 140
+    },
+    "durability": {
+      "current": 0,
+      "max": 40
+    },
+    "requirements": [
+      "Уровень: 9",
+      "Выносливость: 75"
+    ],
+    "effects": [
+      "Уровень жизни (HP): +125",
+      "Свободные распределения:",
+      "Возможных распределений: 11"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/braslet33.gif",
+    "imageFileName": "braslet33.gif",
+    "rawText": "Наручи Адаптации\n\n (Масса: 2.00)\nЦена: 140.00 кр.\nДолговечность: 0/40\nТребуется минимальное:\n• Уровень: 9\n• Выносливость: 75\nДействует на:\n• Уровень жизни (HP): +125\nСвободные распределения:\n• Возможных распределений: 11"
+  },
+  {
+    "itemId": 1240,
+    "name": "Наручи Адаптации",
+    "categoryGroup": "armor",
+    "categoryKey": "bracers",
+    "slot": "bracers",
+    "weaponFamily": null,
+    "sourceFile": "armor_bracers.html",
+    "mass": 2,
+    "prices": {
+      "кр": 167
+    },
+    "durability": {
+      "current": 0,
+      "max": 40
+    },
+    "requirements": [
+      "Уровень: 10",
+      "Выносливость: 75"
+    ],
+    "effects": [
+      "Уровень жизни (HP): +150",
+      "Свободные распределения:",
+      "Возможных распределений: 13"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/braslet33_1.gif",
+    "imageFileName": "braslet33_1.gif",
+    "rawText": "Наручи Адаптации\n\n (Масса: 2.00)\nЦена: 167.00 кр.\nДолговечность: 0/40\nТребуется минимальное:\n• Уровень: 10\n• Выносливость: 75\nДействует на:\n• Уровень жизни (HP): +150\nСвободные распределения:\n• Возможных распределений: 13"
+  },
+  {
+    "itemId": 1714,
+    "name": "Наручи Одаренности",
+    "categoryGroup": "armor",
+    "categoryKey": "bracers",
+    "slot": "bracers",
+    "weaponFamily": null,
+    "sourceFile": "armor_bracers.html",
+    "mass": 2,
+    "prices": {
+      "кр": 146
+    },
+    "durability": {
+      "current": 0,
+      "max": 40
+    },
+    "requirements": [
+      "Уровень: 9",
+      "Сила: 20",
+      "Ловкость: 20",
+      "Интуиция: 20",
+      "Выносливость: 20"
+    ],
+    "effects": [
+      "Сила: +10",
+      "Ловкость: +5",
+      "Интуиция: +5"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/naruchi82.gif",
+    "imageFileName": "naruchi82.gif",
+    "rawText": "Наручи Одаренности\n\n (Масса: 2.00)\nЦена: 146.00 кр.\nДолговечность: 0/40\nТребуется минимальное:\n• Уровень: 9\n• Сила: 20\n• Ловкость: 20\n• Интуиция: 20\n• Выносливость: 20\nДействует на:\n• Сила: +10\n• Ловкость: +5\n• Интуиция: +5"
+  },
+  {
+    "itemId": 2068,
+    "name": "Наручи Забытых Времен",
+    "categoryGroup": "armor",
+    "categoryKey": "bracers",
+    "slot": "bracers",
+    "weaponFamily": null,
+    "sourceFile": "armor_bracers.html",
+    "mass": 2,
+    "prices": {
+      "кр": 140
+    },
+    "durability": {
+      "current": 0,
+      "max": 40
+    },
+    "requirements": [
+      "Уровень: 9",
+      "Сила: 45",
+      "Ловкость: 15",
+      "Интуиция: 15",
+      "Выносливость: 50"
+    ],
+    "effects": [
+      "Сила: +2",
+      "Мастерство владения оружием: +2",
+      "Уровень жизни (HP): +33",
+      "Мф. против увертывания (%): +20",
+      "Защита от урона: +25",
+      "Защита от магии: +30",
+      "Дополнительная информация:",
+      "Часть комплекта: Комплект Забытых Времен• 7: Мф. против критического удара (%): +25",
+      "Мф. против увертывания (%): +25",
+      "11: Мф. против критического удара (%): +35",
+      "Мф. против увертывания (%): +35",
+      "Уровень жизни (HP): +50",
+      "13: Уровень жизни (HP): +50",
+      "Защита от магии: +25"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/braslet25.gif",
+    "imageFileName": "braslet25.gif",
+    "rawText": "Наручи Забытых Времен\n\n (Масса: 2.00)\nЦена: 140.00 кр.\nДолговечность: 0/40\nТребуется минимальное:\n• Уровень: 9\n• Сила: 45\n• Ловкость: 15\n• Интуиция: 15\n• Выносливость: 50\nДействует на:\n• Сила: +2\n• Мастерство владения оружием: +2\n• Уровень жизни (HP): +33\n• Мф. против увертывания (%): +20\n• Защита от урона: +25\n• Защита от магии: +30\nДополнительная информация:\n• Часть комплекта: Комплект Забытых Времен• 7: Мф. против критического удара (%): +25\n Мф. против увертывания (%): +25\n• 11: Мф. против критического удара (%): +35\n Мф. против увертывания (%): +35\n Уровень жизни (HP): +50\n• 13: Уровень жизни (HP): +50\n Защита от магии: +25"
+  },
+  {
+    "itemId": 2080,
+    "name": "Наручи Утреннего Солнца",
+    "categoryGroup": "armor",
+    "categoryKey": "bracers",
+    "slot": "bracers",
+    "weaponFamily": null,
+    "sourceFile": "armor_bracers.html",
+    "mass": 2,
+    "prices": {
+      "кр": 140
+    },
+    "durability": {
+      "current": 0,
+      "max": 40
+    },
+    "requirements": [
+      "Уровень: 9",
+      "Сила: 35",
+      "Ловкость: 30",
+      "Интуиция: 30",
+      "Выносливость: 35"
+    ],
+    "effects": [
+      "Мастерство владения оружием: +2",
+      "Уровень жизни (HP): +33",
+      "Мф. против критического удара (%): +25",
+      "Мф. против увертывания (%): +25",
+      "Защита от магии: +20",
+      "Мф. мощности урона: +5",
+      "Дополнительная информация:",
+      "Часть комплекта: Комплект Утреннего Солнца• 7: Мф. мощности магии огня: +10",
+      "10: Мф. мощности магии огня: +15",
+      "Мф. мощности урона: +10",
+      "13: Защита от магии: +30"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/braslet26_du2.gif",
+    "imageFileName": "braslet26_du2.gif",
+    "rawText": "Наручи Утреннего Солнца\n\n (Масса: 2.00)\nЦена: 140.00 кр.\nДолговечность: 0/40\nТребуется минимальное:\n• Уровень: 9\n• Сила: 35\n• Ловкость: 30\n• Интуиция: 30\n• Выносливость: 35\nДействует на:\n• Мастерство владения оружием: +2\n• Уровень жизни (HP): +33\n• Мф. против критического удара (%): +25\n• Мф. против увертывания (%): +25\n• Защита от магии: +20\n• Мф. мощности урона: +5\nДополнительная информация:\n• Часть комплекта: Комплект Утреннего Солнца• 7: Мф. мощности магии огня: +10\n• 10: Мф. мощности магии огня: +15\n Мф. мощности урона: +10\n• 13: Защита от магии: +30"
+  },
+  {
+    "itemId": 2176,
+    "name": "Браслет Скорпиона",
+    "categoryGroup": "armor",
+    "categoryKey": "bracers",
+    "slot": "bracers",
+    "weaponFamily": null,
+    "sourceFile": "armor_bracers.html",
+    "mass": 2,
+    "prices": {
+      "кр": 140
+    },
+    "durability": {
+      "current": 0,
+      "max": 40
+    },
+    "requirements": [
+      "Уровень: 9",
+      "Сила: 35",
+      "Ловкость: 15",
+      "Интуиция: 45",
+      "Выносливость: 45"
+    ],
+    "effects": [
+      "Сила: +3",
+      "Мастерство владения оружием: +1",
+      "Уровень жизни (HP): +18",
+      "Мф. критического удара (%): +35",
+      "Мф. против критического удара (%): +20",
+      "Мф. против увертывания (%): +40",
+      "Защита от урона: +25",
+      "Дополнительная информация:",
+      "Часть комплекта: Комплект Скорпиона• 4: Защита от магии: +25",
+      "8: Мф. против критического удара (%): +50",
+      "10: Уровень жизни (HP): +54",
+      "12: Мф. критического удара (%): +50"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/braslet32.gif",
+    "imageFileName": "braslet32.gif",
+    "rawText": "Браслет Скорпиона\n\n (Масса: 2.00)\nЦена: 140.00 кр.\nДолговечность: 0/40\nТребуется минимальное:\n• Уровень: 9\n• Сила: 35\n• Ловкость: 15\n• Интуиция: 45\n• Выносливость: 45\nДействует на:\n• Сила: +3\n• Мастерство владения оружием: +1\n• Уровень жизни (HP): +18\n• Мф. критического удара (%): +35\n• Мф. против критического удара (%): +20\n• Мф. против увертывания (%): +40\n• Защита от урона: +25\nДополнительная информация:\n• Часть комплекта: Комплект Скорпиона• 4: Защита от магии: +25\n• 8: Мф. против критического удара (%): +50\n• 10: Уровень жизни (HP): +54\n• 12: Мф. критического удара (%): +50"
+  },
+  {
+    "itemId": 3212,
+    "name": "Наручи воспитанника",
+    "categoryGroup": "armor",
+    "categoryKey": "bracers",
+    "slot": "bracers",
+    "weaponFamily": null,
+    "sourceFile": "armor_bracers.html",
+    "mass": 1,
+    "prices": {
+      "кр": 12
+    },
+    "durability": {
+      "current": 0,
+      "max": 20
+    },
+    "requirements": [
+      "Уровень: 2"
+    ],
+    "effects": [
+      "Уровень жизни (HP): +15",
+      "Защита от урона: +10"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/ref_itm4.gif",
+    "imageFileName": "ref_itm4.gif",
+    "rawText": "Наручи воспитанника\n\n (Масса: 1.00)\nЦена: 12.00 кр.\nДолговечность: 0/20\nТребуется минимальное:\n• Уровень: 2\nДействует на:\n• Уровень жизни (HP): +15\n• Защита от урона: +10"
+  },
+  {
+    "itemId": 4048,
+    "name": "Наручи Валентая",
+    "categoryGroup": "armor",
+    "categoryKey": "bracers",
+    "slot": "bracers",
+    "weaponFamily": null,
+    "sourceFile": "armor_bracers.html",
+    "mass": 2,
+    "prices": {
+      "кр": 169
+    },
+    "durability": {
+      "current": 0,
+      "max": 20
+    },
+    "requirements": [
+      "Уровень: 9",
+      "Сила: 30",
+      "Ловкость: 15",
+      "Интуиция: 15",
+      "Выносливость: 30"
+    ],
+    "effects": [
+      "Сила: +3",
+      "Ловкость: +3",
+      "Интуиция: +3",
+      "Уровень жизни (HP): +18",
+      "Мф. критического удара (%): +20",
+      "Мф. против критического удара (%): +20",
+      "Мф. увертывания (%): +20",
+      "Мф. против увертывания (%): +20",
+      "Защита от урона: +20",
+      "Защита от магии: +20"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/braslet35_2.gif",
+    "imageFileName": "braslet35_2.gif",
+    "rawText": "Наручи Валентая\n\n (Масса: 2.00)\nЦена: 169.00 кр.\nДолговечность: 0/20\nТребуется минимальное:\n• Уровень: 9\n• Сила: 30\n• Ловкость: 15\n• Интуиция: 15\n• Выносливость: 30\nДействует на:\n• Сила: +3\n• Ловкость: +3\n• Интуиция: +3\n• Уровень жизни (HP): +18\n• Мф. критического удара (%): +20\n• Мф. против критического удара (%): +20\n• Мф. увертывания (%): +20\n• Мф. против увертывания (%): +20\n• Защита от урона: +20\n• Защита от магии: +20"
+  },
+  {
+    "itemId": 4049,
+    "name": "Браслет Валентая",
+    "categoryGroup": "armor",
+    "categoryKey": "bracers",
+    "slot": "bracers",
+    "weaponFamily": null,
+    "sourceFile": "armor_bracers.html",
+    "mass": 2,
+    "prices": {
+      "кр": 173
+    },
+    "durability": {
+      "current": 0,
+      "max": 20
+    },
+    "requirements": [
+      "Уровень: 9",
+      "Интеллект: 75",
+      "Мудрость: 75"
+    ],
+    "effects": [
+      "Интеллект: +10",
+      "Уровень жизни (HP): +18",
+      "Уровень маны: +60",
+      "Защита от урона: +10",
+      "Защита от магии: +10",
+      "Мф. мощности магии стихий: +5"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/braslet34_2.gif",
+    "imageFileName": "braslet34_2.gif",
+    "rawText": "Браслет Валентая\n\n (Масса: 2.00)\nЦена: 173.00 кр.\nДолговечность: 0/20\nТребуется минимальное:\n• Уровень: 9\n• Интеллект: 75\n• Мудрость: 75\nДействует на:\n• Интеллект: +10\n• Уровень жизни (HP): +18\n• Уровень маны: +60\n• Защита от урона: +10\n• Защита от магии: +10\n• Мф. мощности магии стихий: +5"
+  },
+  {
+    "itemId": 4288,
+    "name": "Браслет Кровавой Луны [10]",
+    "categoryGroup": "armor",
+    "categoryKey": "bracers",
+    "slot": "bracers",
+    "weaponFamily": null,
+    "sourceFile": "armor_bracers.html",
+    "mass": 2,
+    "prices": {
+      "кр": 167
+    },
+    "durability": {
+      "current": 0,
+      "max": 40
+    },
+    "requirements": [
+      "Уровень: 10",
+      "Сила: 35",
+      "Ловкость: 15",
+      "Интуиция: 60",
+      "Выносливость: 35"
+    ],
+    "effects": [
+      "Сила: +3",
+      "Мастерство владения оружием: +2",
+      "Мф. критического удара (%): +40",
+      "Мф. против критического удара (%): +25",
+      "Мф. мощности крит. удара (%): +23",
+      "Дополнительная информация:",
+      "Часть комплекта: Комплект Кровавой Луны [10]• 5: Мф. против увертывания (%): +45",
+      "8: Мф. против критического удара (%): +30",
+      "Мф. критического удара (%): +35",
+      "10: Уровень жизни (HP): +80",
+      "Защита от магии: +30",
+      "12: Добавляет тактики атаки при критическом ударе: +1"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/braslet24.gif",
+    "imageFileName": "braslet24.gif",
+    "rawText": "Браслет Кровавой Луны [10]\n\n (Масса: 2.00)\nЦена: 167.00 кр.\nДолговечность: 0/40\nТребуется минимальное:\n• Уровень: 10\n• Сила: 35\n• Ловкость: 15\n• Интуиция: 60\n• Выносливость: 35\nДействует на:\n• Сила: +3\n• Мастерство владения оружием: +2\n• Мф. критического удара (%): +40\n• Мф. против критического удара (%): +25\n• Мф. мощности крит. удара (%): +23\nДополнительная информация:\n• Часть комплекта: Комплект Кровавой Луны [10]• 5: Мф. против увертывания (%): +45\n• 8: Мф. против критического удара (%): +30\n Мф. критического удара (%): +35\n• 10: Уровень жизни (HP): +80\n Защита от магии: +30\n• 12: Добавляет тактики атаки при критическом ударе: +1"
+  },
+  {
+    "itemId": 4308,
+    "name": "Наручи Паука [10]",
+    "categoryGroup": "armor",
+    "categoryKey": "bracers",
+    "slot": "bracers",
+    "weaponFamily": null,
+    "sourceFile": "armor_bracers.html",
+    "mass": 2,
+    "prices": {
+      "кр": 168
+    },
+    "durability": {
+      "current": 0,
+      "max": 30
+    },
+    "requirements": [
+      "Уровень: 10",
+      "Сила: 35",
+      "Ловкость: 60",
+      "Интуиция: 15",
+      "Выносливость: 35"
+    ],
+    "effects": [
+      "Интеллект: +1",
+      "Уровень жизни (HP): +26",
+      "Мф. против критического удара (%): +35",
+      "Мф. против увертывания (%): +35",
+      "Мф. мощности урона: +17",
+      "Дополнительная информация:",
+      "Часть комплекта: Комплект Паука [10]• 5: Мф. против увертывания (%): +30",
+      "Мф. против критического удара (%): +43",
+      "8: Мф. парирования (%): +6",
+      "Мастерство владения оружием: +1",
+      "10: Мастерство владения оружием: +1",
+      "Уровень жизни (HP): +40",
+      "12: При ударе, с вероятностью 5% производит дополнительную атаку по противнику в случайную зону: +1"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/naruchi76.gif",
+    "imageFileName": "naruchi76.gif",
+    "rawText": "Наручи Паука [10]\n\n (Масса: 2.00)\nЦена: 168.00 кр.\nДолговечность: 0/30\nТребуется минимальное:\n• Уровень: 10\n• Сила: 35\n• Ловкость: 60\n• Интуиция: 15\n• Выносливость: 35\nДействует на:\n• Интеллект: +1\n• Уровень жизни (HP): +26\n• Мф. против критического удара (%): +35\n• Мф. против увертывания (%): +35\n• Мф. мощности урона: +17\nДополнительная информация:\n• Часть комплекта: Комплект Паука [10]• 5: Мф. против увертывания (%): +30\n Мф. против критического удара (%): +43\n• 8: Мф. парирования (%): +6\n Мастерство владения оружием: +1\n• 10: Мастерство владения оружием: +1\n Уровень жизни (HP): +40\n• 12: При ударе, с вероятностью 5% производит дополнительную атаку по противнику в случайную зону: +1"
+  },
+  {
+    "itemId": 4318,
+    "name": "Наручи Злодеяний [10]",
+    "categoryGroup": "armor",
+    "categoryKey": "bracers",
+    "slot": "bracers",
+    "weaponFamily": null,
+    "sourceFile": "armor_bracers.html",
+    "mass": 2,
+    "prices": {
+      "кр": 168
+    },
+    "durability": {
+      "current": 0,
+      "max": 40
+    },
+    "requirements": [
+      "Уровень: 10",
+      "Сила: 25",
+      "Ловкость: 60",
+      "Интуиция: 45",
+      "Выносливость: 35"
+    ],
+    "effects": [
+      "Ловкость: +2",
+      "Интуиция: +2",
+      "Мастерство владения оружием: +1",
+      "Уровень жизни (HP): +24",
+      "Мф. критического удара (%): +65",
+      "Мф. против критического удара (%): +25",
+      "Мф. контрудара (%): +17",
+      "Дополнительная информация:",
+      "Часть комплекта: Комплект Злодеяний [10]• 5: Мф. увертывания (%): +60",
+      "Уровень жизни (HP): +40",
+      "8: Мф. против критического удара (%): +60",
+      "Уровень жизни (HP): +40",
+      "10: Мастерство владения оружием: +2",
+      "12: Добавляет тактики контрудара при критическом ударе: +1"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/braslet31.gif",
+    "imageFileName": "braslet31.gif",
+    "rawText": "Наручи Злодеяний [10]\n\n (Масса: 2.00)\nЦена: 168.00 кр.\nДолговечность: 0/40\nТребуется минимальное:\n• Уровень: 10\n• Сила: 25\n• Ловкость: 60\n• Интуиция: 45\n• Выносливость: 35\nДействует на:\n• Ловкость: +2\n• Интуиция: +2\n• Мастерство владения оружием: +1\n• Уровень жизни (HP): +24\n• Мф. критического удара (%): +65\n• Мф. против критического удара (%): +25\n• Мф. контрудара (%): +17\nДополнительная информация:\n• Часть комплекта: Комплект Злодеяний [10]• 5: Мф. увертывания (%): +60\n Уровень жизни (HP): +40\n• 8: Мф. против критического удара (%): +60\n Уровень жизни (HP): +40\n• 10: Мастерство владения оружием: +2\n• 12: Добавляет тактики контрудара при критическом ударе: +1"
+  },
+  {
+    "itemId": 4329,
+    "name": "Наручи Забытых Времен [10]",
+    "categoryGroup": "armor",
+    "categoryKey": "bracers",
+    "slot": "bracers",
+    "weaponFamily": null,
+    "sourceFile": "armor_bracers.html",
+    "mass": 2,
+    "prices": {
+      "кр": 168
+    },
+    "durability": {
+      "current": 0,
+      "max": 40
+    },
+    "requirements": [
+      "Уровень: 10",
+      "Сила: 45",
+      "Ловкость: 15",
+      "Интуиция: 15",
+      "Выносливость: 65"
+    ],
+    "effects": [
+      "Сила: +2",
+      "Мастерство владения оружием: +2",
+      "Уровень жизни (HP): +41",
+      "Мф. против увертывания (%): +30",
+      "Защита от урона: +35",
+      "Защита от магии: +40",
+      "Дополнительная информация:",
+      "Часть комплекта: Комплект Забытых Времен [10]• 5: Мф. против увертывания (%): +35",
+      "Мф. против критического удара (%): +30",
+      "8: Мф. против увертывания (%): +43",
+      "Мф. против критического удара (%): +43",
+      "Уровень жизни (HP): +60",
+      "10: Мф. против увертывания (%): +43",
+      "Мф. против критического удара (%): +43",
+      "Защита от магии: +30",
+      "Уровень жизни (HP): +60",
+      "12: Мф. против увертывания (%): +43",
+      "Мф. против критического удара (%): +43",
+      "Защита от магии: +30",
+      "Уровень жизни (HP): +120",
+      "При успешном блоке, с вероятностью 10% восстанавливает здоровье (%): +2"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/braslet25.gif",
+    "imageFileName": "braslet25.gif",
+    "rawText": "Наручи Забытых Времен [10]\n\n (Масса: 2.00)\nЦена: 168.00 кр.\nДолговечность: 0/40\nТребуется минимальное:\n• Уровень: 10\n• Сила: 45\n• Ловкость: 15\n• Интуиция: 15\n• Выносливость: 65\nДействует на:\n• Сила: +2\n• Мастерство владения оружием: +2\n• Уровень жизни (HP): +41\n• Мф. против увертывания (%): +30\n• Защита от урона: +35\n• Защита от магии: +40\nДополнительная информация:\n• Часть комплекта: Комплект Забытых Времен [10]• 5: Мф. против увертывания (%): +35\n Мф. против критического удара (%): +30\n• 8: Мф. против увертывания (%): +43\n Мф. против критического удара (%): +43\n Уровень жизни (HP): +60\n• 10: Мф. против увертывания (%): +43\n Мф. против критического удара (%): +43\n Защита от магии: +30\n Уровень жизни (HP): +60\n• 12: Мф. против увертывания (%): +43\n Мф. против критического удара (%): +43\n Защита от магии: +30\n Уровень жизни (HP): +120\n При успешном блоке, с вероятностью 10% восстанавливает здоровье (%): +2"
+  },
+  {
+    "itemId": 4334,
+    "name": "Браслет Скорпиона [10]",
+    "categoryGroup": "armor",
+    "categoryKey": "bracers",
+    "slot": "bracers",
+    "weaponFamily": null,
+    "sourceFile": "armor_bracers.html",
+    "mass": 2,
+    "prices": {
+      "кр": 168
+    },
+    "durability": {
+      "current": 0,
+      "max": 40
+    },
+    "requirements": [
+      "Уровень: 10",
+      "Сила: 35",
+      "Ловкость: 15",
+      "Интуиция: 60",
+      "Выносливость: 50"
+    ],
+    "effects": [
+      "Сила: +3",
+      "Мастерство владения оружием: +1",
+      "Уровень жизни (HP): +26",
+      "Мф. критического удара (%): +50",
+      "Мф. против критического удара (%): +30",
+      "Мф. против увертывания (%): +45",
+      "Защита от магии: +30",
+      "Дополнительная информация:",
+      "Часть комплекта: Комплект Скорпиона [10]• 5: Защита от магии: +30",
+      "8: Мф. против критического удара (%): +60",
+      "Уровень жизни (HP): +30",
+      "10: Мф. критического удара (%): +60",
+      "Уровень жизни (HP): +40",
+      "12: При ударе, с вероятностью 33% добавляет тактики крови : +1"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/braslet32.gif",
+    "imageFileName": "braslet32.gif",
+    "rawText": "Браслет Скорпиона [10]\n\n (Масса: 2.00)\nЦена: 168.00 кр.\nДолговечность: 0/40\nТребуется минимальное:\n• Уровень: 10\n• Сила: 35\n• Ловкость: 15\n• Интуиция: 60\n• Выносливость: 50\nДействует на:\n• Сила: +3\n• Мастерство владения оружием: +1\n• Уровень жизни (HP): +26\n• Мф. критического удара (%): +50\n• Мф. против критического удара (%): +30\n• Мф. против увертывания (%): +45\n• Защита от магии: +30\nДополнительная информация:\n• Часть комплекта: Комплект Скорпиона [10]• 5: Защита от магии: +30\n• 8: Мф. против критического удара (%): +60\n Уровень жизни (HP): +30\n• 10: Мф. критического удара (%): +60\n Уровень жизни (HP): +40\n• 12: При ударе, с вероятностью 33% добавляет тактики крови : +1"
+  },
+  {
+    "itemId": 4354,
+    "name": "Наручи Решимости [10]",
+    "categoryGroup": "armor",
+    "categoryKey": "bracers",
+    "slot": "bracers",
+    "weaponFamily": null,
+    "sourceFile": "armor_bracers.html",
+    "mass": 2,
+    "prices": {
+      "кр": 168
+    },
+    "durability": {
+      "current": 0,
+      "max": 50
+    },
+    "requirements": [
+      "Уровень: 10",
+      "Интеллект: 50",
+      "Мудрость: 60"
+    ],
+    "effects": [
+      "Интеллект: +2",
+      "Уровень жизни (HP): +77",
+      "Уровень маны: +135",
+      "Защита от магии: +20",
+      "Дополнительная информация:",
+      "Часть комплекта: Комплект Решимости [10]• 3: Мф. мощности магии стихий: +12",
+      "5: Понижение защиты от магии: +2",
+      "7: При касте, с вероятностью 5% увеличивает ваш мф. мощности магии стихий на следующий каст (%): +50"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/braslet27.gif",
+    "imageFileName": "braslet27.gif",
+    "rawText": "Наручи Решимости [10]\n\n (Масса: 2.00)\nЦена: 168.00 кр.\nДолговечность: 0/50\nТребуется минимальное:\n• Уровень: 10\n• Интеллект: 50\n• Мудрость: 60\nДействует на:\n• Интеллект: +2\n• Уровень жизни (HP): +77\n• Уровень маны: +135\n• Защита от магии: +20\nДополнительная информация:\n• Часть комплекта: Комплект Решимости [10]• 3: Мф. мощности магии стихий: +12\n• 5: Понижение защиты от магии: +2\n• 7: При касте, с вероятностью 5% увеличивает ваш мф. мощности магии стихий на следующий каст (%): +50"
+  },
+  {
+    "itemId": 4363,
+    "name": "Наручи Утреннего Солнца [10]",
+    "categoryGroup": "armor",
+    "categoryKey": "bracers",
+    "slot": "bracers",
+    "weaponFamily": null,
+    "sourceFile": "armor_bracers.html",
+    "mass": 2,
+    "prices": {
+      "кр": 168
+    },
+    "durability": {
+      "current": 0,
+      "max": 40
+    },
+    "requirements": [
+      "Уровень: 10",
+      "Сила: 45",
+      "Ловкость: 30",
+      "Интуиция: 30",
+      "Выносливость: 45"
+    ],
+    "effects": [
+      "Мастерство владения оружием: +2",
+      "Уровень жизни (HP): +37",
+      "Мф. против критического удара (%): +35",
+      "Мф. против увертывания (%): +35",
+      "Защита от магии: +30",
+      "Мф. мощности урона: +5",
+      "Дополнительная информация:",
+      "Часть комплекта: Комплект Утреннего Солнца [10]• 5: Мф. против критического удара (%): +60",
+      "8: Мф. мощности урона: +12",
+      "10: Защита от магии: +55",
+      "Мф. мощности урона: +10",
+      "12: При парировании, с вероятностью 25% на два хода увеличивает ваш мф. против критического удара и мф. против увертывания: +300"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/braslet26_du2.gif",
+    "imageFileName": "braslet26_du2.gif",
+    "rawText": "Наручи Утреннего Солнца [10]\n\n (Масса: 2.00)\nЦена: 168.00 кр.\nДолговечность: 0/40\nТребуется минимальное:\n• Уровень: 10\n• Сила: 45\n• Ловкость: 30\n• Интуиция: 30\n• Выносливость: 45\nДействует на:\n• Мастерство владения оружием: +2\n• Уровень жизни (HP): +37\n• Мф. против критического удара (%): +35\n• Мф. против увертывания (%): +35\n• Защита от магии: +30\n• Мф. мощности урона: +5\nДополнительная информация:\n• Часть комплекта: Комплект Утреннего Солнца [10]• 5: Мф. против критического удара (%): +60\n• 8: Мф. мощности урона: +12\n• 10: Защита от магии: +55\n Мф. мощности урона: +10\n• 12: При парировании, с вероятностью 25% на два хода увеличивает ваш мф. против критического удара и мф. против увертывания: +300"
+  },
+  {
+    "itemId": 4365,
+    "name": "Наручи Утреннего Солнца [10]",
+    "categoryGroup": "armor",
+    "categoryKey": "bracers",
+    "slot": "bracers",
+    "weaponFamily": null,
+    "sourceFile": "armor_bracers.html",
+    "mass": 2,
+    "prices": {
+      "кр": 168
+    },
+    "durability": {
+      "current": 0,
+      "max": 40
+    },
+    "requirements": [
+      "Уровень: 10",
+      "Сила: 45",
+      "Ловкость: 30",
+      "Интуиция: 30",
+      "Выносливость: 45"
+    ],
+    "effects": [
+      "Мастерство владения оружием: +2",
+      "Уровень жизни (HP): +37",
+      "Мф. против критического удара (%): +35",
+      "Мф. против увертывания (%): +35",
+      "Защита от магии: +30",
+      "Мф. мощности урона: +5",
+      "Дополнительная информация:",
+      "Часть комплекта: Комплект Утреннего Солнца [10]• 5: Мф. против критического удара (%): +60",
+      "8: Мф. мощности урона: +12",
+      "10: Защита от магии: +55",
+      "Мф. мощности урона: +10",
+      "12: При парировании, с вероятностью 25% на два хода увеличивает ваш мф. против критического удара и мф. против увертывания: +300"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/braslet26_du2.gif",
+    "imageFileName": "braslet26_du2.gif",
+    "rawText": "Наручи Утреннего Солнца [10]\n\n (Масса: 2.00)\nЦена: 168.00 кр.\nДолговечность: 0/40\nТребуется минимальное:\n• Уровень: 10\n• Сила: 45\n• Ловкость: 30\n• Интуиция: 30\n• Выносливость: 45\nДействует на:\n• Мастерство владения оружием: +2\n• Уровень жизни (HP): +37\n• Мф. против критического удара (%): +35\n• Мф. против увертывания (%): +35\n• Защита от магии: +30\n• Мф. мощности урона: +5\nДополнительная информация:\n• Часть комплекта: Комплект Утреннего Солнца [10]• 5: Мф. против критического удара (%): +60\n• 8: Мф. мощности урона: +12\n• 10: Защита от магии: +55\n Мф. мощности урона: +10\n• 12: При парировании, с вероятностью 25% на два хода увеличивает ваш мф. против критического удара и мф. против увертывания: +300"
+  },
+  {
+    "itemId": 4812,
+    "name": "Браслеты Неуловимой Мощи",
+    "categoryGroup": "armor",
+    "categoryKey": "bracers",
+    "slot": "bracers",
+    "weaponFamily": null,
+    "sourceFile": "armor_bracers.html",
+    "mass": 1,
+    "prices": {
+      "кр": 200
+    },
+    "durability": {
+      "current": 0,
+      "max": 50
+    },
+    "requirements": [
+      "Уровень: 10",
+      "Интеллект: 60",
+      "Мудрость: 60"
+    ],
+    "effects": [
+      "Понижение защиты от магии: +2",
+      "Интеллект: +5",
+      "Уровень жизни (HP): +80",
+      "Уровень маны: +80",
+      "Мф. мощности магии стихий: +7",
+      "Дополнительная информация:",
+      "Часть комплекта: Комплект Неуловимой Мощи [3]• 3: Мф. мощности магии стихий: +5",
+      "Уровень жизни (HP): +50"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/braslet43.gif",
+    "imageFileName": "braslet43.gif",
+    "rawText": "Браслеты Неуловимой Мощи\n\n (Масса: 1.00)\nЦена: 200.00 кр.\nДолговечность: 0/50\nТребуется минимальное:\n• Уровень: 10\n• Интеллект: 60\n• Мудрость: 60\nДействует на:\n• Понижение защиты от магии: +2\n• Интеллект: +5\n• Уровень жизни (HP): +80\n• Уровень маны: +80\n• Мф. мощности магии стихий: +7\nДополнительная информация:\n• Часть комплекта: Комплект Неуловимой Мощи [3]• 3: Мф. мощности магии стихий: +5\n Уровень жизни (HP): +50"
+  },
+  {
+    "itemId": 4813,
+    "name": "Наручи Неотвратимого Возмездия",
+    "categoryGroup": "armor",
+    "categoryKey": "bracers",
+    "slot": "bracers",
+    "weaponFamily": null,
+    "sourceFile": "armor_bracers.html",
+    "mass": 2,
+    "prices": {
+      "кр": 199
+    },
+    "durability": {
+      "current": 0,
+      "max": 50
+    },
+    "requirements": [
+      "Уровень: 10",
+      "Сила: 40",
+      "Ловкость: 60",
+      "Интуиция: 10",
+      "Выносливость: 40"
+    ],
+    "effects": [
+      "Ловкость: +3",
+      "Мастерство владения оружием: +1",
+      "Мф. увертывания (%): +120",
+      "Мф. против увертывания (%): +70",
+      "Мф. контрудара (%): +5",
+      "Мф. мощности урона: +10",
+      "Дополнительная информация:",
+      "Часть комплекта: Комплект Неотвратимого Возмездия [3]• 3: Мф. мощности урона: +5",
+      "Мф. увертывания (%): +50"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/naruchi41.gif",
+    "imageFileName": "naruchi41.gif",
+    "rawText": "Наручи Неотвратимого Возмездия\n\n (Масса: 2.00)\nЦена: 199.00 кр.\nДолговечность: 0/50\nТребуется минимальное:\n• Уровень: 10\n• Сила: 40\n• Ловкость: 60\n• Интуиция: 10\n• Выносливость: 40\nДействует на:\n• Ловкость: +3\n• Мастерство владения оружием: +1\n• Мф. увертывания (%): +120\n• Мф. против увертывания (%): +70\n• Мф. контрудара (%): +5\n• Мф. мощности урона: +10\nДополнительная информация:\n• Часть комплекта: Комплект Неотвратимого Возмездия [3]• 3: Мф. мощности урона: +5\n Мф. увертывания (%): +50"
+  },
+  {
+    "itemId": 5281,
+    "name": "Браслеты Неуловимой Мощи [11]",
+    "categoryGroup": "armor",
+    "categoryKey": "bracers",
+    "slot": "bracers",
+    "weaponFamily": null,
+    "sourceFile": "armor_bracers.html",
+    "mass": 1,
+    "prices": {
+      "кр": 200
+    },
+    "durability": {
+      "current": 0,
+      "max": 50
+    },
+    "requirements": [
+      "Уровень: 11",
+      "Интеллект: 125",
+      "Мудрость: 75"
+    ],
+    "effects": [
+      "Понижение защиты от магии: +2",
+      "Интеллект: +6",
+      "Уровень жизни (HP): +95",
+      "Уровень маны: +95",
+      "Мф. мощности магии стихий: +9",
+      "Дополнительная информация:",
+      "Часть комплекта: Комплект Неуловимой Мощи [3]• 3: Мф. мощности магии стихий: +7",
+      "Уровень жизни (HP): +65"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/braslet43.gif",
+    "imageFileName": "braslet43.gif",
+    "rawText": "Браслеты Неуловимой Мощи [11]\n\n (Масса: 1.00)\nЦена: 200.00 кр.\nДолговечность: 0/50\nТребуется минимальное:\n• Уровень: 11\n• Интеллект: 125\n• Мудрость: 75\nДействует на:\n• Понижение защиты от магии: +2\n• Интеллект: +6\n• Уровень жизни (HP): +95\n• Уровень маны: +95\n• Мф. мощности магии стихий: +9\nДополнительная информация:\n• Часть комплекта: Комплект Неуловимой Мощи [3]• 3: Мф. мощности магии стихий: +7\n Уровень жизни (HP): +65"
+  },
+  {
+    "itemId": 5282,
+    "name": "Наручи Неотвратимого Возмездия [11]",
+    "categoryGroup": "armor",
+    "categoryKey": "bracers",
+    "slot": "bracers",
+    "weaponFamily": null,
+    "sourceFile": "armor_bracers.html",
+    "mass": 2,
+    "prices": {
+      "кр": 199
+    },
+    "durability": {
+      "current": 0,
+      "max": 50
+    },
+    "requirements": [
+      "Уровень: 11",
+      "Сила: 40",
+      "Ловкость: 125",
+      "Интуиция: 10",
+      "Выносливость: 50"
+    ],
+    "effects": [
+      "Ловкость: +5",
+      "Мастерство владения оружием: +1",
+      "Мф. увертывания (%): +135",
+      "Мф. против увертывания (%): +80",
+      "Мф. контрудара (%): +6",
+      "Мф. мощности урона: +12",
+      "Дополнительная информация:",
+      "Часть комплекта: Комплект Неотвратимого Возмездия [3]• 3: Мф. мощности урона: +6",
+      "Мф. увертывания (%): +65"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/naruchi41.gif",
+    "imageFileName": "naruchi41.gif",
+    "rawText": "Наручи Неотвратимого Возмездия [11]\n\n (Масса: 2.00)\nЦена: 199.00 кр.\nДолговечность: 0/50\nТребуется минимальное:\n• Уровень: 11\n• Сила: 40\n• Ловкость: 125\n• Интуиция: 10\n• Выносливость: 50\nДействует на:\n• Ловкость: +5\n• Мастерство владения оружием: +1\n• Мф. увертывания (%): +135\n• Мф. против увертывания (%): +80\n• Мф. контрудара (%): +6\n• Мф. мощности урона: +12\nДополнительная информация:\n• Часть комплекта: Комплект Неотвратимого Возмездия [3]• 3: Мф. мощности урона: +6\n Мф. увертывания (%): +65"
+  },
+  {
+    "itemId": 6666,
+    "name": "Перчатки Укротителя Драконов",
+    "categoryGroup": "armor",
+    "categoryKey": "bracers",
+    "slot": "bracers",
+    "weaponFamily": null,
+    "sourceFile": "armor_bracers.html",
+    "mass": 2,
+    "prices": {},
+    "durability": {
+      "current": 0,
+      "max": 500
+    },
+    "requirements": [
+      "Уровень: 5",
+      "Сила: 20",
+      "Ловкость: 20",
+      "Интуиция: 20",
+      "Выносливость: 20"
+    ],
+    "effects": [
+      "Сила: +5",
+      "Ловкость: +3",
+      "Интуиция: +3 Предмет не подлежит ремонту"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/dragons_naruchi.gif",
+    "imageFileName": "dragons_naruchi.gif",
+    "rawText": "Перчатки Укротителя Драконов\n\n (Масса: 2.00)\n\nДолговечность: 0/500\nТребуется минимальное:\n• Уровень: 5\n• Сила: 20\n• Ловкость: 20\n• Интуиция: 20\n• Выносливость: 20\nДействует на:\n• Сила: +5\n• Ловкость: +3\n• Интуиция: +3 Предмет не подлежит ремонту"
+  },
+  {
+    "itemId": 7207,
+    "name": "Наручи Адаптации [11]",
+    "categoryGroup": "armor",
+    "categoryKey": "bracers",
+    "slot": "bracers",
+    "weaponFamily": null,
+    "sourceFile": "armor_bracers.html",
+    "mass": 2,
+    "prices": {
+      "кр": 167
+    },
+    "durability": {
+      "current": 0,
+      "max": 40
+    },
+    "requirements": [
+      "Уровень: 10",
+      "Выносливость: 75"
+    ],
+    "effects": [
+      "Уровень жизни (HP): +165",
+      "Свободные распределения:",
+      "Возможных распределений: 14"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/braslet33_1.gif",
+    "imageFileName": "braslet33_1.gif",
+    "rawText": "Наручи Адаптации [11]\n\n (Масса: 2.00)\nЦена: 167.00 кр.\nДолговечность: 0/40\nТребуется минимальное:\n• Уровень: 10\n• Выносливость: 75\nДействует на:\n• Уровень жизни (HP): +165\nСвободные распределения:\n• Возможных распределений: 14"
+  },
+  {
+    "itemId": 7253,
+    "name": "Браслет Кровавой Луны [11]",
+    "categoryGroup": "armor",
+    "categoryKey": "bracers",
+    "slot": "bracers",
+    "weaponFamily": null,
+    "sourceFile": "armor_bracers.html",
+    "mass": 2,
+    "prices": {
+      "кр": 167
+    },
+    "durability": {
+      "current": 0,
+      "max": 40
+    },
+    "requirements": [
+      "Уровень: 10",
+      "Сила: 35",
+      "Ловкость: 15",
+      "Интуиция: 60",
+      "Выносливость: 35"
+    ],
+    "effects": [
+      "Сила: +3",
+      "Мастерство владения оружием: +2",
+      "Мф. критического удара (%): +44",
+      "Мф. против критического удара (%): +28",
+      "Мф. мощности крит. удара (%): +23",
+      "Дополнительная информация:",
+      "Часть комплекта: Комплект Кровавой Луны [10]• 5: Мф. против увертывания (%): +45",
+      "8: Мф. против критического удара (%): +30",
+      "Мф. критического удара (%): +35",
+      "10: Уровень жизни (HP): +80",
+      "Защита от магии: +30",
+      "12: Добавляет тактики атаки при критическом ударе: +1"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/braslet24.gif",
+    "imageFileName": "braslet24.gif",
+    "rawText": "Браслет Кровавой Луны [11]\n\n (Масса: 2.00)\nЦена: 167.00 кр.\nДолговечность: 0/40\nТребуется минимальное:\n• Уровень: 10\n• Сила: 35\n• Ловкость: 15\n• Интуиция: 60\n• Выносливость: 35\nДействует на:\n• Сила: +3\n• Мастерство владения оружием: +2\n• Мф. критического удара (%): +44\n• Мф. против критического удара (%): +28\n• Мф. мощности крит. удара (%): +23\nДополнительная информация:\n• Часть комплекта: Комплект Кровавой Луны [10]• 5: Мф. против увертывания (%): +45\n• 8: Мф. против критического удара (%): +30\n Мф. критического удара (%): +35\n• 10: Уровень жизни (HP): +80\n Защита от магии: +30\n• 12: Добавляет тактики атаки при критическом ударе: +1"
+  },
+  {
+    "itemId": 7271,
+    "name": "Наручи Паука [11]",
+    "categoryGroup": "armor",
+    "categoryKey": "bracers",
+    "slot": "bracers",
+    "weaponFamily": null,
+    "sourceFile": "armor_bracers.html",
+    "mass": 2,
+    "prices": {
+      "кр": 168
+    },
+    "durability": {
+      "current": 0,
+      "max": 30
+    },
+    "requirements": [
+      "Уровень: 10",
+      "Сила: 35",
+      "Ловкость: 60",
+      "Интуиция: 15",
+      "Выносливость: 35"
+    ],
+    "effects": [
+      "Интеллект: +1",
+      "Уровень жизни (HP): +29",
+      "Мф. против критического удара (%): +39",
+      "Мф. против увертывания (%): +39",
+      "Мф. мощности урона: +19",
+      "Дополнительная информация:",
+      "Часть комплекта: Комплект Паука [10]• 5: Мф. против увертывания (%): +30",
+      "Мф. против критического удара (%): +43",
+      "8: Мф. парирования (%): +6",
+      "Мастерство владения оружием: +1",
+      "10: Мастерство владения оружием: +1",
+      "Уровень жизни (HP): +40",
+      "12: При ударе, с вероятностью 5% производит дополнительную атаку по противнику в случайную зону: +1"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/naruchi76.gif",
+    "imageFileName": "naruchi76.gif",
+    "rawText": "Наручи Паука [11]\n\n (Масса: 2.00)\nЦена: 168.00 кр.\nДолговечность: 0/30\nТребуется минимальное:\n• Уровень: 10\n• Сила: 35\n• Ловкость: 60\n• Интуиция: 15\n• Выносливость: 35\nДействует на:\n• Интеллект: +1\n• Уровень жизни (HP): +29\n• Мф. против критического удара (%): +39\n• Мф. против увертывания (%): +39\n• Мф. мощности урона: +19\nДополнительная информация:\n• Часть комплекта: Комплект Паука [10]• 5: Мф. против увертывания (%): +30\n Мф. против критического удара (%): +43\n• 8: Мф. парирования (%): +6\n Мастерство владения оружием: +1\n• 10: Мастерство владения оружием: +1\n Уровень жизни (HP): +40\n• 12: При ударе, с вероятностью 5% производит дополнительную атаку по противнику в случайную зону: +1"
+  },
+  {
+    "itemId": 7281,
+    "name": "Наручи Злодеяний [11]",
+    "categoryGroup": "armor",
+    "categoryKey": "bracers",
+    "slot": "bracers",
+    "weaponFamily": null,
+    "sourceFile": "armor_bracers.html",
+    "mass": 2,
+    "prices": {
+      "кр": 168
+    },
+    "durability": {
+      "current": 0,
+      "max": 40
+    },
+    "requirements": [
+      "Уровень: 10",
+      "Сила: 25",
+      "Ловкость: 60",
+      "Интуиция: 45",
+      "Выносливость: 35"
+    ],
+    "effects": [
+      "Ловкость: +2",
+      "Интуиция: +2",
+      "Мастерство владения оружием: +1",
+      "Уровень жизни (HP): +26",
+      "Мф. критического удара (%): +72",
+      "Мф. против критического удара (%): +28",
+      "Мф. контрудара (%): +19",
+      "Дополнительная информация:",
+      "Часть комплекта: Комплект Злодеяний [10]• 5: Мф. увертывания (%): +60",
+      "Уровень жизни (HP): +40",
+      "8: Мф. против критического удара (%): +60",
+      "Уровень жизни (HP): +40",
+      "10: Мастерство владения оружием: +2",
+      "12: Добавляет тактики контрудара при критическом ударе: +1"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/braslet31.gif",
+    "imageFileName": "braslet31.gif",
+    "rawText": "Наручи Злодеяний [11]\n\n (Масса: 2.00)\nЦена: 168.00 кр.\nДолговечность: 0/40\nТребуется минимальное:\n• Уровень: 10\n• Сила: 25\n• Ловкость: 60\n• Интуиция: 45\n• Выносливость: 35\nДействует на:\n• Ловкость: +2\n• Интуиция: +2\n• Мастерство владения оружием: +1\n• Уровень жизни (HP): +26\n• Мф. критического удара (%): +72\n• Мф. против критического удара (%): +28\n• Мф. контрудара (%): +19\nДополнительная информация:\n• Часть комплекта: Комплект Злодеяний [10]• 5: Мф. увертывания (%): +60\n Уровень жизни (HP): +40\n• 8: Мф. против критического удара (%): +60\n Уровень жизни (HP): +40\n• 10: Мастерство владения оружием: +2\n• 12: Добавляет тактики контрудара при критическом ударе: +1"
+  },
+  {
+    "itemId": 7292,
+    "name": "Наручи Забытых Времен [11]",
+    "categoryGroup": "armor",
+    "categoryKey": "bracers",
+    "slot": "bracers",
+    "weaponFamily": null,
+    "sourceFile": "armor_bracers.html",
+    "mass": 2,
+    "prices": {
+      "кр": 168
+    },
+    "durability": {
+      "current": 0,
+      "max": 40
+    },
+    "requirements": [
+      "Уровень: 10",
+      "Сила: 45",
+      "Ловкость: 15",
+      "Интуиция: 15",
+      "Выносливость: 65"
+    ],
+    "effects": [
+      "Сила: +2",
+      "Мастерство владения оружием: +2",
+      "Уровень жизни (HP): +45",
+      "Мф. против увертывания (%): +33",
+      "Защита от урона: +39",
+      "Защита от магии: +44",
+      "Дополнительная информация:",
+      "Часть комплекта: Комплект Забытых Времен [10]• 5: Мф. против увертывания (%): +35",
+      "Мф. против критического удара (%): +30",
+      "8: Мф. против увертывания (%): +43",
+      "Мф. против критического удара (%): +43",
+      "Уровень жизни (HP): +60",
+      "10: Мф. против увертывания (%): +43",
+      "Мф. против критического удара (%): +43",
+      "Защита от магии: +30",
+      "Уровень жизни (HP): +60",
+      "12: Мф. против увертывания (%): +43",
+      "Мф. против критического удара (%): +43",
+      "Защита от магии: +30",
+      "Уровень жизни (HP): +120",
+      "При успешном блоке, с вероятностью 10% восстанавливает здоровье (%): +2"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/braslet25.gif",
+    "imageFileName": "braslet25.gif",
+    "rawText": "Наручи Забытых Времен [11]\n\n (Масса: 2.00)\nЦена: 168.00 кр.\nДолговечность: 0/40\nТребуется минимальное:\n• Уровень: 10\n• Сила: 45\n• Ловкость: 15\n• Интуиция: 15\n• Выносливость: 65\nДействует на:\n• Сила: +2\n• Мастерство владения оружием: +2\n• Уровень жизни (HP): +45\n• Мф. против увертывания (%): +33\n• Защита от урона: +39\n• Защита от магии: +44\nДополнительная информация:\n• Часть комплекта: Комплект Забытых Времен [10]• 5: Мф. против увертывания (%): +35\n Мф. против критического удара (%): +30\n• 8: Мф. против увертывания (%): +43\n Мф. против критического удара (%): +43\n Уровень жизни (HP): +60\n• 10: Мф. против увертывания (%): +43\n Мф. против критического удара (%): +43\n Защита от магии: +30\n Уровень жизни (HP): +60\n• 12: Мф. против увертывания (%): +43\n Мф. против критического удара (%): +43\n Защита от магии: +30\n Уровень жизни (HP): +120\n При успешном блоке, с вероятностью 10% восстанавливает здоровье (%): +2"
+  },
+  {
+    "itemId": 7297,
+    "name": "Браслет Скорпиона [11]",
+    "categoryGroup": "armor",
+    "categoryKey": "bracers",
+    "slot": "bracers",
+    "weaponFamily": null,
+    "sourceFile": "armor_bracers.html",
+    "mass": 2,
+    "prices": {
+      "кр": 168
+    },
+    "durability": {
+      "current": 0,
+      "max": 40
+    },
+    "requirements": [
+      "Уровень: 10",
+      "Сила: 35",
+      "Ловкость: 15",
+      "Интуиция: 60",
+      "Выносливость: 50"
+    ],
+    "effects": [
+      "Сила: +3",
+      "Мастерство владения оружием: +1",
+      "Уровень жизни (HP): +29",
+      "Мф. критического удара (%): +55",
+      "Мф. против критического удара (%): +33",
+      "Мф. против увертывания (%): +50",
+      "Защита от магии: +33",
+      "Дополнительная информация:",
+      "Часть комплекта: Комплект Скорпиона [10]• 5: Защита от магии: +30",
+      "8: Мф. против критического удара (%): +60",
+      "Уровень жизни (HP): +30",
+      "10: Мф. критического удара (%): +60",
+      "Уровень жизни (HP): +40",
+      "12: При ударе, с вероятностью 33% добавляет тактики крови : +1"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/braslet32.gif",
+    "imageFileName": "braslet32.gif",
+    "rawText": "Браслет Скорпиона [11]\n\n (Масса: 2.00)\nЦена: 168.00 кр.\nДолговечность: 0/40\nТребуется минимальное:\n• Уровень: 10\n• Сила: 35\n• Ловкость: 15\n• Интуиция: 60\n• Выносливость: 50\nДействует на:\n• Сила: +3\n• Мастерство владения оружием: +1\n• Уровень жизни (HP): +29\n• Мф. критического удара (%): +55\n• Мф. против критического удара (%): +33\n• Мф. против увертывания (%): +50\n• Защита от магии: +33\nДополнительная информация:\n• Часть комплекта: Комплект Скорпиона [10]• 5: Защита от магии: +30\n• 8: Мф. против критического удара (%): +60\n Уровень жизни (HP): +30\n• 10: Мф. критического удара (%): +60\n Уровень жизни (HP): +40\n• 12: При ударе, с вероятностью 33% добавляет тактики крови : +1"
+  },
+  {
+    "itemId": 7317,
+    "name": "Наручи Решимости [11]",
+    "categoryGroup": "armor",
+    "categoryKey": "bracers",
+    "slot": "bracers",
+    "weaponFamily": null,
+    "sourceFile": "armor_bracers.html",
+    "mass": 2,
+    "prices": {
+      "кр": 168
+    },
+    "durability": {
+      "current": 0,
+      "max": 50
+    },
+    "requirements": [
+      "Уровень: 10",
+      "Интеллект: 50",
+      "Мудрость: 60"
+    ],
+    "effects": [
+      "Интеллект: +2",
+      "Уровень жизни (HP): +85",
+      "Уровень маны: +149",
+      "Защита от магии: +22",
+      "Дополнительная информация:",
+      "Часть комплекта: Комплект Решимости [10]• 3: Мф. мощности магии стихий: +12",
+      "5: Понижение защиты от магии: +2",
+      "7: При касте, с вероятностью 5% увеличивает ваш мф. мощности магии стихий на следующий каст (%): +50"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/braslet27.gif",
+    "imageFileName": "braslet27.gif",
+    "rawText": "Наручи Решимости [11]\n\n (Масса: 2.00)\nЦена: 168.00 кр.\nДолговечность: 0/50\nТребуется минимальное:\n• Уровень: 10\n• Интеллект: 50\n• Мудрость: 60\nДействует на:\n• Интеллект: +2\n• Уровень жизни (HP): +85\n• Уровень маны: +149\n• Защита от магии: +22\nДополнительная информация:\n• Часть комплекта: Комплект Решимости [10]• 3: Мф. мощности магии стихий: +12\n• 5: Понижение защиты от магии: +2\n• 7: При касте, с вероятностью 5% увеличивает ваш мф. мощности магии стихий на следующий каст (%): +50"
+  },
+  {
+    "itemId": 7326,
+    "name": "Наручи Утреннего Солнца [11]",
+    "categoryGroup": "armor",
+    "categoryKey": "bracers",
+    "slot": "bracers",
+    "weaponFamily": null,
+    "sourceFile": "armor_bracers.html",
+    "mass": 2,
+    "prices": {
+      "кр": 168
+    },
+    "durability": {
+      "current": 0,
+      "max": 40
+    },
+    "requirements": [
+      "Уровень: 10",
+      "Сила: 45",
+      "Ловкость: 30",
+      "Интуиция: 30",
+      "Выносливость: 45"
+    ],
+    "effects": [
+      "Мастерство владения оружием: +2",
+      "Уровень жизни (HP): +41",
+      "Мф. против критического удара (%): +39",
+      "Мф. против увертывания (%): +39",
+      "Защита от магии: +33",
+      "Мф. мощности урона: +6",
+      "Дополнительная информация:",
+      "Часть комплекта: Комплект Утреннего Солнца [10]• 5: Мф. против критического удара (%): +60",
+      "8: Мф. мощности урона: +12",
+      "10: Защита от магии: +55",
+      "Мф. мощности урона: +10",
+      "12: При парировании, с вероятностью 25% на два хода увеличивает ваш мф. против критического удара и мф. против увертывания: +300"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/braslet26_du2.gif",
+    "imageFileName": "braslet26_du2.gif",
+    "rawText": "Наручи Утреннего Солнца [11]\n\n (Масса: 2.00)\nЦена: 168.00 кр.\nДолговечность: 0/40\nТребуется минимальное:\n• Уровень: 10\n• Сила: 45\n• Ловкость: 30\n• Интуиция: 30\n• Выносливость: 45\nДействует на:\n• Мастерство владения оружием: +2\n• Уровень жизни (HP): +41\n• Мф. против критического удара (%): +39\n• Мф. против увертывания (%): +39\n• Защита от магии: +33\n• Мф. мощности урона: +6\nДополнительная информация:\n• Часть комплекта: Комплект Утреннего Солнца [10]• 5: Мф. против критического удара (%): +60\n• 8: Мф. мощности урона: +12\n• 10: Защита от магии: +55\n Мф. мощности урона: +10\n• 12: При парировании, с вероятностью 25% на два хода увеличивает ваш мф. против критического удара и мф. против увертывания: +300"
+  },
+  {
+    "itemId": 7328,
+    "name": "Наручи Утреннего Солнца [11]",
+    "categoryGroup": "armor",
+    "categoryKey": "bracers",
+    "slot": "bracers",
+    "weaponFamily": null,
+    "sourceFile": "armor_bracers.html",
+    "mass": 2,
+    "prices": {
+      "кр": 168
+    },
+    "durability": {
+      "current": 0,
+      "max": 40
+    },
+    "requirements": [
+      "Уровень: 10",
+      "Сила: 45",
+      "Ловкость: 30",
+      "Интуиция: 30",
+      "Выносливость: 45"
+    ],
+    "effects": [
+      "Мастерство владения оружием: +2",
+      "Уровень жизни (HP): +41",
+      "Мф. против критического удара (%): +39",
+      "Мф. против увертывания (%): +39",
+      "Защита от магии: +33",
+      "Мф. мощности урона: +6",
+      "Дополнительная информация:",
+      "Часть комплекта: Комплект Утреннего Солнца [10]• 5: Мф. против критического удара (%): +60",
+      "8: Мф. мощности урона: +12",
+      "10: Защита от магии: +55",
+      "Мф. мощности урона: +10",
+      "12: При парировании, с вероятностью 25% на два хода увеличивает ваш мф. против критического удара и мф. против увертывания: +300"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/braslet26_du2.gif",
+    "imageFileName": "braslet26_du2.gif",
+    "rawText": "Наручи Утреннего Солнца [11]\n\n (Масса: 2.00)\nЦена: 168.00 кр.\nДолговечность: 0/40\nТребуется минимальное:\n• Уровень: 10\n• Сила: 45\n• Ловкость: 30\n• Интуиция: 30\n• Выносливость: 45\nДействует на:\n• Мастерство владения оружием: +2\n• Уровень жизни (HP): +41\n• Мф. против критического удара (%): +39\n• Мф. против увертывания (%): +39\n• Защита от магии: +33\n• Мф. мощности урона: +6\nДополнительная информация:\n• Часть комплекта: Комплект Утреннего Солнца [10]• 5: Мф. против критического удара (%): +60\n• 8: Мф. мощности урона: +12\n• 10: Защита от магии: +55\n Мф. мощности урона: +10\n• 12: При парировании, с вероятностью 25% на два хода увеличивает ваш мф. против критического удара и мф. против увертывания: +300"
+  },
+  {
+    "itemId": 7526,
+    "name": "Грубые наручи",
+    "categoryGroup": "armor",
+    "categoryKey": "bracers",
+    "slot": "bracers",
+    "weaponFamily": null,
+    "sourceFile": "armor_bracers.html",
+    "mass": 1,
+    "prices": {
+      "кр": 1
+    },
+    "durability": {
+      "current": 0,
+      "max": 20
+    },
+    "requirements": [
+      "Уровень: 0"
+    ],
+    "effects": [
+      "Сила: +1",
+      "Мастерство владения оружием: +1",
+      "Уровень жизни (HP): +2",
+      "Предметы",
+      "Амуниция",
+      "&middot; Костыли",
+      "&middot; Эликсиры и еда",
+      "Заклинания",
+      "&middot; Заклинания",
+      "Одежда",
+      "&middot; Тяжелая броня",
+      "&middot; Легкая броня",
+      "&middot; Венки",
+      "&middot; Наручи",
+      "&middot; Обувь",
+      "&middot; Перчатки",
+      "&middot; Плащи",
+      "&middot; Поножи",
+      "&middot; Пояса",
+      "&middot; Рубахи",
+      "&middot; Шлемы",
+      "Оружие",
+      "&middot; Ёлки",
+      "&middot; Дубины",
+      "&middot; Кинжалы",
+      "&middot; Мечи",
+      "&middot; Топоры",
+      "&middot; Посохи",
+      "&middot; Цветы и Букеты",
+      "Разное",
+      "&middot; Компоненты",
+      "Магические предметы",
+      "->",
+      "&middot; Подарки",
+      "&middot; Руны",
+      "&middot; Прочие предметы",
+      "Щиты",
+      "&middot; Щиты",
+      "Ювелирные товары",
+      "&middot; Кольца",
+      "&middot; Ожерелья",
+      "&middot; Серьги",
+      "Copyright © 2026 «www.battlekings.club»",
+      "/*",
+      "$( document ).ready(function() {",
+      "$('#libFilterName').keypress(function() {",
+      "$('.libItem').show();",
+      "$('.libItem').each(function () {",
+      "console.log($(this).find('.itemName'));",
+      "});",
+      "});",
+      "});",
+      "/",
+      "function hideshow() {",
+      "document.getElementById(\"mmoves\").style.visibility = \"hidden\"",
+      "}",
+      "function fastshow(a, event) {",
+      "var b = document.getElementById(\"mmoves\"), d = (typeof(event) != 'undefined' ? event.target : window.event.srcElement);",
+      "if (a != \"\" && b.style.visibility != \"visible\")",
+      "b.innerHTML = \"\" + a + \"\";",
+      "a = (typeof(event) != 'undefined' ? event.clientY : window.event.clientY) + document.documentElement.scrollTop + document.body.scrollTop + 5;",
+      "b.style.left = (typeof(event) != 'undefined' ? event.clientX : window.event.clientX) + document.documentElement.scrollLeft + document.body.scrollLeft + 10 + \"px\";",
+      "b.style.top = a + \"px\";",
+      "if (b.style.visibility != \"visible\")",
+      "b.style.visibility = \"visible\"",
+      "}"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/naruchi200.gif",
+    "imageFileName": "naruchi200.gif",
+    "rawText": "Грубые наручи\n\n (Масса: 1.00)\nЦена: 1.00 кр.\nДолговечность: 0/20\nТребуется минимальное:\n• Уровень: 0\nДействует на:\n• Сила: +1\n• Мастерство владения оружием: +1\n• Уровень жизни (HP): +2\n\nПредметы\n\nАмуниция\n\n &middot; Костыли\n\n &middot; Эликсиры и еда\n\nЗаклинания\n\n &middot; Заклинания\n\nОдежда\n\n &middot; Тяжелая броня\n\n &middot; Легкая броня\n\n &middot; Венки\n\n &middot; Наручи\n\n &middot; Обувь\n\n &middot; Перчатки\n\n &middot; Плащи\n\n &middot; Поножи\n\n &middot; Пояса\n\n &middot; Рубахи\n\n &middot; Шлемы\n\nОружие\n\n &middot; Ёлки\n\n &middot; Дубины\n\n &middot; Кинжалы\n\n &middot; Мечи\n\n &middot; Топоры\n\n &middot; Посохи\n\n &middot; Цветы и Букеты\n\nРазное\n\n &middot; Компоненты\n\n Магические предметы\n-->\n &middot; Подарки\n\n &middot; Руны\n\n &middot; Прочие предметы\n\nЩиты\n\n &middot; Щиты\n\nЮвелирные товары\n\n &middot; Кольца\n\n &middot; Ожерелья\n\n &middot; Серьги\n\n Copyright © 2026 «www.battlekings.club»\n\n /*\n $( document ).ready(function() {\n $('#libFilterName').keypress(function() {\n $('.libItem').show();\n $('.libItem').each(function () {\n console.log($(this).find('.itemName'));\n });\n });\n });\n */\n\n function hideshow() {\n document.getElementById(\"mmoves\").style.visibility = \"hidden\"\n }\n function fastshow(a, event) {\n var b = document.getElementById(\"mmoves\"), d = (typeof(event) != 'undefined' ? event.target : window.event.srcElement);\n if (a != \"\" && b.style.visibility != \"visible\")\n b.innerHTML = \"\" + a + \"\";\n a = (typeof(event) != 'undefined' ? event.clientY : window.event.clientY) + document.documentElement.scrollTop + document.body.scrollTop + 5;\n b.style.left = (typeof(event) != 'undefined' ? event.clientX : window.event.clientX) + document.documentElement.scrollLeft + document.body.scrollLeft + 10 + \"px\";\n b.style.top = a + \"px\";\n if (b.style.visibility != \"visible\")\n b.style.visibility = \"visible\"\n }"
+  }
+]

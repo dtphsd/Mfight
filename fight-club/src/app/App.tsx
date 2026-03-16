@@ -1,9 +1,39 @@
-import { useState } from "react";
+import { Suspense, lazy, useState } from "react";
 import { AppShell } from "@/ui/components/layout/AppShell";
-import { CombatSandboxScreen } from "@/ui/screens/Combat/CombatSandboxScreen";
-import { CombatRulesScreen } from "@/ui/screens/CombatRules/CombatRulesScreen";
-import { HuntingScreen } from "@/ui/screens/Hunting/HuntingScreen";
 import { MainMenuScreen } from "@/ui/screens/MainMenu/MainMenuScreen";
+
+const CombatSandboxScreen = lazy(() =>
+  import("@/ui/screens/Combat/CombatSandboxScreen").then((module) => ({
+    default: module.CombatSandboxScreen,
+  }))
+);
+const CombatRulesScreen = lazy(() =>
+  import("@/ui/screens/CombatRules/CombatRulesScreen").then((module) => ({
+    default: module.CombatRulesScreen,
+  }))
+);
+const HuntingScreen = lazy(() =>
+  import("@/ui/screens/Hunting/HuntingScreen").then((module) => ({
+    default: module.HuntingScreen,
+  }))
+);
+
+const screenLoadingFallback = (
+  <div
+    style={{
+      minHeight: "52vh",
+      display: "grid",
+      placeItems: "center",
+      color: "rgba(255,244,231,0.78)",
+      letterSpacing: "0.08em",
+      textTransform: "uppercase",
+      fontSize: "12px",
+      fontWeight: 700,
+    }}
+  >
+    Loading arena module...
+  </div>
+);
 
 export function App() {
   const [screen, setScreen] = useState<"menu" | "combat" | "rules" | "hunting">("menu");
@@ -18,18 +48,22 @@ export function App() {
           onOpenCombatRules={() => setScreen("rules")}
           onOpenHunting={() => setScreen("hunting")}
         />
-      ) : screen === "rules" ? (
-        <CombatRulesScreen
-          onBack={() => setScreen("menu")}
-          onOpenCombatSandbox={() => setScreen("combat")}
-        />
-      ) : screen === "hunting" ? (
-        <HuntingScreen onBack={() => setScreen("menu")} />
       ) : (
-        <CombatSandboxScreen
-          playerName={playerName}
-          onPlayerNameChange={setPlayerName}
-        />
+        <Suspense fallback={screenLoadingFallback}>
+          {screen === "rules" ? (
+            <CombatRulesScreen
+              onBack={() => setScreen("menu")}
+              onOpenCombatSandbox={() => setScreen("combat")}
+            />
+          ) : screen === "hunting" ? (
+            <HuntingScreen onBack={() => setScreen("menu")} />
+          ) : (
+            <CombatSandboxScreen
+              playerName={playerName}
+              onPlayerNameChange={setPlayerName}
+            />
+          )}
+        </Suspense>
       )}
     </AppShell>
   );

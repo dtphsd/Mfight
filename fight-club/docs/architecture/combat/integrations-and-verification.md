@@ -1,6 +1,6 @@
 # Combat Integrations And Verification
 
-> Last updated: 2026-03-14 15:19 MSK
+> Last updated: 2026-03-16 02:35 MSK
 
 ## Sandbox And UI Dependencies
 
@@ -72,6 +72,7 @@ Current live alignment facts:
 - `CombatRulesScreen.tsx` renders `combatRulesContent`
 - `combatRulesContent.ts` passes sections through `withGeneratedCombatRulesFacts(...)`
 - `combatRulesFacts.ts` generates item rows, skill callouts, and the named-state primer from `starterItems`
+- the active item facts now resolve against generated Battle Kings starter content, not the removed legacy training set
 
 What this means:
 
@@ -116,6 +117,9 @@ Minimum verification for combat changes:
 - `npm run test -- tests/modules/combat.test.ts`
 - `npm run build`
 - sandbox manual pass
+- if item data changed:
+  - `npm run baza:parse`
+  - `npm run baza:generate-items`
 
 Recommended for balance-sensitive changes:
 
@@ -146,7 +150,9 @@ Use this checklist whenever combat formulas, effects, resources, action rules, c
 - verify dodge, block, penetration, crit, and clean-hit paths still work
 - verify zone targeting still changes damage outcome
 - verify armor penetration still changes mitigated damage
+- verify zone armor still changes defended-zone mitigation by slot layout
 - verify skill damage modifiers and crit multipliers still apply in the expected order
+- verify block reduction still rolls inside the intended `40-70%` band
 
 ### 4. Resources
 
@@ -173,6 +179,7 @@ Use this checklist whenever combat formulas, effects, resources, action rules, c
 - verify `block break` only appears when a block happened and damage still penetrated through
 - verify post-fight silhouette states keep winner and loser readable until the next fight starts
 - verify bot behavior still looks coherent against the updated formulas and skills
+- verify silhouette `PIERCE` feedback only appears for real penetration results
 - verify `Combat Rules` still matches live content and runtime behavior
 - verify generated skill facts still describe state-based payoff correctly
 
@@ -193,6 +200,7 @@ Use this checklist whenever combat formulas, effects, resources, action rules, c
 
 - `npm run test`
 - `npm run balance:matrix`
+- `npm run lint`
 - compare `docs/balance/latest-build-matrix.md` before and after if combat numbers changed materially
 
 ---
@@ -205,4 +213,4 @@ Use this checklist whenever combat formulas, effects, resources, action rules, c
 
 ---
 
-> Last updated: 2026-03-15 02:18 MSK
+> Last updated: 2026-03-16 02:35 MSK

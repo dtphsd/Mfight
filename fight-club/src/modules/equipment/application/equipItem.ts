@@ -74,10 +74,16 @@ export function getEquipmentSlotForItemType(itemType: ItemType): EquipmentSlot |
     case "shield":
       return "offHand";
     case "helmet":
+    case "shirt":
     case "armor":
+    case "bracers":
+    case "belt":
+    case "pants":
     case "boots":
     case "gloves":
-    case "accessory":
+    case "ring":
+    case "ring2":
+    case "earring":
       return itemType;
     default:
       return null;

@@ -1,0 +1,3698 @@
+[
+  {
+    "itemId": 177,
+    "name": "Тигровый Пояс",
+    "categoryGroup": "armor",
+    "categoryKey": "belts",
+    "slot": "belt",
+    "weaponFamily": null,
+    "sourceFile": "armor_belts.html",
+    "mass": 1,
+    "prices": {
+      "кр": 40
+    },
+    "durability": {
+      "current": 0,
+      "max": 30
+    },
+    "requirements": [
+      "Уровень: 6",
+      "Сила: 24",
+      "Выносливость: 15"
+    ],
+    "effects": [
+      "Сила: +4",
+      "Броня пояса: 4-21"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/belt13.gif",
+    "imageFileName": "belt13.gif",
+    "rawText": "Тигровый Пояс\n\n (Масса: 1.00)\nЦена: 40.00 кр.\nДолговечность: 0/30\nТребуется минимальное:\n• Уровень: 6\n• Сила: 24\n• Выносливость: 15\nДействует на:\n• Сила: +4\n• Броня пояса: 4-21"
+  },
+  {
+    "itemId": 178,
+    "name": "Черный Пояс",
+    "categoryGroup": "armor",
+    "categoryKey": "belts",
+    "slot": "belt",
+    "weaponFamily": null,
+    "sourceFile": "armor_belts.html",
+    "mass": 3,
+    "prices": {
+      "кр": 40
+    },
+    "durability": {
+      "current": 0,
+      "max": 30
+    },
+    "requirements": [
+      "Уровень: 6",
+      "Сила: 15",
+      "Ловкость: 18",
+      "Интуиция: 18",
+      "Выносливость: 15"
+    ],
+    "effects": [
+      "Сила: +1",
+      "Ловкость: +1",
+      "Интуиция: +1",
+      "Уровень жизни (HP): +12",
+      "Броня пояса: 5-16"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/belt8.gif",
+    "imageFileName": "belt8.gif",
+    "rawText": "Черный Пояс\n\n (Масса: 3.00)\nЦена: 40.00 кр.\nДолговечность: 0/30\nТребуется минимальное:\n• Уровень: 6\n• Сила: 15\n• Ловкость: 18\n• Интуиция: 18\n• Выносливость: 15\nДействует на:\n• Сила: +1\n• Ловкость: +1\n• Интуиция: +1\n• Уровень жизни (HP): +12\n• Броня пояса: 5-16"
+  },
+  {
+    "itemId": 179,
+    "name": "Экзотический Пояс",
+    "categoryGroup": "armor",
+    "categoryKey": "belts",
+    "slot": "belt",
+    "weaponFamily": null,
+    "sourceFile": "armor_belts.html",
+    "mass": 2,
+    "prices": {
+      "кр": 40
+    },
+    "durability": {
+      "current": 0,
+      "max": 30
+    },
+    "requirements": [
+      "Уровень: 6",
+      "Сила: 12",
+      "Ловкость: 12",
+      "Интуиция: 12",
+      "Выносливость: 12"
+    ],
+    "effects": [
+      "Сила: +2",
+      "Мф. критического удара (%): +5",
+      "Мф. против критического удара (%): +5",
+      "Мф. увертывания (%): +6",
+      "Мф. против увертывания (%): +6",
+      "Броня пояса: 6-20"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/belt24.gif",
+    "imageFileName": "belt24.gif",
+    "rawText": "Экзотический Пояс\n\n (Масса: 2.00)\nЦена: 40.00 кр.\nДолговечность: 0/30\nТребуется минимальное:\n• Уровень: 6\n• Сила: 12\n• Ловкость: 12\n• Интуиция: 12\n• Выносливость: 12\nДействует на:\n• Сила: +2\n• Мф. критического удара (%): +5\n• Мф. против критического удара (%): +5\n• Мф. увертывания (%): +6\n• Мф. против увертывания (%): +6\n• Броня пояса: 6-20"
+  },
+  {
+    "itemId": 180,
+    "name": "Кожаный Пояс Агрессии",
+    "categoryGroup": "armor",
+    "categoryKey": "belts",
+    "slot": "belt",
+    "weaponFamily": null,
+    "sourceFile": "armor_belts.html",
+    "mass": 2,
+    "prices": {
+      "кр": 41
+    },
+    "durability": {
+      "current": 0,
+      "max": 30
+    },
+    "requirements": [
+      "Уровень: 6",
+      "Сила: 24",
+      "Интуиция: 24"
+    ],
+    "effects": [
+      "Мф. мощности крит. удара (%): +10",
+      "Броня пояса: 4-18"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/belt14.gif",
+    "imageFileName": "belt14.gif",
+    "rawText": "Кожаный Пояс Агрессии\n\n (Масса: 2.00)\nЦена: 41.00 кр.\nДолговечность: 0/30\nТребуется минимальное:\n• Уровень: 6\n• Сила: 24\n• Интуиция: 24\nДействует на:\n• Мф. мощности крит. удара (%): +10\n• Броня пояса: 4-18"
+  },
+  {
+    "itemId": 181,
+    "name": "Ювелирный Поясок",
+    "categoryGroup": "armor",
+    "categoryKey": "belts",
+    "slot": "belt",
+    "weaponFamily": null,
+    "sourceFile": "armor_belts.html",
+    "mass": 3,
+    "prices": {
+      "кр": 41
+    },
+    "durability": {
+      "current": 0,
+      "max": 30
+    },
+    "requirements": [
+      "Уровень: 6",
+      "Сила: 10",
+      "Ловкость: 25",
+      "Интуиция: 25",
+      "Выносливость: 10"
+    ],
+    "effects": [
+      "Мф. мощности колющего урона: +10",
+      "Броня пояса: 5-16"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/belt29.gif",
+    "imageFileName": "belt29.gif",
+    "rawText": "Ювелирный Поясок\n\n (Масса: 3.00)\nЦена: 41.00 кр.\nДолговечность: 0/30\nТребуется минимальное:\n• Уровень: 6\n• Сила: 10\n• Ловкость: 25\n• Интуиция: 25\n• Выносливость: 10\nДействует на:\n• Мф. мощности колющего урона: +10\n• Броня пояса: 5-16"
+  },
+  {
+    "itemId": 182,
+    "name": "Пояс Равновесия",
+    "categoryGroup": "armor",
+    "categoryKey": "belts",
+    "slot": "belt",
+    "weaponFamily": null,
+    "sourceFile": "armor_belts.html",
+    "mass": 1,
+    "prices": {
+      "кр": 59
+    },
+    "durability": {
+      "current": 0,
+      "max": 50
+    },
+    "requirements": [
+      "Уровень: 7",
+      "Сила: 15",
+      "Ловкость: 37",
+      "Выносливость: 15"
+    ],
+    "effects": [
+      "Уровень жизни (HP): +30",
+      "Мф. против критического удара (%): +40",
+      "Броня пояса: 7-24"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/belt18.gif",
+    "imageFileName": "belt18.gif",
+    "rawText": "Пояс Равновесия\n\n (Масса: 1.00)\nЦена: 59.00 кр.\nДолговечность: 0/50\nТребуется минимальное:\n• Уровень: 7\n• Сила: 15\n• Ловкость: 37\n• Выносливость: 15\nДействует на:\n• Уровень жизни (HP): +30\n• Мф. против критического удара (%): +40\n• Броня пояса: 7-24"
+  },
+  {
+    "itemId": 185,
+    "name": "Пояс Холодного Разума",
+    "categoryGroup": "armor",
+    "categoryKey": "belts",
+    "slot": "belt",
+    "weaponFamily": null,
+    "sourceFile": "armor_belts.html",
+    "mass": 1,
+    "prices": {
+      "кр": 59
+    },
+    "durability": {
+      "current": 0,
+      "max": 30
+    },
+    "requirements": [
+      "Уровень: 7",
+      "Сила: 15",
+      "Интеллект: 15",
+      "Мудрость: 15"
+    ],
+    "effects": [
+      "Интуиция: +3",
+      "Интеллект: +3",
+      "Уровень жизни (HP): +6",
+      "Мф. увертывания (%): +8",
+      "Броня пояса: 5-16"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/belt28.gif",
+    "imageFileName": "belt28.gif",
+    "rawText": "Пояс Холодного Разума\n\n (Масса: 1.00)\nЦена: 59.00 кр.\nДолговечность: 0/30\nТребуется минимальное:\n• Уровень: 7\n• Сила: 15\n• Интеллект: 15\n• Мудрость: 15\nДействует на:\n• Интуиция: +3\n• Интеллект: +3\n• Уровень жизни (HP): +6\n• Мф. увертывания (%): +8\n• Броня пояса: 5-16"
+  },
+  {
+    "itemId": 186,
+    "name": "Горный Пояс",
+    "categoryGroup": "armor",
+    "categoryKey": "belts",
+    "slot": "belt",
+    "weaponFamily": null,
+    "sourceFile": "armor_belts.html",
+    "mass": 1,
+    "prices": {
+      "кр": 60
+    },
+    "durability": {
+      "current": 0,
+      "max": 40
+    },
+    "requirements": [
+      "Уровень: 7",
+      "Сила: 30",
+      "Выносливость: 30"
+    ],
+    "effects": [
+      "Мф. мощности дробящего урона: +14",
+      "Броня пояса: 8-31"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/belt30.gif",
+    "imageFileName": "belt30.gif",
+    "rawText": "Горный Пояс\n\n (Масса: 1.00)\nЦена: 60.00 кр.\nДолговечность: 0/40\nТребуется минимальное:\n• Уровень: 7\n• Сила: 30\n• Выносливость: 30\nДействует на:\n• Мф. мощности дробящего урона: +14\n• Броня пояса: 8-31"
+  },
+  {
+    "itemId": 187,
+    "name": "Лесной Пояс",
+    "categoryGroup": "armor",
+    "categoryKey": "belts",
+    "slot": "belt",
+    "weaponFamily": null,
+    "sourceFile": "armor_belts.html",
+    "mass": 2,
+    "prices": {
+      "кр": 60
+    },
+    "durability": {
+      "current": 0,
+      "max": 40
+    },
+    "requirements": [
+      "Уровень: 7",
+      "Сила: 24",
+      "Выносливость: 24"
+    ],
+    "effects": [
+      "Интеллект: +1",
+      "Защита от магии воздуха: +15",
+      "Защита от магии воды: +15",
+      "Защита от магии земли: +15",
+      "Броня пояса: 8-28",
+      "Дополнительная информация:",
+      "Часть комплекта: Комплект Лесной• 13: Мф. против критического удара (%): +25",
+      "Защита от урона: +30",
+      "Мф. против увертывания (%): +25",
+      "Защита от магии воздуха: +15",
+      "Защита от магии воды: +15",
+      "Защита от магии земли: +15"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/belt2.gif",
+    "imageFileName": "belt2.gif",
+    "rawText": "Лесной Пояс\n\n (Масса: 2.00)\nЦена: 60.00 кр.\nДолговечность: 0/40\nТребуется минимальное:\n• Уровень: 7\n• Сила: 24\n• Выносливость: 24\nДействует на:\n• Интеллект: +1\n• Защита от магии воздуха: +15\n• Защита от магии воды: +15\n• Защита от магии земли: +15\n• Броня пояса: 8-28\nДополнительная информация:\n• Часть комплекта: Комплект Лесной• 13: Мф. против критического удара (%): +25\n Защита от урона: +30\n Мф. против увертывания (%): +25\n Защита от магии воздуха: +15\n Защита от магии воды: +15\n Защита от магии земли: +15"
+  },
+  {
+    "itemId": 190,
+    "name": "Пояс Ищущего",
+    "categoryGroup": "armor",
+    "categoryKey": "belts",
+    "slot": "belt",
+    "weaponFamily": null,
+    "sourceFile": "armor_belts.html",
+    "mass": 2,
+    "prices": {
+      "кр": 60
+    },
+    "durability": {
+      "current": 0,
+      "max": 20
+    },
+    "requirements": [
+      "Уровень: 7",
+      "Сила: 15",
+      "Выносливость: 15",
+      "Интеллект: 25",
+      "Мудрость: 30"
+    ],
+    "effects": [
+      "Уровень жизни (HP): +36",
+      "Мф. мощности магии стихий: +5",
+      "Броня пояса: 4-12"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/belt42.gif",
+    "imageFileName": "belt42.gif",
+    "rawText": "Пояс Ищущего\n\n (Масса: 2.00)\nЦена: 60.00 кр.\nДолговечность: 0/20\nТребуется минимальное:\n• Уровень: 7\n• Сила: 15\n• Выносливость: 15\n• Интеллект: 25\n• Мудрость: 30\nДействует на:\n• Уровень жизни (HP): +36\n• Мф. мощности магии стихий: +5\n• Броня пояса: 4-12"
+  },
+  {
+    "itemId": 191,
+    "name": "Пояс Маны",
+    "categoryGroup": "armor",
+    "categoryKey": "belts",
+    "slot": "belt",
+    "weaponFamily": null,
+    "sourceFile": "armor_belts.html",
+    "mass": 2,
+    "prices": {
+      "кр": 60
+    },
+    "durability": {
+      "current": 0,
+      "max": 20
+    },
+    "requirements": [
+      "Уровень: 7",
+      "Сила: 10",
+      "Выносливость: 10",
+      "Интеллект: 20",
+      "Мудрость: 20"
+    ],
+    "effects": [
+      "Уровень маны: +80",
+      "Броня пояса: 7-18"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/belt6.gif",
+    "imageFileName": "belt6.gif",
+    "rawText": "Пояс Маны\n\n (Масса: 2.00)\nЦена: 60.00 кр.\nДолговечность: 0/20\nТребуется минимальное:\n• Уровень: 7\n• Сила: 10\n• Выносливость: 10\n• Интеллект: 20\n• Мудрость: 20\nДействует на:\n• Уровень маны: +80\n• Броня пояса: 7-18"
+  },
+  {
+    "itemId": 192,
+    "name": "Двойной Черный Пояс",
+    "categoryGroup": "armor",
+    "categoryKey": "belts",
+    "slot": "belt",
+    "weaponFamily": null,
+    "sourceFile": "armor_belts.html",
+    "mass": 4,
+    "prices": {
+      "кр": 62
+    },
+    "durability": {
+      "current": 0,
+      "max": 30
+    },
+    "requirements": [
+      "Уровень: 7",
+      "Сила: 15",
+      "Выносливость: 15"
+    ],
+    "effects": [
+      "Сила: +2",
+      "Ловкость: +2",
+      "Интуиция: +2",
+      "Уровень жизни (HP): +6",
+      "Броня пояса: 7-24"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/belt12.gif",
+    "imageFileName": "belt12.gif",
+    "rawText": "Двойной Черный Пояс\n\n (Масса: 4.00)\nЦена: 62.00 кр.\nДолговечность: 0/30\nТребуется минимальное:\n• Уровень: 7\n• Сила: 15\n• Выносливость: 15\nДействует на:\n• Сила: +2\n• Ловкость: +2\n• Интуиция: +2\n• Уровень жизни (HP): +6\n• Броня пояса: 7-24"
+  },
+  {
+    "itemId": 193,
+    "name": "Пояс Лаконичности",
+    "categoryGroup": "armor",
+    "categoryKey": "belts",
+    "slot": "belt",
+    "weaponFamily": null,
+    "sourceFile": "armor_belts.html",
+    "mass": 4,
+    "prices": {
+      "кр": 62
+    },
+    "durability": {
+      "current": 0,
+      "max": 30
+    },
+    "requirements": [
+      "Уровень: 7",
+      "Сила: 30",
+      "Ловкость: 30",
+      "Выносливость: 20"
+    ],
+    "effects": [
+      "Сила: +1",
+      "Мф. против увертывания (%): +15",
+      "Мф. мощности рубящего урона: +10",
+      "Броня пояса: 7-24"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/belt32.gif",
+    "imageFileName": "belt32.gif",
+    "rawText": "Пояс Лаконичности\n\n (Масса: 4.00)\nЦена: 62.00 кр.\nДолговечность: 0/30\nТребуется минимальное:\n• Уровень: 7\n• Сила: 30\n• Ловкость: 30\n• Выносливость: 20\nДействует на:\n• Сила: +1\n• Мф. против увертывания (%): +15\n• Мф. мощности рубящего урона: +10\n• Броня пояса: 7-24"
+  },
+  {
+    "itemId": 198,
+    "name": "Пояс Валентая",
+    "categoryGroup": "armor",
+    "categoryKey": "belts",
+    "slot": "belt",
+    "weaponFamily": null,
+    "sourceFile": "armor_belts.html",
+    "mass": 1,
+    "prices": {
+      "кр": 100
+    },
+    "durability": {
+      "current": 0,
+      "max": 20
+    },
+    "requirements": [
+      "Уровень: 7",
+      "Интеллект: 30",
+      "Мудрость: 30"
+    ],
+    "effects": [
+      "Интеллект: +5",
+      "Уровень жизни (HP): +24",
+      "Уровень маны: +30",
+      "Мф. против критического удара (%): +10",
+      "Защита от урона: +5",
+      "Защита от магии: +10",
+      "Броня пояса: 4-12"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/belt46_2.gif",
+    "imageFileName": "belt46_2.gif",
+    "rawText": "Пояс Валентая\n\n (Масса: 1.00)\nЦена: 100.00 кр.\nДолговечность: 0/20\nТребуется минимальное:\n• Уровень: 7\n• Интеллект: 30\n• Мудрость: 30\nДействует на:\n• Интеллект: +5\n• Уровень жизни (HP): +24\n• Уровень маны: +30\n• Мф. против критического удара (%): +10\n• Защита от урона: +5\n• Защита от магии: +10\n• Броня пояса: 4-12"
+  },
+  {
+    "itemId": 201,
+    "name": "Ремень Валентая",
+    "categoryGroup": "armor",
+    "categoryKey": "belts",
+    "slot": "belt",
+    "weaponFamily": null,
+    "sourceFile": "armor_belts.html",
+    "mass": 1,
+    "prices": {
+      "кр": 101
+    },
+    "durability": {
+      "current": 0,
+      "max": 20
+    },
+    "requirements": [
+      "Уровень: 7",
+      "Сила: 25",
+      "Ловкость: 10",
+      "Интуиция: 10",
+      "Выносливость: 25"
+    ],
+    "effects": [
+      "Уровень жизни (HP): +24",
+      "Мф. критического удара (%): +10",
+      "Мф. против критического удара (%): +10",
+      "Мф. увертывания (%): +10",
+      "Мф. против увертывания (%): +10",
+      "Защита от урона: +25",
+      "Защита от магии: +10",
+      "Броня пояса: 11-35"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/belt45_1.gif",
+    "imageFileName": "belt45_1.gif",
+    "rawText": "Ремень Валентая\n\n (Масса: 1.00)\nЦена: 101.00 кр.\nДолговечность: 0/20\nТребуется минимальное:\n• Уровень: 7\n• Сила: 25\n• Ловкость: 10\n• Интуиция: 10\n• Выносливость: 25\nДействует на:\n• Уровень жизни (HP): +24\n• Мф. критического удара (%): +10\n• Мф. против критического удара (%): +10\n• Мф. увертывания (%): +10\n• Мф. против увертывания (%): +10\n• Защита от урона: +25\n• Защита от магии: +10\n• Броня пояса: 11-35"
+  },
+  {
+    "itemId": 411,
+    "name": "Пояс Новобранца",
+    "categoryGroup": "armor",
+    "categoryKey": "belts",
+    "slot": "belt",
+    "weaponFamily": null,
+    "sourceFile": "armor_belts.html",
+    "mass": 2,
+    "prices": {
+      "кр": 3
+    },
+    "durability": {
+      "current": 0,
+      "max": 20
+    },
+    "requirements": [
+      "Уровень: 1",
+      "Сила: 4"
+    ],
+    "effects": [
+      "Броня пояса: 2-4"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/belt17.gif",
+    "imageFileName": "belt17.gif",
+    "rawText": "Пояс Новобранца\n\n (Масса: 2.00)\nЦена: 3.00 кр.\nДолговечность: 0/20\nТребуется минимальное:\n• Уровень: 1\n• Сила: 4\nДействует на:\n• Броня пояса: 2-4"
+  },
+  {
+    "itemId": 412,
+    "name": "Пояс Силы",
+    "categoryGroup": "armor",
+    "categoryKey": "belts",
+    "slot": "belt",
+    "weaponFamily": null,
+    "sourceFile": "armor_belts.html",
+    "mass": 1,
+    "prices": {
+      "кр": 7
+    },
+    "durability": {
+      "current": 0,
+      "max": 10
+    },
+    "requirements": [
+      "Уровень: 2",
+      "Сила: 9",
+      "Выносливость: 9"
+    ],
+    "effects": [
+      "Сила: +1"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/belt1.gif",
+    "imageFileName": "belt1.gif",
+    "rawText": "Пояс Силы\n\n (Масса: 1.00)\nЦена: 7.00 кр.\nДолговечность: 0/10\nТребуется минимальное:\n• Уровень: 2\n• Сила: 9\n• Выносливость: 9\nДействует на:\n• Сила: +1"
+  },
+  {
+    "itemId": 413,
+    "name": "Широкий Пояс",
+    "categoryGroup": "armor",
+    "categoryKey": "belts",
+    "slot": "belt",
+    "weaponFamily": null,
+    "sourceFile": "armor_belts.html",
+    "mass": 2,
+    "prices": {
+      "кр": 10
+    },
+    "durability": {
+      "current": 0,
+      "max": 20
+    },
+    "requirements": [
+      "Уровень: 2",
+      "Сила: 8",
+      "Выносливость: 8"
+    ],
+    "effects": [
+      "Уровень жизни (HP): +6",
+      "Мф. против критического удара (%): +2",
+      "Броня пояса: 3-8"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/belt16.gif",
+    "imageFileName": "belt16.gif",
+    "rawText": "Широкий Пояс\n\n (Масса: 2.00)\nЦена: 10.00 кр.\nДолговечность: 0/20\nТребуется минимальное:\n• Уровень: 2\n• Сила: 8\n• Выносливость: 8\nДействует на:\n• Уровень жизни (HP): +6\n• Мф. против критического удара (%): +2\n• Броня пояса: 3-8"
+  },
+  {
+    "itemId": 414,
+    "name": "Пояс Рекрута",
+    "categoryGroup": "armor",
+    "categoryKey": "belts",
+    "slot": "belt",
+    "weaponFamily": null,
+    "sourceFile": "armor_belts.html",
+    "mass": 3,
+    "prices": {
+      "кр": 16
+    },
+    "durability": {
+      "current": 0,
+      "max": 30
+    },
+    "requirements": [
+      "Уровень: 3",
+      "Сила: 12",
+      "Выносливость: 12"
+    ],
+    "effects": [
+      "Уровень жизни (HP): +12",
+      "Броня пояса: 4-12"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/belt19.gif",
+    "imageFileName": "belt19.gif",
+    "rawText": "Пояс Рекрута\n\n (Масса: 3.00)\nЦена: 16.00 кр.\nДолговечность: 0/30\nТребуется минимальное:\n• Уровень: 3\n• Сила: 12\n• Выносливость: 12\nДействует на:\n• Уровень жизни (HP): +12\n• Броня пояса: 4-12"
+  },
+  {
+    "itemId": 415,
+    "name": "Девичий Пояс",
+    "categoryGroup": "armor",
+    "categoryKey": "belts",
+    "slot": "belt",
+    "weaponFamily": null,
+    "sourceFile": "armor_belts.html",
+    "mass": 2,
+    "prices": {
+      "кр": 20
+    },
+    "durability": {
+      "current": 0,
+      "max": 30
+    },
+    "requirements": [
+      "Уровень: 4",
+      "Сила: 10",
+      "Ловкость: 10",
+      "Интуиция: 10",
+      "Выносливость: 10"
+    ],
+    "effects": [
+      "Ловкость: +1",
+      "Интуиция: +1",
+      "Броня пояса: 3-8"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/belt5.gif",
+    "imageFileName": "belt5.gif",
+    "rawText": "Девичий Пояс\n\n (Масса: 2.00)\nЦена: 20.00 кр.\nДолговечность: 0/30\nТребуется минимальное:\n• Уровень: 4\n• Сила: 10\n• Ловкость: 10\n• Интуиция: 10\n• Выносливость: 10\nДействует на:\n• Ловкость: +1\n• Интуиция: +1\n• Броня пояса: 3-8"
+  },
+  {
+    "itemId": 416,
+    "name": "Пояс Ученика",
+    "categoryGroup": "armor",
+    "categoryKey": "belts",
+    "slot": "belt",
+    "weaponFamily": null,
+    "sourceFile": "armor_belts.html",
+    "mass": 2,
+    "prices": {
+      "кр": 20
+    },
+    "durability": {
+      "current": 0,
+      "max": 20
+    },
+    "requirements": [
+      "Уровень: 4",
+      "Интеллект: 20"
+    ],
+    "effects": [
+      "Уровень маны: +30",
+      "Броня пояса: 3-3"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/belt40.gif",
+    "imageFileName": "belt40.gif",
+    "rawText": "Пояс Ученика\n\n (Масса: 2.00)\nЦена: 20.00 кр.\nДолговечность: 0/20\nТребуется минимальное:\n• Уровень: 4\n• Интеллект: 20\nДействует на:\n• Уровень маны: +30\n• Броня пояса: 3-3"
+  },
+  {
+    "itemId": 417,
+    "name": "Пояс Желтого Демона",
+    "categoryGroup": "armor",
+    "categoryKey": "belts",
+    "slot": "belt",
+    "weaponFamily": null,
+    "sourceFile": "armor_belts.html",
+    "mass": 2,
+    "prices": {
+      "кр": 21
+    },
+    "durability": {
+      "current": 0,
+      "max": 30
+    },
+    "requirements": [
+      "Уровень: 4",
+      "Сила: 15",
+      "Интуиция: 15"
+    ],
+    "effects": [
+      "Интуиция: +2",
+      "Броня пояса: 1-12"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/belt31.gif",
+    "imageFileName": "belt31.gif",
+    "rawText": "Пояс Желтого Демона\n\n (Масса: 2.00)\nЦена: 21.00 кр.\nДолговечность: 0/30\nТребуется минимальное:\n• Уровень: 4\n• Сила: 15\n• Интуиция: 15\nДействует на:\n• Интуиция: +2\n• Броня пояса: 1-12"
+  },
+  {
+    "itemId": 418,
+    "name": "Пояс Валентая",
+    "categoryGroup": "armor",
+    "categoryKey": "belts",
+    "slot": "belt",
+    "weaponFamily": null,
+    "sourceFile": "armor_belts.html",
+    "mass": 1,
+    "prices": {
+      "кр": 43
+    },
+    "durability": {
+      "current": 0,
+      "max": 20
+    },
+    "requirements": [
+      "Уровень: 4",
+      "Интеллект: 20"
+    ],
+    "effects": [
+      "Уровень жизни (HP): +36",
+      "Уровень маны: +30",
+      "Броня пояса: 2-4"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/belt46_2.gif",
+    "imageFileName": "belt46_2.gif",
+    "rawText": "Пояс Валентая\n\n (Масса: 1.00)\nЦена: 43.00 кр.\nДолговечность: 0/20\nТребуется минимальное:\n• Уровень: 4\n• Интеллект: 20\nДействует на:\n• Уровень жизни (HP): +36\n• Уровень маны: +30\n• Броня пояса: 2-4"
+  },
+  {
+    "itemId": 419,
+    "name": "Ремень Валентая",
+    "categoryGroup": "armor",
+    "categoryKey": "belts",
+    "slot": "belt",
+    "weaponFamily": null,
+    "sourceFile": "armor_belts.html",
+    "mass": 1,
+    "prices": {
+      "кр": 44
+    },
+    "durability": {
+      "current": 0,
+      "max": 20
+    },
+    "requirements": [
+      "Уровень: 4",
+      "Сила: 15",
+      "Ловкость: 5",
+      "Интуиция: 5",
+      "Выносливость: 15"
+    ],
+    "effects": [
+      "Уровень жизни (HP): +12",
+      "Мф. критического удара (%): +5",
+      "Мф. против критического удара (%): +5",
+      "Мф. увертывания (%): +5",
+      "Мф. против увертывания (%): +5",
+      "Защита от магии: +15",
+      "Броня пояса: 4-12"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/belt45_1.gif",
+    "imageFileName": "belt45_1.gif",
+    "rawText": "Ремень Валентая\n\n (Масса: 1.00)\nЦена: 44.00 кр.\nДолговечность: 0/20\nТребуется минимальное:\n• Уровень: 4\n• Сила: 15\n• Ловкость: 5\n• Интуиция: 5\n• Выносливость: 15\nДействует на:\n• Уровень жизни (HP): +12\n• Мф. критического удара (%): +5\n• Мф. против критического удара (%): +5\n• Мф. увертывания (%): +5\n• Мф. против увертывания (%): +5\n• Защита от магии: +15\n• Броня пояса: 4-12"
+  },
+  {
+    "itemId": 420,
+    "name": "Двойной Кожаный Пояс",
+    "categoryGroup": "armor",
+    "categoryKey": "belts",
+    "slot": "belt",
+    "weaponFamily": null,
+    "sourceFile": "armor_belts.html",
+    "mass": 1,
+    "prices": {
+      "кр": 30
+    },
+    "durability": {
+      "current": 0,
+      "max": 20
+    },
+    "requirements": [
+      "Уровень: 5",
+      "Сила: 20",
+      "Выносливость: 15"
+    ],
+    "effects": [
+      "Уровень жизни (HP): +18",
+      "Мф. против критического удара (%): +5",
+      "Мф. увертывания (%): +5",
+      "Защита от магии огня: +5",
+      "Броня пояса: 3-17"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/belt26.gif",
+    "imageFileName": "belt26.gif",
+    "rawText": "Двойной Кожаный Пояс\n\n (Масса: 1.00)\nЦена: 30.00 кр.\nДолговечность: 0/20\nТребуется минимальное:\n• Уровень: 5\n• Сила: 20\n• Выносливость: 15\nДействует на:\n• Уровень жизни (HP): +18\n• Мф. против критического удара (%): +5\n• Мф. увертывания (%): +5\n• Защита от магии огня: +5\n• Броня пояса: 3-17"
+  },
+  {
+    "itemId": 421,
+    "name": "Изящный Пояс",
+    "categoryGroup": "armor",
+    "categoryKey": "belts",
+    "slot": "belt",
+    "weaponFamily": null,
+    "sourceFile": "armor_belts.html",
+    "mass": 3,
+    "prices": {
+      "кр": 30
+    },
+    "durability": {
+      "current": 0,
+      "max": 30
+    },
+    "requirements": [
+      "Уровень: 5",
+      "Сила: 20",
+      "Ловкость: 20",
+      "Выносливость: 10"
+    ],
+    "effects": [
+      "Ловкость: +1",
+      "Интуиция: +1",
+      "Мф. увертывания (%): +10",
+      "Мф. против увертывания (%): +5",
+      "Броня пояса: 3-14"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/belt3.gif",
+    "imageFileName": "belt3.gif",
+    "rawText": "Изящный Пояс\n\n (Масса: 3.00)\nЦена: 30.00 кр.\nДолговечность: 0/30\nТребуется минимальное:\n• Уровень: 5\n• Сила: 20\n• Ловкость: 20\n• Выносливость: 10\nДействует на:\n• Ловкость: +1\n• Интуиция: +1\n• Мф. увертывания (%): +10\n• Мф. против увертывания (%): +5\n• Броня пояса: 3-14"
+  },
+  {
+    "itemId": 422,
+    "name": "Пояс Обреченности",
+    "categoryGroup": "armor",
+    "categoryKey": "belts",
+    "slot": "belt",
+    "weaponFamily": null,
+    "sourceFile": "armor_belts.html",
+    "mass": 3,
+    "prices": {
+      "кр": 30
+    },
+    "durability": {
+      "current": 0,
+      "max": 30
+    },
+    "requirements": [
+      "Уровень: 5",
+      "Сила: 15",
+      "Ловкость: 15"
+    ],
+    "effects": [
+      "Мф. увертывания (%): +25",
+      "Мф. против увертывания (%): +15",
+      "Броня пояса: 5-16"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/belt25.gif",
+    "imageFileName": "belt25.gif",
+    "rawText": "Пояс Обреченности\n\n (Масса: 3.00)\nЦена: 30.00 кр.\nДолговечность: 0/30\nТребуется минимальное:\n• Уровень: 5\n• Сила: 15\n• Ловкость: 15\nДействует на:\n• Мф. увертывания (%): +25\n• Мф. против увертывания (%): +15\n• Броня пояса: 5-16"
+  },
+  {
+    "itemId": 423,
+    "name": "Пояс Жестокости",
+    "categoryGroup": "armor",
+    "categoryKey": "belts",
+    "slot": "belt",
+    "weaponFamily": null,
+    "sourceFile": "armor_belts.html",
+    "mass": 5,
+    "prices": {
+      "кр": 31
+    },
+    "durability": {
+      "current": 0,
+      "max": 30
+    },
+    "requirements": [
+      "Уровень: 5",
+      "Сила: 10",
+      "Интуиция: 25",
+      "Выносливость: 10"
+    ],
+    "effects": [
+      "Мф. критического удара (%): +25",
+      "Мф. против критического удара (%): +5",
+      "Броня пояса: 6-20"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/belt20.gif",
+    "imageFileName": "belt20.gif",
+    "rawText": "Пояс Жестокости\n\n (Масса: 5.00)\nЦена: 31.00 кр.\nДолговечность: 0/30\nТребуется минимальное:\n• Уровень: 5\n• Сила: 10\n• Интуиция: 25\n• Выносливость: 10\nДействует на:\n• Мф. критического удара (%): +25\n• Мф. против критического удара (%): +5\n• Броня пояса: 6-20"
+  },
+  {
+    "itemId": 424,
+    "name": "Восточный Пояс",
+    "categoryGroup": "armor",
+    "categoryKey": "belts",
+    "slot": "belt",
+    "weaponFamily": null,
+    "sourceFile": "armor_belts.html",
+    "mass": 2,
+    "prices": {
+      "кр": 32
+    },
+    "durability": {
+      "current": 0,
+      "max": 20
+    },
+    "requirements": [
+      "Уровень: 5",
+      "Сила: 20",
+      "Выносливость: 20"
+    ],
+    "effects": [
+      "Уровень жизни (HP): +45",
+      "Броня пояса: 3-8"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/belt23.gif",
+    "imageFileName": "belt23.gif",
+    "rawText": "Восточный Пояс\n\n (Масса: 2.00)\nЦена: 32.00 кр.\nДолговечность: 0/20\nТребуется минимальное:\n• Уровень: 5\n• Сила: 20\n• Выносливость: 20\nДействует на:\n• Уровень жизни (HP): +45\n• Броня пояса: 3-8"
+  },
+  {
+    "itemId": 425,
+    "name": "Зеленый Пояс",
+    "categoryGroup": "armor",
+    "categoryKey": "belts",
+    "slot": "belt",
+    "weaponFamily": null,
+    "sourceFile": "armor_belts.html",
+    "mass": 2,
+    "prices": {
+      "кр": 32
+    },
+    "durability": {
+      "current": 0,
+      "max": 20
+    },
+    "requirements": [
+      "Уровень: 5",
+      "Выносливость: 10",
+      "Интеллект: 25"
+    ],
+    "effects": [
+      "Уровень маны: +45",
+      "Броня пояса: 4-9"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/belt41.gif",
+    "imageFileName": "belt41.gif",
+    "rawText": "Зеленый Пояс\n\n (Масса: 2.00)\nЦена: 32.00 кр.\nДолговечность: 0/20\nТребуется минимальное:\n• Уровень: 5\n• Выносливость: 10\n• Интеллект: 25\nДействует на:\n• Уровень маны: +45\n• Броня пояса: 4-9"
+  },
+  {
+    "itemId": 624,
+    "name": "Pure Leather Belt",
+    "categoryGroup": "armor",
+    "categoryKey": "belts",
+    "slot": "belt",
+    "weaponFamily": null,
+    "sourceFile": "armor_belts.html",
+    "mass": 1,
+    "prices": {
+      "кр": 10,
+      "екр": 2
+    },
+    "durability": {
+      "current": 0,
+      "max": 20
+    },
+    "requirements": [
+      "Уровень: 2",
+      "Сила: 7"
+    ],
+    "effects": [
+      "Уровень жизни (HP): +12",
+      "Броня пояса: 2-4"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/belt200.gif",
+    "imageFileName": "belt200.gif",
+    "rawText": "Pure Leather Belt\n\n (Масса: 1.00)\nЦена: 10.00 кр.\nЦена: 2.00 екр.\nДолговечность: 0/20\nТребуется минимальное:\n• Уровень: 2\n• Сила: 7\nДействует на:\n• Уровень жизни (HP): +12\n• Броня пояса: 2-4"
+  },
+  {
+    "itemId": 625,
+    "name": "Цепной Пояс",
+    "categoryGroup": "armor",
+    "categoryKey": "belts",
+    "slot": "belt",
+    "weaponFamily": null,
+    "sourceFile": "armor_belts.html",
+    "mass": 12,
+    "prices": {
+      "кр": 98
+    },
+    "durability": {
+      "current": 0,
+      "max": 40
+    },
+    "requirements": [
+      "Уровень: 8",
+      "Ловкость: 30",
+      "Выносливость: 35"
+    ],
+    "effects": [
+      "Сила: +4",
+      "Уровень жизни (HP): +72",
+      "Броня пояса: 11-40"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/belt22.gif",
+    "imageFileName": "belt22.gif",
+    "rawText": "Цепной Пояс\n\n (Масса: 12.00)\nЦена: 98.00 кр.\nДолговечность: 0/40\nТребуется минимальное:\n• Уровень: 8\n• Ловкость: 30\n• Выносливость: 35\nДействует на:\n• Сила: +4\n• Уровень жизни (HP): +72\n• Броня пояса: 11-40"
+  },
+  {
+    "itemId": 626,
+    "name": "Пояс Заката",
+    "categoryGroup": "armor",
+    "categoryKey": "belts",
+    "slot": "belt",
+    "weaponFamily": null,
+    "sourceFile": "armor_belts.html",
+    "mass": 1,
+    "prices": {
+      "кр": 100
+    },
+    "durability": {
+      "current": 0,
+      "max": 50
+    },
+    "requirements": [
+      "Уровень: 8",
+      "Сила: 30",
+      "Интуиция: 35",
+      "Выносливость: 30"
+    ],
+    "effects": [
+      "Мф. мощности крит. удара (%): +20",
+      "Мф. против увертывания (%): +5",
+      "Броня пояса: 16-60",
+      "Дополнительная информация:",
+      "Часть комплекта: Комплект Заката• 4: Мф. критического удара (%): +25",
+      "8: Мф. против критического удара (%): +20",
+      "Мф. против увертывания (%): +25",
+      "12: Уровень жизни (HP): +50"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/belt4.gif",
+    "imageFileName": "belt4.gif",
+    "rawText": "Пояс Заката\n\n (Масса: 1.00)\nЦена: 100.00 кр.\nДолговечность: 0/50\nТребуется минимальное:\n• Уровень: 8\n• Сила: 30\n• Интуиция: 35\n• Выносливость: 30\nДействует на:\n• Мф. мощности крит. удара (%): +20\n• Мф. против увертывания (%): +5\n• Броня пояса: 16-60\nДополнительная информация:\n• Часть комплекта: Комплект Заката• 4: Мф. критического удара (%): +25\n• 8: Мф. против критического удара (%): +20\n Мф. против увертывания (%): +25\n• 12: Уровень жизни (HP): +50"
+  },
+  {
+    "itemId": 627,
+    "name": "Пояс Огненной Зари",
+    "categoryGroup": "armor",
+    "categoryKey": "belts",
+    "slot": "belt",
+    "weaponFamily": null,
+    "sourceFile": "armor_belts.html",
+    "mass": 1,
+    "prices": {
+      "кр": 100
+    },
+    "durability": {
+      "current": 0,
+      "max": 50
+    },
+    "requirements": [
+      "Уровень: 8",
+      "Сила: 25",
+      "Ловкость: 25",
+      "Интуиция: 25",
+      "Выносливость: 25"
+    ],
+    "effects": [
+      "Сила: +1",
+      "Уровень жизни (HP): +18",
+      "Мф. против критического удара (%): +25",
+      "Защита от урона: +25",
+      "Защита от магии огня: +20",
+      "Защита от магии воды: -20",
+      "Броня пояса: 16-60",
+      "Дополнительная информация:",
+      "Часть комплекта: Комплект Огненной Зари• 4: Мф. против критического удара (%): +20",
+      "8: Мф. парирования (%): +5",
+      "12: Уровень жизни (HP): +50"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/belt21.gif",
+    "imageFileName": "belt21.gif",
+    "rawText": "Пояс Огненной Зари\n\n (Масса: 1.00)\nЦена: 100.00 кр.\nДолговечность: 0/50\nТребуется минимальное:\n• Уровень: 8\n• Сила: 25\n• Ловкость: 25\n• Интуиция: 25\n• Выносливость: 25\nДействует на:\n• Сила: +1\n• Уровень жизни (HP): +18\n• Мф. против критического удара (%): +25\n• Защита от урона: +25\n• Защита от магии огня: +20\n• Защита от магии воды: -20\n• Броня пояса: 16-60\nДополнительная информация:\n• Часть комплекта: Комплект Огненной Зари• 4: Мф. против критического удара (%): +20\n• 8: Мф. парирования (%): +5\n• 12: Уровень жизни (HP): +50"
+  },
+  {
+    "itemId": 628,
+    "name": "Осадный Тяжелый Пояс",
+    "categoryGroup": "armor",
+    "categoryKey": "belts",
+    "slot": "belt",
+    "weaponFamily": null,
+    "sourceFile": "armor_belts.html",
+    "mass": 10,
+    "prices": {
+      "кр": 101
+    },
+    "durability": {
+      "current": 0,
+      "max": 50
+    },
+    "requirements": [
+      "Уровень: 8",
+      "Сила: 40",
+      "Выносливость: 40"
+    ],
+    "effects": [
+      "Ловкость: -2",
+      "Уровень жизни (HP): +99",
+      "Защита от дробящего урона: +25",
+      "Броня пояса: 16-60",
+      "Дополнительная информация:",
+      "Часть комплекта: Комплект Осадный• 4: Мф. против критического удара (%): +30",
+      "7: Мф. против увертывания (%): +30",
+      "10: Уровень жизни (HP): +60"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/belt7.gif",
+    "imageFileName": "belt7.gif",
+    "rawText": "Осадный Тяжелый Пояс\n\n (Масса: 10.00)\nЦена: 101.00 кр.\nДолговечность: 0/50\nТребуется минимальное:\n• Уровень: 8\n• Сила: 40\n• Выносливость: 40\nДействует на:\n• Ловкость: -2\n• Уровень жизни (HP): +99\n• Защита от дробящего урона: +25\n• Броня пояса: 16-60\nДополнительная информация:\n• Часть комплекта: Комплект Осадный• 4: Мф. против критического удара (%): +30\n• 7: Мф. против увертывания (%): +30\n• 10: Уровень жизни (HP): +60"
+  },
+  {
+    "itemId": 629,
+    "name": "Пояс Безрассудства",
+    "categoryGroup": "armor",
+    "categoryKey": "belts",
+    "slot": "belt",
+    "weaponFamily": null,
+    "sourceFile": "armor_belts.html",
+    "mass": 2,
+    "prices": {
+      "кр": 102
+    },
+    "durability": {
+      "current": 0,
+      "max": 40
+    },
+    "requirements": [
+      "Уровень: 8",
+      "Сила: 15",
+      "Выносливость: 15",
+      "Интеллект: 25",
+      "Мудрость: 30"
+    ],
+    "effects": [
+      "Уровень жизни (HP): +27",
+      "Уровень маны: +30",
+      "Мф. мощности магии стихий: +10",
+      "Броня пояса: 4-9",
+      "Дополнительная информация:",
+      "Часть комплекта: Комплект Безрассудства• 3: Интеллект: +4",
+      "5: Мастерство владения магией стихий: +1",
+      "7: Понижение защиты от магии: +3"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/belt50.gif",
+    "imageFileName": "belt50.gif",
+    "rawText": "Пояс Безрассудства\n\n (Масса: 2.00)\nЦена: 102.00 кр.\nДолговечность: 0/40\nТребуется минимальное:\n• Уровень: 8\n• Сила: 15\n• Выносливость: 15\n• Интеллект: 25\n• Мудрость: 30\nДействует на:\n• Уровень жизни (HP): +27\n• Уровень маны: +30\n• Мф. мощности магии стихий: +10\n• Броня пояса: 4-9\nДополнительная информация:\n• Часть комплекта: Комплект Безрассудства• 3: Интеллект: +4\n• 5: Мастерство владения магией стихий: +1\n• 7: Понижение защиты от магии: +3"
+  },
+  {
+    "itemId": 632,
+    "name": "Пояс Надежды",
+    "categoryGroup": "armor",
+    "categoryKey": "belts",
+    "slot": "belt",
+    "weaponFamily": null,
+    "sourceFile": "armor_belts.html",
+    "mass": 1,
+    "prices": {
+      "кр": 104
+    },
+    "durability": {
+      "current": 0,
+      "max": 35
+    },
+    "requirements": [
+      "Уровень: 8",
+      "Сила: 25",
+      "Ловкость: 35",
+      "Выносливость: 25"
+    ],
+    "effects": [
+      "Уровень жизни (HP): +33",
+      "Мф. против критического удара (%): +35",
+      "Мф. парирования (%): +7",
+      "Броня пояса: 9-32"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/belt10.gif",
+    "imageFileName": "belt10.gif",
+    "rawText": "Пояс Надежды\n\n (Масса: 1.00)\nЦена: 104.00 кр.\nДолговечность: 0/35\nТребуется минимальное:\n• Уровень: 8\n• Сила: 25\n• Ловкость: 35\n• Выносливость: 25\nДействует на:\n• Уровень жизни (HP): +33\n• Мф. против критического удара (%): +35\n• Мф. парирования (%): +7\n• Броня пояса: 9-32"
+  },
+  {
+    "itemId": 633,
+    "name": "Пояс Призрачной Тьмы",
+    "categoryGroup": "armor",
+    "categoryKey": "belts",
+    "slot": "belt",
+    "weaponFamily": null,
+    "sourceFile": "armor_belts.html",
+    "mass": 4,
+    "prices": {
+      "кр": 104
+    },
+    "durability": {
+      "current": 0,
+      "max": 50
+    },
+    "requirements": [
+      "Уровень: 8",
+      "Сила: 15",
+      "Ловкость: 40",
+      "Выносливость: 15"
+    ],
+    "effects": [
+      "Ловкость: +2",
+      "Интуиция: +2",
+      "Мф. увертывания (%): +60",
+      "Мф. парирования (%): +5",
+      "Броня пояса: 7-30"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/belt33.gif",
+    "imageFileName": "belt33.gif",
+    "rawText": "Пояс Призрачной Тьмы\n\n (Масса: 4.00)\nЦена: 104.00 кр.\nДолговечность: 0/50\nТребуется минимальное:\n• Уровень: 8\n• Сила: 15\n• Ловкость: 40\n• Выносливость: 15\nДействует на:\n• Ловкость: +2\n• Интуиция: +2\n• Мф. увертывания (%): +60\n• Мф. парирования (%): +5\n• Броня пояса: 7-30"
+  },
+  {
+    "itemId": 634,
+    "name": "Пояс Коварства",
+    "categoryGroup": "armor",
+    "categoryKey": "belts",
+    "slot": "belt",
+    "weaponFamily": null,
+    "sourceFile": "armor_belts.html",
+    "mass": 4,
+    "prices": {
+      "кр": 113
+    },
+    "durability": {
+      "current": 0,
+      "max": 50
+    },
+    "requirements": [
+      "Уровень: 8",
+      "Сила: 10",
+      "Ловкость: 45",
+      "Выносливость: 15"
+    ],
+    "effects": [
+      "Ловкость: +4",
+      "Мф. увертывания (%): +50",
+      "Мф. контрудара (%): +5",
+      "Защита от магии стихий: +20",
+      "Броня пояса: 11-40 Описание: Впору лучшим мастерам меча и кинжала"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/belt47.gif",
+    "imageFileName": "belt47.gif",
+    "rawText": "Пояс Коварства\n\n (Масса: 4.00)\nЦена: 113.00 кр.\nДолговечность: 0/50\nТребуется минимальное:\n• Уровень: 8\n• Сила: 10\n• Ловкость: 45\n• Выносливость: 15\nДействует на:\n• Ловкость: +4\n• Мф. увертывания (%): +50\n• Мф. контрудара (%): +5\n• Защита от магии стихий: +20\n• Броня пояса: 11-40 Описание: Впору лучшим мастерам меча и кинжала"
+  },
+  {
+    "itemId": 635,
+    "name": "Belt of Red Circuits",
+    "categoryGroup": "armor",
+    "categoryKey": "belts",
+    "slot": "belt",
+    "weaponFamily": null,
+    "sourceFile": "armor_belts.html",
+    "mass": 1,
+    "prices": {
+      "кр": 30,
+      "екр": 6
+    },
+    "durability": {
+      "current": 0,
+      "max": 30
+    },
+    "requirements": [
+      "Уровень: 5",
+      "Сила: 20",
+      "Выносливость: 20"
+    ],
+    "effects": [
+      "Ловкость: +1",
+      "Уровень жизни (HP): +21",
+      "Броня пояса: 7-24"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/belt205.gif",
+    "imageFileName": "belt205.gif",
+    "rawText": "Belt of Red Circuits\n\n (Масса: 1.00)\nЦена: 30.00 кр.\nЦена: 6.00 екр.\nДолговечность: 0/30\nТребуется минимальное:\n• Уровень: 5\n• Сила: 20\n• Выносливость: 20\nДействует на:\n• Ловкость: +1\n• Уровень жизни (HP): +21\n• Броня пояса: 7-24"
+  },
+  {
+    "itemId": 636,
+    "name": "Bewitched Belt",
+    "categoryGroup": "armor",
+    "categoryKey": "belts",
+    "slot": "belt",
+    "weaponFamily": null,
+    "sourceFile": "armor_belts.html",
+    "mass": 1,
+    "prices": {
+      "кр": 41,
+      "екр": 8
+    },
+    "durability": {
+      "current": 0,
+      "max": 20
+    },
+    "requirements": [
+      "Уровень: 6",
+      "Сила: 20",
+      "Ловкость: 24",
+      "Выносливость: 20"
+    ],
+    "effects": [
+      "Ловкость: +4",
+      "Броня пояса: 9-32"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/belt203.gif",
+    "imageFileName": "belt203.gif",
+    "rawText": "Bewitched Belt\n\n (Масса: 1.00)\nЦена: 41.00 кр.\nЦена: 8.00 екр.\nДолговечность: 0/20\nТребуется минимальное:\n• Уровень: 6\n• Сила: 20\n• Ловкость: 24\n• Выносливость: 20\nДействует на:\n• Ловкость: +4\n• Броня пояса: 9-32"
+  },
+  {
+    "itemId": 637,
+    "name": "Belt of Fear",
+    "categoryGroup": "armor",
+    "categoryKey": "belts",
+    "slot": "belt",
+    "weaponFamily": null,
+    "sourceFile": "armor_belts.html",
+    "mass": 2,
+    "prices": {
+      "кр": 60,
+      "екр": 12
+    },
+    "durability": {
+      "current": 0,
+      "max": 40
+    },
+    "requirements": [
+      "Уровень: 7",
+      "Сила: 15",
+      "Ловкость: 30",
+      "Интуиция: 30",
+      "Выносливость: 15"
+    ],
+    "effects": [
+      "Уровень жизни (HP): +9",
+      "Мф. критического удара (%): +25",
+      "Мф. мощности крит. удара (%): +5",
+      "Мф. увертывания (%): +25",
+      "Мф. контрудара (%): +3",
+      "Броня пояса: 5-28",
+      "Дополнительная информация:",
+      "Часть комплекта: Комплект Ужаса• 13: Мф. парирования (%): +",
+      "Мф. контрудара (%): +5",
+      "Мф. мощности крит. удара (%): +20"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/belt204.gif",
+    "imageFileName": "belt204.gif",
+    "rawText": "Belt of Fear\n\n (Масса: 2.00)\nЦена: 60.00 кр.\nЦена: 12.00 екр.\nДолговечность: 0/40\nТребуется минимальное:\n• Уровень: 7\n• Сила: 15\n• Ловкость: 30\n• Интуиция: 30\n• Выносливость: 15\nДействует на:\n• Уровень жизни (HP): +9\n• Мф. критического удара (%): +25\n• Мф. мощности крит. удара (%): +5\n• Мф. увертывания (%): +25\n• Мф. контрудара (%): +3\n• Броня пояса: 5-28\nДополнительная информация:\n• Часть комплекта: Комплект Ужаса• 13: Мф. парирования (%): +\n Мф. контрудара (%): +5\n Мф. мощности крит. удара (%): +20"
+  },
+  {
+    "itemId": 638,
+    "name": "Belt of Oblivion",
+    "categoryGroup": "armor",
+    "categoryKey": "belts",
+    "slot": "belt",
+    "weaponFamily": null,
+    "sourceFile": "armor_belts.html",
+    "mass": 2,
+    "prices": {
+      "кр": 60,
+      "екр": 12
+    },
+    "durability": {
+      "current": 0,
+      "max": 40
+    },
+    "requirements": [
+      "Уровень: 7",
+      "Сила: 35",
+      "Выносливость: 35"
+    ],
+    "effects": [
+      "Уровень жизни (HP): +33",
+      "Мф. против критического удара (%): +35",
+      "Броня пояса: 13-48",
+      "Дополнительная информация:",
+      "Часть комплекта: Комплект Забвения• 13: Защита от урона: +75",
+      "Защита от магии: +75"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/belt34.gif",
+    "imageFileName": "belt34.gif",
+    "rawText": "Belt of Oblivion\n\n (Масса: 2.00)\nЦена: 60.00 кр.\nЦена: 12.00 екр.\nДолговечность: 0/40\nТребуется минимальное:\n• Уровень: 7\n• Сила: 35\n• Выносливость: 35\nДействует на:\n• Уровень жизни (HP): +33\n• Мф. против критического удара (%): +35\n• Броня пояса: 13-48\nДополнительная информация:\n• Часть комплекта: Комплект Забвения• 13: Защита от урона: +75\n Защита от магии: +75"
+  },
+  {
+    "itemId": 639,
+    "name": "Golden Belt",
+    "categoryGroup": "armor",
+    "categoryKey": "belts",
+    "slot": "belt",
+    "weaponFamily": null,
+    "sourceFile": "armor_belts.html",
+    "mass": 1,
+    "prices": {
+      "кр": 60,
+      "екр": 12
+    },
+    "durability": {
+      "current": 0,
+      "max": 30
+    },
+    "requirements": [
+      "Уровень: 7",
+      "Сила: 25",
+      "Ловкость: 30",
+      "Выносливость: 25"
+    ],
+    "effects": [
+      "Мф. против критического удара (%): +25",
+      "Мф. увертывания (%): +25",
+      "Защита от урона: +25",
+      "Броня пояса: 7-30",
+      "Дополнительная информация:",
+      "Часть комплекта: Комплект Золота• 13: Мф. парирования (%): +10",
+      "Мф. контрудара (%): +15"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/belt202.gif",
+    "imageFileName": "belt202.gif",
+    "rawText": "Golden Belt\n\n (Масса: 1.00)\nЦена: 60.00 кр.\nЦена: 12.00 екр.\nДолговечность: 0/30\nТребуется минимальное:\n• Уровень: 7\n• Сила: 25\n• Ловкость: 30\n• Выносливость: 25\nДействует на:\n• Мф. против критического удара (%): +25\n• Мф. увертывания (%): +25\n• Защита от урона: +25\n• Броня пояса: 7-30\nДополнительная информация:\n• Часть комплекта: Комплект Золота• 13: Мф. парирования (%): +10\n Мф. контрудара (%): +15"
+  },
+  {
+    "itemId": 640,
+    "name": "DarkSteel Belt",
+    "categoryGroup": "armor",
+    "categoryKey": "belts",
+    "slot": "belt",
+    "weaponFamily": null,
+    "sourceFile": "armor_belts.html",
+    "mass": 1,
+    "prices": {
+      "кр": 60,
+      "екр": 12
+    },
+    "durability": {
+      "current": 0,
+      "max": 30
+    },
+    "requirements": [
+      "Уровень: 7",
+      "Сила: 25",
+      "Ловкость: 10",
+      "Интуиция: 25",
+      "Выносливость: 25"
+    ],
+    "effects": [
+      "Интуиция: +1",
+      "Уровень жизни (HP): +33",
+      "Защита от урона: +25",
+      "Броня пояса: 5-28",
+      "Дополнительная информация:",
+      "Часть комплекта: Комплект Темной Стали• 13: Мф. против критического удара (%): +20",
+      "Мф. критического удара (%): +30",
+      "Мф. мощности крит. удара (%): +5",
+      "Мф. против увертывания (%): +15"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/belt201.gif",
+    "imageFileName": "belt201.gif",
+    "rawText": "DarkSteel Belt\n\n (Масса: 1.00)\nЦена: 60.00 кр.\nЦена: 12.00 екр.\nДолговечность: 0/30\nТребуется минимальное:\n• Уровень: 7\n• Сила: 25\n• Ловкость: 10\n• Интуиция: 25\n• Выносливость: 25\nДействует на:\n• Интуиция: +1\n• Уровень жизни (HP): +33\n• Защита от урона: +25\n• Броня пояса: 5-28\nДополнительная информация:\n• Часть комплекта: Комплект Темной Стали• 13: Мф. против критического удара (%): +20\n Мф. критического удара (%): +30\n Мф. мощности крит. удара (%): +5\n Мф. против увертывания (%): +15"
+  },
+  {
+    "itemId": 641,
+    "name": "Desert Belt",
+    "categoryGroup": "armor",
+    "categoryKey": "belts",
+    "slot": "belt",
+    "weaponFamily": null,
+    "sourceFile": "armor_belts.html",
+    "mass": 1,
+    "prices": {
+      "кр": 100,
+      "екр": 20
+    },
+    "durability": {
+      "current": 0,
+      "max": 30
+    },
+    "requirements": [
+      "Уровень: 8",
+      "Сила: 25",
+      "Ловкость: 40",
+      "Интуиция: 20",
+      "Выносливость: 25"
+    ],
+    "effects": [
+      "Уровень жизни (HP): +33",
+      "Мф. против критического удара (%): +5",
+      "Мф. парирования (%): +2",
+      "Защита от урона: +25",
+      "Защита от магии: +25",
+      "Броня пояса: 11-37",
+      "Дополнительная информация:",
+      "Часть комплекта: Комплект Странника• 5: Мастерство владения оружием: +1",
+      "Уровень жизни (HP): +33",
+      "9: Защита от магии: +20",
+      "13: Защита от урона: +20"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/belt207.gif",
+    "imageFileName": "belt207.gif",
+    "rawText": "Desert Belt\n\n (Масса: 1.00)\nЦена: 100.00 кр.\nЦена: 20.00 екр.\nДолговечность: 0/30\nТребуется минимальное:\n• Уровень: 8\n• Сила: 25\n• Ловкость: 40\n• Интуиция: 20\n• Выносливость: 25\nДействует на:\n• Уровень жизни (HP): +33\n• Мф. против критического удара (%): +5\n• Мф. парирования (%): +2\n• Защита от урона: +25\n• Защита от магии: +25\n• Броня пояса: 11-37\nДополнительная информация:\n• Часть комплекта: Комплект Странника• 5: Мастерство владения оружием: +1\n Уровень жизни (HP): +33\n• 9: Защита от магии: +20\n• 13: Защита от урона: +20"
+  },
+  {
+    "itemId": 642,
+    "name": "Smashing Belt",
+    "categoryGroup": "armor",
+    "categoryKey": "belts",
+    "slot": "belt",
+    "weaponFamily": null,
+    "sourceFile": "armor_belts.html",
+    "mass": 1,
+    "prices": {
+      "кр": 100,
+      "екр": 20
+    },
+    "durability": {
+      "current": 0,
+      "max": 30
+    },
+    "requirements": [
+      "Уровень: 8",
+      "Сила: 30",
+      "Ловкость: 20",
+      "Интуиция: 30",
+      "Выносливость: 30"
+    ],
+    "effects": [
+      "Интуиция: +2",
+      "Уровень жизни (HP): +45",
+      "Защита от урона: +25",
+      "Защита от магии: +20",
+      "Броня пояса: 11-37",
+      "Дополнительная информация:",
+      "Часть комплекта: Комплект Сокрушения• 5: Мастерство владения оружием: +1",
+      "8: Уровень жизни (HP): +33",
+      "11: Защита от магии: +20",
+      "13: Защита от урона: +20"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/belt206.gif",
+    "imageFileName": "belt206.gif",
+    "rawText": "Smashing Belt\n\n (Масса: 1.00)\nЦена: 100.00 кр.\nЦена: 20.00 екр.\nДолговечность: 0/30\nТребуется минимальное:\n• Уровень: 8\n• Сила: 30\n• Ловкость: 20\n• Интуиция: 30\n• Выносливость: 30\nДействует на:\n• Интуиция: +2\n• Уровень жизни (HP): +45\n• Защита от урона: +25\n• Защита от магии: +20\n• Броня пояса: 11-37\nДополнительная информация:\n• Часть комплекта: Комплект Сокрушения• 5: Мастерство владения оружием: +1\n• 8: Уровень жизни (HP): +33\n• 11: Защита от магии: +20\n• 13: Защита от урона: +20"
+  },
+  {
+    "itemId": 643,
+    "name": "Earthen Belt of Haughtiness",
+    "categoryGroup": "armor",
+    "categoryKey": "belts",
+    "slot": "belt",
+    "weaponFamily": null,
+    "sourceFile": "armor_belts.html",
+    "mass": 1,
+    "prices": {
+      "кр": 120,
+      "екр": 20
+    },
+    "durability": {
+      "current": 0,
+      "max": 30
+    },
+    "requirements": [
+      "Уровень: 8",
+      "Интеллект: 25",
+      "Мудрость: 50"
+    ],
+    "effects": [
+      "Интеллект: +2",
+      "Уровень жизни (HP): +30",
+      "Уровень маны: +40",
+      "Мф. мощности магии земли: +7",
+      "Защита от урона: +20",
+      "Защита от магии: +10",
+      "Броня пояса: 4-9",
+      "Дополнительная информация:",
+      "Часть комплекта: Комплект Надменности• 5: Уровень маны: +25",
+      "Уровень жизни (HP): +25",
+      "7: Мф. против критического удара (%): +25",
+      "Мастерство владения магией стихий: +1",
+      "9: Защита от урона: +25",
+      "Защита от магии: +25"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/belt211.gif",
+    "imageFileName": "belt211.gif",
+    "rawText": "Earthen Belt of Haughtiness\n\n (Масса: 1.00)\nЦена: 120.00 кр.\nЦена: 20.00 екр.\nДолговечность: 0/30\nТребуется минимальное:\n• Уровень: 8\n• Интеллект: 25\n• Мудрость: 50\nДействует на:\n• Интеллект: +2\n• Уровень жизни (HP): +30\n• Уровень маны: +40\n• Мф. мощности магии земли: +7\n• Защита от урона: +20\n• Защита от магии: +10\n• Броня пояса: 4-9\nДополнительная информация:\n• Часть комплекта: Комплект Надменности• 5: Уровень маны: +25\n Уровень жизни (HP): +25\n• 7: Мф. против критического удара (%): +25\n Мастерство владения магией стихий: +1\n• 9: Защита от урона: +25\n Защита от магии: +25"
+  },
+  {
+    "itemId": 644,
+    "name": "Fiery Belt of Haughtiness",
+    "categoryGroup": "armor",
+    "categoryKey": "belts",
+    "slot": "belt",
+    "weaponFamily": null,
+    "sourceFile": "armor_belts.html",
+    "mass": 1,
+    "prices": {
+      "кр": 120,
+      "екр": 20
+    },
+    "durability": {
+      "current": 0,
+      "max": 30
+    },
+    "requirements": [
+      "Уровень: 8",
+      "Интеллект: 25",
+      "Мудрость: 50"
+    ],
+    "effects": [
+      "Интеллект: +2",
+      "Уровень жизни (HP): +20",
+      "Уровень маны: +50",
+      "Мф. мощности магии огня: +7",
+      "Защита от урона: +10",
+      "Защита от магии: +20",
+      "Броня пояса: 4-9",
+      "Дополнительная информация:",
+      "Часть комплекта: Комплект Надменности• 5: Уровень маны: +25",
+      "Уровень жизни (HP): +25",
+      "7: Мф. против критического удара (%): +25",
+      "Мастерство владения магией стихий: +1",
+      "9: Защита от урона: +25",
+      "Защита от магии: +25"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/belt210.gif",
+    "imageFileName": "belt210.gif",
+    "rawText": "Fiery Belt of Haughtiness\n\n (Масса: 1.00)\nЦена: 120.00 кр.\nЦена: 20.00 екр.\nДолговечность: 0/30\nТребуется минимальное:\n• Уровень: 8\n• Интеллект: 25\n• Мудрость: 50\nДействует на:\n• Интеллект: +2\n• Уровень жизни (HP): +20\n• Уровень маны: +50\n• Мф. мощности магии огня: +7\n• Защита от урона: +10\n• Защита от магии: +20\n• Броня пояса: 4-9\nДополнительная информация:\n• Часть комплекта: Комплект Надменности• 5: Уровень маны: +25\n Уровень жизни (HP): +25\n• 7: Мф. против критического удара (%): +25\n Мастерство владения магией стихий: +1\n• 9: Защита от урона: +25\n Защита от магии: +25"
+  },
+  {
+    "itemId": 645,
+    "name": "Icy Belt of Haughtiness",
+    "categoryGroup": "armor",
+    "categoryKey": "belts",
+    "slot": "belt",
+    "weaponFamily": null,
+    "sourceFile": "armor_belts.html",
+    "mass": 1,
+    "prices": {
+      "кр": 120,
+      "екр": 20
+    },
+    "durability": {
+      "current": 0,
+      "max": 30
+    },
+    "requirements": [
+      "Уровень: 8",
+      "Интеллект: 25",
+      "Мудрость: 50"
+    ],
+    "effects": [
+      "Интеллект: +2",
+      "Уровень жизни (HP): +25",
+      "Уровень маны: +45",
+      "Мф. мощности магии воды: +7",
+      "Защита от урона: +15",
+      "Защита от магии: +15",
+      "Броня пояса: 4-9",
+      "Дополнительная информация:",
+      "Часть комплекта: Комплект Надменности• 5: Уровень маны: +25",
+      "Уровень жизни (HP): +25",
+      "7: Мф. против критического удара (%): +25",
+      "Мастерство владения магией стихий: +1",
+      "9: Защита от урона: +25",
+      "Защита от магии: +25"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/belt209.gif",
+    "imageFileName": "belt209.gif",
+    "rawText": "Icy Belt of Haughtiness\n\n (Масса: 1.00)\nЦена: 120.00 кр.\nЦена: 20.00 екр.\nДолговечность: 0/30\nТребуется минимальное:\n• Уровень: 8\n• Интеллект: 25\n• Мудрость: 50\nДействует на:\n• Интеллект: +2\n• Уровень жизни (HP): +25\n• Уровень маны: +45\n• Мф. мощности магии воды: +7\n• Защита от урона: +15\n• Защита от магии: +15\n• Броня пояса: 4-9\nДополнительная информация:\n• Часть комплекта: Комплект Надменности• 5: Уровень маны: +25\n Уровень жизни (HP): +25\n• 7: Мф. против критического удара (%): +25\n Мастерство владения магией стихий: +1\n• 9: Защита от урона: +25\n Защита от магии: +25"
+  },
+  {
+    "itemId": 646,
+    "name": "Airy Belt of Haughtiness",
+    "categoryGroup": "armor",
+    "categoryKey": "belts",
+    "slot": "belt",
+    "weaponFamily": null,
+    "sourceFile": "armor_belts.html",
+    "mass": 1,
+    "prices": {
+      "кр": 120,
+      "екр": 20
+    },
+    "durability": {
+      "current": 0,
+      "max": 30
+    },
+    "requirements": [
+      "Уровень: 8",
+      "Интеллект: 25",
+      "Мудрость: 50"
+    ],
+    "effects": [
+      "Интеллект: +2",
+      "Уровень жизни (HP): +15",
+      "Уровень маны: +55",
+      "Мф. мощности магии воздуха: +7",
+      "Защита от урона: +10",
+      "Защита от магии: +20",
+      "Броня пояса: 4-9",
+      "Дополнительная информация:",
+      "Часть комплекта: Комплект Надменности• 5: Уровень маны: +25",
+      "Уровень жизни (HP): +25",
+      "7: Мф. против критического удара (%): +25",
+      "Мастерство владения магией стихий: +1",
+      "9: Защита от урона: +25",
+      "Защита от магии: +25"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/belt208.gif",
+    "imageFileName": "belt208.gif",
+    "rawText": "Airy Belt of Haughtiness\n\n (Масса: 1.00)\nЦена: 120.00 кр.\nЦена: 20.00 екр.\nДолговечность: 0/30\nТребуется минимальное:\n• Уровень: 8\n• Интеллект: 25\n• Мудрость: 50\nДействует на:\n• Интеллект: +2\n• Уровень жизни (HP): +15\n• Уровень маны: +55\n• Мф. мощности магии воздуха: +7\n• Защита от урона: +10\n• Защита от магии: +20\n• Броня пояса: 4-9\nДополнительная информация:\n• Часть комплекта: Комплект Надменности• 5: Уровень маны: +25\n Уровень жизни (HP): +25\n• 7: Мф. против критического удара (%): +25\n Мастерство владения магией стихий: +1\n• 9: Защита от урона: +25\n Защита от магии: +25"
+  },
+  {
+    "itemId": 1015,
+    "name": "Пояс Ученика",
+    "categoryGroup": "armor",
+    "categoryKey": "belts",
+    "slot": "belt",
+    "weaponFamily": null,
+    "sourceFile": "armor_belts.html",
+    "mass": 2,
+    "prices": {
+      "кр": 20
+    },
+    "durability": {
+      "current": 0,
+      "max": 20
+    },
+    "requirements": [
+      "Уровень: 4",
+      "Интеллект: 20"
+    ],
+    "effects": [
+      "Уровень маны: +30",
+      "Броня пояса: 3-3"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/belt40.gif",
+    "imageFileName": "belt40.gif",
+    "rawText": "Пояс Ученика\n\n (Масса: 2.00)\nЦена: 20.00 кр.\nДолговечность: 0/20\nТребуется минимальное:\n• Уровень: 4\n• Интеллект: 20\nДействует на:\n• Уровень маны: +30\n• Броня пояса: 3-3"
+  },
+  {
+    "itemId": 1135,
+    "name": "Пояс Злодеяний",
+    "categoryGroup": "armor",
+    "categoryKey": "belts",
+    "slot": "belt",
+    "weaponFamily": null,
+    "sourceFile": "armor_belts.html",
+    "mass": 2,
+    "prices": {
+      "кр": 140
+    },
+    "durability": {
+      "current": 0,
+      "max": 40
+    },
+    "requirements": [
+      "Уровень: 9",
+      "Сила: 25",
+      "Ловкость: 50",
+      "Интуиция: 40",
+      "Выносливость: 30"
+    ],
+    "effects": [
+      "Уровень жизни (HP): +12",
+      "Мф. против критического удара (%): +20",
+      "Мф. контрудара (%): +15",
+      "Защита от магии: +30",
+      "Броня пояса: 19-63",
+      "Дополнительная информация:",
+      "Часть комплекта: Комплект Злодеяний• 5: Мф. увертывания (%): +50",
+      "8: Мф. увертывания (%): +50",
+      "Мф. против критического удара (%): +50",
+      "10: Мф. увертывания (%): +50",
+      "Мф. против критического удара (%): +50",
+      "Уровень жизни (HP): +66",
+      "12: Мф. увертывания (%): +50",
+      "Мф. против критического удара (%): +50",
+      "Уровень жизни (HP): +66",
+      "Мастерство владения ножами, кинжалами: +2"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/belt43.gif",
+    "imageFileName": "belt43.gif",
+    "rawText": "Пояс Злодеяний\n\n (Масса: 2.00)\nЦена: 140.00 кр.\nДолговечность: 0/40\nТребуется минимальное:\n• Уровень: 9\n• Сила: 25\n• Ловкость: 50\n• Интуиция: 40\n• Выносливость: 30\nДействует на:\n• Уровень жизни (HP): +12\n• Мф. против критического удара (%): +20\n• Мф. контрудара (%): +15\n• Защита от магии: +30\n• Броня пояса: 19-63\nДополнительная информация:\n• Часть комплекта: Комплект Злодеяний• 5: Мф. увертывания (%): +50\n• 8: Мф. увертывания (%): +50\n Мф. против критического удара (%): +50\n• 10: Мф. увертывания (%): +50\n Мф. против критического удара (%): +50\n Уровень жизни (HP): +66\n• 12: Мф. увертывания (%): +50\n Мф. против критического удара (%): +50\n Уровень жизни (HP): +66\n Мастерство владения ножами, кинжалами: +2"
+  },
+  {
+    "itemId": 1152,
+    "name": "Пояс Паука",
+    "categoryGroup": "armor",
+    "categoryKey": "belts",
+    "slot": "belt",
+    "weaponFamily": null,
+    "sourceFile": "armor_belts.html",
+    "mass": 2,
+    "prices": {
+      "кр": 140
+    },
+    "durability": {
+      "current": 0,
+      "max": 40
+    },
+    "requirements": [
+      "Уровень: 9",
+      "Сила: 30",
+      "Ловкость: 50",
+      "Интуиция: 15",
+      "Выносливость: 30"
+    ],
+    "effects": [
+      "Сила: +4",
+      "Уровень жизни (HP): +33",
+      "Мф. против критического удара (%): +45",
+      "Защита от магии: +20",
+      "Броня пояса: 19-63",
+      "Дополнительная информация:",
+      "Часть комплекта: Комплект Паука• 5: Мф. против критического удара (%): +35",
+      "9: Мф. против увертывания (%): +25",
+      "Мф. парирования (%): +5",
+      "11: Мастерство владения оружием: +1",
+      "13: Уровень жизни (HP): +33",
+      "Мастерство владения оружием: +1"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/belt35.gif",
+    "imageFileName": "belt35.gif",
+    "rawText": "Пояс Паука\n\n (Масса: 2.00)\nЦена: 140.00 кр.\nДолговечность: 0/40\nТребуется минимальное:\n• Уровень: 9\n• Сила: 30\n• Ловкость: 50\n• Интуиция: 15\n• Выносливость: 30\nДействует на:\n• Сила: +4\n• Уровень жизни (HP): +33\n• Мф. против критического удара (%): +45\n• Защита от магии: +20\n• Броня пояса: 19-63\nДополнительная информация:\n• Часть комплекта: Комплект Паука• 5: Мф. против критического удара (%): +35\n• 9: Мф. против увертывания (%): +25\n Мф. парирования (%): +5\n• 11: Мастерство владения оружием: +1\n• 13: Уровень жизни (HP): +33\n Мастерство владения оружием: +1"
+  },
+  {
+    "itemId": 1181,
+    "name": "Пояс Кровавой Луны",
+    "categoryGroup": "armor",
+    "categoryKey": "belts",
+    "slot": "belt",
+    "weaponFamily": null,
+    "sourceFile": "armor_belts.html",
+    "mass": 1,
+    "prices": {
+      "кр": 140
+    },
+    "durability": {
+      "current": 0,
+      "max": 50
+    },
+    "requirements": [
+      "Уровень: 9",
+      "Сила: 30",
+      "Ловкость: 15",
+      "Интуиция: 50",
+      "Выносливость: 30"
+    ],
+    "effects": [
+      "Мф. мощности крит. удара (%): +15",
+      "Защита от урона: +25",
+      "Защита от магии: +20",
+      "Броня пояса: 19-63",
+      "Дополнительная информация:",
+      "Часть комплекта: Комплект Кровавой Луны• 5: Мф. против увертывания (%): +35",
+      "9: Мф. против критического удара (%): +25",
+      "Мф. критического удара (%): +25",
+      "11: Уровень жизни (HP): +66",
+      "13: Защита от магии: +25"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/belt36.gif",
+    "imageFileName": "belt36.gif",
+    "rawText": "Пояс Кровавой Луны\n\n (Масса: 1.00)\nЦена: 140.00 кр.\nДолговечность: 0/50\nТребуется минимальное:\n• Уровень: 9\n• Сила: 30\n• Ловкость: 15\n• Интуиция: 50\n• Выносливость: 30\nДействует на:\n• Мф. мощности крит. удара (%): +15\n• Защита от урона: +25\n• Защита от магии: +20\n• Броня пояса: 19-63\nДополнительная информация:\n• Часть комплекта: Комплект Кровавой Луны• 5: Мф. против увертывания (%): +35\n• 9: Мф. против критического удара (%): +25\n Мф. критического удара (%): +25\n• 11: Уровень жизни (HP): +66\n• 13: Защита от магии: +25"
+  },
+  {
+    "itemId": 1213,
+    "name": "Пояс Решимости",
+    "categoryGroup": "armor",
+    "categoryKey": "belts",
+    "slot": "belt",
+    "weaponFamily": null,
+    "sourceFile": "armor_belts.html",
+    "mass": 1,
+    "prices": {
+      "кр": 140
+    },
+    "durability": {
+      "current": 0,
+      "max": 50
+    },
+    "requirements": [
+      "Уровень: 9",
+      "Сила: 10",
+      "Интеллект: 40",
+      "Мудрость: 50"
+    ],
+    "effects": [
+      "Понижение защиты от магии: +2",
+      "Интеллект: +2",
+      "Уровень маны: +130",
+      "Броня пояса: 5-16",
+      "Дополнительная информация:",
+      "Часть комплекта: Комплект Решимости [9]• 3: Мф. мощности магии стихий: +12",
+      "5: Понижение защиты от магии: +2",
+      "7: При касте, с вероятностью 5% увеличивает ваш мф. мощности магии стихий на следующий каст (%): +50"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/belt39.gif",
+    "imageFileName": "belt39.gif",
+    "rawText": "Пояс Решимости\n\n (Масса: 1.00)\nЦена: 140.00 кр.\nДолговечность: 0/50\nТребуется минимальное:\n• Уровень: 9\n• Сила: 10\n• Интеллект: 40\n• Мудрость: 50\nДействует на:\n• Понижение защиты от магии: +2\n• Интеллект: +2\n• Уровень маны: +130\n• Броня пояса: 5-16\nДополнительная информация:\n• Часть комплекта: Комплект Решимости [9]• 3: Мф. мощности магии стихий: +12\n• 5: Понижение защиты от магии: +2\n• 7: При касте, с вероятностью 5% увеличивает ваш мф. мощности магии стихий на следующий каст (%): +50"
+  },
+  {
+    "itemId": 2069,
+    "name": "Пояс Забытых Времен",
+    "categoryGroup": "armor",
+    "categoryKey": "belts",
+    "slot": "belt",
+    "weaponFamily": null,
+    "sourceFile": "armor_belts.html",
+    "mass": 2,
+    "prices": {
+      "кр": 140
+    },
+    "durability": {
+      "current": 0,
+      "max": 50
+    },
+    "requirements": [
+      "Уровень: 9",
+      "Сила: 45",
+      "Ловкость: 15",
+      "Интуиция: 15",
+      "Выносливость: 50"
+    ],
+    "effects": [
+      "Уровень жизни (HP): +99",
+      "Защита от дробящего урона: +25",
+      "Защита от магии: +20",
+      "Броня пояса: 19-68",
+      "Дополнительная информация:",
+      "Часть комплекта: Комплект Забытых Времен• 7: Мф. против критического удара (%): +25",
+      "Мф. против увертывания (%): +25",
+      "11: Мф. против критического удара (%): +35",
+      "Мф. против увертывания (%): +35",
+      "Уровень жизни (HP): +50",
+      "13: Уровень жизни (HP): +50",
+      "Защита от магии: +25"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/belt37.gif",
+    "imageFileName": "belt37.gif",
+    "rawText": "Пояс Забытых Времен\n\n (Масса: 2.00)\nЦена: 140.00 кр.\nДолговечность: 0/50\nТребуется минимальное:\n• Уровень: 9\n• Сила: 45\n• Ловкость: 15\n• Интуиция: 15\n• Выносливость: 50\nДействует на:\n• Уровень жизни (HP): +99\n• Защита от дробящего урона: +25\n• Защита от магии: +20\n• Броня пояса: 19-68\nДополнительная информация:\n• Часть комплекта: Комплект Забытых Времен• 7: Мф. против критического удара (%): +25\n Мф. против увертывания (%): +25\n• 11: Мф. против критического удара (%): +35\n Мф. против увертывания (%): +35\n Уровень жизни (HP): +50\n• 13: Уровень жизни (HP): +50\n Защита от магии: +25"
+  },
+  {
+    "itemId": 2083,
+    "name": "Пояс Утреннего Солнца",
+    "categoryGroup": "armor",
+    "categoryKey": "belts",
+    "slot": "belt",
+    "weaponFamily": null,
+    "sourceFile": "armor_belts.html",
+    "mass": 1,
+    "prices": {
+      "кр": 140
+    },
+    "durability": {
+      "current": 0,
+      "max": 50
+    },
+    "requirements": [
+      "Уровень: 9",
+      "Сила: 35",
+      "Ловкость: 30",
+      "Интуиция: 30",
+      "Выносливость: 35"
+    ],
+    "effects": [
+      "Сила: +4",
+      "Уровень жизни (HP): +33",
+      "Мф. против критического удара (%): +35",
+      "Защита от урона: +25",
+      "Защита от магии огня: +10",
+      "Защита от магии воды: -10",
+      "Броня пояса: 19-68",
+      "Дополнительная информация:",
+      "Часть комплекта: Комплект Утреннего Солнца• 7: Мф. мощности магии огня: +10",
+      "10: Мф. мощности магии огня: +15",
+      "Мф. мощности урона: +10",
+      "13: Защита от магии: +30"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/belt38_du2.gif",
+    "imageFileName": "belt38_du2.gif",
+    "rawText": "Пояс Утреннего Солнца\n\n (Масса: 1.00)\nЦена: 140.00 кр.\nДолговечность: 0/50\nТребуется минимальное:\n• Уровень: 9\n• Сила: 35\n• Ловкость: 30\n• Интуиция: 30\n• Выносливость: 35\nДействует на:\n• Сила: +4\n• Уровень жизни (HP): +33\n• Мф. против критического удара (%): +35\n• Защита от урона: +25\n• Защита от магии огня: +10\n• Защита от магии воды: -10\n• Броня пояса: 19-68\nДополнительная информация:\n• Часть комплекта: Комплект Утреннего Солнца• 7: Мф. мощности магии огня: +10\n• 10: Мф. мощности магии огня: +15\n Мф. мощности урона: +10\n• 13: Защита от магии: +30"
+  },
+  {
+    "itemId": 2175,
+    "name": "Пояс Скорпиона",
+    "categoryGroup": "armor",
+    "categoryKey": "belts",
+    "slot": "belt",
+    "weaponFamily": null,
+    "sourceFile": "armor_belts.html",
+    "mass": 1,
+    "prices": {
+      "кр": 140
+    },
+    "durability": {
+      "current": 0,
+      "max": 40
+    },
+    "requirements": [
+      "Уровень: 9",
+      "Сила: 35",
+      "Ловкость: 15",
+      "Интуиция: 45",
+      "Выносливость: 45"
+    ],
+    "effects": [
+      "Уровень жизни (HP): +30",
+      "Мф. против критического удара (%): +55",
+      "Защита от урона: +25",
+      "Защита от магии: +15",
+      "Броня пояса: 19-63",
+      "Дополнительная информация:",
+      "Часть комплекта: Комплект Скорпиона• 4: Защита от магии: +25",
+      "8: Мф. против критического удара (%): +50",
+      "10: Уровень жизни (HP): +54",
+      "12: Мф. критического удара (%): +50"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/belt44.gif",
+    "imageFileName": "belt44.gif",
+    "rawText": "Пояс Скорпиона\n\n (Масса: 1.00)\nЦена: 140.00 кр.\nДолговечность: 0/40\nТребуется минимальное:\n• Уровень: 9\n• Сила: 35\n• Ловкость: 15\n• Интуиция: 45\n• Выносливость: 45\nДействует на:\n• Уровень жизни (HP): +30\n• Мф. против критического удара (%): +55\n• Защита от урона: +25\n• Защита от магии: +15\n• Броня пояса: 19-63\nДополнительная информация:\n• Часть комплекта: Комплект Скорпиона• 4: Защита от магии: +25\n• 8: Мф. против критического удара (%): +50\n• 10: Уровень жизни (HP): +54\n• 12: Мф. критического удара (%): +50"
+  },
+  {
+    "itemId": 2406,
+    "name": "Пояс Древнего Лича",
+    "categoryGroup": "armor",
+    "categoryKey": "belts",
+    "slot": "belt",
+    "weaponFamily": null,
+    "sourceFile": "armor_belts.html",
+    "mass": 2,
+    "prices": {
+      "кр": 242
+    },
+    "durability": {
+      "current": 0,
+      "max": 100
+    },
+    "requirements": [
+      "Уровень: 10",
+      "Интеллект: 75",
+      "Мудрость: 50"
+    ],
+    "effects": [
+      "Интеллект: +5",
+      "Уровень жизни (HP): +50",
+      "Уровень маны: +65",
+      "Защита от урона: +50",
+      "Мф. мощности магии стихий: +10",
+      "Броня пояса: 6-20 Предмет из подземелья"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/belt51.gif",
+    "imageFileName": "belt51.gif",
+    "rawText": "Пояс Древнего Лича\n\n (Масса: 2.00)\nЦена: 242.00 кр.\nДолговечность: 0/100\nТребуется минимальное:\n• Уровень: 10\n• Интеллект: 75\n• Мудрость: 50\nДействует на:\n• Интеллект: +5\n• Уровень жизни (HP): +50\n• Уровень маны: +65\n• Защита от урона: +50\n• Мф. мощности магии стихий: +10\n• Броня пояса: 6-20 Предмет из подземелья"
+  },
+  {
+    "itemId": 3215,
+    "name": "Пояс воспитанника",
+    "categoryGroup": "armor",
+    "categoryKey": "belts",
+    "slot": "belt",
+    "weaponFamily": null,
+    "sourceFile": "armor_belts.html",
+    "mass": 1,
+    "prices": {
+      "кр": 23
+    },
+    "durability": {
+      "current": 0,
+      "max": 25
+    },
+    "requirements": [
+      "Уровень: 3"
+    ],
+    "effects": [
+      "Уровень жизни (HP): +12",
+      "Мф. против увертывания (%): +10",
+      "Броня пояса: 2-4",
+      "Свободные распределения:",
+      "Возможных распределений: 1"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/ref_itm7.gif",
+    "imageFileName": "ref_itm7.gif",
+    "rawText": "Пояс воспитанника\n\n (Масса: 1.00)\nЦена: 23.00 кр.\nДолговечность: 0/25\nТребуется минимальное:\n• Уровень: 3\nДействует на:\n• Уровень жизни (HP): +12\n• Мф. против увертывания (%): +10\n• Броня пояса: 2-4\nСвободные распределения:\n• Возможных распределений: 1"
+  },
+  {
+    "itemId": 4050,
+    "name": "Ремень Валентая",
+    "categoryGroup": "armor",
+    "categoryKey": "belts",
+    "slot": "belt",
+    "weaponFamily": null,
+    "sourceFile": "armor_belts.html",
+    "mass": 1,
+    "prices": {
+      "кр": 171
+    },
+    "durability": {
+      "current": 0,
+      "max": 20
+    },
+    "requirements": [
+      "Уровень: 9",
+      "Сила: 30",
+      "Ловкость: 15",
+      "Интуиция: 15",
+      "Выносливость: 30"
+    ],
+    "effects": [
+      "Уровень жизни (HP): +36",
+      "Мф. критического удара (%): +20",
+      "Мф. против критического удара (%): +20",
+      "Мф. увертывания (%): +20",
+      "Мф. против увертывания (%): +20",
+      "Защита от урона: +35",
+      "Защита от магии: +20",
+      "Броня пояса: 19-63"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/belt45_1.gif",
+    "imageFileName": "belt45_1.gif",
+    "rawText": "Ремень Валентая\n\n (Масса: 1.00)\nЦена: 171.00 кр.\nДолговечность: 0/20\nТребуется минимальное:\n• Уровень: 9\n• Сила: 30\n• Ловкость: 15\n• Интуиция: 15\n• Выносливость: 30\nДействует на:\n• Уровень жизни (HP): +36\n• Мф. критического удара (%): +20\n• Мф. против критического удара (%): +20\n• Мф. увертывания (%): +20\n• Мф. против увертывания (%): +20\n• Защита от урона: +35\n• Защита от магии: +20\n• Броня пояса: 19-63"
+  },
+  {
+    "itemId": 4051,
+    "name": "Пояс Валентая",
+    "categoryGroup": "armor",
+    "categoryKey": "belts",
+    "slot": "belt",
+    "weaponFamily": null,
+    "sourceFile": "armor_belts.html",
+    "mass": 1,
+    "prices": {
+      "кр": 176
+    },
+    "durability": {
+      "current": 0,
+      "max": 20
+    },
+    "requirements": [
+      "Уровень: 9",
+      "Интеллект: 75",
+      "Мудрость: 75"
+    ],
+    "effects": [
+      "Интеллект: +10",
+      "Уровень жизни (HP): +36",
+      "Уровень маны: +60",
+      "Защита от урона: +10",
+      "Защита от магии: +20",
+      "Броня пояса: 5-16"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/belt46_2.gif",
+    "imageFileName": "belt46_2.gif",
+    "rawText": "Пояс Валентая\n\n (Масса: 1.00)\nЦена: 176.00 кр.\nДолговечность: 0/20\nТребуется минимальное:\n• Уровень: 9\n• Интеллект: 75\n• Мудрость: 75\nДействует на:\n• Интеллект: +10\n• Уровень жизни (HP): +36\n• Уровень маны: +60\n• Защита от урона: +10\n• Защита от магии: +20\n• Броня пояса: 5-16"
+  },
+  {
+    "itemId": 4290,
+    "name": "Пояс Кровавой Луны [10]",
+    "categoryGroup": "armor",
+    "categoryKey": "belts",
+    "slot": "belt",
+    "weaponFamily": null,
+    "sourceFile": "armor_belts.html",
+    "mass": 1,
+    "prices": {
+      "кр": 168
+    },
+    "durability": {
+      "current": 0,
+      "max": 50
+    },
+    "requirements": [
+      "Уровень: 10",
+      "Сила: 35",
+      "Ловкость: 15",
+      "Интуиция: 60",
+      "Выносливость: 35"
+    ],
+    "effects": [
+      "Мф. критического удара (%): +20",
+      "Мф. мощности крит. удара (%): +15",
+      "Защита от урона: +30",
+      "Защита от магии: +25",
+      "Броня пояса: 21-70",
+      "Дополнительная информация:",
+      "Часть комплекта: Комплект Кровавой Луны [10]• 5: Мф. против увертывания (%): +45",
+      "8: Мф. против критического удара (%): +30",
+      "Мф. критического удара (%): +35",
+      "10: Уровень жизни (HP): +80",
+      "Защита от магии: +30",
+      "12: Добавляет тактики атаки при критическом ударе: +1"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/belt36.gif",
+    "imageFileName": "belt36.gif",
+    "rawText": "Пояс Кровавой Луны [10]\n\n (Масса: 1.00)\nЦена: 168.00 кр.\nДолговечность: 0/50\nТребуется минимальное:\n• Уровень: 10\n• Сила: 35\n• Ловкость: 15\n• Интуиция: 60\n• Выносливость: 35\nДействует на:\n• Мф. критического удара (%): +20\n• Мф. мощности крит. удара (%): +15\n• Защита от урона: +30\n• Защита от магии: +25\n• Броня пояса: 21-70\nДополнительная информация:\n• Часть комплекта: Комплект Кровавой Луны [10]• 5: Мф. против увертывания (%): +45\n• 8: Мф. против критического удара (%): +30\n Мф. критического удара (%): +35\n• 10: Уровень жизни (HP): +80\n Защита от магии: +30\n• 12: Добавляет тактики атаки при критическом ударе: +1"
+  },
+  {
+    "itemId": 4310,
+    "name": "Пояс Паука [10]",
+    "categoryGroup": "armor",
+    "categoryKey": "belts",
+    "slot": "belt",
+    "weaponFamily": null,
+    "sourceFile": "armor_belts.html",
+    "mass": 2,
+    "prices": {
+      "кр": 168
+    },
+    "durability": {
+      "current": 0,
+      "max": 40
+    },
+    "requirements": [
+      "Уровень: 10",
+      "Сила: 35",
+      "Ловкость: 60",
+      "Интуиция: 15",
+      "Выносливость: 35"
+    ],
+    "effects": [
+      "Сила: +4",
+      "Уровень жизни (HP): +41",
+      "Мф. против критического удара (%): +55",
+      "Мф. увертывания (%): +15",
+      "Защита от магии: +25",
+      "Броня пояса: 21-70",
+      "Дополнительная информация:",
+      "Часть комплекта: Комплект Паука [10]• 5: Мф. против увертывания (%): +30",
+      "Мф. против критического удара (%): +43",
+      "8: Мф. парирования (%): +6",
+      "Мастерство владения оружием: +1",
+      "10: Мастерство владения оружием: +1",
+      "Уровень жизни (HP): +40",
+      "12: При ударе, с вероятностью 5% производит дополнительную атаку по противнику в случайную зону: +1"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/belt35.gif",
+    "imageFileName": "belt35.gif",
+    "rawText": "Пояс Паука [10]\n\n (Масса: 2.00)\nЦена: 168.00 кр.\nДолговечность: 0/40\nТребуется минимальное:\n• Уровень: 10\n• Сила: 35\n• Ловкость: 60\n• Интуиция: 15\n• Выносливость: 35\nДействует на:\n• Сила: +4\n• Уровень жизни (HP): +41\n• Мф. против критического удара (%): +55\n• Мф. увертывания (%): +15\n• Защита от магии: +25\n• Броня пояса: 21-70\nДополнительная информация:\n• Часть комплекта: Комплект Паука [10]• 5: Мф. против увертывания (%): +30\n Мф. против критического удара (%): +43\n• 8: Мф. парирования (%): +6\n Мастерство владения оружием: +1\n• 10: Мастерство владения оружием: +1\n Уровень жизни (HP): +40\n• 12: При ударе, с вероятностью 5% производит дополнительную атаку по противнику в случайную зону: +1"
+  },
+  {
+    "itemId": 4320,
+    "name": "Пояс Злодеяний [10]",
+    "categoryGroup": "armor",
+    "categoryKey": "belts",
+    "slot": "belt",
+    "weaponFamily": null,
+    "sourceFile": "armor_belts.html",
+    "mass": 2,
+    "prices": {
+      "кр": 168
+    },
+    "durability": {
+      "current": 0,
+      "max": 40
+    },
+    "requirements": [
+      "Уровень: 10",
+      "Сила: 25",
+      "Ловкость: 60",
+      "Интуиция: 45",
+      "Выносливость: 35"
+    ],
+    "effects": [
+      "Уровень жизни (HP): +20",
+      "Мф. против критического удара (%): +30",
+      "Мф. контрудара (%): +17",
+      "Защита от магии: +35",
+      "Броня пояса: 21-70",
+      "Дополнительная информация:",
+      "Часть комплекта: Комплект Злодеяний [10]• 5: Мф. увертывания (%): +60",
+      "Уровень жизни (HP): +40",
+      "8: Мф. против критического удара (%): +60",
+      "Уровень жизни (HP): +40",
+      "10: Мастерство владения оружием: +2",
+      "12: Добавляет тактики контрудара при критическом ударе: +1"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/belt43.gif",
+    "imageFileName": "belt43.gif",
+    "rawText": "Пояс Злодеяний [10]\n\n (Масса: 2.00)\nЦена: 168.00 кр.\nДолговечность: 0/40\nТребуется минимальное:\n• Уровень: 10\n• Сила: 25\n• Ловкость: 60\n• Интуиция: 45\n• Выносливость: 35\nДействует на:\n• Уровень жизни (HP): +20\n• Мф. против критического удара (%): +30\n• Мф. контрудара (%): +17\n• Защита от магии: +35\n• Броня пояса: 21-70\nДополнительная информация:\n• Часть комплекта: Комплект Злодеяний [10]• 5: Мф. увертывания (%): +60\n Уровень жизни (HP): +40\n• 8: Мф. против критического удара (%): +60\n Уровень жизни (HP): +40\n• 10: Мастерство владения оружием: +2\n• 12: Добавляет тактики контрудара при критическом ударе: +1"
+  },
+  {
+    "itemId": 4331,
+    "name": "Пояс Забытых Времен [10]",
+    "categoryGroup": "armor",
+    "categoryKey": "belts",
+    "slot": "belt",
+    "weaponFamily": null,
+    "sourceFile": "armor_belts.html",
+    "mass": 2,
+    "prices": {
+      "кр": 168
+    },
+    "durability": {
+      "current": 0,
+      "max": 50
+    },
+    "requirements": [
+      "Уровень: 10",
+      "Сила: 45",
+      "Ловкость: 15",
+      "Интуиция: 15",
+      "Выносливость: 65"
+    ],
+    "effects": [
+      "Уровень жизни (HP): +121",
+      "Защита от дробящего урона: +25",
+      "Защита от магии: +25",
+      "Броня пояса: 21-80",
+      "Дополнительная информация:",
+      "Часть комплекта: Комплект Забытых Времен [10]• 5: Мф. против увертывания (%): +35",
+      "Мф. против критического удара (%): +30",
+      "8: Мф. против увертывания (%): +43",
+      "Мф. против критического удара (%): +43",
+      "Уровень жизни (HP): +60",
+      "10: Мф. против увертывания (%): +43",
+      "Мф. против критического удара (%): +43",
+      "Защита от магии: +30",
+      "Уровень жизни (HP): +60",
+      "12: Мф. против увертывания (%): +43",
+      "Мф. против критического удара (%): +43",
+      "Защита от магии: +30",
+      "Уровень жизни (HP): +120",
+      "При успешном блоке, с вероятностью 10% восстанавливает здоровье (%): +2"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/belt37.gif",
+    "imageFileName": "belt37.gif",
+    "rawText": "Пояс Забытых Времен [10]\n\n (Масса: 2.00)\nЦена: 168.00 кр.\nДолговечность: 0/50\nТребуется минимальное:\n• Уровень: 10\n• Сила: 45\n• Ловкость: 15\n• Интуиция: 15\n• Выносливость: 65\nДействует на:\n• Уровень жизни (HP): +121\n• Защита от дробящего урона: +25\n• Защита от магии: +25\n• Броня пояса: 21-80\nДополнительная информация:\n• Часть комплекта: Комплект Забытых Времен [10]• 5: Мф. против увертывания (%): +35\n Мф. против критического удара (%): +30\n• 8: Мф. против увертывания (%): +43\n Мф. против критического удара (%): +43\n Уровень жизни (HP): +60\n• 10: Мф. против увертывания (%): +43\n Мф. против критического удара (%): +43\n Защита от магии: +30\n Уровень жизни (HP): +60\n• 12: Мф. против увертывания (%): +43\n Мф. против критического удара (%): +43\n Защита от магии: +30\n Уровень жизни (HP): +120\n При успешном блоке, с вероятностью 10% восстанавливает здоровье (%): +2"
+  },
+  {
+    "itemId": 4332,
+    "name": "Пояс Забытых Времен [10] (старый)",
+    "categoryGroup": "armor",
+    "categoryKey": "belts",
+    "slot": "belt",
+    "weaponFamily": null,
+    "sourceFile": "armor_belts.html",
+    "mass": 2,
+    "prices": {
+      "кр": 168
+    },
+    "durability": {
+      "current": 0,
+      "max": 50
+    },
+    "requirements": [
+      "Уровень: 10",
+      "Сила: 45",
+      "Ловкость: 15",
+      "Интуиция: 15",
+      "Выносливость: 65"
+    ],
+    "effects": [
+      "Уровень жизни (HP): +121",
+      "Защита от дробящего урона: +25",
+      "Защита от магии: +25",
+      "Броня пояса: 21-80"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/belt37.gif",
+    "imageFileName": "belt37.gif",
+    "rawText": "Пояс Забытых Времен [10] (старый)\n\n (Масса: 2.00)\nЦена: 168.00 кр.\nДолговечность: 0/50\nТребуется минимальное:\n• Уровень: 10\n• Сила: 45\n• Ловкость: 15\n• Интуиция: 15\n• Выносливость: 65\nДействует на:\n• Уровень жизни (HP): +121\n• Защита от дробящего урона: +25\n• Защита от магии: +25\n• Броня пояса: 21-80"
+  },
+  {
+    "itemId": 4336,
+    "name": "Пояс Скорпиона [10]",
+    "categoryGroup": "armor",
+    "categoryKey": "belts",
+    "slot": "belt",
+    "weaponFamily": null,
+    "sourceFile": "armor_belts.html",
+    "mass": 1,
+    "prices": {
+      "кр": 168
+    },
+    "durability": {
+      "current": 0,
+      "max": 50
+    },
+    "requirements": [
+      "Уровень: 10",
+      "Сила: 35",
+      "Ловкость: 15",
+      "Интуиция: 60",
+      "Выносливость: 50"
+    ],
+    "effects": [
+      "Уровень жизни (HP): +39",
+      "Мф. против критического удара (%): +65",
+      "Защита от урона: +30",
+      "Защита от магии: +20",
+      "Броня пояса: 21-70",
+      "Дополнительная информация:",
+      "Часть комплекта: Комплект Скорпиона [10]• 5: Защита от магии: +30",
+      "8: Мф. против критического удара (%): +60",
+      "Уровень жизни (HP): +30",
+      "10: Мф. критического удара (%): +60",
+      "Уровень жизни (HP): +40",
+      "12: При ударе, с вероятностью 33% добавляет тактики крови : +1"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/belt44.gif",
+    "imageFileName": "belt44.gif",
+    "rawText": "Пояс Скорпиона [10]\n\n (Масса: 1.00)\nЦена: 168.00 кр.\nДолговечность: 0/50\nТребуется минимальное:\n• Уровень: 10\n• Сила: 35\n• Ловкость: 15\n• Интуиция: 60\n• Выносливость: 50\nДействует на:\n• Уровень жизни (HP): +39\n• Мф. против критического удара (%): +65\n• Защита от урона: +30\n• Защита от магии: +20\n• Броня пояса: 21-70\nДополнительная информация:\n• Часть комплекта: Комплект Скорпиона [10]• 5: Защита от магии: +30\n• 8: Мф. против критического удара (%): +60\n Уровень жизни (HP): +30\n• 10: Мф. критического удара (%): +60\n Уровень жизни (HP): +40\n• 12: При ударе, с вероятностью 33% добавляет тактики крови : +1"
+  },
+  {
+    "itemId": 4344,
+    "name": "Пояс Забытых Времен [10] (старый)",
+    "categoryGroup": "armor",
+    "categoryKey": "belts",
+    "slot": "belt",
+    "weaponFamily": null,
+    "sourceFile": "armor_belts.html",
+    "mass": 2,
+    "prices": {
+      "кр": 168
+    },
+    "durability": {
+      "current": 0,
+      "max": 50
+    },
+    "requirements": [
+      "Уровень: 10",
+      "Сила: 45",
+      "Ловкость: 15",
+      "Интуиция: 15",
+      "Выносливость: 65"
+    ],
+    "effects": [
+      "Уровень жизни (HP): +121",
+      "Защита от дробящего урона: +25",
+      "Защита от магии: +25",
+      "Броня пояса: 21-80"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/belt37.gif",
+    "imageFileName": "belt37.gif",
+    "rawText": "Пояс Забытых Времен [10] (старый)\n\n (Масса: 2.00)\nЦена: 168.00 кр.\nДолговечность: 0/50\nТребуется минимальное:\n• Уровень: 10\n• Сила: 45\n• Ловкость: 15\n• Интуиция: 15\n• Выносливость: 65\nДействует на:\n• Уровень жизни (HP): +121\n• Защита от дробящего урона: +25\n• Защита от магии: +25\n• Броня пояса: 21-80"
+  },
+  {
+    "itemId": 4345,
+    "name": "Пояс Забытых Времен [10] (старый)",
+    "categoryGroup": "armor",
+    "categoryKey": "belts",
+    "slot": "belt",
+    "weaponFamily": null,
+    "sourceFile": "armor_belts.html",
+    "mass": 2,
+    "prices": {
+      "кр": 168
+    },
+    "durability": {
+      "current": 0,
+      "max": 50
+    },
+    "requirements": [
+      "Уровень: 10",
+      "Сила: 45",
+      "Ловкость: 15",
+      "Интуиция: 15",
+      "Выносливость: 65"
+    ],
+    "effects": [
+      "Уровень жизни (HP): +121",
+      "Защита от дробящего урона: +25",
+      "Защита от магии: +25",
+      "Броня пояса: 21-80"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/belt37.gif",
+    "imageFileName": "belt37.gif",
+    "rawText": "Пояс Забытых Времен [10] (старый)\n\n (Масса: 2.00)\nЦена: 168.00 кр.\nДолговечность: 0/50\nТребуется минимальное:\n• Уровень: 10\n• Сила: 45\n• Ловкость: 15\n• Интуиция: 15\n• Выносливость: 65\nДействует на:\n• Уровень жизни (HP): +121\n• Защита от дробящего урона: +25\n• Защита от магии: +25\n• Броня пояса: 21-80"
+  },
+  {
+    "itemId": 4346,
+    "name": "Пояс Забытых Времен [10] (старый)",
+    "categoryGroup": "armor",
+    "categoryKey": "belts",
+    "slot": "belt",
+    "weaponFamily": null,
+    "sourceFile": "armor_belts.html",
+    "mass": 2,
+    "prices": {
+      "кр": 168
+    },
+    "durability": {
+      "current": 0,
+      "max": 50
+    },
+    "requirements": [
+      "Уровень: 10",
+      "Сила: 45",
+      "Ловкость: 15",
+      "Интуиция: 15",
+      "Выносливость: 65"
+    ],
+    "effects": [
+      "Уровень жизни (HP): +121",
+      "Защита от дробящего урона: +25",
+      "Защита от магии: +25",
+      "Броня пояса: 21-80"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/belt37.gif",
+    "imageFileName": "belt37.gif",
+    "rawText": "Пояс Забытых Времен [10] (старый)\n\n (Масса: 2.00)\nЦена: 168.00 кр.\nДолговечность: 0/50\nТребуется минимальное:\n• Уровень: 10\n• Сила: 45\n• Ловкость: 15\n• Интуиция: 15\n• Выносливость: 65\nДействует на:\n• Уровень жизни (HP): +121\n• Защита от дробящего урона: +25\n• Защита от магии: +25\n• Броня пояса: 21-80"
+  },
+  {
+    "itemId": 4347,
+    "name": "Пояс Забытых Времен [10] (старый)",
+    "categoryGroup": "armor",
+    "categoryKey": "belts",
+    "slot": "belt",
+    "weaponFamily": null,
+    "sourceFile": "armor_belts.html",
+    "mass": 2,
+    "prices": {
+      "кр": 168
+    },
+    "durability": {
+      "current": 0,
+      "max": 50
+    },
+    "requirements": [
+      "Уровень: 10",
+      "Сила: 45",
+      "Ловкость: 15",
+      "Интуиция: 15",
+      "Выносливость: 65"
+    ],
+    "effects": [
+      "Уровень жизни (HP): +121",
+      "Защита от дробящего урона: +25",
+      "Защита от магии: +25",
+      "Броня пояса: 21-80"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/belt37.gif",
+    "imageFileName": "belt37.gif",
+    "rawText": "Пояс Забытых Времен [10] (старый)\n\n (Масса: 2.00)\nЦена: 168.00 кр.\nДолговечность: 0/50\nТребуется минимальное:\n• Уровень: 10\n• Сила: 45\n• Ловкость: 15\n• Интуиция: 15\n• Выносливость: 65\nДействует на:\n• Уровень жизни (HP): +121\n• Защита от дробящего урона: +25\n• Защита от магии: +25\n• Броня пояса: 21-80"
+  },
+  {
+    "itemId": 4352,
+    "name": "Пояс Решимости [10]",
+    "categoryGroup": "armor",
+    "categoryKey": "belts",
+    "slot": "belt",
+    "weaponFamily": null,
+    "sourceFile": "armor_belts.html",
+    "mass": 1,
+    "prices": {
+      "кр": 168
+    },
+    "durability": {
+      "current": 0,
+      "max": 50
+    },
+    "requirements": [
+      "Уровень: 10",
+      "Сила: 10",
+      "Интеллект: 50",
+      "Мудрость: 60"
+    ],
+    "effects": [
+      "Понижение защиты от магии: +2",
+      "Интеллект: +2",
+      "Уровень жизни (HP): +22",
+      "Уровень маны: +150",
+      "Броня пояса: 6-20",
+      "Дополнительная информация:",
+      "Часть комплекта: Комплект Решимости [10]• 3: Мф. мощности магии стихий: +12",
+      "5: Понижение защиты от магии: +2",
+      "7: При касте, с вероятностью 5% увеличивает ваш мф. мощности магии стихий на следующий каст (%): +50"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/belt39.gif",
+    "imageFileName": "belt39.gif",
+    "rawText": "Пояс Решимости [10]\n\n (Масса: 1.00)\nЦена: 168.00 кр.\nДолговечность: 0/50\nТребуется минимальное:\n• Уровень: 10\n• Сила: 10\n• Интеллект: 50\n• Мудрость: 60\nДействует на:\n• Понижение защиты от магии: +2\n• Интеллект: +2\n• Уровень жизни (HP): +22\n• Уровень маны: +150\n• Броня пояса: 6-20\nДополнительная информация:\n• Часть комплекта: Комплект Решимости [10]• 3: Мф. мощности магии стихий: +12\n• 5: Понижение защиты от магии: +2\n• 7: При касте, с вероятностью 5% увеличивает ваш мф. мощности магии стихий на следующий каст (%): +50"
+  },
+  {
+    "itemId": 4366,
+    "name": "Пояс Утреннего Солнца [10]",
+    "categoryGroup": "armor",
+    "categoryKey": "belts",
+    "slot": "belt",
+    "weaponFamily": null,
+    "sourceFile": "armor_belts.html",
+    "mass": 1,
+    "prices": {
+      "кр": 168
+    },
+    "durability": {
+      "current": 0,
+      "max": 50
+    },
+    "requirements": [
+      "Уровень: 10",
+      "Сила: 45",
+      "Ловкость: 30",
+      "Интуиция: 30",
+      "Выносливость: 45"
+    ],
+    "effects": [
+      "Сила: +4",
+      "Уровень жизни (HP): +42",
+      "Мф. против критического удара (%): +40",
+      "Защита от урона: +30",
+      "Защита от магии огня: +20",
+      "Защита от магии воды: -10",
+      "Броня пояса: 21-75",
+      "Дополнительная информация:",
+      "Часть комплекта: Комплект Утреннего Солнца [10]• 5: Мф. против критического удара (%): +60",
+      "8: Мф. мощности урона: +12",
+      "10: Защита от магии: +55",
+      "Мф. мощности урона: +10",
+      "12: При парировании, с вероятностью 25% на два хода увеличивает ваш мф. против критического удара и мф. против увертывания: +300"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/belt38_du2.gif",
+    "imageFileName": "belt38_du2.gif",
+    "rawText": "Пояс Утреннего Солнца [10]\n\n (Масса: 1.00)\nЦена: 168.00 кр.\nДолговечность: 0/50\nТребуется минимальное:\n• Уровень: 10\n• Сила: 45\n• Ловкость: 30\n• Интуиция: 30\n• Выносливость: 45\nДействует на:\n• Сила: +4\n• Уровень жизни (HP): +42\n• Мф. против критического удара (%): +40\n• Защита от урона: +30\n• Защита от магии огня: +20\n• Защита от магии воды: -10\n• Броня пояса: 21-75\nДополнительная информация:\n• Часть комплекта: Комплект Утреннего Солнца [10]• 5: Мф. против критического удара (%): +60\n• 8: Мф. мощности урона: +12\n• 10: Защита от магии: +55\n Мф. мощности урона: +10\n• 12: При парировании, с вероятностью 25% на два хода увеличивает ваш мф. против критического удара и мф. против увертывания: +300"
+  },
+  {
+    "itemId": 4367,
+    "name": "Пояс Забытых Времен [10] (старый)",
+    "categoryGroup": "armor",
+    "categoryKey": "belts",
+    "slot": "belt",
+    "weaponFamily": null,
+    "sourceFile": "armor_belts.html",
+    "mass": 2,
+    "prices": {
+      "кр": 168
+    },
+    "durability": {
+      "current": 0,
+      "max": 50
+    },
+    "requirements": [
+      "Уровень: 10",
+      "Сила: 45",
+      "Ловкость: 15",
+      "Интуиция: 15",
+      "Выносливость: 65"
+    ],
+    "effects": [
+      "Уровень жизни (HP): +121",
+      "Защита от дробящего урона: +25",
+      "Защита от магии: +25",
+      "Броня пояса: 21-80"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/belt37.gif",
+    "imageFileName": "belt37.gif",
+    "rawText": "Пояс Забытых Времен [10] (старый)\n\n (Масса: 2.00)\nЦена: 168.00 кр.\nДолговечность: 0/50\nТребуется минимальное:\n• Уровень: 10\n• Сила: 45\n• Ловкость: 15\n• Интуиция: 15\n• Выносливость: 65\nДействует на:\n• Уровень жизни (HP): +121\n• Защита от дробящего урона: +25\n• Защита от магии: +25\n• Броня пояса: 21-80"
+  },
+  {
+    "itemId": 4368,
+    "name": "Пояс Забытых Времен [10] (старый)",
+    "categoryGroup": "armor",
+    "categoryKey": "belts",
+    "slot": "belt",
+    "weaponFamily": null,
+    "sourceFile": "armor_belts.html",
+    "mass": 2,
+    "prices": {
+      "кр": 168
+    },
+    "durability": {
+      "current": 0,
+      "max": 50
+    },
+    "requirements": [
+      "Уровень: 10",
+      "Сила: 45",
+      "Ловкость: 15",
+      "Интуиция: 15",
+      "Выносливость: 65"
+    ],
+    "effects": [
+      "Уровень жизни (HP): +121",
+      "Защита от дробящего урона: +25",
+      "Защита от магии: +25",
+      "Броня пояса: 21-80"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/belt37.gif",
+    "imageFileName": "belt37.gif",
+    "rawText": "Пояс Забытых Времен [10] (старый)\n\n (Масса: 2.00)\nЦена: 168.00 кр.\nДолговечность: 0/50\nТребуется минимальное:\n• Уровень: 10\n• Сила: 45\n• Ловкость: 15\n• Интуиция: 15\n• Выносливость: 65\nДействует на:\n• Уровень жизни (HP): +121\n• Защита от дробящего урона: +25\n• Защита от магии: +25\n• Броня пояса: 21-80"
+  },
+  {
+    "itemId": 4369,
+    "name": "Пояс Забытых Времен [10] (старый)",
+    "categoryGroup": "armor",
+    "categoryKey": "belts",
+    "slot": "belt",
+    "weaponFamily": null,
+    "sourceFile": "armor_belts.html",
+    "mass": 2,
+    "prices": {
+      "кр": 168
+    },
+    "durability": {
+      "current": 0,
+      "max": 50
+    },
+    "requirements": [
+      "Уровень: 10",
+      "Сила: 45",
+      "Ловкость: 15",
+      "Интуиция: 15",
+      "Выносливость: 65"
+    ],
+    "effects": [
+      "Уровень жизни (HP): +121",
+      "Защита от дробящего урона: +25",
+      "Защита от магии: +25",
+      "Броня пояса: 21-80"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/belt37.gif",
+    "imageFileName": "belt37.gif",
+    "rawText": "Пояс Забытых Времен [10] (старый)\n\n (Масса: 2.00)\nЦена: 168.00 кр.\nДолговечность: 0/50\nТребуется минимальное:\n• Уровень: 10\n• Сила: 45\n• Ловкость: 15\n• Интуиция: 15\n• Выносливость: 65\nДействует на:\n• Уровень жизни (HP): +121\n• Защита от дробящего урона: +25\n• Защита от магии: +25\n• Броня пояса: 21-80"
+  },
+  {
+    "itemId": 4370,
+    "name": "Пояс Забытых Времен [10] (старый)",
+    "categoryGroup": "armor",
+    "categoryKey": "belts",
+    "slot": "belt",
+    "weaponFamily": null,
+    "sourceFile": "armor_belts.html",
+    "mass": 2,
+    "prices": {
+      "кр": 168
+    },
+    "durability": {
+      "current": 0,
+      "max": 50
+    },
+    "requirements": [
+      "Уровень: 10",
+      "Сила: 45",
+      "Ловкость: 15",
+      "Интуиция: 15",
+      "Выносливость: 65"
+    ],
+    "effects": [
+      "Уровень жизни (HP): +121",
+      "Защита от дробящего урона: +25",
+      "Защита от магии: +25",
+      "Броня пояса: 21-80"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/belt37.gif",
+    "imageFileName": "belt37.gif",
+    "rawText": "Пояс Забытых Времен [10] (старый)\n\n (Масса: 2.00)\nЦена: 168.00 кр.\nДолговечность: 0/50\nТребуется минимальное:\n• Уровень: 10\n• Сила: 45\n• Ловкость: 15\n• Интуиция: 15\n• Выносливость: 65\nДействует на:\n• Уровень жизни (HP): +121\n• Защита от дробящего урона: +25\n• Защита от магии: +25\n• Броня пояса: 21-80"
+  },
+  {
+    "itemId": 4814,
+    "name": "Пояс Неприступного Утеса",
+    "categoryGroup": "armor",
+    "categoryKey": "belts",
+    "slot": "belt",
+    "weaponFamily": null,
+    "sourceFile": "armor_belts.html",
+    "mass": 2,
+    "prices": {
+      "кр": 200
+    },
+    "durability": {
+      "current": 0,
+      "max": 50
+    },
+    "requirements": [
+      "Уровень: 10",
+      "Сила: 50",
+      "Ловкость: 10",
+      "Интуиция: 10",
+      "Выносливость: 70"
+    ],
+    "effects": [
+      "Сила: +5",
+      "Уровень жизни (HP): +100",
+      "Мф. против критического удара (%): +20",
+      "Мф. против увертывания (%): +20",
+      "Защита от урона: +25",
+      "Броня пояса: 21-80",
+      "Дополнительная информация:",
+      "Часть комплекта: Комплект Неприступного Утеса [3]• 3: Мф. против увертывания (%): +40",
+      "Уровень жизни (HP): +100"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/belt52.gif",
+    "imageFileName": "belt52.gif",
+    "rawText": "Пояс Неприступного Утеса\n\n (Масса: 2.00)\nЦена: 200.00 кр.\nДолговечность: 0/50\nТребуется минимальное:\n• Уровень: 10\n• Сила: 50\n• Ловкость: 10\n• Интуиция: 10\n• Выносливость: 70\nДействует на:\n• Сила: +5\n• Уровень жизни (HP): +100\n• Мф. против критического удара (%): +20\n• Мф. против увертывания (%): +20\n• Защита от урона: +25\n• Броня пояса: 21-80\nДополнительная информация:\n• Часть комплекта: Комплект Неприступного Утеса [3]• 3: Мф. против увертывания (%): +40\n Уровень жизни (HP): +100"
+  },
+  {
+    "itemId": 5283,
+    "name": "Пояс Неприступного Утеса [11]",
+    "categoryGroup": "armor",
+    "categoryKey": "belts",
+    "slot": "belt",
+    "weaponFamily": null,
+    "sourceFile": "armor_belts.html",
+    "mass": 2,
+    "prices": {
+      "кр": 200
+    },
+    "durability": {
+      "current": 0,
+      "max": 50
+    },
+    "requirements": [
+      "Уровень: 11",
+      "Сила: 125",
+      "Ловкость: 10",
+      "Интуиция: 10",
+      "Выносливость: 125"
+    ],
+    "effects": [
+      "Сила: +7",
+      "Уровень жизни (HP): +124",
+      "Мф. против критического удара (%): +40",
+      "Мф. против увертывания (%): +40",
+      "Защита от урона: +45",
+      "Броня пояса: 24-96",
+      "Дополнительная информация:",
+      "Часть комплекта: Комплект Неприступного Утеса [3]• 3: Мф. против увертывания (%): +60",
+      "Уровень жизни (HP): +130"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/belt52.gif",
+    "imageFileName": "belt52.gif",
+    "rawText": "Пояс Неприступного Утеса [11]\n\n (Масса: 2.00)\nЦена: 200.00 кр.\nДолговечность: 0/50\nТребуется минимальное:\n• Уровень: 11\n• Сила: 125\n• Ловкость: 10\n• Интуиция: 10\n• Выносливость: 125\nДействует на:\n• Сила: +7\n• Уровень жизни (HP): +124\n• Мф. против критического удара (%): +40\n• Мф. против увертывания (%): +40\n• Защита от урона: +45\n• Броня пояса: 24-96\nДополнительная информация:\n• Часть комплекта: Комплект Неприступного Утеса [3]• 3: Мф. против увертывания (%): +60\n Уровень жизни (HP): +130"
+  },
+  {
+    "itemId": 7214,
+    "name": "Пояс Древнего Лича [11]",
+    "categoryGroup": "armor",
+    "categoryKey": "belts",
+    "slot": "belt",
+    "weaponFamily": null,
+    "sourceFile": "armor_belts.html",
+    "mass": 2,
+    "prices": {
+      "кр": 242
+    },
+    "durability": {
+      "current": 0,
+      "max": 100
+    },
+    "requirements": [
+      "Уровень: 10",
+      "Интеллект: 75",
+      "Мудрость: 50"
+    ],
+    "effects": [
+      "Интеллект: +6",
+      "Уровень жизни (HP): +55",
+      "Уровень маны: +72",
+      "Защита от урона: +55",
+      "Мф. мощности магии стихий: +11",
+      "Броня пояса: 7-22 Предмет из подземелья"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/belt51.gif",
+    "imageFileName": "belt51.gif",
+    "rawText": "Пояс Древнего Лича [11]\n\n (Масса: 2.00)\nЦена: 242.00 кр.\nДолговечность: 0/100\nТребуется минимальное:\n• Уровень: 10\n• Интеллект: 75\n• Мудрость: 50\nДействует на:\n• Интеллект: +6\n• Уровень жизни (HP): +55\n• Уровень маны: +72\n• Защита от урона: +55\n• Мф. мощности магии стихий: +11\n• Броня пояса: 7-22 Предмет из подземелья"
+  },
+  {
+    "itemId": 7255,
+    "name": "Пояс Кровавой Луны [11]",
+    "categoryGroup": "armor",
+    "categoryKey": "belts",
+    "slot": "belt",
+    "weaponFamily": null,
+    "sourceFile": "armor_belts.html",
+    "mass": 1,
+    "prices": {
+      "кр": 168
+    },
+    "durability": {
+      "current": 0,
+      "max": 50
+    },
+    "requirements": [
+      "Уровень: 10",
+      "Сила: 35",
+      "Ловкость: 15",
+      "Интуиция: 60",
+      "Выносливость: 35"
+    ],
+    "effects": [
+      "Мф. критического удара (%): +22",
+      "Мф. мощности крит. удара (%): +15",
+      "Защита от урона: +33",
+      "Защита от магии: +28",
+      "Броня пояса: 23-77",
+      "Дополнительная информация:",
+      "Часть комплекта: Комплект Кровавой Луны [10]• 5: Мф. против увертывания (%): +45",
+      "8: Мф. против критического удара (%): +30",
+      "Мф. критического удара (%): +35",
+      "10: Уровень жизни (HP): +80",
+      "Защита от магии: +30",
+      "12: Добавляет тактики атаки при критическом ударе: +1"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/belt36.gif",
+    "imageFileName": "belt36.gif",
+    "rawText": "Пояс Кровавой Луны [11]\n\n (Масса: 1.00)\nЦена: 168.00 кр.\nДолговечность: 0/50\nТребуется минимальное:\n• Уровень: 10\n• Сила: 35\n• Ловкость: 15\n• Интуиция: 60\n• Выносливость: 35\nДействует на:\n• Мф. критического удара (%): +22\n• Мф. мощности крит. удара (%): +15\n• Защита от урона: +33\n• Защита от магии: +28\n• Броня пояса: 23-77\nДополнительная информация:\n• Часть комплекта: Комплект Кровавой Луны [10]• 5: Мф. против увертывания (%): +45\n• 8: Мф. против критического удара (%): +30\n Мф. критического удара (%): +35\n• 10: Уровень жизни (HP): +80\n Защита от магии: +30\n• 12: Добавляет тактики атаки при критическом ударе: +1"
+  },
+  {
+    "itemId": 7273,
+    "name": "Пояс Паука [11]",
+    "categoryGroup": "armor",
+    "categoryKey": "belts",
+    "slot": "belt",
+    "weaponFamily": null,
+    "sourceFile": "armor_belts.html",
+    "mass": 2,
+    "prices": {
+      "кр": 168
+    },
+    "durability": {
+      "current": 0,
+      "max": 40
+    },
+    "requirements": [
+      "Уровень: 10",
+      "Сила: 35",
+      "Ловкость: 60",
+      "Интуиция: 15",
+      "Выносливость: 35"
+    ],
+    "effects": [
+      "Сила: +4",
+      "Уровень жизни (HP): +45",
+      "Мф. против критического удара (%): +61",
+      "Мф. увертывания (%): +17",
+      "Защита от магии: +28",
+      "Броня пояса: 23-77",
+      "Дополнительная информация:",
+      "Часть комплекта: Комплект Паука [10]• 5: Мф. против увертывания (%): +30",
+      "Мф. против критического удара (%): +43",
+      "8: Мф. парирования (%): +6",
+      "Мастерство владения оружием: +1",
+      "10: Мастерство владения оружием: +1",
+      "Уровень жизни (HP): +40",
+      "12: При ударе, с вероятностью 5% производит дополнительную атаку по противнику в случайную зону: +1"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/belt35.gif",
+    "imageFileName": "belt35.gif",
+    "rawText": "Пояс Паука [11]\n\n (Масса: 2.00)\nЦена: 168.00 кр.\nДолговечность: 0/40\nТребуется минимальное:\n• Уровень: 10\n• Сила: 35\n• Ловкость: 60\n• Интуиция: 15\n• Выносливость: 35\nДействует на:\n• Сила: +4\n• Уровень жизни (HP): +45\n• Мф. против критического удара (%): +61\n• Мф. увертывания (%): +17\n• Защита от магии: +28\n• Броня пояса: 23-77\nДополнительная информация:\n• Часть комплекта: Комплект Паука [10]• 5: Мф. против увертывания (%): +30\n Мф. против критического удара (%): +43\n• 8: Мф. парирования (%): +6\n Мастерство владения оружием: +1\n• 10: Мастерство владения оружием: +1\n Уровень жизни (HP): +40\n• 12: При ударе, с вероятностью 5% производит дополнительную атаку по противнику в случайную зону: +1"
+  },
+  {
+    "itemId": 7283,
+    "name": "Пояс Злодеяний [11]",
+    "categoryGroup": "armor",
+    "categoryKey": "belts",
+    "slot": "belt",
+    "weaponFamily": null,
+    "sourceFile": "armor_belts.html",
+    "mass": 2,
+    "prices": {
+      "кр": 168
+    },
+    "durability": {
+      "current": 0,
+      "max": 40
+    },
+    "requirements": [
+      "Уровень: 10",
+      "Сила: 25",
+      "Ловкость: 60",
+      "Интуиция: 45",
+      "Выносливость: 35"
+    ],
+    "effects": [
+      "Уровень жизни (HP): +22",
+      "Мф. против критического удара (%): +33",
+      "Мф. контрудара (%): +19",
+      "Защита от магии: +39",
+      "Броня пояса: 23-77",
+      "Дополнительная информация:",
+      "Часть комплекта: Комплект Злодеяний [10]• 5: Мф. увертывания (%): +60",
+      "Уровень жизни (HP): +40",
+      "8: Мф. против критического удара (%): +60",
+      "Уровень жизни (HP): +40",
+      "10: Мастерство владения оружием: +2",
+      "12: Добавляет тактики контрудара при критическом ударе: +1"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/belt43.gif",
+    "imageFileName": "belt43.gif",
+    "rawText": "Пояс Злодеяний [11]\n\n (Масса: 2.00)\nЦена: 168.00 кр.\nДолговечность: 0/40\nТребуется минимальное:\n• Уровень: 10\n• Сила: 25\n• Ловкость: 60\n• Интуиция: 45\n• Выносливость: 35\nДействует на:\n• Уровень жизни (HP): +22\n• Мф. против критического удара (%): +33\n• Мф. контрудара (%): +19\n• Защита от магии: +39\n• Броня пояса: 23-77\nДополнительная информация:\n• Часть комплекта: Комплект Злодеяний [10]• 5: Мф. увертывания (%): +60\n Уровень жизни (HP): +40\n• 8: Мф. против критического удара (%): +60\n Уровень жизни (HP): +40\n• 10: Мастерство владения оружием: +2\n• 12: Добавляет тактики контрудара при критическом ударе: +1"
+  },
+  {
+    "itemId": 7294,
+    "name": "Пояс Забытых Времен [11]",
+    "categoryGroup": "armor",
+    "categoryKey": "belts",
+    "slot": "belt",
+    "weaponFamily": null,
+    "sourceFile": "armor_belts.html",
+    "mass": 2,
+    "prices": {
+      "кр": 168
+    },
+    "durability": {
+      "current": 0,
+      "max": 50
+    },
+    "requirements": [
+      "Уровень: 10",
+      "Сила: 45",
+      "Ловкость: 15",
+      "Интуиция: 15",
+      "Выносливость: 65"
+    ],
+    "effects": [
+      "Уровень жизни (HP): +133",
+      "Защита от дробящего урона: +28",
+      "Защита от магии: +28",
+      "Броня пояса: 23-88",
+      "Дополнительная информация:",
+      "Часть комплекта: Комплект Забытых Времен [10]• 5: Мф. против увертывания (%): +35",
+      "Мф. против критического удара (%): +30",
+      "8: Мф. против увертывания (%): +43",
+      "Мф. против критического удара (%): +43",
+      "Уровень жизни (HP): +60",
+      "10: Мф. против увертывания (%): +43",
+      "Мф. против критического удара (%): +43",
+      "Защита от магии: +30",
+      "Уровень жизни (HP): +60",
+      "12: Мф. против увертывания (%): +43",
+      "Мф. против критического удара (%): +43",
+      "Защита от магии: +30",
+      "Уровень жизни (HP): +120",
+      "При успешном блоке, с вероятностью 10% восстанавливает здоровье (%): +2"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/belt37.gif",
+    "imageFileName": "belt37.gif",
+    "rawText": "Пояс Забытых Времен [11]\n\n (Масса: 2.00)\nЦена: 168.00 кр.\nДолговечность: 0/50\nТребуется минимальное:\n• Уровень: 10\n• Сила: 45\n• Ловкость: 15\n• Интуиция: 15\n• Выносливость: 65\nДействует на:\n• Уровень жизни (HP): +133\n• Защита от дробящего урона: +28\n• Защита от магии: +28\n• Броня пояса: 23-88\nДополнительная информация:\n• Часть комплекта: Комплект Забытых Времен [10]• 5: Мф. против увертывания (%): +35\n Мф. против критического удара (%): +30\n• 8: Мф. против увертывания (%): +43\n Мф. против критического удара (%): +43\n Уровень жизни (HP): +60\n• 10: Мф. против увертывания (%): +43\n Мф. против критического удара (%): +43\n Защита от магии: +30\n Уровень жизни (HP): +60\n• 12: Мф. против увертывания (%): +43\n Мф. против критического удара (%): +43\n Защита от магии: +30\n Уровень жизни (HP): +120\n При успешном блоке, с вероятностью 10% восстанавливает здоровье (%): +2"
+  },
+  {
+    "itemId": 7295,
+    "name": "Пояс Забытых Времен (старый) [11]",
+    "categoryGroup": "armor",
+    "categoryKey": "belts",
+    "slot": "belt",
+    "weaponFamily": null,
+    "sourceFile": "armor_belts.html",
+    "mass": 2,
+    "prices": {
+      "кр": 168
+    },
+    "durability": {
+      "current": 0,
+      "max": 50
+    },
+    "requirements": [
+      "Уровень: 10",
+      "Сила: 45",
+      "Ловкость: 15",
+      "Интуиция: 15",
+      "Выносливость: 65"
+    ],
+    "effects": [
+      "Уровень жизни (HP): +133",
+      "Защита от дробящего урона: +28",
+      "Защита от магии: +28",
+      "Броня пояса: 23-88"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/belt37.gif",
+    "imageFileName": "belt37.gif",
+    "rawText": "Пояс Забытых Времен (старый) [11]\n\n (Масса: 2.00)\nЦена: 168.00 кр.\nДолговечность: 0/50\nТребуется минимальное:\n• Уровень: 10\n• Сила: 45\n• Ловкость: 15\n• Интуиция: 15\n• Выносливость: 65\nДействует на:\n• Уровень жизни (HP): +133\n• Защита от дробящего урона: +28\n• Защита от магии: +28\n• Броня пояса: 23-88"
+  },
+  {
+    "itemId": 7299,
+    "name": "Пояс Скорпиона [11]",
+    "categoryGroup": "armor",
+    "categoryKey": "belts",
+    "slot": "belt",
+    "weaponFamily": null,
+    "sourceFile": "armor_belts.html",
+    "mass": 1,
+    "prices": {
+      "кр": 168
+    },
+    "durability": {
+      "current": 0,
+      "max": 50
+    },
+    "requirements": [
+      "Уровень: 10",
+      "Сила: 35",
+      "Ловкость: 15",
+      "Интуиция: 60",
+      "Выносливость: 50"
+    ],
+    "effects": [
+      "Уровень жизни (HP): +43",
+      "Мф. против критического удара (%): +72",
+      "Защита от урона: +33",
+      "Защита от магии: +22",
+      "Броня пояса: 23-77",
+      "Дополнительная информация:",
+      "Часть комплекта: Комплект Скорпиона [10]• 5: Защита от магии: +30",
+      "8: Мф. против критического удара (%): +60",
+      "Уровень жизни (HP): +30",
+      "10: Мф. критического удара (%): +60",
+      "Уровень жизни (HP): +40",
+      "12: При ударе, с вероятностью 33% добавляет тактики крови : +1"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/belt44.gif",
+    "imageFileName": "belt44.gif",
+    "rawText": "Пояс Скорпиона [11]\n\n (Масса: 1.00)\nЦена: 168.00 кр.\nДолговечность: 0/50\nТребуется минимальное:\n• Уровень: 10\n• Сила: 35\n• Ловкость: 15\n• Интуиция: 60\n• Выносливость: 50\nДействует на:\n• Уровень жизни (HP): +43\n• Мф. против критического удара (%): +72\n• Защита от урона: +33\n• Защита от магии: +22\n• Броня пояса: 23-77\nДополнительная информация:\n• Часть комплекта: Комплект Скорпиона [10]• 5: Защита от магии: +30\n• 8: Мф. против критического удара (%): +60\n Уровень жизни (HP): +30\n• 10: Мф. критического удара (%): +60\n Уровень жизни (HP): +40\n• 12: При ударе, с вероятностью 33% добавляет тактики крови : +1"
+  },
+  {
+    "itemId": 7307,
+    "name": "Пояс Забытых Времен (старый) [11]",
+    "categoryGroup": "armor",
+    "categoryKey": "belts",
+    "slot": "belt",
+    "weaponFamily": null,
+    "sourceFile": "armor_belts.html",
+    "mass": 2,
+    "prices": {
+      "кр": 168
+    },
+    "durability": {
+      "current": 0,
+      "max": 50
+    },
+    "requirements": [
+      "Уровень: 10",
+      "Сила: 45",
+      "Ловкость: 15",
+      "Интуиция: 15",
+      "Выносливость: 65"
+    ],
+    "effects": [
+      "Уровень жизни (HP): +133",
+      "Защита от дробящего урона: +28",
+      "Защита от магии: +28",
+      "Броня пояса: 23-88"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/belt37.gif",
+    "imageFileName": "belt37.gif",
+    "rawText": "Пояс Забытых Времен (старый) [11]\n\n (Масса: 2.00)\nЦена: 168.00 кр.\nДолговечность: 0/50\nТребуется минимальное:\n• Уровень: 10\n• Сила: 45\n• Ловкость: 15\n• Интуиция: 15\n• Выносливость: 65\nДействует на:\n• Уровень жизни (HP): +133\n• Защита от дробящего урона: +28\n• Защита от магии: +28\n• Броня пояса: 23-88"
+  },
+  {
+    "itemId": 7308,
+    "name": "Пояс Забытых Времен (старый) [11]",
+    "categoryGroup": "armor",
+    "categoryKey": "belts",
+    "slot": "belt",
+    "weaponFamily": null,
+    "sourceFile": "armor_belts.html",
+    "mass": 2,
+    "prices": {
+      "кр": 168
+    },
+    "durability": {
+      "current": 0,
+      "max": 50
+    },
+    "requirements": [
+      "Уровень: 10",
+      "Сила: 45",
+      "Ловкость: 15",
+      "Интуиция: 15",
+      "Выносливость: 65"
+    ],
+    "effects": [
+      "Уровень жизни (HP): +133",
+      "Защита от дробящего урона: +28",
+      "Защита от магии: +28",
+      "Броня пояса: 23-88"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/belt37.gif",
+    "imageFileName": "belt37.gif",
+    "rawText": "Пояс Забытых Времен (старый) [11]\n\n (Масса: 2.00)\nЦена: 168.00 кр.\nДолговечность: 0/50\nТребуется минимальное:\n• Уровень: 10\n• Сила: 45\n• Ловкость: 15\n• Интуиция: 15\n• Выносливость: 65\nДействует на:\n• Уровень жизни (HP): +133\n• Защита от дробящего урона: +28\n• Защита от магии: +28\n• Броня пояса: 23-88"
+  },
+  {
+    "itemId": 7309,
+    "name": "Пояс Забытых Времен (старый) [11]",
+    "categoryGroup": "armor",
+    "categoryKey": "belts",
+    "slot": "belt",
+    "weaponFamily": null,
+    "sourceFile": "armor_belts.html",
+    "mass": 2,
+    "prices": {
+      "кр": 168
+    },
+    "durability": {
+      "current": 0,
+      "max": 50
+    },
+    "requirements": [
+      "Уровень: 10",
+      "Сила: 45",
+      "Ловкость: 15",
+      "Интуиция: 15",
+      "Выносливость: 65"
+    ],
+    "effects": [
+      "Уровень жизни (HP): +133",
+      "Защита от дробящего урона: +28",
+      "Защита от магии: +28",
+      "Броня пояса: 23-88"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/belt37.gif",
+    "imageFileName": "belt37.gif",
+    "rawText": "Пояс Забытых Времен (старый) [11]\n\n (Масса: 2.00)\nЦена: 168.00 кр.\nДолговечность: 0/50\nТребуется минимальное:\n• Уровень: 10\n• Сила: 45\n• Ловкость: 15\n• Интуиция: 15\n• Выносливость: 65\nДействует на:\n• Уровень жизни (HP): +133\n• Защита от дробящего урона: +28\n• Защита от магии: +28\n• Броня пояса: 23-88"
+  },
+  {
+    "itemId": 7310,
+    "name": "Пояс Забытых Времен (старый) [11]",
+    "categoryGroup": "armor",
+    "categoryKey": "belts",
+    "slot": "belt",
+    "weaponFamily": null,
+    "sourceFile": "armor_belts.html",
+    "mass": 2,
+    "prices": {
+      "кр": 168
+    },
+    "durability": {
+      "current": 0,
+      "max": 50
+    },
+    "requirements": [
+      "Уровень: 10",
+      "Сила: 45",
+      "Ловкость: 15",
+      "Интуиция: 15",
+      "Выносливость: 65"
+    ],
+    "effects": [
+      "Уровень жизни (HP): +133",
+      "Защита от дробящего урона: +28",
+      "Защита от магии: +28",
+      "Броня пояса: 23-88"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/belt37.gif",
+    "imageFileName": "belt37.gif",
+    "rawText": "Пояс Забытых Времен (старый) [11]\n\n (Масса: 2.00)\nЦена: 168.00 кр.\nДолговечность: 0/50\nТребуется минимальное:\n• Уровень: 10\n• Сила: 45\n• Ловкость: 15\n• Интуиция: 15\n• Выносливость: 65\nДействует на:\n• Уровень жизни (HP): +133\n• Защита от дробящего урона: +28\n• Защита от магии: +28\n• Броня пояса: 23-88"
+  },
+  {
+    "itemId": 7315,
+    "name": "Пояс Решимости [11]",
+    "categoryGroup": "armor",
+    "categoryKey": "belts",
+    "slot": "belt",
+    "weaponFamily": null,
+    "sourceFile": "armor_belts.html",
+    "mass": 1,
+    "prices": {
+      "кр": 168
+    },
+    "durability": {
+      "current": 0,
+      "max": 50
+    },
+    "requirements": [
+      "Уровень: 10",
+      "Сила: 10",
+      "Интеллект: 50",
+      "Мудрость: 60"
+    ],
+    "effects": [
+      "Понижение защиты от магии: +2",
+      "Интеллект: +2",
+      "Уровень жизни (HP): +24",
+      "Уровень маны: +165",
+      "Броня пояса: 7-22",
+      "Дополнительная информация:",
+      "Часть комплекта: Комплект Решимости [10]• 3: Мф. мощности магии стихий: +12",
+      "5: Понижение защиты от магии: +2",
+      "7: При касте, с вероятностью 5% увеличивает ваш мф. мощности магии стихий на следующий каст (%): +50"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/belt39.gif",
+    "imageFileName": "belt39.gif",
+    "rawText": "Пояс Решимости [11]\n\n (Масса: 1.00)\nЦена: 168.00 кр.\nДолговечность: 0/50\nТребуется минимальное:\n• Уровень: 10\n• Сила: 10\n• Интеллект: 50\n• Мудрость: 60\nДействует на:\n• Понижение защиты от магии: +2\n• Интеллект: +2\n• Уровень жизни (HP): +24\n• Уровень маны: +165\n• Броня пояса: 7-22\nДополнительная информация:\n• Часть комплекта: Комплект Решимости [10]• 3: Мф. мощности магии стихий: +12\n• 5: Понижение защиты от магии: +2\n• 7: При касте, с вероятностью 5% увеличивает ваш мф. мощности магии стихий на следующий каст (%): +50"
+  },
+  {
+    "itemId": 7329,
+    "name": "Пояс Утреннего Солнца [11]",
+    "categoryGroup": "armor",
+    "categoryKey": "belts",
+    "slot": "belt",
+    "weaponFamily": null,
+    "sourceFile": "armor_belts.html",
+    "mass": 1,
+    "prices": {
+      "кр": 168
+    },
+    "durability": {
+      "current": 0,
+      "max": 50
+    },
+    "requirements": [
+      "Уровень: 10",
+      "Сила: 45",
+      "Ловкость: 30",
+      "Интуиция: 30",
+      "Выносливость: 45"
+    ],
+    "effects": [
+      "Сила: +4",
+      "Уровень жизни (HP): +46",
+      "Мф. против критического удара (%): +44",
+      "Защита от урона: +33",
+      "Защита от магии огня: +22",
+      "Защита от магии воды: -11",
+      "Броня пояса: 23-83",
+      "Дополнительная информация:",
+      "Часть комплекта: Комплект Утреннего Солнца [10]• 5: Мф. против критического удара (%): +60",
+      "8: Мф. мощности урона: +12",
+      "10: Защита от магии: +55",
+      "Мф. мощности урона: +10",
+      "12: При парировании, с вероятностью 25% на два хода увеличивает ваш мф. против критического удара и мф. против увертывания: +300"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/belt38_du2.gif",
+    "imageFileName": "belt38_du2.gif",
+    "rawText": "Пояс Утреннего Солнца [11]\n\n (Масса: 1.00)\nЦена: 168.00 кр.\nДолговечность: 0/50\nТребуется минимальное:\n• Уровень: 10\n• Сила: 45\n• Ловкость: 30\n• Интуиция: 30\n• Выносливость: 45\nДействует на:\n• Сила: +4\n• Уровень жизни (HP): +46\n• Мф. против критического удара (%): +44\n• Защита от урона: +33\n• Защита от магии огня: +22\n• Защита от магии воды: -11\n• Броня пояса: 23-83\nДополнительная информация:\n• Часть комплекта: Комплект Утреннего Солнца [10]• 5: Мф. против критического удара (%): +60\n• 8: Мф. мощности урона: +12\n• 10: Защита от магии: +55\n Мф. мощности урона: +10\n• 12: При парировании, с вероятностью 25% на два хода увеличивает ваш мф. против критического удара и мф. против увертывания: +300"
+  },
+  {
+    "itemId": 7330,
+    "name": "Пояс Забытых Времен (старый) [11]",
+    "categoryGroup": "armor",
+    "categoryKey": "belts",
+    "slot": "belt",
+    "weaponFamily": null,
+    "sourceFile": "armor_belts.html",
+    "mass": 2,
+    "prices": {
+      "кр": 168
+    },
+    "durability": {
+      "current": 0,
+      "max": 50
+    },
+    "requirements": [
+      "Уровень: 10",
+      "Сила: 45",
+      "Ловкость: 15",
+      "Интуиция: 15",
+      "Выносливость: 65"
+    ],
+    "effects": [
+      "Уровень жизни (HP): +133",
+      "Защита от дробящего урона: +28",
+      "Защита от магии: +28",
+      "Броня пояса: 23-88"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/belt37.gif",
+    "imageFileName": "belt37.gif",
+    "rawText": "Пояс Забытых Времен (старый) [11]\n\n (Масса: 2.00)\nЦена: 168.00 кр.\nДолговечность: 0/50\nТребуется минимальное:\n• Уровень: 10\n• Сила: 45\n• Ловкость: 15\n• Интуиция: 15\n• Выносливость: 65\nДействует на:\n• Уровень жизни (HP): +133\n• Защита от дробящего урона: +28\n• Защита от магии: +28\n• Броня пояса: 23-88"
+  },
+  {
+    "itemId": 7331,
+    "name": "Пояс Забытых Времен (старый) [11]",
+    "categoryGroup": "armor",
+    "categoryKey": "belts",
+    "slot": "belt",
+    "weaponFamily": null,
+    "sourceFile": "armor_belts.html",
+    "mass": 2,
+    "prices": {
+      "кр": 168
+    },
+    "durability": {
+      "current": 0,
+      "max": 50
+    },
+    "requirements": [
+      "Уровень: 10",
+      "Сила: 45",
+      "Ловкость: 15",
+      "Интуиция: 15",
+      "Выносливость: 65"
+    ],
+    "effects": [
+      "Уровень жизни (HP): +133",
+      "Защита от дробящего урона: +28",
+      "Защита от магии: +28",
+      "Броня пояса: 23-88"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/belt37.gif",
+    "imageFileName": "belt37.gif",
+    "rawText": "Пояс Забытых Времен (старый) [11]\n\n (Масса: 2.00)\nЦена: 168.00 кр.\nДолговечность: 0/50\nТребуется минимальное:\n• Уровень: 10\n• Сила: 45\n• Ловкость: 15\n• Интуиция: 15\n• Выносливость: 65\nДействует на:\n• Уровень жизни (HP): +133\n• Защита от дробящего урона: +28\n• Защита от магии: +28\n• Броня пояса: 23-88"
+  },
+  {
+    "itemId": 7332,
+    "name": "Пояс Забытых Времен (старый) [11]",
+    "categoryGroup": "armor",
+    "categoryKey": "belts",
+    "slot": "belt",
+    "weaponFamily": null,
+    "sourceFile": "armor_belts.html",
+    "mass": 2,
+    "prices": {
+      "кр": 168
+    },
+    "durability": {
+      "current": 0,
+      "max": 50
+    },
+    "requirements": [
+      "Уровень: 10",
+      "Сила: 45",
+      "Ловкость: 15",
+      "Интуиция: 15",
+      "Выносливость: 65"
+    ],
+    "effects": [
+      "Уровень жизни (HP): +133",
+      "Защита от дробящего урона: +28",
+      "Защита от магии: +28",
+      "Броня пояса: 23-88"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/belt37.gif",
+    "imageFileName": "belt37.gif",
+    "rawText": "Пояс Забытых Времен (старый) [11]\n\n (Масса: 2.00)\nЦена: 168.00 кр.\nДолговечность: 0/50\nТребуется минимальное:\n• Уровень: 10\n• Сила: 45\n• Ловкость: 15\n• Интуиция: 15\n• Выносливость: 65\nДействует на:\n• Уровень жизни (HP): +133\n• Защита от дробящего урона: +28\n• Защита от магии: +28\n• Броня пояса: 23-88"
+  },
+  {
+    "itemId": 7333,
+    "name": "Пояс Забытых Времен (старый) [11]",
+    "categoryGroup": "armor",
+    "categoryKey": "belts",
+    "slot": "belt",
+    "weaponFamily": null,
+    "sourceFile": "armor_belts.html",
+    "mass": 2,
+    "prices": {
+      "кр": 168
+    },
+    "durability": {
+      "current": 0,
+      "max": 50
+    },
+    "requirements": [
+      "Уровень: 10",
+      "Сила: 45",
+      "Ловкость: 15",
+      "Интуиция: 15",
+      "Выносливость: 65"
+    ],
+    "effects": [
+      "Уровень жизни (HP): +133",
+      "Защита от дробящего урона: +28",
+      "Защита от магии: +28",
+      "Броня пояса: 23-88",
+      "Предметы",
+      "Амуниция",
+      "&middot; Костыли",
+      "&middot; Эликсиры и еда",
+      "Заклинания",
+      "&middot; Заклинания",
+      "Одежда",
+      "&middot; Тяжелая броня",
+      "&middot; Легкая броня",
+      "&middot; Венки",
+      "&middot; Наручи",
+      "&middot; Обувь",
+      "&middot; Перчатки",
+      "&middot; Плащи",
+      "&middot; Поножи",
+      "&middot; Пояса",
+      "&middot; Рубахи",
+      "&middot; Шлемы",
+      "Оружие",
+      "&middot; Ёлки",
+      "&middot; Дубины",
+      "&middot; Кинжалы",
+      "&middot; Мечи",
+      "&middot; Топоры",
+      "&middot; Посохи",
+      "&middot; Цветы и Букеты",
+      "Разное",
+      "&middot; Компоненты",
+      "Магические предметы",
+      "->",
+      "&middot; Подарки",
+      "&middot; Руны",
+      "&middot; Прочие предметы",
+      "Щиты",
+      "&middot; Щиты",
+      "Ювелирные товары",
+      "&middot; Кольца",
+      "&middot; Ожерелья",
+      "&middot; Серьги",
+      "Copyright © 2026 «www.battlekings.club»",
+      "/*",
+      "$( document ).ready(function() {",
+      "$('#libFilterName').keypress(function() {",
+      "$('.libItem').show();",
+      "$('.libItem').each(function () {",
+      "console.log($(this).find('.itemName'));",
+      "});",
+      "});",
+      "});",
+      "/",
+      "function hideshow() {",
+      "document.getElementById(\"mmoves\").style.visibility = \"hidden\"",
+      "}",
+      "function fastshow(a, event) {",
+      "var b = document.getElementById(\"mmoves\"), d = (typeof(event) != 'undefined' ? event.target : window.event.srcElement);",
+      "if (a != \"\" && b.style.visibility != \"visible\")",
+      "b.innerHTML = \"\" + a + \"\";",
+      "a = (typeof(event) != 'undefined' ? event.clientY : window.event.clientY) + document.documentElement.scrollTop + document.body.scrollTop + 5;",
+      "b.style.left = (typeof(event) != 'undefined' ? event.clientX : window.event.clientX) + document.documentElement.scrollLeft + document.body.scrollLeft + 10 + \"px\";",
+      "b.style.top = a + \"px\";",
+      "if (b.style.visibility != \"visible\")",
+      "b.style.visibility = \"visible\"",
+      "}"
+    ],
+    "properties": [],
+    "features": [],
+    "imageSrc": "https://img.battlekings.club/i/items/belt37.gif",
+    "imageFileName": "belt37.gif",
+    "rawText": "Пояс Забытых Времен (старый) [11]\n\n (Масса: 2.00)\nЦена: 168.00 кр.\nДолговечность: 0/50\nТребуется минимальное:\n• Уровень: 10\n• Сила: 45\n• Ловкость: 15\n• Интуиция: 15\n• Выносливость: 65\nДействует на:\n• Уровень жизни (HP): +133\n• Защита от дробящего урона: +28\n• Защита от магии: +28\n• Броня пояса: 23-88\n\nПредметы\n\nАмуниция\n\n &middot; Костыли\n\n &middot; Эликсиры и еда\n\nЗаклинания\n\n &middot; Заклинания\n\nОдежда\n\n &middot; Тяжелая броня\n\n &middot; Легкая броня\n\n &middot; Венки\n\n &middot; Наручи\n\n &middot; Обувь\n\n &middot; Перчатки\n\n &middot; Плащи\n\n &middot; Поножи\n\n &middot; Пояса\n\n &middot; Рубахи\n\n &middot; Шлемы\n\nОружие\n\n &middot; Ёлки\n\n &middot; Дубины\n\n &middot; Кинжалы\n\n &middot; Мечи\n\n &middot; Топоры\n\n &middot; Посохи\n\n &middot; Цветы и Букеты\n\nРазное\n\n &middot; Компоненты\n\n Магические предметы\n-->\n &middot; Подарки\n\n &middot; Руны\n\n &middot; Прочие предметы\n\nЩиты\n\n &middot; Щиты\n\nЮвелирные товары\n\n &middot; Кольца\n\n &middot; Ожерелья\n\n &middot; Серьги\n\n Copyright © 2026 «www.battlekings.club»\n\n /*\n $( document ).ready(function() {\n $('#libFilterName').keypress(function() {\n $('.libItem').show();\n $('.libItem').each(function () {\n console.log($(this).find('.itemName'));\n });\n });\n });\n */\n\n function hideshow() {\n document.getElementById(\"mmoves\").style.visibility = \"hidden\"\n }\n function fastshow(a, event) {\n var b = document.getElementById(\"mmoves\"), d = (typeof(event) != 'undefined' ? event.target : window.event.srcElement);\n if (a != \"\" && b.style.visibility != \"visible\")\n b.innerHTML = \"\" + a + \"\";\n a = (typeof(event) != 'undefined' ? event.clientY : window.event.clientY) + document.documentElement.scrollTop + document.body.scrollTop + 5;\n b.style.left = (typeof(event) != 'undefined' ? event.clientX : window.event.clientX) + document.documentElement.scrollLeft + document.body.scrollLeft + 10 + \"px\";\n b.style.top = a + \"px\";\n if (b.style.visibility != \"visible\")\n b.style.visibility = \"visible\"\n }"
+  }
+]

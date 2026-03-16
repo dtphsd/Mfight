@@ -1,0 +1,57 @@
+{
+  "generatedAt": "2026-03-15T21:50:43.830Z",
+  "rootDir": "BazaBK/pages",
+  "totalItems": 947,
+  "categories": {
+    "armor/belts": {
+      "count": 98,
+      "firstItemId": 177,
+      "lastItemId": 7333
+    },
+    "armor/boots": {
+      "count": 94,
+      "firstItemId": 257,
+      "lastItemId": 7525
+    },
+    "armor/bracers": {
+      "count": 82,
+      "firstItemId": 163,
+      "lastItemId": 7526
+    },
+    "armor/gloves": {
+      "count": 88,
+      "firstItemId": 268,
+      "lastItemId": 7322
+    },
+    "armor/helms": {
+      "count": 160,
+      "firstItemId": 135,
+      "lastItemId": 7337
+    },
+    "armor/legs": {
+      "count": 58,
+      "firstItemId": 73,
+      "lastItemId": 7323
+    },
+    "weapons/axes": {
+      "count": 91,
+      "firstItemId": 115,
+      "lastItemId": 7380
+    },
+    "weapons/blunts": {
+      "count": 92,
+      "firstItemId": 139,
+      "lastItemId": 7370
+    },
+    "weapons/knives": {
+      "count": 68,
+      "firstItemId": 103,
+      "lastItemId": 7514
+    },
+    "weapons/swords": {
+      "count": 116,
+      "firstItemId": 6,
+      "lastItemId": 7378
+    }
+  }
+}

@@ -1,11 +1,11 @@
 # PROJECT-INFO - Fight Club
 
-> Last updated: 2026-03-15 20:32 MSK
+> Last updated: 2026-03-16 02:35 MSK
 
 **Project:** Fight Club  
 **Type:** browser-only SPA / combat sandbox  
 **Stack:** React 19, TypeScript, Vite, Vitest, ESLint, Zod  
-**Current state:** working combat sandbox with item skills, weapon passives, consumables, stackable timed status effects, a rich combat log, and a combat rules reference screen
+**Current state:** working combat sandbox with Battle Kings item imports, zone-based armor, cooldown-aware item skills, consumables, stackable timed status effects, a rich combat log, and a combat rules reference screen
 
 ---
 
@@ -31,6 +31,7 @@ The app root now also contains a local planning workflow:
 - `fight-club/docs/architecture/hunting-mvp-blueprint.md` as the original architecture blueprint for the autonomous hunting module
 - `fight-club/docs/architecture/hunting-runtime-reference.md` as the live hunting runtime reference and verification guide
 - `fight-club/ART/Avatars/` as the raw character-art source folder for combat silhouettes
+- `fight-club/BazaBK/` as the local Battle Kings HTML/image/catalog workspace
 
 It has:
 
@@ -75,10 +76,11 @@ The app now also has a second live flow:
 
 - stack / non-stack inventory
 - direct equip from inventory popover
-- slot-based equipment with `mainHand / offHand / helmet / armor / gloves / boots / accessory`
+- slot-based equipment with `mainHand / offHand / helmet / shirt / armor / bracers / gloves / belt / pants / boots / ring / ring2 / earring`
 - support for `one_hand`, `two_hand`, and `off_hand_only`
 - item-driven `skills[]`
 - consumables with direct effects and timed combat effects
+- generated Battle Kings combat items replacing the old handcrafted training-item pool
 
 ### Hunting Module
 
@@ -114,8 +116,11 @@ The app now also has a second live flow:
   - `momentum`
   - `focus`
 - item skills with resource costs
+- runtime skill cooldown tracking
 - consumables inside round flow
 - weapon-class passive effects on hit or crit
+- zone-based armor mitigation on defended hits
+- random damage and armor ranges
 - timed combat effects:
   - buffs
   - debuffs
@@ -163,7 +168,9 @@ Effects are visible:
 - skill loadout popover
 - local profile mail icon with a mailbox mini modal for inbox reading, quick replies, and direct letters from another profile card
 - curated build presets now also switch the active combat silhouette to a matching character avatar
+- inventory now uses an MMO-style bag grid with a paper-doll equipment view
 - combat silhouette impact overlays now use one-shot pulses plus latched active-impact rendering so damage text and block/crit/break visuals do not reappear after fading out
+- penetration now has its own dedicated `PIERCE` impact treatment
 - rich hover cards for equipped items and inventory/equipment cards
 - prominent `Weapon Passive` block on weapon cards
 - prominent `Signature Skill` block on item cards and preset equipment previews
@@ -202,6 +209,13 @@ There is also a dedicated balance runner:
 - runs ordered preset matchups with configurable `runs`, `max-rounds`, and planner difficulty
 - reflects sandbox parity mode where the right preset is clipped to the left preset stat budget
 
+### Battle Kings Data Pipeline
+
+- `BazaBK/` now stores normalized local HTML pages, item images, parsed category dumps, and summary metadata
+- `npm run baza:parse` parses normalized local Battle Kings pages into JSON catalog artifacts
+- `npm run baza:generate-items` builds the live starter item pool from parsed Battle Kings data
+- the active combat item pool now resolves from generated `bk-item-*` content instead of the old `training-*` legacy set
+
 ### Combat Rules Screen
 
 - implemented reference screen
@@ -219,6 +233,7 @@ There is also a dedicated balance runner:
 - `fight-club/src/modules/combat/application/resolveRound.ts`
 - `fight-club/src/modules/combat/application/startCombat.ts`
 - `fight-club/src/modules/combat/model/CombatEffect.ts`
+- `fight-club/src/modules/combat/model/CombatantState.ts`
 - `fight-club/src/modules/combat/model/RoundAction.ts`
 - `fight-club/src/modules/combat/model/RoundResult.ts`
 - `fight-club/src/modules/combat/config/combatWeaponPassives.ts`
@@ -234,6 +249,9 @@ There is also a dedicated balance runner:
 - `fight-club/src/ui/components/combat/ItemPresentationCard.tsx`
 - `fight-club/src/ui/components/combat/BuildPresetsPopover.tsx`
 - `fight-club/src/content/items/starterItems.ts`
+- `fight-club/src/content/items/generatedBattleKingsStarterItems.ts`
+- `fight-club/scripts/parse-bazakbk-pages.mjs`
+- `fight-club/scripts/generate-bazakbk-starter-items.mjs`
 - `fight-club/src/modules/hunting/application/startHunt.ts`
 - `fight-club/src/modules/hunting/application/resolveHunt.ts`
 - `fight-club/src/modules/hunting/application/claimHuntRewards.ts`
@@ -252,7 +270,6 @@ There is also a dedicated balance runner:
 
 - no server trust boundary
 - no multiplayer
-- no cooldown system
 - bot now uses build-aware skill planning, but still does not use consumables
 - sandbox bot stat allocations are clipped to the current player allocation budget
 - persistence still means browser `localStorage`, not a real save profile system
@@ -290,10 +307,12 @@ Current validated state:
 - `npm run docs:validate` passes
 - `npm run lint` passes
 - `npm run balance:matrix` passes and writes the current matchup matrix to `fight-club/docs/balance/`
+- `npm run baza:parse` passes
+- `npm run baza:generate-items` passes
 
 Current automated coverage count:
 
-- `21` test files / `143` tests
+- `22` test files / `127` tests
 
 ---
 
@@ -319,4 +338,4 @@ From repo root:
 
 ---
 
-> Last updated: 2026-03-15 20:32 MSK
+> Last updated: 2026-03-16 02:35 MSK

@@ -15,7 +15,9 @@
     "docs:preview": "vitepress preview docs",
     "docs:validate": "node scripts/validate-content.mjs",
     "generate:module": "node scripts/generate-module.mjs",
-    "balance:matrix": "node scripts/run-build-matrix.cjs"
+    "balance:matrix": "node scripts/run-build-matrix.cjs",
+    "baza:parse": "node scripts/parse-bazakbk-pages.mjs",
+    "baza:generate-items": "node scripts/generate-bazakbk-starter-items.mjs"
   },
   "dependencies": {
     "react": "^19.0.0",

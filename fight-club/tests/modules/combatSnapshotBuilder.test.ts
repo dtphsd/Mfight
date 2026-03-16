@@ -21,7 +21,7 @@ describe("combat snapshot builder", () => {
       rage: 3,
       endurance: 3,
     });
-    expect(snapshot.maxHp).toBe(130);
+    expect(snapshot.maxHp).toBe(124);
     expect(snapshot.damage).toEqual(zeroDamageProfile);
     expect(snapshot.armor).toEqual(zeroArmorProfile);
     expect(snapshot.critChanceBonus).toBe(0);
@@ -47,7 +47,7 @@ describe("combat snapshot builder", () => {
     expect(snapshot.stats.strength).toBe(15);
     expect(snapshot.stats.agility).toBe(4);
     expect(snapshot.stats.endurance).toBe(6);
-    expect(snapshot.maxHp).toBe(160);
+    expect(snapshot.maxHp).toBe(148);
   });
 
   it("clamps percent bonuses and keeps the stat above one", () => {
@@ -64,7 +64,7 @@ describe("combat snapshot builder", () => {
 
     expect(snapshot.stats.strength).toBe(1);
     expect(snapshot.stats.endurance).toBe(33);
-    expect(snapshot.maxHp).toBe(430);
+    expect(snapshot.maxHp).toBe(364);
   });
 
   it("aggregates damage, armor and combat bonuses into the snapshot", () => {

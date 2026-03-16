@@ -4,9 +4,18 @@ title: Gameplay
 
 # Gameplay
 
-> Last updated: 2026-03-14 12:41 MSK
+> Last updated: 2026-03-16 02:42 MSK
 
 This section is the fastest path for understanding how the game is meant to feel and what player-facing combat behavior currently exists.
+
+The current gameplay baseline now includes:
+
+- generated Battle Kings combat items
+- zone-based armor and defended-zone weighting
+- random damage and armor ranges
+- roll-based block reduction in the `40-70%` band
+- cooldown-aware item skills
+- synchronized `Combat Rules` content in both `ru` and `en`
 
 Use it when you are balancing, tuning combat clarity, reviewing rules text, or checking whether runtime behavior still matches the product experience.
 
@@ -44,13 +53,15 @@ Use it when you are balancing, tuning combat clarity, reviewing rules text, or c
 
 1. [Combat Design Reference](../architecture/combat-design-reference.md)
 2. `docs/balance/latest-build-matrix.md`
-3. [Combat System Roadmap](../architecture/combat-system-roadmap.md)
+3. `BazaBK/parsed/summary.json`
+4. [Combat System Roadmap](../architecture/combat-system-roadmap.md)
 
 ### For Player-Facing Rule Clarity
 
 1. [Combat Design Reference](../architecture/combat-design-reference.md)
 2. `src/ui/screens/CombatRules/`
-3. [Architecture Overview](../architecture/overview.md)
+3. `src/ui/components/combat/ItemPresentationCard.tsx`
+4. [Architecture Overview](../architecture/overview.md)
 
 ### For Bot And Difficulty Tuning
 
@@ -63,6 +74,7 @@ Use it when you are balancing, tuning combat clarity, reviewing rules text, or c
 ## Common Gameplay Tasks
 
 - checking whether combat rules text still matches live runtime behavior
+- checking whether Battle Kings imports still match the intended early-game combat feel
 - validating whether a balance change should also update `Combat Rules`
 - reviewing whether the bot still feels fair after formula or content changes
 - tracing player-facing confusion back to runtime sequencing or resource rules
@@ -80,6 +92,10 @@ Use it when you are balancing, tuning combat clarity, reviewing rules text, or c
 - content and presets:
   - `src/content/items/`
   - `src/orchestration/combat/combatSandboxConfigs.ts`
+- Battle Kings source pipeline:
+  - `BazaBK/`
+  - `scripts/parse-bazakbk-pages.mjs`
+  - `scripts/generate-bazakbk-starter-items.mjs`
 
 ---
 
@@ -91,4 +107,4 @@ Use it when you are balancing, tuning combat clarity, reviewing rules text, or c
 
 ---
 
-> Last updated: 2026-03-14 12:41 MSK
+> Last updated: 2026-03-16 02:42 MSK

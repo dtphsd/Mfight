@@ -2,29 +2,6 @@ import { starterItems } from "@/content/items/starterItems";
 
 import type { Locale, RuleSection, RuleTone } from "./types";
 
-const showcasedItemCodes = [
-  "training-sword",
-  "training-dagger",
-  "training-mace",
-  "sparring-axe",
-  "oak-shield",
-  "great-training-sword",
-] as const;
-
-type ShowcasedItemCode = (typeof showcasedItemCodes)[number];
-
-const showcasedSkillItemCodes = [
-  ...showcasedItemCodes,
-  "leather-cap",
-  "leather-vest",
-  "chain-jacket",
-  "braced-gloves",
-  "trail-boots",
-  "duelist-charm",
-  "arena-earring",
-  "war-medallion",
-] as const;
-
 const resourceToneByType: Record<string, RuleTone> = {
   momentum: "strength",
   focus: "agility",
@@ -33,15 +10,16 @@ const resourceToneByType: Record<string, RuleTone> = {
 };
 
 function getShowcasedItems() {
-  return showcasedItemCodes
-    .map((code) => starterItems.find((entry) => entry.item.code === code)?.item)
-    .filter((item) => item !== undefined);
+  return starterItems
+    .map((entry) => entry.item)
+    .filter((item) => item.type === "weapon")
+    .slice(0, 6);
 }
 
 function getShowcasedSkillItems() {
-  return showcasedSkillItemCodes
-    .map((code) => starterItems.find((entry) => entry.item.code === code)?.item)
-    .filter((item) => item !== undefined);
+  return starterItems
+    .map((entry) => entry.item)
+    .filter((item) => (item.skills?.length ?? 0) > 0);
 }
 
 function formatDamageProfilePercent(
@@ -79,18 +57,16 @@ function formatSkillCost(resourceType: string, cost: number) {
   return `${cost} ${resourceType[0].toUpperCase()}${resourceType.slice(1)}`;
 }
 
-function getItemTone(code: ShowcasedItemCode): RuleTone {
-  switch (code) {
-    case "training-sword":
-    case "great-training-sword":
-    case "training-mace":
-    case "sparring-axe":
-      return "strength";
-    case "training-dagger":
-      return "agility";
-    case "oak-shield":
-      return "armor";
+function getItemTone(item: { type: string; equip?: { weaponClass?: string } | null }): RuleTone {
+  if (item.type === "helmet" || item.type === "bracers" || item.type === "belt" || item.type === "pants" || item.type === "boots" || item.type === "gloves") {
+    return "armor";
   }
+
+  if (item.equip?.weaponClass === "dagger") {
+    return "agility";
+  }
+
+  return "strength";
 }
 
 export function createStarterItemRows(locale: Locale) {
@@ -123,10 +99,65 @@ export function createStarterSkillCallouts(locale: Locale) {
     .flatMap((item) =>
       (item.skills ?? []).map((skill) => ({
         label: skill.name,
-        value: `${skill.cost} ${skill.resourceType[0].toUpperCase()}${skill.resourceType.slice(1)}, x${skill.damageMultiplier} dmg, +${skill.critChanceBonus}% crit${formatSkillPenSuffix(skill.armorPenetrationPercentBonus)}${formatSkillEffectSuffix(skill.effects)}${formatSkillStateBonusSuffix(skill.stateBonuses, locale)}`,
-        tone: resourceToneByType[skill.resourceType] ?? getItemTone(item.code as ShowcasedItemCode),
+        value: `${skill.cost} ${skill.resourceType[0].toUpperCase()}${skill.resourceType.slice(1)}, x${skill.damageMultiplier} dmg, +${skill.critChanceBonus}% crit${formatSkillCooldownSuffix(skill.cooldownTurns)}${formatSkillRequirementSuffix(skill.requirements, locale)}${formatSkillUnlockSuffix(skill.unlock, locale)}${formatSkillPenSuffix(skill.armorPenetrationPercentBonus)}${formatSkillEffectSuffix(skill.effects)}${formatSkillStateBonusSuffix(skill.stateBonuses, locale)}`,
+        tone: resourceToneByType[skill.resourceType] ?? getItemTone(item),
       }))
     );
+}
+
+function formatSkillCooldownSuffix(cooldownTurns: number | undefined) {
+  if (typeof cooldownTurns !== "number") {
+    return "";
+  }
+
+  return `, cd ${cooldownTurns}t`;
+}
+
+function formatSkillRequirementSuffix(
+  requirements:
+    | {
+        minLevel?: number;
+        notes?: string[];
+      }
+    | undefined,
+  locale: Locale
+) {
+  if (!requirements) {
+    return "";
+  }
+
+  const parts: string[] = [];
+
+  if (typeof requirements.minLevel === "number") {
+    parts.push(locale === "ru" ? `lvl ${requirements.minLevel}+` : `lvl ${requirements.minLevel}+`);
+  }
+
+  if (requirements.notes?.length) {
+    parts.push(...requirements.notes);
+  }
+
+  return parts.length > 0 ? `, req ${parts.join(" / ")}` : "";
+}
+
+function formatSkillUnlockSuffix(
+  unlock:
+    | {
+        kind: "item" | "book" | "trainer" | "quest" | "default";
+        sourceName?: string;
+        note?: string;
+      }
+    | undefined,
+  locale: Locale
+) {
+  if (!unlock || unlock.kind === "default") {
+    return "";
+  }
+
+  const base = locale === "ru" ? "unlock" : "unlock";
+  const source = unlock.sourceName ? ` ${unlock.sourceName}` : "";
+  const note = unlock.note ? ` ${unlock.note}` : "";
+
+  return `, ${base} ${unlock.kind}${source}${note}`;
 }
 
 function formatSkillPenSuffix(
@@ -215,8 +246,8 @@ function createStatePrimerCallouts(locale: Locale) {
       label: locale === "ru" ? "Setup -> Payoff" : "Setup -> Payoff",
       value:
         locale === "ru"
-          ? "Opening Sense и Open Flank создают Exposed, Armor Crush и Shield Bash создают Staggered, а payoff-skills усиливаются по этим окнам."
-          : "Opening Sense and Open Flank create Exposed, Armor Crush and Shield Bash create Staggered, and payoff skills get stronger during those windows.",
+          ? "Некоторые навыки готовят окно через Exposed или Staggered, а следующие удары и добивающие кнопки усиливаются по этим состояниям."
+          : "Some skills create Exposed or Staggered windows, and follow-up attacks or finishers hit harder during those states.",
       tone: "strength" as const,
     },
   ];

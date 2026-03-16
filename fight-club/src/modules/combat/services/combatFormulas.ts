@@ -49,13 +49,29 @@ export function critChance(attackerRage: number, defenderRage: number) {
   );
 }
 
-export function critMultiplier(attackerEndurance: number) {
+export function critMultiplier(attackerRage: number, attackerEndurance: number) {
   return (
     combatFormulaConfig.critMultiplierBase +
+    attackerRage * combatFormulaConfig.rageToCritMultiplierFactor +
     attackerEndurance * combatFormulaConfig.enduranceToCritMultiplierFactor
   );
 }
 
 export function baseDamage(attackerStrength: number) {
   return combatFormulaConfig.baseDamage + attackerStrength * combatFormulaConfig.strengthToBaseDamageFactor;
+}
+
+function valueRange(value: number) {
+  return {
+    min: Math.max(0, Math.floor(value * combatFormulaConfig.damageRollMinFactor)),
+    max: Math.max(0, Math.floor(value * combatFormulaConfig.damageRollMaxFactor)),
+  };
+}
+
+export function damageRange(value: number) {
+  return valueRange(value);
+}
+
+export function armorRange(value: number) {
+  return valueRange(value);
 }

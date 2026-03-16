@@ -7,11 +7,13 @@ import {
   zeroArmorProfile,
   zeroCombatBonuses,
   zeroDamageProfile,
+  zeroZoneArmorProfile,
   type ArmorProfile,
   type CombatBonuses,
   type DamageProfile,
   type DamageType,
   type WeaponClass,
+  type ZoneArmorProfile,
 } from "@/modules/inventory";
 
 export interface EquipmentBonuses {
@@ -20,7 +22,9 @@ export interface EquipmentBonuses {
   statBonuses: CharacterStats;
   baseDamage: DamageProfile;
   baseArmor: ArmorProfile;
+  baseZoneArmor: ZoneArmorProfile;
   armorBySlot: Partial<Record<EquipmentSlot, ArmorProfile>>;
+  zoneArmorBySlot: Partial<Record<EquipmentSlot, ZoneArmorProfile>>;
   combatBonuses: CombatBonuses;
   preferredDamageType: DamageType | null;
   mainHandWeaponClass: WeaponClass | null;
@@ -36,7 +40,9 @@ export function getEquipmentBonuses(
   let statBonuses: CharacterStats = { ...zeroCharacterStats };
   let baseDamage: DamageProfile = { ...zeroDamageProfile };
   let baseArmor: ArmorProfile = { ...zeroArmorProfile };
+  let baseZoneArmor: ZoneArmorProfile = { ...zeroZoneArmorProfile };
   const armorBySlot: Partial<Record<EquipmentSlot, ArmorProfile>> = {};
+  const zoneArmorBySlot: Partial<Record<EquipmentSlot, ZoneArmorProfile>> = {};
   let combatBonuses: CombatBonuses = cloneCombatBonuses();
   let preferredDamageType: DamageType | null = null;
   let mainHandWeaponClass: WeaponClass | null = null;
@@ -57,10 +63,17 @@ export function getEquipmentBonuses(
     statBonuses = addCharacterStats(statBonuses, entry.item.statBonuses ?? zeroCharacterStats);
     baseDamage = addDamageProfiles(baseDamage, entry.item.baseDamage ?? zeroDamageProfile);
     baseArmor = addArmorProfiles(baseArmor, entry.item.baseArmor ?? zeroArmorProfile);
+    baseZoneArmor = addZoneArmorProfiles(baseZoneArmor, entry.item.baseZoneArmor ?? zeroZoneArmorProfile);
     if (hasArmorProfile(entry.item.baseArmor)) {
       armorBySlot[slot as EquipmentSlot] = addArmorProfiles(
         armorBySlot[slot as EquipmentSlot] ?? zeroArmorProfile,
         entry.item.baseArmor ?? zeroArmorProfile
+      );
+    }
+    if (hasZoneArmorProfile(entry.item.baseZoneArmor)) {
+      zoneArmorBySlot[slot as EquipmentSlot] = addZoneArmorProfiles(
+        zoneArmorBySlot[slot as EquipmentSlot] ?? zeroZoneArmorProfile,
+        entry.item.baseZoneArmor ?? zeroZoneArmorProfile
       );
     }
     combatBonuses = addCombatBonuses(combatBonuses, normalizeCombatBonuses(entry.item.combatBonuses));
@@ -80,7 +93,9 @@ export function getEquipmentBonuses(
     statBonuses,
     baseDamage,
     baseArmor,
+    baseZoneArmor,
     armorBySlot,
+    zoneArmorBySlot,
     combatBonuses,
     preferredDamageType,
     mainHandWeaponClass,
@@ -112,6 +127,16 @@ function addArmorProfiles(left: ArmorProfile, right: ArmorProfile): ArmorProfile
     pierce: left.pierce + right.pierce,
     blunt: left.blunt + right.blunt,
     chop: left.chop + right.chop,
+  };
+}
+
+function addZoneArmorProfiles(left: ZoneArmorProfile, right: ZoneArmorProfile): ZoneArmorProfile {
+  return {
+    head: left.head + right.head,
+    chest: left.chest + right.chest,
+    belly: left.belly + right.belly,
+    waist: left.waist + right.waist,
+    legs: left.legs + right.legs,
   };
 }
 
@@ -200,4 +225,12 @@ function hasArmorProfile(profile: ArmorProfile | undefined) {
   }
 
   return profile.slash > 0 || profile.pierce > 0 || profile.blunt > 0 || profile.chop > 0;
+}
+
+function hasZoneArmorProfile(profile: ZoneArmorProfile | undefined) {
+  if (!profile) {
+    return false;
+  }
+
+  return profile.head > 0 || profile.chest > 0 || profile.belly > 0 || profile.waist > 0 || profile.legs > 0;
 }

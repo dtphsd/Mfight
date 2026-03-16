@@ -3,7 +3,7 @@ import type { CombatStats } from "@/modules/combat/model/CombatStats";
 import type { CombatResources } from "@/modules/combat/model/CombatResources";
 import type { CombatZone } from "@/modules/combat/model/CombatZone";
 import type { EquipmentSlot } from "@/modules/equipment";
-import type { ArmorProfile, DamageProfile, DamageType, WeaponClass } from "@/modules/inventory";
+import type { ArmorProfile, DamageProfile, DamageType, WeaponClass, ZoneArmorProfile } from "@/modules/inventory";
 
 export interface CombatantState {
   id: string;
@@ -14,7 +14,9 @@ export interface CombatantState {
   resources: CombatResources;
   damage: DamageProfile;
   armor: ArmorProfile;
+  zoneArmor?: ZoneArmorProfile;
   armorBySlot: Partial<Record<EquipmentSlot, ArmorProfile>>;
+  zoneArmorBySlot?: Partial<Record<EquipmentSlot, ZoneArmorProfile>>;
   critChanceBonus: number;
   critMultiplierBonus: number;
   dodgeChanceBonus: number;
@@ -27,4 +29,5 @@ export interface CombatantState {
   attackZone: CombatZone | null;
   defenseZones: CombatZone[];
   activeEffects: ActiveCombatEffect[];
+  skillCooldowns?: Record<string, number>;
 }

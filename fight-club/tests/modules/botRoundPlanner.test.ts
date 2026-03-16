@@ -224,8 +224,8 @@ describe("botRoundPlanner", () => {
           ],
         },
         {
-          id: "heartseeker",
-          name: "Heartseeker",
+          id: "finisher-strike",
+          name: "Finisher Strike",
           description: "Finisher thrust.",
           sourceItemCode: "test-dagger",
           resourceType: "focus",
@@ -256,7 +256,7 @@ describe("botRoundPlanner", () => {
       ],
     });
 
-    expect(plan.skillId).toBe("heartseeker");
+    expect(plan.skillId).toBe("finisher-strike");
   });
 });
 
@@ -319,3 +319,4 @@ function createCombatant(
     },
   };
 }
+

@@ -1,101 +1,136 @@
 # Fight Club
 
-React + TypeScript skeleton for a modular browser fighting game.
+Browser-only combat sandbox built with React, TypeScript, and Vite.
 
-Last updated: 2026-03-12
+Last updated: 2026-03-16
 
-## Commands
+## Current State
+
+The project is no longer a minimal skeleton.
+
+It now includes:
+
+- live `Combat Sandbox`
+- live `Hunting Lodge`
+- generated Battle Kings combat items
+- zone-based armor and defended-zone weighting
+- random damage and armor ranges
+- roll-based block reduction in the `40-70%` band
+- cooldown-aware combat skills
+- item-driven combat effects, passives, and consumables
+- local docs site with architecture, systems, gameplay, and balance references
+
+## Main Commands
 
 - `npm install`
 - `npm run dev`
 - `npm run build`
 - `npm run test`
 - `npm run lint`
-- `npm run generate:module -- module-name`
+- `npm run docs:validate`
+- `npm run balance:matrix`
+- `npm run baza:parse`
+- `npm run baza:generate-items`
 
-## Architecture
+## Runtime Shape
 
-- `src/core` contains shared technical primitives.
-- `src/modules` contains domain modules with a stable internal layout.
-- `src/content` stores static gameplay data.
-- `src/orchestration` coordinates cross-module use cases.
-- `src/ui` renders React screens without owning canonical game state.
+- `src/core`
+  - shared technical primitives
+- `src/modules`
+  - headless gameplay domains such as combat, inventory, equipment, hunting, and profile
+- `src/content`
+  - static and generated gameplay data
+- `src/orchestration`
+  - cross-module runtime assembly for combat and hunting flows
+- `src/ui`
+  - React screens, hooks, and presentational components
+- `docs`
+  - repo-native documentation, architecture references, and balance artifacts
+- `BazaBK`
+  - local Battle Kings source pages, item images, parsed catalogs, and generation inputs
 
-## Combat Sandbox Orchestration
+## Combat Sandbox
 
-- The playable combat loop now has an explicit lifecycle layer above raw damage formulas.
-- `src/modules/combat/model/CombatPhase.ts`
-  - shared combat phase type for setup, round resolution, and finished states
-- `src/orchestration/combat/combatStateMachine.ts`
-  - legal combat phase transitions and UI-facing phase labels
-- `src/orchestration/combat/roundDraft.ts`
-  - single source of truth for the player's pending round action
-- `src/orchestration/combat/combatPressure.ts`
-  - reusable preview and zone-pressure helpers used by both UI metrics and AI planning
-- `src/orchestration/combat/botRoundPlanner.ts`
-  - bot decision layer that plans attack/defense zones from matchup pressure instead of pure random picks
-- `src/ui/hooks/useCombatSandbox.ts`
-  - current orchestration entry point that wires snapshots, phases, round draft, planner, and round resolution together
-- Long-term combat refactor and gameplay roadmap:
-  - `docs/architecture/combat-system-roadmap.md`
+The live combat flow supports:
 
-## Current Sandbox Build
+- manual attack zone and two defense zones
+- 7 curated build presets
+- manual 5-slot skill loadout selection
+- MMO-style inventory with bag grid and paper-doll equipment
+- silhouette equipment previews
+- consumables in combat flow
+- battle log, status effects, and combat impact overlays
 
-- The starter inventory is no longer minimal:
-  - multiple weapon classes
-  - armor across several slots
-  - accessory-driven skills
-  - consumables with different usage rules
-- The combat sandbox currently ships with four playable preset archetypes:
-  - `Warden`
-  - `Duelist`
-  - `Breaker`
-  - `Executioner`
-- Bot difficulty is now configurable:
-  - `Recruit`
-  - `Veteran`
-  - `Champion`
-- Bot loadout and planning change with difficulty instead of only changing raw stats.
-- Skills are no longer weapon-only:
-  - weapons
-  - shield
-  - armor
-  - helmet
-  - gloves
-  - boots
-  - accessory
-  can all contribute active combat skills if the item data defines them.
-- Consumables now have explicit usage modes:
-  - `replace_attack`
-  - `with_attack`
-  and the round resolution layer already supports combined attack + consumable turns for the second case.
+Current curated presets:
 
-## Combat Rules Page
+- `Sword / Bleed`
+- `Shield / Guard`
+- `Dagger / Crit`
+- `Mace / Control`
+- `Axe / Pressure`
+- `Heavy / Two-Hand`
+- `Sustain / Regen`
 
-- The combat-system reference page lives in `src/ui/screens/CombatRules`.
-- The screen is split into small parts:
-  - `CombatRulesScreen.tsx` assembles the page.
-  - `components/CombatRulesHero.tsx` renders the hero and contents navigation.
-  - `components/CombatRulesSection.tsx` renders sections, callouts, steps, and tables.
-  - `combatRulesContent.ts` stores human-written RU/EN explanatory copy.
-  - `combatRulesFacts.ts` derives item and skill facts from real gameplay data.
-  - `combatRulesRichText.tsx` owns term highlighting.
-  - `combatRulesTheme.ts` owns section/tone helpers.
+## Combat Runtime Facts
 
-## Documentation Maintenance
+- initiative is driven by `agility`
+- combat uses typed damage profiles:
+  - `slash`
+  - `pierce`
+  - `blunt`
+  - `chop`
+- defended hits use:
+  - zone armor
+  - penetration
+  - roll-based block reduction
+- crit multiplier now scales from both `Rage` and `Endurance`
+- combatants now track skill cooldown state
+- penetration has its own `PIERCE` impact feedback lane
 
-- After changing combat formulas, starter items, or combat resources, review the Combat Rules page.
-- Item tables and skill cards already derive from `src/content/items/starterItems.ts`; prefer extending those generators instead of hardcoding duplicate values in page copy.
-- Formula explanations, resource gains, and round-resolution text are still human-maintained and must be checked when combat logic changes.
-- After changing combat flow, also review:
-  - `src/orchestration/combat/combatStateMachine.ts`
-  - `src/orchestration/combat/roundDraft.ts`
-  - `src/orchestration/combat/botRoundPlanner.ts`
-  - `src/orchestration/combat/combatPressure.ts`
-- After changing consumables, also review:
-  - `src/modules/inventory/model/Item.ts`
-  - `src/modules/combat/model/RoundAction.ts`
-  - `src/modules/combat/application/resolveRound.ts`
-  - `src/ui/components/combat/ItemPresentationCard.tsx`
-  - `src/ui/screens/Combat/CombatSandboxScreen.tsx`
-- Keep lifecycle/orchestration rules out of `resolveRound.ts`; that module should stay focused on combat math and per-round resolution.
+## Item And Data Pipeline
+
+The active starter combat pool now comes from local Battle Kings source data.
+
+Workflow:
+
+1. normalize / collect source pages inside `BazaBK/`
+2. parse them with `npm run baza:parse`
+3. generate live starter items with `npm run baza:generate-items`
+4. consume them through `src/content/items/starterItems.ts`
+
+Important files:
+
+- `BazaBK/README.md`
+- `scripts/parse-bazakbk-pages.mjs`
+- `scripts/generate-bazakbk-starter-items.mjs`
+- `src/content/items/generatedBattleKingsStarterItems.ts`
+
+## Docs And Source Of Truth
+
+Start here:
+
+- `docs/README.md`
+- `docs/gameplay/index.md`
+- `docs/systems/index.md`
+- `docs/architecture/combat-design-reference.md`
+
+Rules:
+
+- code is the source of truth
+- if combat behavior changes, update docs in the same pass
+- if Battle Kings source data changes, rerun parse and generation before calling the state final
+
+## Verification
+
+Current regular checks:
+
+- `npm run lint`
+- `npm run test`
+- `npm run build`
+- `npm run docs:validate`
+- `npm run balance:matrix`
+
+For item-pool changes also run:
+
+- `npm run baza:parse`
+- `npm run baza:generate-items`

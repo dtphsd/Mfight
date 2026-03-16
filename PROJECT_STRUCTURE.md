@@ -1,6 +1,6 @@
 # PROJECT_STRUCTURE - Fight Club
 
-> Last updated: 2026-03-15 20:32 MSK
+> Last updated: 2026-03-16 02:35 MSK
 
 **Project root:** `c:/Users/dtphs/.vscode/Project`
 
@@ -22,6 +22,7 @@ Main app tree:
 ```text
 fight-club/
 |-- ART/                   # Raw art source files for avatars and future visual assets
+|-- BazaBK/                # Local Battle Kings HTML dump, images, parsed catalogs, and normalized sources
 |-- features/              # Feature-level task and change tracking docs
 |-- MASTER-PLAN.md         # Global master plan for active tasks and sprint history
 |-- docs/                  # Local project notes, backup points, and balance artifacts
@@ -44,6 +45,7 @@ Notes:
 
 - `dist/` is generated output, never source
 - `ART/Avatars/` now stores the raw `.png` source portraits; `src/assets/combat/*.jpg` are the compressed runtime silhouettes
+- `BazaBK/` now stores raw library dump, normalized pages, item images, and generated parsed JSON artifacts
 - `vite.config.js` / `vitest.config.js` and matching `.d.ts` files are generated beside the TypeScript sources
 - `docs/balance/` stores generated preset matchup reports
 - `docs/backup-points/` now stores both documentation markers and restorable UI baseline snapshots
@@ -83,6 +85,8 @@ Notes:
 - `generate-module.mjs` - helper generator for new module scaffolding
 - `run-build-matrix.cjs` - standalone balance runner with sandbox-style stat-budget parity for the right-side preset
 - `run-build-matrix.ts` - TypeScript helper version of the same balance matrix logic
+- `parse-bazakbk-pages.mjs` - parses normalized local Battle Kings HTML pages into item catalogs
+- `generate-bazakbk-starter-items.mjs` - generates the live starter item pool from parsed Battle Kings data
 
 ---
 
@@ -125,6 +129,7 @@ src/
 ## `src/content`
 
 - `items/starterItems.ts` - all starter weapons, armor, accessories, consumables, and materials
+- `items/generatedBattleKingsStarterItems.ts` - generated Battle Kings-derived combat item catalog
 - `commentator/phrases.ts` - phrase pools for battle log flavor
 - `combat/balance.ts` - compatibility export layer
 - `hunting/zones.ts` - live hunting zone catalog
@@ -135,7 +140,8 @@ src/
 
 Important current fact:
 
-- `starterItems.ts` now includes item skills, timed status effects, and consumables that can also apply combat effects
+- `starterItems.ts` now re-exports the generated Battle Kings combat pool
+- generated Battle Kings items now carry raw source metadata, zone-armor data, and cleaned preview text for UI cards
 
 ---
 
@@ -183,6 +189,10 @@ Combat facts:
 - active effects can now stack up to per-effect caps
 - consumables and skills can both apply combat effects
 - weapon classes can apply passive effects on hit or crit
+- combatants now also hold runtime skill cooldown state
+- block now uses a `40-70%` reduction roll with stronger results biased by `Endurance`
+- crit multiplier now scales from both `Rage` and `Endurance`
+- zone armor is now part of the real mitigation layer, not just generic per-type armor
 
 ### `inventory`
 
@@ -194,6 +204,7 @@ Current item model supports:
 
 - `baseDamage`
 - `baseArmor`
+- `baseZoneArmor`
 - `combatBonuses`
 - `skills[]`
 - `consumableEffect`
@@ -242,6 +253,7 @@ Current preset fact:
 - `combatSandboxConfigs.ts` now holds 7 curated build presets with recommended skill panels and consumables
 - `combatSandboxSupport.ts` now clips bot stat allocations to the current player allocation budget in sandbox flow
 - `BuildPresetsPopover.tsx` now renders those presets in a compact one-page `2 x 3` browser with avatar previews and color-zoned details
+- the active preset and builder item pool now resolve against generated `bk-item-*` content instead of the removed legacy training set
 
 ---
 
@@ -249,12 +261,12 @@ Current preset fact:
 
 ### `components/combat`
 
-- `CombatSilhouette.tsx` - silhouette, body zones, equipment slot buttons, status effects above HP, and latched one-shot impact overlays
+- `CombatSilhouette.tsx` - silhouette, body zones, expanded equipment slot buttons, status effects above HP, and latched one-shot impact overlays
 - `BattleLogPanel.tsx` - battle log UI
 - `battleLogFormatting.ts` - battle log formatter
 - `BuilderPopover.tsx` - build and matchup panel
 - `BuildPresetsPopover.tsx` - dedicated curated build browser and preset applier with compact `2 x 3` layout and styled detail zones
-- `InventoryPopover.tsx` - inventory browser
+- `InventoryPopover.tsx` - MMO-style inventory browser with tabs, bag grid, and paper-doll equipment layout
 - `EquipmentSlotPopover.tsx` - slot gear manager
 - `ItemPresentationCard.tsx` - full item card with prominent `Weapon Passive` and `Signature Skill` blocks
 - `ItemHoverPreview.tsx` - smart hover card positioning for item previews
@@ -307,6 +319,7 @@ Current UI facts:
 - `src/ui/components/shared/` now exists as the first extracted UI-foundation layer for `UI-002`
 - `src/ui/hooks/useAnchoredPopup.ts` is the first shared infrastructure piece for `UI-004`
 - preview chrome and preview item shell are now unified through `PreviewSurface.tsx`, `PreviewTag.tsx`, and `ItemPreviewPopover.tsx`
+- silhouette impact overlays now include a dedicated `PIERCE` treatment for penetration events
 
 ---
 
@@ -350,6 +363,8 @@ Current test files cover:
 - battle log formatting
 - combat rules screen
 - combat sandbox screen
+- hunting
+- hunting persistence
 
 Current status:
 
@@ -368,4 +383,4 @@ Current status:
 
 ---
 
-> Last updated: 2026-03-15 20:32 MSK
+> Last updated: 2026-03-16 02:35 MSK

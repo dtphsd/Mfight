@@ -40,15 +40,19 @@
 }
 
 .combat-silhouette-impact--hit {
-  animation: combat-silhouette-impact 300ms cubic-bezier(0.22, 0.7, 0.24, 1);
+  animation: combat-silhouette-impact 360ms cubic-bezier(0.22, 0.7, 0.24, 1);
 }
 
 .combat-silhouette-impact--crit {
-  animation: combat-silhouette-impact 380ms cubic-bezier(0.22, 0.7, 0.24, 1);
+  animation: combat-silhouette-impact 456ms cubic-bezier(0.22, 0.7, 0.24, 1);
 }
 
 .combat-silhouette-impact--block_break {
-  animation: combat-silhouette-impact 460ms cubic-bezier(0.16, 0.76, 0.2, 1);
+  animation: combat-silhouette-impact 552ms cubic-bezier(0.16, 0.76, 0.2, 1);
+}
+
+.combat-silhouette-impact--penetration {
+  animation: combat-silhouette-impact 432ms cubic-bezier(0.14, 0.82, 0.2, 1);
 }
 
 @keyframes combat-silhouette-block {
@@ -74,7 +78,7 @@
 }
 
 .combat-silhouette-impact--block {
-  animation: combat-silhouette-block 420ms ease-out;
+  animation: combat-silhouette-block 504ms ease-out;
 }
 
 @keyframes combat-silhouette-dodge {
@@ -105,7 +109,7 @@
 }
 
 .combat-silhouette-impact--dodge {
-  animation: combat-silhouette-dodge 520ms cubic-bezier(0.2, 0.7, 0.22, 1);
+  animation: combat-silhouette-dodge 624ms cubic-bezier(0.2, 0.7, 0.22, 1);
 }
 
 @keyframes combat-silhouette-hit-flash {
@@ -137,15 +141,19 @@
 }
 
 .combat-silhouette-hit-flash--hit {
-  animation: combat-silhouette-hit-flash 5s ease-out;
+  animation: combat-silhouette-hit-flash 6s ease-out;
 }
 
 .combat-silhouette-hit-flash--crit {
-  animation: combat-silhouette-hit-flash 5s ease-out;
+  animation: combat-silhouette-hit-flash 6s ease-out;
 }
 
 .combat-silhouette-hit-flash--block_break {
-  animation: combat-silhouette-hit-flash 5s ease-out;
+  animation: combat-silhouette-hit-flash 6s ease-out;
+}
+
+.combat-silhouette-hit-flash--penetration {
+  animation: combat-silhouette-hit-flash 2.64s ease-out;
 }
 
 @keyframes combat-silhouette-block-flash {
@@ -166,7 +174,7 @@
 }
 
 .combat-silhouette-hit-flash--block {
-  animation: combat-silhouette-block-flash 5s ease-out;
+  animation: combat-silhouette-block-flash 6s ease-out;
 }
 
 @keyframes combat-silhouette-dodge-flash {
@@ -187,7 +195,7 @@
 }
 
 .combat-silhouette-hit-flash--dodge {
-  animation: combat-silhouette-dodge-flash 5s ease-out;
+  animation: combat-silhouette-dodge-flash 6s ease-out;
 }
 
 @keyframes combat-silhouette-frame-glow {
@@ -206,14 +214,21 @@
 
 .combat-silhouette-frame-glow {
   opacity: 0;
-  animation: combat-silhouette-frame-glow 2.5s ease-out;
+  animation: combat-silhouette-frame-glow 3s ease-out;
   animation-fill-mode: forwards;
   will-change: opacity;
 }
 
 .combat-silhouette-block-break-frame {
   opacity: 0;
-  animation: combat-silhouette-frame-glow 2.5s ease-out;
+  animation: combat-silhouette-frame-glow 3s ease-out;
+  animation-fill-mode: forwards;
+  will-change: opacity;
+}
+
+.combat-silhouette-penetration-frame {
+  opacity: 0;
+  animation: combat-silhouette-frame-glow 3s ease-out;
   animation-fill-mode: forwards;
   will-change: opacity;
 }
@@ -237,7 +252,7 @@
 
 .combat-silhouette-block-sigil {
   opacity: 0;
-  animation: combat-silhouette-block-sigil 2.5s ease-out;
+  animation: combat-silhouette-block-sigil 3s ease-out;
   animation-fill-mode: forwards;
   will-change: opacity, transform;
 }
@@ -261,7 +276,7 @@
 
 .combat-silhouette-crit-sigil {
   opacity: 0;
-  animation: combat-silhouette-crit-sigil 2.5s ease-out;
+  animation: combat-silhouette-crit-sigil 3s ease-out;
   animation-fill-mode: forwards;
   will-change: opacity, transform;
 }
@@ -285,7 +300,14 @@
 
 .combat-silhouette-block-break-sigil {
   opacity: 0;
-  animation: combat-silhouette-block-break-sigil 2.5s ease-out;
+  animation: combat-silhouette-block-break-sigil 3s ease-out;
+  animation-fill-mode: forwards;
+  will-change: opacity, transform;
+}
+
+.combat-silhouette-penetration-sigil {
+  opacity: 0;
+  animation: combat-silhouette-block-break-sigil 2.04s ease-out;
   animation-fill-mode: forwards;
   will-change: opacity, transform;
 }
@@ -321,34 +343,39 @@
   text-shadow:
     0 2px 0 rgba(18, 12, 11, 0.9),
     0 8px 20px rgba(0, 0, 0, 0.42);
-  animation: combat-silhouette-impact-text 2s ease-out;
+  animation: combat-silhouette-impact-text 2.4s ease-out;
   animation-fill-mode: forwards;
   will-change: opacity, transform, letter-spacing;
 }
 
 .combat-silhouette-impact-text--hit {
   color: #ffc7b7;
-  animation-duration: 2s;
+  animation-duration: 2.4s;
 }
 
 .combat-silhouette-impact-text--crit {
   color: #ffd2d2;
-  animation-duration: 2s;
+  animation-duration: 2.4s;
 }
 
 .combat-silhouette-impact-text--block {
   color: #d6eeff;
-  animation-duration: 2s;
+  animation-duration: 2.4s;
 }
 
 .combat-silhouette-impact-text--block_break {
   color: #ffbf7d;
-  animation-duration: 2s;
+  animation-duration: 2.4s;
+}
+
+.combat-silhouette-impact-text--penetration {
+  color: #ffd39e;
+  animation-duration: 1.92s;
 }
 
 .combat-silhouette-impact-text--dodge {
   color: #c8fff1;
-  animation-duration: 2s;
+  animation-duration: 2.4s;
 }
 
 @keyframes combat-finish-winner-left {

@@ -4,9 +4,9 @@ title: Systems
 
 # Systems
 
-> Last updated: 2026-03-14 12:41 MSK
+> Last updated: 2026-03-16 02:42 MSK
 
-This section is the engineering entry point for understanding how Fight Club is assembled from runtime modules, orchestration layers, UI contracts, and documentation.
+This section is the engineering entry point for understanding how Fight Club is assembled from runtime modules, orchestration layers, UI contracts, documentation, and the local data-ingestion pipeline.
 
 Use it when you need to trace dependencies, plan safe refactors, or quickly locate the right layer before editing code.
 
@@ -26,6 +26,10 @@ Use it when you need to trace dependencies, plan safe refactors, or quickly loca
   <div class="docs-hub-card">
     <h3>Docs And Release Flow</h3>
     <p>Use it when the repo-native docs site, publishing workflow, and source-of-truth pages need to stay in sync.</p>
+  </div>
+  <div class="docs-hub-card">
+    <h3>Data Pipeline</h3>
+    <p>Use it when Battle Kings source pages, parsed catalogs, and generated combat items need to stay aligned with runtime code.</p>
   </div>
 </div>
 
@@ -52,13 +56,21 @@ Use it when you need to trace dependencies, plan safe refactors, or quickly loca
 
 1. [Architecture Overview](../architecture/overview.md)
 2. `src/ui/hooks/useCombatSandbox.ts`
-3. `src/ui/screens/Combat/CombatSandboxScreen.tsx`
+3. `src/ui/screens/CombatRules/combatRulesContent.ts`
+4. `src/ui/screens/Combat/CombatSandboxScreen.tsx`
 
 ### For Release And Docs Workflow
 
 1. [GitBook Publish Setup](../gitbook-publish-setup.md)
 2. `docs/.vitepress/config.mts`
 3. `scripts/validate-content.mjs`
+
+### For Data And Content Pipeline Work
+
+1. [Combat Design Reference](../architecture/combat-design-reference.md)
+2. `BazaBK/`
+3. `scripts/parse-bazakbk-pages.mjs`
+4. `scripts/generate-bazakbk-starter-items.mjs`
 
 ---
 
@@ -68,6 +80,7 @@ Use it when you need to trace dependencies, plan safe refactors, or quickly loca
 - tracing data flow from module logic into UI state or presentation
 - checking whether a docs change also needs code or workflow updates
 - reviewing architecture boundaries before deep refactors
+- keeping Battle Kings source data, generated items, and live combat runtime in sync
 
 ---
 
@@ -81,6 +94,8 @@ Use it when you need to trace dependencies, plan safe refactors, or quickly loca
   - React screens, hooks, and presentational components
 - `docs/`
   - architecture, decisions, publishing, and operational reference
+- `BazaBK/`
+  - local source-data layer for imported item pages, images, and parsed catalogs
 
 ---
 
@@ -92,4 +107,4 @@ Use it when you need to trace dependencies, plan safe refactors, or quickly loca
 
 ---
 
-> Last updated: 2026-03-14 12:41 MSK
+> Last updated: 2026-03-16 02:42 MSK

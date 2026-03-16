@@ -1,6 +1,6 @@
 # Combat Model And Flow
 
-> Last updated: 2026-03-14 12:52 MSK
+> Last updated: 2026-03-16 02:35 MSK
 
 ## Combat Model
 
@@ -28,6 +28,7 @@ Each combatant starts a fight with:
 - no selected attack zone
 - no selected defense zones
 - no active effects
+- empty skill cooldown state
 
 ### Round Actions
 
@@ -99,6 +100,7 @@ The round is rejected if any of these conditions fail:
 - a dead combatant tries to act
 - both defense zones are the same
 - a selected skill costs more resources than the attacker currently has
+- a selected skill is still on cooldown
 
 At orchestration level, the sandbox also rejects:
 
@@ -106,6 +108,7 @@ At orchestration level, the sandbox also rejects:
 - missing player or bot combatant
 - fewer than two selected defense zones
 - unavailable skill or missing required resources
+- unavailable skill because of active cooldown
 
 ---
 
@@ -183,7 +186,7 @@ If the defender covered the attack zone:
 
 If fully blocked:
 
-- damage is reduced by blocked percent
+- damage is reduced by a rolled blocked percent in the `40-70%` range
 - defender gains `guard`
 
 If penetrated:
@@ -223,6 +226,14 @@ Effects can trigger through:
 
 - `on_use`
 - `on_hit`
+
+### 11.5. Cooldown update
+
+After a skill is used successfully:
+
+- that skill is put on cooldown if it has `cooldownTurns`
+- cooldowns tick down on the owning combatant's future turn starts
+- bot planning and player action validation both respect the live cooldown state
 
 ### 12. Log result and update next state
 
@@ -396,4 +407,4 @@ If the faster combatant reduces the slower combatant to `0` HP before the slower
 
 ---
 
-> Last updated: 2026-03-14 12:52 MSK
+> Last updated: 2026-03-16 02:35 MSK

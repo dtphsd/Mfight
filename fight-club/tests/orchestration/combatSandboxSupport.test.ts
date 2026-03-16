@@ -87,25 +87,25 @@ describe("combatSandboxSupport", () => {
 
   it("maps equipped items and filters inventory options by slot", () => {
     const inventory = createStarterInventory();
-    const withSword = equipItem(createEquipment(), inventory, "training-sword");
+    const withSword = equipItem(createEquipment(), inventory, "bk-item-6");
 
     if (!withSword.success) {
       throw new Error(withSword.reason);
     }
 
-    const withShield = equipItem(withSword.data, inventory, "oak-shield");
+    const withHelmet = equipItem(withSword.data, inventory, "bk-item-366");
 
-    if (!withShield.success) {
-      throw new Error(withShield.reason);
+    if (!withHelmet.success) {
+      throw new Error(withHelmet.reason);
     }
 
-    const equippedItems = getSandboxEquippedItems(withShield.data, inventory);
+    const equippedItems = getSandboxEquippedItems(withHelmet.data, inventory);
     const mainHand = equippedItems.find((entry) => entry.slot === "mainHand");
-    const offHandOptions = getSandboxInventoryOptionsForSlot(inventory, "offHand");
+    const helmetOptions = getSandboxInventoryOptionsForSlot(inventory, "helmet");
 
-    expect(mainHand?.item?.name).toBe("Training Sword");
-    expect(offHandOptions.some((entry) => entry.item.code === "oak-shield")).toBe(true);
-    expect(offHandOptions.every((entry) => entry.item.equip?.slot === "offHand")).toBe(true);
+    expect(mainHand?.item?.code).toBe("bk-item-6");
+    expect(helmetOptions.some((entry) => entry.item.code === "bk-item-366")).toBe(true);
+    expect(helmetOptions.every((entry) => entry.item.equip?.slot === "helmet")).toBe(true);
   });
 
   it("builds preset equipment and allocations from sandbox preset data", () => {
@@ -114,7 +114,7 @@ describe("combatSandboxSupport", () => {
     const result = buildSandboxPresetState({
       inventory,
       preset: {
-        loadout: ["training-sword", "oak-shield"],
+        loadout: ["bk-item-6", "bk-item-366", "bk-item-411"],
         allocations: {
           strength: 2,
           agility: 0,
@@ -124,8 +124,9 @@ describe("combatSandboxSupport", () => {
       },
     });
 
-    expect(result.equipment.slots.mainHand).toBe("training-sword");
-    expect(result.equipment.slots.offHand).toBe("oak-shield");
+    expect(result.equipment.slots.mainHand).toBe("bk-item-6");
+    expect(result.equipment.slots.helmet).toBe("bk-item-366");
+    expect(result.equipment.slots.belt).toBe("bk-item-411");
     expect(result.playerAllocations).toEqual({
       strength: 2,
       agility: 0,

@@ -25,7 +25,9 @@ function createCombatant(snapshot: CombatSnapshot): CombatantState {
     resources: { ...zeroCombatResources },
     damage: snapshot.damage,
     armor: snapshot.armor,
+    zoneArmor: snapshot.zoneArmor,
     armorBySlot: snapshot.armorBySlot,
+    zoneArmorBySlot: snapshot.zoneArmorBySlot,
     critChanceBonus: snapshot.critChanceBonus,
     critMultiplierBonus: snapshot.critMultiplierBonus,
     dodgeChanceBonus: snapshot.dodgeChanceBonus,
@@ -38,5 +40,6 @@ function createCombatant(snapshot: CombatSnapshot): CombatantState {
     attackZone: null,
     defenseZones: [],
     activeEffects: [],
+    skillCooldowns: {},
   };
 }

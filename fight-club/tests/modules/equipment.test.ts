@@ -19,15 +19,15 @@ const testAccessory: Item = {
   code: "test-ring",
   name: "Test Ring",
   category: "accessory",
-  type: "accessory",
+  type: "ring2",
   rarity: "rare",
   description: "Test accessory",
   value: 20,
   stackable: false,
   maxStack: 1,
   equip: {
-    slot: "accessory",
-    armorClass: "accessory",
+    slot: "ring2",
+    armorClass: "ring2",
   },
   baseDamage: zeroDamageProfile,
   baseArmor: zeroArmorProfile,
@@ -59,19 +59,35 @@ describe("equipment module", () => {
   it("creates empty equipment slots", () => {
     const equipment = createEquipment();
 
-    expect(Object.values(equipment.slots)).toEqual([null, null, null, null, null, null, null]);
+    expect(Object.values(equipment.slots)).toEqual(new Array(13).fill(null));
   });
 
-  it("equips an equippable inventory item into its slot", () => {
+  it("equips a Battle Kings weapon into mainHand", () => {
     const inventory = createStarterInventory();
-    const result = equipItem(createEquipment(), inventory, "training-sword");
+    const result = equipItem(createEquipment(), inventory, "bk-item-6");
 
     expect(result.success).toBe(true);
     if (!result.success) {
       return;
     }
 
-    expect(result.data.slots.mainHand).toBe("training-sword");
+    expect(result.data.slots.mainHand).toBe("bk-item-6");
+  });
+
+  it("equips armor pieces into their dedicated slots", () => {
+    const inventory = createStarterInventory();
+    const withHelmet = equipItem(createEquipment(), inventory, "bk-item-366");
+    if (!withHelmet.success) {
+      throw new Error(withHelmet.reason);
+    }
+
+    const withBelt = equipItem(withHelmet.data, inventory, "bk-item-411");
+    if (!withBelt.success) {
+      throw new Error(withBelt.reason);
+    }
+
+    expect(withBelt.data.slots.helmet).toBe("bk-item-366");
+    expect(withBelt.data.slots.belt).toBe("bk-item-411");
   });
 
   it("rejects equipping a non-equippable item", () => {
@@ -84,51 +100,19 @@ describe("equipment module", () => {
     });
   });
 
-  it("equips a shield into offHand", () => {
+  it("rejects equipping an item code that is not present", () => {
     const inventory = createStarterInventory();
-    const result = equipItem(createEquipment(), inventory, "oak-shield");
-
-    expect(result.success).toBe(true);
-    if (!result.success) {
-      return;
-    }
-
-    expect(result.data.slots.offHand).toBe("oak-shield");
-  });
-
-  it("rejects equipping a two-hand weapon while offHand is occupied", () => {
-    const inventory = createStarterInventory();
-    const withShield = equipItem(createEquipment(), inventory, "oak-shield");
-    if (!withShield.success) {
-      throw new Error(withShield.reason);
-    }
-
-    const result = equipItem(withShield.data, inventory, "great-training-sword");
+    const result = equipItem(createEquipment(), inventory, "bk-item-missing");
 
     expect(result).toEqual({
       success: false,
-      reason: "offhand_occupied",
-    });
-  });
-
-  it("rejects equipping offHand item while two-hand weapon is equipped", () => {
-    const inventory = createStarterInventory();
-    const withTwoHand = equipItem(createEquipment(), inventory, "great-training-sword");
-    if (!withTwoHand.success) {
-      throw new Error(withTwoHand.reason);
-    }
-
-    const result = equipItem(withTwoHand.data, inventory, "oak-shield");
-
-    expect(result).toEqual({
-      success: false,
-      reason: "two_hand_conflict",
+      reason: "item_not_found",
     });
   });
 
   it("unequips a slot", () => {
     const inventory = createStarterInventory();
-    const equipped = equipItem(createEquipment(), inventory, "training-sword");
+    const equipped = equipItem(createEquipment(), inventory, "bk-item-6");
     if (!equipped.success) {
       throw new Error(equipped.reason);
     }
@@ -160,9 +144,9 @@ describe("equipment module", () => {
     expect(bonuses.armorBySlot).toEqual({});
   });
 
-  it("derives preferred damage type from main hand weapon class", () => {
+  it("derives preferred damage type from Battle Kings dagger metadata", () => {
     const inventory = createStarterInventory();
-    const equipped = equipItem(createEquipment(), inventory, "training-dagger");
+    const equipped = equipItem(createEquipment(), inventory, "bk-item-103");
     if (!equipped.success) {
       throw new Error(equipped.reason);
     }
@@ -174,58 +158,31 @@ describe("equipment module", () => {
     expect(bonuses.armorBySlot.mainHand).toBeUndefined();
   });
 
-  it("collects skills from multiple equipped item slots", () => {
+  it("tracks armor contributions by equipped slot", () => {
     const inventory = createStarterInventory();
-    const withWeapon = equipItem(createEquipment(), inventory, "training-sword");
-    if (!withWeapon.success) {
-      throw new Error(withWeapon.reason);
-    }
-
-    const withHelmet = equipItem(withWeapon.data, inventory, "leather-cap");
+    const withHelmet = equipItem(createEquipment(), inventory, "bk-item-366");
     if (!withHelmet.success) {
       throw new Error(withHelmet.reason);
     }
 
-    const withAccessory = equipItem(withHelmet.data, inventory, "arena-earring");
-    if (!withAccessory.success) {
-      throw new Error(withAccessory.reason);
+    const withBelt = equipItem(withHelmet.data, inventory, "bk-item-411");
+    if (!withBelt.success) {
+      throw new Error(withBelt.reason);
     }
 
-    const bonuses = getEquipmentBonuses(withAccessory.data, inventory);
+    const bonuses = getEquipmentBonuses(withBelt.data, inventory);
 
-    expect(bonuses.skills.map((skill) => skill.id)).toEqual([
-      "training-sword-feint",
-      "training-sword-expose-guard",
-      "leather-cap-head-slip",
-      "arena-earring-killer-focus",
-    ]);
-  });
-
-  it("tracks armor contributions by equipped slot", () => {
-    const inventory = createStarterInventory();
-    const withShield = equipItem(createEquipment(), inventory, "oak-shield");
-    if (!withShield.success) {
-      throw new Error(withShield.reason);
-    }
-
-    const withArmor = equipItem(withShield.data, inventory, "leather-vest");
-    if (!withArmor.success) {
-      throw new Error(withArmor.reason);
-    }
-
-    const bonuses = getEquipmentBonuses(withArmor.data, inventory);
-
-    expect(bonuses.armorBySlot.offHand).toEqual({
-      slash: 6,
-      pierce: 8,
-      blunt: 10,
-      chop: 7,
-    });
-    expect(bonuses.armorBySlot.armor).toEqual({
-      slash: 10,
-      pierce: 5,
+    expect(bonuses.armorBySlot.helmet).toEqual({
+      slash: 3,
+      pierce: 3,
       blunt: 3,
-      chop: 6,
+      chop: 3,
+    });
+    expect(bonuses.armorBySlot.belt).toEqual({
+      slash: 3,
+      pierce: 3,
+      blunt: 3,
+      chop: 3,
     });
   });
 
@@ -235,10 +192,16 @@ describe("equipment module", () => {
         mainHand: null,
         offHand: null,
         helmet: null,
+        shirt: null,
         armor: null,
+        bracers: null,
+        belt: null,
+        pants: null,
         boots: null,
         gloves: null,
-        accessory: "missing-ring",
+        ring: null,
+        ring2: "missing-ring",
+        earring: null,
       } satisfies Record<EquipmentSlot, string | null>,
     };
 

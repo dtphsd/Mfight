@@ -1,4 +1,5 @@
 import {
+  armorRange,
   baseDamage,
   baseBlockPenetration,
   baseCritChance,
@@ -6,12 +7,13 @@ import {
   blockPenetration,
   critChance,
   critMultiplier,
+  damageRange,
   dodgeChance,
   type CombatSnapshot,
   type CombatState,
   type RoundResult,
 } from "@/modules/combat";
-import type { ArmorProfile, DamageProfile, DamageType } from "@/modules/inventory";
+import type { ArmorProfile, DamageProfile, DamageType, ZoneArmorProfile } from "@/modules/inventory";
 import { buildZonePressureLens, resolveDisplayDamageType, totalProfileValue } from "@/orchestration/combat/combatPressure";
 import { createBattleLogEntries } from "@/ui/components/combat/battleLogFormatting";
 
@@ -49,9 +51,12 @@ export interface CombatSandboxMatchupLens {
 export interface CombatSandboxMetrics {
   maxHp: number;
   baseAttackDamage: number;
+  baseAttackDamageRange: { min: number; max: number };
   weaponDamage: number;
   totalDamage: number;
+  totalDamageRange: { min: number; max: number };
   totalArmor: number;
+  totalArmorRange: { min: number; max: number };
   baseDodgeChance: number;
   dodgeVsBot: number;
   baseCritChance: number;
@@ -69,7 +74,9 @@ export interface CombatSandboxMetrics {
   weaponClass: CombatSnapshot["weaponClass"];
   damageProfile: DamageProfile;
   armorProfile: ArmorProfile;
+  zoneArmorProfile: ZoneArmorProfile;
   armorBySlot: CombatSnapshot["armorBySlot"];
+  zoneArmorBySlot: CombatSnapshot["zoneArmorBySlot"];
   armorPenetrationFlat: DamageProfile;
   armorPenetrationPercent: DamageProfile;
   mainHandLabel: string | null;
@@ -78,7 +85,9 @@ export interface CombatSandboxMetrics {
   weaponDamageType: DamageType | null;
   opponentMaxHp: number;
   opponentTotalDamage: number;
+  opponentTotalDamageRange: { min: number; max: number };
   opponentTotalArmor: number;
+  opponentTotalArmorRange: { min: number; max: number };
   opponentWeaponDamageType: DamageType | null;
   opponentDamageProfile: DamageProfile;
   opponentArmorProfile: ArmorProfile;
@@ -152,13 +161,24 @@ export function buildCombatSandboxMetrics(input: {
   offHandItem: EquippedSandboxItem["item"];
 }): CombatSandboxMetrics {
   const { playerSnapshot, botSnapshot, playerWeaponItem, offHandItem } = input;
+  const playerBaseAttackDamage = baseDamage(playerSnapshot.stats.strength);
+  const playerWeaponDamage = totalProfileValue(playerSnapshot.damage);
+  const playerTotalDamage = playerBaseAttackDamage + playerWeaponDamage;
+  const botBaseAttackDamage = baseDamage(botSnapshot.stats.strength);
+  const botWeaponDamage = totalProfileValue(botSnapshot.damage);
+  const botTotalDamage = botBaseAttackDamage + botWeaponDamage;
+  const playerTotalArmor = totalZoneArmorValue(playerSnapshot.zoneArmor);
+  const botTotalArmor = totalZoneArmorValue(botSnapshot.zoneArmor);
 
   return {
     maxHp: playerSnapshot.maxHp,
-    baseAttackDamage: Math.floor(baseDamage(playerSnapshot.stats.strength)),
-    weaponDamage: Math.floor(totalProfileValue(playerSnapshot.damage)),
-    totalDamage: Math.floor(baseDamage(playerSnapshot.stats.strength) + totalProfileValue(playerSnapshot.damage)),
-    totalArmor: Math.floor(totalProfileValue(playerSnapshot.armor)),
+    baseAttackDamage: Math.floor(playerBaseAttackDamage),
+    baseAttackDamageRange: damageRange(playerBaseAttackDamage),
+    weaponDamage: Math.floor(playerWeaponDamage),
+    totalDamage: Math.floor(playerTotalDamage),
+    totalDamageRange: damageRange(playerTotalDamage),
+    totalArmor: Math.floor(playerTotalArmor),
+    totalArmorRange: armorRange(playerTotalArmor),
     baseDodgeChance: baseDodgeChance(playerSnapshot.stats.agility),
     dodgeVsBot: dodgeChance(botSnapshot.stats.agility, playerSnapshot.stats.agility),
     baseCritChance: baseCritChance(playerSnapshot.stats.rage),
@@ -167,7 +187,8 @@ export function buildCombatSandboxMetrics(input: {
     baseBlockPenetration: baseBlockPenetration(playerSnapshot.stats.strength),
     blockPenetrationVsBot: blockPenetration(playerSnapshot.stats.strength, botSnapshot.stats.strength),
     critMultiplier: playerSnapshot.critMultiplierBonus,
-    totalCritMultiplier: critMultiplier(playerSnapshot.stats.endurance) + playerSnapshot.critMultiplierBonus,
+    totalCritMultiplier:
+      critMultiplier(playerSnapshot.stats.rage, playerSnapshot.stats.endurance) + playerSnapshot.critMultiplierBonus,
     critChanceBonus: playerSnapshot.critChanceBonus,
     dodgeChanceBonus: playerSnapshot.dodgeChanceBonus,
     blockChanceBonus: playerSnapshot.blockChanceBonus,
@@ -176,7 +197,9 @@ export function buildCombatSandboxMetrics(input: {
     weaponClass: playerSnapshot.weaponClass,
     damageProfile: playerSnapshot.damage,
     armorProfile: playerSnapshot.armor,
+    zoneArmorProfile: playerSnapshot.zoneArmor ?? { head: 0, chest: 0, belly: 0, waist: 0, legs: 0 },
     armorBySlot: playerSnapshot.armorBySlot,
+    zoneArmorBySlot: playerSnapshot.zoneArmorBySlot ?? {},
     armorPenetrationFlat: playerSnapshot.armorPenetrationFlat,
     armorPenetrationPercent: playerSnapshot.armorPenetrationPercent,
     mainHandLabel: playerWeaponItem?.name ?? null,
@@ -184,8 +207,10 @@ export function buildCombatSandboxMetrics(input: {
     weaponHandedness: playerWeaponItem?.equip?.handedness ?? null,
     weaponDamageType: resolveDisplayDamageType(playerSnapshot.preferredDamageType, playerSnapshot.damage),
     opponentMaxHp: botSnapshot.maxHp,
-    opponentTotalDamage: Math.floor(totalProfileValue(botSnapshot.damage)),
-    opponentTotalArmor: Math.floor(totalProfileValue(botSnapshot.armor)),
+    opponentTotalDamage: Math.floor(botTotalDamage),
+    opponentTotalDamageRange: damageRange(botTotalDamage),
+    opponentTotalArmor: Math.floor(botTotalArmor),
+    opponentTotalArmorRange: armorRange(botTotalArmor),
     opponentWeaponDamageType: resolveDisplayDamageType(botSnapshot.preferredDamageType, botSnapshot.damage),
     opponentDamageProfile: botSnapshot.damage,
     opponentArmorProfile: botSnapshot.armor,
@@ -203,11 +228,11 @@ function buildMatchupLens(playerSnapshot: CombatSnapshot, botSnapshot: CombatSna
     playerPrimaryType,
     botPrimaryType,
     playerPrimaryDamage: playerPrimaryType ? getProfileValue(playerSnapshot.damage, playerPrimaryType) : 0,
-    botArmorVsPlayer: playerPrimaryType ? getProfileValue(botSnapshot.armor, playerPrimaryType) : 0,
+    botArmorVsPlayer: playerPrimaryType ? totalZoneArmorValue(botSnapshot.zoneArmor) : 0,
     playerPenFlat: playerPrimaryType ? getProfileValue(playerSnapshot.armorPenetrationFlat, playerPrimaryType) : 0,
     playerPenPercent: playerPrimaryType ? getProfileValue(playerSnapshot.armorPenetrationPercent, playerPrimaryType) : 0,
     botPrimaryDamage: botPrimaryType ? getProfileValue(botSnapshot.damage, botPrimaryType) : 0,
-    playerArmorVsBot: botPrimaryType ? getProfileValue(playerSnapshot.armor, botPrimaryType) : 0,
+    playerArmorVsBot: botPrimaryType ? totalZoneArmorValue(playerSnapshot.zoneArmor) : 0,
     botPenFlat: botPrimaryType ? getProfileValue(botSnapshot.armorPenetrationFlat, botPrimaryType) : 0,
     botPenPercent: botPrimaryType ? getProfileValue(botSnapshot.armorPenetrationPercent, botPrimaryType) : 0,
     playerCritVsBot: critChance(playerSnapshot.stats.rage, botSnapshot.stats.rage) + playerSnapshot.critChanceBonus,
@@ -223,4 +248,12 @@ function buildMatchupLens(playerSnapshot: CombatSnapshot, botSnapshot: CombatSna
 
 function getProfileValue(profile: DamageProfile | ArmorProfile, type: DamageType) {
   return profile[type];
+}
+
+function totalZoneArmorValue(profile: ZoneArmorProfile | undefined) {
+  if (!profile) {
+    return 0;
+  }
+
+  return profile.head + profile.chest + profile.belly + profile.waist + profile.legs;
 }

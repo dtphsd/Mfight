@@ -8,8 +8,10 @@ import type {
   DamageType,
   InventoryEntry,
   Item,
+  ZoneArmorProfile,
 } from "@/modules/inventory";
 import { getWeaponClassPassivePreview } from "@/modules/combat/config/combatWeaponPassives";
+import { armorRange, damageRange } from "@/modules/combat/services/combatFormulas";
 
 interface ItemPresentationCardProps {
   entry: InventoryEntry;
@@ -20,6 +22,7 @@ interface ItemPresentationCardProps {
 
 type SectionTone = "offense" | "defense" | "attributes" | "utility";
 type ItemInfoRow = { label: string; value: string; icon?: ReactNode };
+type ItemSectionDefinition = { tone: SectionTone; title?: string; rows: ItemInfoRow[] };
 type TagTone = { background: string; border: string; text: string };
 
 const tonePalette: Record<SectionTone, { label: string; accent: string; text: string; background: string }> = {
@@ -27,25 +30,25 @@ const tonePalette: Record<SectionTone, { label: string; accent: string; text: st
     label: "Offense",
     accent: "#ff9f7a",
     text: "#ffd6c7",
-    background: "rgb(62, 34, 30)",
+    background: "rgb(49, 31, 28)",
   },
   defense: {
     label: "Defense",
     accent: "#7fb9ff",
     text: "#d8ebff",
-    background: "rgb(30, 39, 55)",
+    background: "rgb(26, 34, 48)",
   },
   attributes: {
     label: "Attributes",
     accent: "#dabb6f",
     text: "#f5e4af",
-    background: "rgb(55, 45, 26)",
+    background: "rgb(47, 39, 24)",
   },
   utility: {
     label: "Utility",
     accent: "#7fd3c7",
     text: "#d7fff8",
-    background: "rgb(24, 48, 44)",
+    background: "rgb(23, 41, 38)",
   },
 };
 
@@ -76,10 +79,16 @@ const itemTypePalette: Record<Item["type"], TagTone> = {
   weapon: { background: "rgb(66, 38, 32)", border: "rgb(119, 70, 59)", text: "#f0a286" },
   shield: { background: "rgb(33, 46, 66)", border: "rgb(66, 94, 134)", text: "#b7d5ff" },
   helmet: { background: "rgb(67, 55, 31)", border: "rgb(123, 101, 58)", text: "#ebcf8b" },
+  shirt: { background: "rgb(68, 56, 34)", border: "rgb(121, 99, 65)", text: "#e9d1a2" },
   armor: { background: "rgb(63, 45, 37)", border: "rgb(108, 77, 63)", text: "#f2c3a7" },
+  bracers: { background: "rgb(26, 58, 53)", border: "rgb(58, 109, 102)", text: "#9ce6d8" },
+  belt: { background: "rgb(68, 49, 35)", border: "rgb(111, 83, 58)", text: "#e0bd96" },
+  pants: { background: "rgb(34, 45, 66)", border: "rgb(68, 92, 135)", text: "#c6d8ff" },
   boots: { background: "rgb(34, 45, 66)", border: "rgb(70, 90, 133)", text: "#b8cbff" },
   gloves: { background: "rgb(26, 51, 46)", border: "rgb(57, 106, 97)", text: "#87e2cf" },
-  accessory: { background: "rgb(44, 38, 72)", border: "rgb(83, 72, 132)", text: "#ccc0ff" },
+  ring: { background: "rgb(52, 42, 78)", border: "rgb(92, 77, 141)", text: "#d8ccff" },
+  ring2: { background: "rgb(58, 46, 84)", border: "rgb(103, 86, 152)", text: "#e0d6ff" },
+  earring: { background: "rgb(38, 48, 76)", border: "rgb(78, 99, 146)", text: "#d2e1ff" },
   consumable: { background: "rgb(26, 51, 46)", border: "rgb(57, 106, 97)", text: "#87e2cf" },
   material: { background: "rgb(48, 48, 52)", border: "rgb(88, 88, 96)", text: "#ddd3c5" },
 };
@@ -87,11 +96,12 @@ const itemTypePalette: Record<Item["type"], TagTone> = {
 const cardStyle: CSSProperties = {
   borderRadius: "16px",
   padding: "12px",
-  background: "linear-gradient(180deg, rgb(30,25,21), rgb(17,15,21))",
+  background: "rgb(24,21,18)",
   border: "1px solid rgba(255,255,255,0.08)",
   boxShadow: "inset 0 1px 0 rgba(255,255,255,0.04), 0 14px 28px rgba(0,0,0,0.28)",
   display: "grid",
   gap: "12px",
+  opacity: 1,
 };
 
 export function ItemPresentationCard({
@@ -122,21 +132,27 @@ export function ItemPresentationCard({
               <div style={{ fontSize: compact ? "15px" : "16px", fontWeight: 800, color: "#fff6e8", lineHeight: 1.15 }}>
                 {item.name}
               </div>
-              <div style={{ marginTop: "4px", fontSize: "12px", lineHeight: 1.45, color: "#d7cbbc" }}>
-                {item.description}
-              </div>
+              {item.description ? (
+                <div style={{ marginTop: "4px", fontSize: "12px", lineHeight: 1.45, color: "#d7cbbc" }}>
+                  {item.description}
+                </div>
+              ) : null}
             </div>
             <ItemTag label={formatRarity(item.rarity)} palette={rarityPalette[item.rarity]} />
           </div>
 
           <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
-            <MutedTag label={formatItemType(item.type)} palette={itemTypePalette[item.type]} />
             {showQuantityTag ? <MutedTag label={`Quantity: ${quantity}`} /> : null}
             <MutedTag label={`Value: ${item.value}`} />
-            {item.equip?.slot ? <MutedTag label={`Slot: ${formatEquipSlot(item.equip.slot)}`} palette={getSlotPalette(item.equip.slot)} /> : null}
-            {item.equip?.weaponClass ? <MutedTag label={`Weapon: ${formatWeaponClass(item.equip.weaponClass)}`} palette={itemTypePalette.weapon} /> : null}
-            {item.equip?.armorClass ? <MutedTag label={`Armor: ${formatArmorClass(item.equip.armorClass)}`} palette={getArmorClassPalette(item.equip.armorClass)} /> : null}
+            {item.equip?.weaponClass ? <MutedTag label={formatWeaponClass(item.equip.weaponClass)} palette={itemTypePalette.weapon} /> : null}
+            {!item.equip?.weaponClass && item.equip?.slot ? (
+              <MutedTag label={formatEquipSlot(item.equip.slot)} palette={getSlotPalette(item.equip.slot)} />
+            ) : null}
             {item.equip?.handedness ? <MutedTag label={`Hands: ${formatHandedness(item.equip.handedness)}`} /> : null}
+            {item.sourceMeta?.mass ? <MutedTag label={`Mass: ${item.sourceMeta.mass}`} /> : null}
+            {item.sourceMeta?.durability ? (
+              <MutedTag label={`Durability: ${item.sourceMeta.durability.current}/${item.sourceMeta.durability.max}`} />
+            ) : null}
           </div>
         </div>
       </div>
@@ -146,7 +162,7 @@ export function ItemPresentationCard({
 
       <div style={{ display: "grid", gap: "8px" }}>
         {sections.map((section) => (
-          <ItemSection key={section.tone} tone={section.tone} rows={section.rows} compact={compact} />
+          <ItemSection key={`${section.tone}-${section.title ?? "default"}`} tone={section.tone} title={section.title} rows={section.rows} compact={compact} />
         ))}
       </div>
 
@@ -195,10 +211,12 @@ export function ItemArtwork({ item, size = 96 }: { item: Item; size?: number }) 
 
 function ItemSection({
   tone,
+  title,
   rows,
   compact,
 }: {
   tone: SectionTone;
+  title?: string;
   rows: ItemInfoRow[];
   compact: boolean;
 }) {
@@ -213,7 +231,7 @@ function ItemSection({
       style={{
         borderRadius: "14px",
         padding: compact ? "8px 9px" : "10px 11px",
-        background: palette.background,
+        background: resolveOpaqueSectionBackground(tone),
         border: "1px solid rgba(255,255,255,0.08)",
         display: "grid",
         gap: compact ? "6px" : "8px",
@@ -228,38 +246,63 @@ function ItemSection({
           textTransform: "uppercase",
         }}
       >
-        {palette.label}
+        {title ?? palette.label}
       </div>
       <div style={{ display: "grid", gap: "6px" }}>
-        {rows.map((row) => (
-          <div key={`${tone}-${row.label}`} style={{ display: "flex", justifyContent: "space-between", gap: "10px", alignItems: "center" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: "7px", minWidth: 0 }}>
-              {row.icon ? (
+        {rows.map((row) => {
+          const factLine = !row.value;
+
+          return (
+            <div
+              key={`${tone}-${row.label}`}
+              style={{
+                display: "flex",
+                justifyContent: factLine ? "flex-start" : "space-between",
+                gap: "10px",
+                alignItems: factLine ? "flex-start" : "center",
+              }}
+            >
+              <div style={{ display: "flex", alignItems: factLine ? "flex-start" : "center", gap: "7px", minWidth: 0, width: factLine ? "100%" : undefined }}>
+                {row.icon ? (
+                  <span
+                    style={{
+                      width: "18px",
+                      height: "18px",
+                      borderRadius: "999px",
+                      display: "inline-flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      background: "rgb(56, 52, 48)",
+                      border: "1px solid rgb(78, 74, 70)",
+                      flexShrink: 0,
+                    }}
+                  >
+                    {row.icon}
+                  </span>
+                ) : null}
                 <span
                   style={{
-                    width: "18px",
-                    height: "18px",
-                    borderRadius: "999px",
-                    display: "inline-flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    background: "rgb(56, 52, 48)",
-                    border: "1px solid rgb(78, 74, 70)",
-                    flexShrink: 0,
+                    color: factLine ? palette.text : palette.accent,
+                    fontSize: compact ? "11px" : "12px",
+                    fontWeight: factLine ? 600 : 700,
+                    lineHeight: 1.35,
+                    whiteSpace: "normal",
+                    wordBreak: "break-word",
+                    display: "block",
+                    width: factLine ? "100%" : undefined,
                   }}
                 >
-                  {row.icon}
+                  {row.label}
+                </span>
+              </div>
+              {row.value ? (
+                <span style={{ color: palette.text, fontSize: compact ? "11px" : "12px", textAlign: "right", lineHeight: 1.25 }}>
+                  {row.value}
                 </span>
               ) : null}
-              <span style={{ color: palette.accent, fontSize: compact ? "11px" : "12px", fontWeight: 700, lineHeight: 1.2 }}>
-                {row.label}
-              </span>
             </div>
-            <span style={{ color: palette.text, fontSize: compact ? "11px" : "12px", textAlign: "right", lineHeight: 1.25 }}>
-              {row.value}
-            </span>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
@@ -308,10 +351,16 @@ function MutedTag({ label, palette }: { label: string; palette?: TagTone }) {
   );
 }
 
-function buildSections(item: Item): Array<{ tone: SectionTone; rows: ItemInfoRow[] }> {
+function buildSections(item: Item): ItemSectionDefinition[] {
+  const sourceSections = buildSourceSections(item);
+  if (sourceSections.length > 0) {
+    return sourceSections;
+  }
+
   return [
     {
       tone: "offense" as const,
+      title: "Offense",
       rows: [
         ...buildDamageRows(item.baseDamage),
         ...buildOffenseBonusRows(item.combatBonuses),
@@ -319,18 +368,51 @@ function buildSections(item: Item): Array<{ tone: SectionTone; rows: ItemInfoRow
     },
     {
       tone: "defense" as const,
+      title: "Defense",
       rows: [
-        ...buildArmorRows(item.baseArmor),
+        ...buildZoneArmorRows(item.baseZoneArmor ?? { head: 0, chest: 0, belly: 0, waist: 0, legs: 0 }),
         ...buildDefenseBonusRows(item.combatBonuses),
       ],
     },
     {
       tone: "attributes" as const,
+      title: "Attributes",
       rows: buildAttributeRows(item.flatBonuses, item.percentBonuses),
     },
     {
       tone: "utility" as const,
+      title: "Utility",
       rows: buildUtilityRows(item),
+    },
+  ].filter((section) => section.rows.length > 0);
+}
+
+function buildSourceSections(item: Item): ItemSectionDefinition[] {
+  const source = item.sourceMeta;
+  if (!source) {
+    return [];
+  }
+
+  return [
+    {
+      tone: "offense" as const,
+      title: "Properties",
+      rows: source.properties?.map((line) => ({ label: line, value: "" })) ?? [],
+    },
+    {
+      tone: "defense" as const,
+      title: "Effects",
+      rows: source.effects?.map((line) => ({ label: line, value: "" })) ?? [],
+    },
+    {
+      tone: "attributes" as const,
+      title: "Requirements",
+      rows: source.requirements?.map((line) => ({ label: line, value: "" })) ?? [],
+    },
+    {
+      tone: "utility" as const,
+      title: "Features",
+      rows: source.features?.map((line) => ({ label: line, value: "" })) ?? [],
     },
   ].filter((section) => section.rows.length > 0);
 }
@@ -340,17 +422,23 @@ function buildDamageRows(profile: DamageProfile): ItemInfoRow[] {
     .filter((type) => profile[type] !== 0)
     .map((type) => ({
       label: `${formatDamageType(type)} Damage`,
-      value: `${profile[type]}`,
+      value: formatRangeValue(profile[type]),
       icon: getDamageTypeIcon(type),
     }));
 }
 
-function buildArmorRows(profile: ArmorProfile): ItemInfoRow[] {
-  return damageTypes
-    .filter((type) => profile[type] !== 0)
-    .map((type) => ({
-      label: `${formatDamageType(type)} Armor`,
-      value: `${profile[type]}`,
+function buildZoneArmorRows(profile: ZoneArmorProfile): ItemInfoRow[] {
+  return ([
+    ["Head Armor", profile.head],
+    ["Chest Armor", profile.chest],
+    ["Belly Armor", profile.belly],
+    ["Waist Armor", profile.waist],
+    ["Leg Armor", profile.legs],
+  ] as Array<[string, number]>)
+    .filter(([, value]) => value > 0)
+    .map(([label, value]) => ({
+      label,
+      value: formatArmorRangeValue(value),
       icon: <ShieldGlyph size={11} />,
     }));
 }
@@ -397,7 +485,6 @@ function buildAttributeRows(flatBonuses: CharacterStats, percentBonuses: Charact
 
 function buildUtilityRows(item: Item): ItemInfoRow[] {
   return [
-    { label: "Category", value: formatItemCategory(item.category) },
     { label: "Stack Size", value: item.stackable ? `${item.maxStack}` : "Single Item" },
     item.consumableEffect ? { label: "Usage Mode", value: formatConsumableUsageMode(item.consumableEffect.usageMode) } : null,
     { label: "Trade Value", value: `${item.value}` },
@@ -416,8 +503,7 @@ function WeaponPassiveFeature({
       style={{
         borderRadius: compact ? "14px" : "16px",
         padding: compact ? "10px" : "12px",
-        background:
-          "linear-gradient(180deg, rgba(229,115,79,0.16), rgba(229,115,79,0.08)), radial-gradient(circle at top right, rgba(255,208,158,0.18), transparent 42%)",
+        background: "rgb(58, 35, 29)",
         border: "1px solid rgba(255,171,97,0.28)",
         boxShadow: "inset 0 1px 0 rgba(255,255,255,0.05)",
         display: "grid",
@@ -440,7 +526,7 @@ function WeaponPassiveFeature({
             fontSize: "10px",
             fontWeight: 800,
             color: "#ffe2c9",
-            background: "rgba(255,171,97,0.12)",
+            background: "rgb(86, 47, 36)",
             border: "1px solid rgba(255,171,97,0.24)",
             whiteSpace: "nowrap",
           }}
@@ -473,8 +559,7 @@ function ItemSkillFeature({
       style={{
         borderRadius: compact ? "14px" : "16px",
         padding: compact ? "10px" : "12px",
-        background:
-          "linear-gradient(180deg, rgba(92,199,178,0.14), rgba(92,199,178,0.07)), radial-gradient(circle at top right, rgba(189,255,241,0.14), transparent 42%)",
+        background: "rgb(27, 49, 45)",
         border: "1px solid rgba(92,199,178,0.24)",
         boxShadow: "inset 0 1px 0 rgba(255,255,255,0.05)",
         display: "grid",
@@ -497,7 +582,7 @@ function ItemSkillFeature({
             fontSize: "10px",
             fontWeight: 800,
             color: "#d9fffa",
-            background: "rgba(92,199,178,0.12)",
+            background: "rgb(35, 70, 64)",
             border: "1px solid rgba(92,199,178,0.24)",
             whiteSpace: "nowrap",
           }}
@@ -556,8 +641,14 @@ function getArtworkPalette(item: Item) {
     case "shield":
     case "armor":
     case "helmet":
+    case "shirt":
+    case "bracers":
+    case "belt":
+    case "pants":
     case "boots":
     case "gloves":
+    case "ring":
+    case "earring":
       return {
         background: "linear-gradient(180deg, #1c2532, #11161d)",
         border: "rgba(124, 178, 255, 0.32)",
@@ -589,38 +680,6 @@ function getArtworkPalette(item: Item) {
 
 function renderArtworkScene(item: Item) {
   switch (item.code) {
-    case "training-sword":
-      return (
-        <>
-          <path d="M38 86 80 28l8 8-58 42-4 14 12-6Z" fill="#d9dfe7" stroke="#fff5e8" strokeWidth="2" strokeLinejoin="round" />
-          <path d="M32 84 42 94l-10 6-6-6 6-10Z" fill="#7f5532" stroke="#c99964" strokeWidth="2" />
-          <path d="M50 76l8 8" stroke="#b87446" strokeWidth="3" strokeLinecap="round" />
-        </>
-      );
-    case "training-dagger":
-      return (
-        <>
-          <path d="M60 22 78 58 58 80 42 64 60 22Z" fill="#dfe5ed" stroke="#fff7ef" strokeWidth="2" strokeLinejoin="round" />
-          <path d="M42 64 32 78l10 10 16-8" fill="#8f5f3a" stroke="#d9aa75" strokeWidth="2" strokeLinejoin="round" />
-          <path d="M60 28 52 58" stroke="#bfd6ea" strokeWidth="2" strokeLinecap="round" />
-        </>
-      );
-    case "oak-shield":
-      return (
-        <>
-          <path d="M60 20 28 34v28c0 20 12 34 32 44 20-10 32-24 32-44V34L60 20Z" fill="#5f7d59" stroke="#eff7ec" strokeWidth="2.4" />
-          <path d="M60 27v68" stroke="#e6f4e2" strokeWidth="2.2" opacity="0.8" />
-          <path d="M38 48h44" stroke="#9dbb95" strokeWidth="2.2" opacity="0.9" />
-        </>
-      );
-    case "great-training-sword":
-      return (
-        <>
-          <path d="M34 90 78 18l10 10-62 54-4 18 12-10Z" fill="#e1e6ee" stroke="#fff6e8" strokeWidth="2.2" strokeLinejoin="round" />
-          <path d="M26 88 40 102l-14 8-8-8 8-14Z" fill="#7b5232" stroke="#c99a63" strokeWidth="2" />
-          <path d="M46 80l10 10" stroke="#b87446" strokeWidth="4" strokeLinecap="round" />
-        </>
-      );
     case "leather-vest":
       return (
         <>
@@ -665,46 +724,6 @@ function renderArtworkScene(item: Item) {
 
 const damageTypes: DamageType[] = ["slash", "pierce", "blunt", "chop"];
 
-function formatItemType(type: Item["type"]) {
-  switch (type) {
-    case "weapon":
-      return "Weapon";
-    case "shield":
-      return "Shield";
-    case "helmet":
-      return "Helmet";
-    case "armor":
-      return "Armor";
-    case "boots":
-      return "Boots";
-    case "gloves":
-      return "Gloves";
-    case "accessory":
-      return "Accessory";
-    case "consumable":
-      return "Consumable";
-    case "material":
-      return "Material";
-  }
-}
-
-function formatItemCategory(category: Item["category"]) {
-  switch (category) {
-    case "weapon":
-      return "Weapon";
-    case "shield":
-      return "Shield";
-    case "armor":
-      return "Armor";
-    case "accessory":
-      return "Accessory";
-    case "consumable":
-      return "Consumable";
-    case "material":
-      return "Material";
-  }
-}
-
 function formatConsumableUsageMode(usageMode: NonNullable<Item["consumableEffect"]>["usageMode"]) {
   switch (usageMode) {
     case "replace_attack":
@@ -722,14 +741,26 @@ function formatEquipSlot(slot: NonNullable<Item["equip"]>["slot"]) {
       return "Off Hand";
     case "helmet":
       return "Helmet";
+    case "shirt":
+      return "Shirt";
     case "armor":
       return "Armor";
+    case "bracers":
+      return "Bracers";
+    case "belt":
+      return "Belt";
+    case "pants":
+      return "Pants";
     case "boots":
       return "Boots";
     case "gloves":
       return "Gloves";
-    case "accessory":
-      return "Accessory";
+    case "ring":
+      return "Ring";
+    case "ring2":
+      return "Ring II";
+    case "earring":
+      return "Earring";
   }
 }
 
@@ -749,23 +780,6 @@ function formatWeaponClass(weaponClass: NonNullable<NonNullable<Item["equip"]>["
       return "Greatmace";
     case "greataxe":
       return "Greataxe";
-  }
-}
-
-function formatArmorClass(armorClass: NonNullable<NonNullable<Item["equip"]>["armorClass"]>) {
-  switch (armorClass) {
-    case "helmet":
-      return "Helmet";
-    case "armor":
-      return "Body Armor";
-    case "boots":
-      return "Boots";
-    case "gloves":
-      return "Gloves";
-    case "shield":
-      return "Shield";
-    case "accessory":
-      return "Accessory";
   }
 }
 
@@ -816,6 +830,16 @@ function formatSignedValue(value: number) {
   return value > 0 ? `+${value}` : `${value}`;
 }
 
+function formatRangeValue(value: number) {
+  const range = damageRange(value);
+  return `${range.min}-${range.max}`;
+}
+
+function formatArmorRangeValue(value: number) {
+  const range = armorRange(value);
+  return `${range.min}-${range.max}`;
+}
+
 function formatResourceLabel(resourceType: CombatSkill["resourceType"]) {
   switch (resourceType) {
     case "momentum":
@@ -836,6 +860,18 @@ function buildSkillFeatureTags(skill: CombatSkill) {
     tags.push(`Crit +${skill.critChanceBonus}%`);
   }
 
+  if (typeof skill.cooldownTurns === "number") {
+    tags.push(`CD ${skill.cooldownTurns}T`);
+  }
+
+  if (typeof skill.requirements?.minLevel === "number") {
+    tags.push(`Lv ${skill.requirements.minLevel}+`);
+  }
+
+  if (skill.unlock?.kind === "book") {
+    tags.push(skill.unlock.sourceName ? `Book: ${skill.unlock.sourceName}` : "Book Skill");
+  }
+
   const penetrationEntries = Object.entries(skill.armorPenetrationPercentBonus)
     .filter(([, value]) => value > 0)
     .map(([type, value]) => `${formatDamageType(type as DamageType)} Pen +${value}%`);
@@ -848,6 +884,19 @@ function buildSkillFeatureTags(skill: CombatSkill) {
   return tags;
 }
 
+function resolveOpaqueSectionBackground(tone: SectionTone) {
+  switch (tone) {
+    case "offense":
+      return "rgb(47, 30, 28)";
+    case "defense":
+      return "rgb(25, 34, 47)";
+    case "attributes":
+      return "rgb(46, 39, 25)";
+    case "utility":
+      return "rgb(22, 40, 37)";
+  }
+}
+
 function getSlotPalette(slot: NonNullable<Item["equip"]>["slot"]): TagTone {
   switch (slot) {
     case "mainHand":
@@ -856,31 +905,26 @@ function getSlotPalette(slot: NonNullable<Item["equip"]>["slot"]): TagTone {
       return itemTypePalette.shield;
     case "helmet":
       return itemTypePalette.helmet;
+    case "shirt":
+      return itemTypePalette.shirt;
     case "armor":
       return itemTypePalette.armor;
+    case "bracers":
+      return itemTypePalette.bracers;
+    case "belt":
+      return itemTypePalette.belt;
+    case "pants":
+      return itemTypePalette.pants;
     case "boots":
       return itemTypePalette.boots;
     case "gloves":
       return itemTypePalette.gloves;
-    case "accessory":
-      return itemTypePalette.accessory;
-  }
-}
-
-function getArmorClassPalette(armorClass: NonNullable<NonNullable<Item["equip"]>["armorClass"]>): TagTone {
-  switch (armorClass) {
-    case "helmet":
-      return itemTypePalette.helmet;
-    case "armor":
-      return itemTypePalette.armor;
-    case "boots":
-      return itemTypePalette.boots;
-    case "gloves":
-      return itemTypePalette.gloves;
-    case "shield":
-      return itemTypePalette.shield;
-    case "accessory":
-      return itemTypePalette.accessory;
+    case "ring":
+      return itemTypePalette.ring;
+    case "ring2":
+      return itemTypePalette.ring2;
+    case "earring":
+      return itemTypePalette.earring;
   }
 }
 

@@ -1,20 +1,22 @@
-export type CombatImpactVariant = "hit" | "crit" | "block" | "block_break" | "dodge";
+export type CombatImpactVariant = "hit" | "crit" | "block" | "block_break" | "penetration" | "dodge";
 
-export const COMBAT_IMPACT_LINGER_DURATION_MS = 5000;
+export const COMBAT_IMPACT_LINGER_DURATION_MS = 6000;
 
 export function getCombatImpactMotionDurationMs(impactVariant: CombatImpactVariant) {
   switch (impactVariant) {
     case "crit":
-      return 380;
+      return 456;
     case "block_break":
-      return 460;
+      return 552;
+    case "penetration":
+      return 504;
     case "block":
-      return 420;
+      return 504;
     case "dodge":
-      return 520;
+      return 624;
     case "hit":
     default:
-      return 300;
+      return 360;
   }
 }
 
@@ -24,6 +26,8 @@ export function getCombatImpactLabel(impactVariant: CombatImpactVariant) {
       return "CRIT";
     case "block_break":
       return "BLOCK BREAK";
+    case "penetration":
+      return "PIERCE";
     case "block":
       return "BLOCK";
     case "dodge":
@@ -46,6 +50,7 @@ export function shouldShowCombatImpactValue(
     impactVariant === "hit" ||
     impactVariant === "crit" ||
     impactVariant === "block" ||
-    impactVariant === "block_break"
+    impactVariant === "block_break" ||
+    impactVariant === "penetration"
   );
 }

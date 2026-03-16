@@ -1,12 +1,14 @@
 import { useLayoutEffect, useState, type CSSProperties, type RefObject } from "react";
 
 type PopupPlacement = "horizontal" | "vertical";
+type VerticalPreference = "auto" | "above" | "below";
 
 interface UseAnchoredPopupOptions {
   open: boolean;
   triggerRef: RefObject<HTMLElement | null>;
   popupRef: RefObject<HTMLElement | null>;
   placement: PopupPlacement;
+  verticalPreference?: VerticalPreference;
   preferredWidth?: number;
   gap?: number;
   viewportPadding?: number;
@@ -18,6 +20,7 @@ export function useAnchoredPopup({
   triggerRef,
   popupRef,
   placement,
+  verticalPreference = "auto",
   preferredWidth = 320,
   gap = 8,
   viewportPadding = 12,
@@ -77,7 +80,12 @@ export function useAnchoredPopup({
       );
       const spaceBelow = viewportHeight - triggerRect.bottom - viewportPadding;
       const spaceAbove = triggerRect.top - viewportPadding;
-      const placeBelow = spaceBelow >= popupRect.height + gap || spaceBelow >= spaceAbove;
+      const placeBelow =
+        verticalPreference === "below"
+          ? true
+          : verticalPreference === "above"
+            ? false
+            : spaceBelow >= popupRect.height + gap || spaceBelow >= spaceAbove;
       const top = placeBelow
         ? Math.min(triggerRect.bottom + gap, viewportHeight - popupRect.height - viewportPadding)
         : Math.max(viewportPadding, triggerRect.top - popupRect.height - gap);
@@ -100,7 +108,7 @@ export function useAnchoredPopup({
       window.removeEventListener("resize", updatePosition);
       window.removeEventListener("scroll", updatePosition, true);
     };
-  }, [gap, open, placement, popupRef, preferredWidth, triggerRef, viewportPadding, zIndex]);
+  }, [gap, open, placement, popupRef, preferredWidth, triggerRef, verticalPreference, viewportPadding, zIndex]);
 
   return popupStyle;
 }

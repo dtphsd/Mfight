@@ -1,10 +1,12 @@
 import {
+  armorRange,
   baseBlockPenetration,
   baseCritChance,
   baseDamage,
   baseDodgeChance,
   blockPenetration,
   critChance,
+  damageRange,
   dodgeChance,
 } from "@/modules/combat/services/combatFormulas";
 
@@ -18,11 +20,16 @@ describe("combat formulas", () => {
   });
 
   it("returns deterministic base damage", () => {
-    expect(baseDamage(10)).toBe(25);
+    expect(baseDamage(10)).toBe(20);
   });
 
   it("increases base damage when strength grows", () => {
     expect(baseDamage(4)).toBeGreaterThan(baseDamage(3));
+  });
+
+  it("builds symmetric min-max ranges for damage and armor previews", () => {
+    expect(damageRange(20)).toEqual({ min: 17, max: 23 });
+    expect(armorRange(20)).toEqual({ min: 17, max: 23 });
   });
 
   it("returns visible base crit from rage even before target comparison", () => {

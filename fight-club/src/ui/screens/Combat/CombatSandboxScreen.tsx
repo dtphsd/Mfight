@@ -1,6 +1,7 @@
-import { useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
+import { Suspense, lazy, useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import type { CharacterStatName, CharacterStats } from "@/modules/character";
 import {
+  armorRange,
   baseBlockPenetration,
   baseCritChance,
   baseDodgeChance,
@@ -8,6 +9,7 @@ import {
   combatChanceCaps,
   combatFormulaConfig,
   combatZoneDamageModifiers,
+  damageRange,
   type CombatZone,
 } from "@/modules/combat";
 import type { EquipmentSlot } from "@/modules/equipment";
@@ -23,15 +25,41 @@ import {
 } from "@/modules/profile";
 import { totalProfileValue } from "@/orchestration/combat/combatPressure";
 import { BattleLogPanel } from "@/ui/components/combat/BattleLogPanel";
-import { BuildPresetsPopover } from "@/ui/components/combat/BuildPresetsPopover";
-import { BuilderPopover } from "@/ui/components/combat/BuilderPopover";
 import { CombatSilhouette, type CombatFigureId } from "@/ui/components/combat/CombatSilhouette";
-import { EquipmentSlotPopover } from "@/ui/components/combat/EquipmentSlotPopover";
-import { InventoryPopover } from "@/ui/components/combat/InventoryPopover";
-import { ProfileModal } from "@/ui/components/profile/ProfileModal";
+import { useAnchoredPopup } from "@/ui/hooks/useAnchoredPopup";
 import { useCombatSandbox } from "@/ui/hooks/useCombatSandbox";
 
-const playerEquipmentSlots: EquipmentSlot[] = ["helmet", "armor", "mainHand", "offHand", "gloves", "accessory", "boots"];
+const BuildPresetsPopover = lazy(() =>
+  import("@/ui/components/combat/BuildPresetsPopover").then((module) => ({ default: module.BuildPresetsPopover }))
+);
+const BuilderPopover = lazy(() =>
+  import("@/ui/components/combat/BuilderPopover").then((module) => ({ default: module.BuilderPopover }))
+);
+const EquipmentSlotPopover = lazy(() =>
+  import("@/ui/components/combat/EquipmentSlotPopover").then((module) => ({ default: module.EquipmentSlotPopover }))
+);
+const InventoryPopover = lazy(() =>
+  import("@/ui/components/combat/InventoryPopover").then((module) => ({ default: module.InventoryPopover }))
+);
+const ProfileModal = lazy(() =>
+  import("@/ui/components/profile/ProfileModal").then((module) => ({ default: module.ProfileModal }))
+);
+
+const playerEquipmentSlots: EquipmentSlot[] = [
+  "helmet",
+  "earring",
+  "shirt",
+  "armor",
+  "bracers",
+  "gloves",
+  "mainHand",
+  "offHand",
+  "belt",
+  "ring",
+  "ring2",
+  "pants",
+  "boots",
+];
 
 const shellStyle: CSSProperties = {
   borderRadius: "28px",
@@ -68,12 +96,31 @@ const primaryButtonStyle: CSSProperties = {
   boxShadow: "0 14px 30px rgba(207,106,50,0.2)",
 };
 
+const deferredOverlayFallbackStyle: CSSProperties = {
+  position: "fixed",
+  inset: "24px 24px auto auto",
+  zIndex: 90,
+  padding: "8px 12px",
+  borderRadius: "999px",
+  border: "1px solid rgba(255,255,255,0.1)",
+  background: "rgba(18,16,14,0.9)",
+  color: "#efe6da",
+  fontSize: "11px",
+  letterSpacing: "0.08em",
+  textTransform: "uppercase",
+  boxShadow: "0 18px 40px rgba(0,0,0,0.35)",
+};
+
 const statMeta: Record<CharacterStatName, { short: string; color: string; background: string; border: string }> = {
   strength: { short: "STR", color: "#f0a286", background: "rgba(229,115,79,0.14)", border: "rgba(229,115,79,0.28)" },
   agility: { short: "AGI", color: "#87e2cf", background: "rgba(92,199,178,0.14)", border: "rgba(92,199,178,0.28)" },
   rage: { short: "RAG", color: "#ee9abb", background: "rgba(216,93,145,0.14)", border: "rgba(216,93,145,0.28)" },
   endurance: { short: "END", color: "#ebcf8b", background: "rgba(214,177,95,0.14)", border: "rgba(214,177,95,0.28)" },
 };
+
+function DeferredOverlayFallback({ label = "Loading..." }: { label?: string }) {
+  return <div style={deferredOverlayFallbackStyle}>{label}</div>;
+}
 
 const presetFigureById: Record<string, CombatFigureId> = {
   "sword-bleed": "rush-chip",
@@ -266,23 +313,25 @@ export function CombatSandboxScreen({
       />
 
       {buildPresetsOpen ? (
-        <BuildPresetsPopover
-          buildPresets={sandbox.buildPresets}
-          onApplyBuild={(presetId) => {
-            sandbox.applyPreset(presetId);
-            setPlayerFigure(resolvePresetFigure(presetId, "rush-chip"));
-            setBuildPresetsOpen(false);
-          }}
-          onApplyItemsOnly={(presetId) => {
-            sandbox.applyPresetItemsOnly(presetId);
-            setPlayerFigure(resolvePresetFigure(presetId, "rush-chip"));
-          }}
-          onApplySkillsOnly={(presetId) => {
-            sandbox.applyPresetSkillsOnly(presetId);
-            setPlayerFigure(resolvePresetFigure(presetId, "rush-chip"));
-          }}
-          onClose={() => setBuildPresetsOpen(false)}
-        />
+        <Suspense fallback={<DeferredOverlayFallback label="Loading builds..." />}>
+          <BuildPresetsPopover
+            buildPresets={sandbox.buildPresets}
+            onApplyBuild={(presetId) => {
+              sandbox.applyPreset(presetId);
+              setPlayerFigure(resolvePresetFigure(presetId, "rush-chip"));
+              setBuildPresetsOpen(false);
+            }}
+            onApplyItemsOnly={(presetId) => {
+              sandbox.applyPresetItemsOnly(presetId);
+              setPlayerFigure(resolvePresetFigure(presetId, "rush-chip"));
+            }}
+            onApplySkillsOnly={(presetId) => {
+              sandbox.applyPresetSkillsOnly(presetId);
+              setPlayerFigure(resolvePresetFigure(presetId, "rush-chip"));
+            }}
+            onClose={() => setBuildPresetsOpen(false)}
+          />
+        </Suspense>
       ) : null}
       {botBuildPresetsOpen ? (
         <BotBuildPresetsPopover
@@ -296,27 +345,29 @@ export function CombatSandboxScreen({
         />
       ) : null}
       {builderOpen ? (
-        <BuilderPopover
-          buildPresets={sandbox.buildPresets}
-          unlockedSkills={sandbox.unlockedSkills}
-          equippedSkillIds={sandbox.equippedSkillIds}
-          maxEquippedSkills={sandbox.maxEquippedSkills}
-          playerCharacter={sandbox.playerCharacter}
-          metrics={sandbox.metrics}
-          increaseStat={sandbox.increaseStat}
-          decreaseStat={sandbox.decreaseStat}
-          applyPreset={(presetId) => {
-            sandbox.applyPreset(presetId);
-            setPlayerFigure(resolvePresetFigure(presetId, "rush-chip"));
-          }}
-          resetBuild={() => {
-            sandbox.resetBuild();
-            setPlayerFigure("rush-chip");
-          }}
-          toggleEquippedSkill={sandbox.toggleEquippedSkill}
-          onOpenBuildPresets={() => setBuildPresetsOpen(true)}
-          onClose={() => setBuilderOpen(false)}
-        />
+        <Suspense fallback={<DeferredOverlayFallback label="Loading builder..." />}>
+          <BuilderPopover
+            buildPresets={sandbox.buildPresets}
+            unlockedSkills={sandbox.unlockedSkills}
+            equippedSkillIds={sandbox.equippedSkillIds}
+            maxEquippedSkills={sandbox.maxEquippedSkills}
+            playerCharacter={sandbox.playerCharacter}
+            metrics={sandbox.metrics}
+            increaseStat={sandbox.increaseStat}
+            decreaseStat={sandbox.decreaseStat}
+            applyPreset={(presetId) => {
+              sandbox.applyPreset(presetId);
+              setPlayerFigure(resolvePresetFigure(presetId, "rush-chip"));
+            }}
+            resetBuild={() => {
+              sandbox.resetBuild();
+              setPlayerFigure("rush-chip");
+            }}
+            toggleEquippedSkill={sandbox.toggleEquippedSkill}
+            onOpenBuildPresets={() => setBuildPresetsOpen(true)}
+            onClose={() => setBuilderOpen(false)}
+          />
+        </Suspense>
       ) : null}
       {skillLoadoutOpen ? (
         <SkillLoadoutPopover
@@ -329,105 +380,113 @@ export function CombatSandboxScreen({
       ) : null}
 
       {profileTarget === "player" ? (
-        <ProfileModal
-          onClose={() => setProfileTarget(null)}
-          name={playerName}
-          level={sandbox.playerCharacter.level}
-          figure={playerFigure}
-          mirrored
-          currentHp={sandbox.playerCombatant?.currentHp ?? sandbox.playerSnapshot.maxHp}
-          maxHp={sandbox.playerCombatant?.maxHp ?? sandbox.playerSnapshot.maxHp}
-          activeEffects={sandbox.playerCombatant?.activeEffects ?? []}
-          equipmentSlots={playerEquipment}
-          profile={playerProfile}
-          baseStats={sandbox.playerSnapshot.stats}
-          derivedStats={buildProfileDerivedStats({
-            totalDamage: sandbox.metrics.totalDamage,
-            stats: sandbox.playerSnapshot.stats,
-            totalArmor: sandbox.metrics.totalArmor,
-            dodgeBonus: sandbox.playerSnapshot.dodgeChanceBonus,
-            critBonus: sandbox.playerSnapshot.critChanceBonus,
-            totalCritMultiplier: sandbox.metrics.totalCritMultiplier,
-            baseBlockPenetrationValue: sandbox.metrics.baseBlockPenetration,
-            armorPenetrationPercent: sandbox.playerSnapshot.armorPenetrationPercent,
-          })}
-          skillLabels={sandbox.equippedSkills.map((skill) => skill.name)}
-          isOwnProfile
-          onNameChange={onPlayerNameChange}
-          onMottoChange={(value) => setPlayerProfile((current) => ({ ...current, motto: value }))}
-          mailboxActorId="player"
-          mailboxEntries={mailboxes.player.entries}
-          unreadMailCount={countUnreadMailboxEntries(mailboxes, "player")}
-          onOpenMailbox={() => setMailboxes((current) => markMailboxEntriesAsRead(current, "player"))}
-          onSendMail={({ toActorId, toName, subject, body }) =>
-            setMailboxes((current) =>
-              sendProfileMail({
-                mailboxes: current,
-                fromActorId: "player",
-                fromName: playerName,
-                toActorId,
-                toName,
-                subject,
-                body,
-              })
-            )
-          }
-        />
+        <Suspense fallback={<DeferredOverlayFallback label="Loading profile..." />}>
+          <ProfileModal
+            onClose={() => setProfileTarget(null)}
+            name={playerName}
+            level={sandbox.playerCharacter.level}
+            figure={playerFigure}
+            mirrored
+            currentHp={sandbox.playerCombatant?.currentHp ?? sandbox.playerSnapshot.maxHp}
+            maxHp={sandbox.playerCombatant?.maxHp ?? sandbox.playerSnapshot.maxHp}
+            activeEffects={sandbox.playerCombatant?.activeEffects ?? []}
+            equipmentSlots={playerEquipment}
+            profile={playerProfile}
+            baseStats={sandbox.playerSnapshot.stats}
+            derivedStats={buildProfileDerivedStats({
+              totalDamage: sandbox.metrics.totalDamage,
+              stats: sandbox.playerSnapshot.stats,
+              totalArmor: sandbox.metrics.totalArmor,
+              dodgeBonus: sandbox.playerSnapshot.dodgeChanceBonus,
+              critBonus: sandbox.playerSnapshot.critChanceBonus,
+              totalCritMultiplier: sandbox.metrics.totalCritMultiplier,
+              baseBlockPenetrationValue: sandbox.metrics.baseBlockPenetration,
+              armorPenetrationPercent: sandbox.playerSnapshot.armorPenetrationPercent,
+            })}
+            skillLabels={sandbox.equippedSkills.map((skill) => skill.name)}
+            isOwnProfile
+            onNameChange={onPlayerNameChange}
+            onMottoChange={(value) => setPlayerProfile((current) => ({ ...current, motto: value }))}
+            mailboxActorId="player"
+            mailboxEntries={mailboxes.player.entries}
+            unreadMailCount={countUnreadMailboxEntries(mailboxes, "player")}
+            onOpenMailbox={() => setMailboxes((current) => markMailboxEntriesAsRead(current, "player"))}
+            onSendMail={({ toActorId, toName, subject, body }) =>
+              setMailboxes((current) =>
+                sendProfileMail({
+                  mailboxes: current,
+                  fromActorId: "player",
+                  fromName: playerName,
+                  toActorId,
+                  toName,
+                  subject,
+                  body,
+                })
+              )
+            }
+          />
+        </Suspense>
       ) : null}
 
       {profileTarget === "bot" ? (
-        <ProfileModal
-          onClose={() => setProfileTarget(null)}
-          name="Arena Bot"
-          level={sandbox.botBuildPreset.targetFightLength === "long" ? 4 : 3}
-          figure={botFigure}
-          currentHp={sandbox.botCombatant?.currentHp ?? sandbox.botSnapshot.maxHp}
-          maxHp={sandbox.botCombatant?.maxHp ?? sandbox.botSnapshot.maxHp}
-          activeEffects={sandbox.botCombatant?.activeEffects ?? []}
-          equipmentSlots={botEquipment}
-          profile={botProfile}
-          baseStats={sandbox.botSnapshot.stats}
-          derivedStats={buildProfileDerivedStats({
-            totalDamage: sandbox.metrics.opponentTotalDamage,
-            stats: sandbox.botSnapshot.stats,
-            totalArmor: sandbox.metrics.opponentTotalArmor,
-            dodgeBonus: sandbox.botSnapshot.dodgeChanceBonus,
-            critBonus: sandbox.botSnapshot.critChanceBonus,
-            totalCritMultiplier: critMultiplier(sandbox.botSnapshot.stats.endurance) + sandbox.botSnapshot.critMultiplierBonus,
-            baseBlockPenetrationValue: baseBlockPenetration(sandbox.botSnapshot.stats.strength),
-            armorPenetrationPercent: sandbox.botSnapshot.armorPenetrationPercent,
-          })}
-          skillLabels={sandbox.botBuildPreset.skillLoadout.map(formatIdLabel)}
-          mailboxActorId="bot"
-          mailboxEntries={mailboxes.bot.entries}
-          unreadMailCount={countUnreadMailboxEntries(mailboxes, "bot")}
-          directMessageTarget={{ actorId: "bot", name: "Arena Bot" }}
-          onOpenMailbox={() => setMailboxes((current) => markMailboxEntriesAsRead(current, "bot"))}
-          onSendMail={({ toActorId, toName, subject, body }) =>
-            setMailboxes((current) =>
-              sendProfileMail({
-                mailboxes: current,
-                fromActorId: "player",
-                fromName: playerName,
-                toActorId,
-                toName,
-                subject,
-                body,
-              })
-            )
-          }
-        />
+        <Suspense fallback={<DeferredOverlayFallback label="Loading profile..." />}>
+          <ProfileModal
+            onClose={() => setProfileTarget(null)}
+            name="Arena Bot"
+            level={sandbox.botBuildPreset.targetFightLength === "long" ? 4 : 3}
+            figure={botFigure}
+            currentHp={sandbox.botCombatant?.currentHp ?? sandbox.botSnapshot.maxHp}
+            maxHp={sandbox.botCombatant?.maxHp ?? sandbox.botSnapshot.maxHp}
+            activeEffects={sandbox.botCombatant?.activeEffects ?? []}
+            equipmentSlots={botEquipment}
+            profile={botProfile}
+            baseStats={sandbox.botSnapshot.stats}
+            derivedStats={buildProfileDerivedStats({
+              totalDamage: sandbox.metrics.opponentTotalDamage,
+              stats: sandbox.botSnapshot.stats,
+              totalArmor: sandbox.metrics.opponentTotalArmor,
+              dodgeBonus: sandbox.botSnapshot.dodgeChanceBonus,
+              critBonus: sandbox.botSnapshot.critChanceBonus,
+              totalCritMultiplier:
+                critMultiplier(sandbox.botSnapshot.stats.rage, sandbox.botSnapshot.stats.endurance) +
+                sandbox.botSnapshot.critMultiplierBonus,
+              baseBlockPenetrationValue: baseBlockPenetration(sandbox.botSnapshot.stats.strength),
+              armorPenetrationPercent: sandbox.botSnapshot.armorPenetrationPercent,
+            })}
+            skillLabels={sandbox.botBuildPreset.skillLoadout.map(formatIdLabel)}
+            mailboxActorId="bot"
+            mailboxEntries={mailboxes.bot.entries}
+            unreadMailCount={countUnreadMailboxEntries(mailboxes, "bot")}
+            directMessageTarget={{ actorId: "bot", name: "Arena Bot" }}
+            onOpenMailbox={() => setMailboxes((current) => markMailboxEntriesAsRead(current, "bot"))}
+            onSendMail={({ toActorId, toName, subject, body }) =>
+              setMailboxes((current) =>
+                sendProfileMail({
+                  mailboxes: current,
+                  fromActorId: "player",
+                  fromName: playerName,
+                  toActorId,
+                  toName,
+                  subject,
+                  body,
+                })
+              )
+            }
+          />
+        </Suspense>
       ) : null}
 
       {inventoryOpen ? (
-        <InventoryPopover
-          entries={sandbox.inventory.entries}
-          slotsUsed={sandbox.inventorySlots.used}
-          slotsMax={sandbox.inventorySlots.max}
-          equippedItems={sandbox.equippedItems}
-          onEquip={sandbox.equipItemByCode}
-          onClose={() => setInventoryOpen(false)}
-        />
+        <Suspense fallback={<DeferredOverlayFallback label="Loading inventory..." />}>
+          <InventoryPopover
+            entries={sandbox.inventory.entries}
+            slotsUsed={sandbox.inventorySlots.used}
+            slotsMax={sandbox.inventorySlots.max}
+            equippedItems={sandbox.equippedItems}
+            onEquip={sandbox.equipItemByCode}
+            onClose={() => setInventoryOpen(false)}
+          />
+        </Suspense>
       ) : null}
     </section>
   );
@@ -523,8 +582,8 @@ function PlayerCombatPanel({
             <MetricGrid
               items={[
                 { label: "HP", value: String(sandbox.metrics.maxHp) },
-                { label: "DMG", value: String(sandbox.metrics.totalDamage), tone: "warm" },
-                { label: "Armor", value: String(sandbox.metrics.totalArmor) },
+                { label: "DMG", value: formatRangeLabel(sandbox.metrics.totalDamageRange), tone: "warm" },
+                { label: "Armor", value: formatRangeLabel(sandbox.metrics.totalArmorRange) },
                 { label: "Crit", value: `${sandbox.metrics.baseCritChance + sandbox.metrics.critChanceBonus}%` },
                 { label: "Dodge", value: `${sandbox.metrics.baseDodgeChance + sandbox.metrics.dodgeChanceBonus}%` },
                 { label: "Type", value: formatMaybeTitle(sandbox.metrics.weaponDamageType) },
@@ -536,20 +595,22 @@ function PlayerCombatPanel({
       blocks={[]}
       overlay={
         selectedEquipmentSlot ? (
-          <EquipmentSlotPopover
-            slot={selectedEquipmentSlot}
-            entries={sandbox.getInventoryOptionsForSlot(selectedEquipmentSlot)}
-            equippedItemCode={sandbox.equippedItems.find((entry) => entry.slot === selectedEquipmentSlot)?.item?.code ?? null}
-            onEquip={(itemCode) => {
-              sandbox.equipItemByCode(itemCode);
-              onCloseEquipmentSlot();
-            }}
-            onUnequip={(slot) => {
-              sandbox.unequipSlot(slot);
-              onCloseEquipmentSlot();
-            }}
-            onClose={onCloseEquipmentSlot}
-          />
+          <Suspense fallback={<DeferredOverlayFallback label="Loading slot..." />}>
+            <EquipmentSlotPopover
+              slot={selectedEquipmentSlot}
+              entries={sandbox.getInventoryOptionsForSlot(selectedEquipmentSlot)}
+              equippedItemCode={sandbox.equippedItems.find((entry) => entry.slot === selectedEquipmentSlot)?.item?.code ?? null}
+              onEquip={(itemCode) => {
+                sandbox.equipItemByCode(itemCode);
+                onCloseEquipmentSlot();
+              }}
+              onUnequip={(slot) => {
+                sandbox.unequipSlot(slot);
+                onCloseEquipmentSlot();
+              }}
+              onClose={onCloseEquipmentSlot}
+            />
+          </Suspense>
         ) : null
       }
     />
@@ -1047,26 +1108,34 @@ function CombatActionsPanel({
           }
           entries={sandbox.equippedSkills.map((skill) => {
             const currentValue = (sandbox.playerResources ?? { rage: 0, guard: 0, momentum: 0, focus: 0 })[skill.resourceType];
+            const cooldownTurns = ((sandbox.playerCombatant?.skillCooldowns ?? {})[skill.id] ?? 0);
+            const skillReady = currentValue >= skill.cost && cooldownTurns <= 0;
             return (
               <ActionButton
                 key={skill.id}
                 selected={sandbox.selectedAction.kind === "skill_attack" && sandbox.selectedAction.skillId === skill.id}
-                muted={currentValue < skill.cost}
-                ready={currentValue >= skill.cost}
+                muted={currentValue < skill.cost || cooldownTurns > 0}
+                ready={skillReady}
                 resourceProgress={skill.cost > 0 ? Math.min(1, currentValue / skill.cost) : 1}
                 onClick={() =>
-                  sandbox.setSelectedSkillAction(
-                    sandbox.selectedAction.kind === "skill_attack" && sandbox.selectedAction.skillId === skill.id
-                      ? null
-                      : skill.id
-                  )}
+                  cooldownTurns <= 0
+                    ? sandbox.setSelectedSkillAction(
+                        sandbox.selectedAction.kind === "skill_attack" && sandbox.selectedAction.skillId === skill.id
+                          ? null
+                          : skill.id
+                      )
+                    : undefined}
                 label={skill.name}
-                note={`${currentValue}/${skill.cost} ${skill.resourceType}`}
+                note={
+                  cooldownTurns > 0
+                    ? `Cooldown ${cooldownTurns}T`
+                    : `${currentValue}/${skill.cost} ${skill.resourceType}`
+                }
                 description={skill.description}
                 detailLines={formatSkillDetailLines(skill)}
                 icon={getSkillIcon(skill.name, skill.sourceItemCode)}
                 iconHint={skill.sourceItemCode}
-                badge={`${skill.cost}`}
+                badge={cooldownTurns > 0 ? `${cooldownTurns}` : `${skill.cost}`}
               />
             );
           })}
@@ -1145,8 +1214,8 @@ function BotCombatPanelSidebar({
         <MetricGrid
           items={[
             { label: "HP", value: String(sandbox.metrics.opponentMaxHp) },
-            { label: "DMG", value: String(sandbox.metrics.opponentTotalDamage), tone: "warm" },
-            { label: "Armor", value: String(sandbox.metrics.opponentTotalArmor) },
+            { label: "DMG", value: formatRangeLabel(sandbox.metrics.opponentTotalDamageRange), tone: "warm" },
+            { label: "Armor", value: formatRangeLabel(sandbox.metrics.opponentTotalArmorRange) },
             { label: "Type", value: formatMaybeTitle(sandbox.metrics.opponentWeaponDamageType) },
           ]}
         />
@@ -1903,9 +1972,22 @@ function ActionButton({
   badge?: string;
 }) {
   const [popupOpen, setPopupOpen] = useState(false);
+  const triggerRef = useRef<HTMLButtonElement | null>(null);
+  const popupRef = useRef<HTMLDivElement | null>(null);
   const visual = getActionVisual(label, iconHint);
   const progress = Math.max(0, Math.min(1, resourceProgress));
   const showProgressRing = progress > 0 && progress < 1 && !ready;
+  const popupStyle = useAnchoredPopup({
+    open: popupOpen,
+    triggerRef,
+    popupRef,
+    placement: "vertical",
+    verticalPreference: "above",
+    preferredWidth: 230,
+    gap: 10,
+    viewportPadding: 10,
+    zIndex: 25,
+  });
 
   return (
     <div style={{ position: "relative", display: "grid", justifyItems: "center", alignItems: "center" }}>
@@ -1923,6 +2005,7 @@ function ActionButton({
         />
       ) : null}
       <button
+        ref={triggerRef}
         type="button"
         aria-label={`Select ${label}`}
         onClick={onClick}
@@ -1985,13 +2068,16 @@ function ActionButton({
       </button>
       {popupOpen ? (
         <div
+          ref={popupRef}
           style={{
-            position: "absolute",
-            zIndex: 5,
-            top: "calc(100% + 8px)",
-            left: "50%",
-            transform: "translateX(-50%)",
-            width: "230px",
+            ...(popupStyle ?? {
+              position: "fixed",
+              left: "-9999px",
+              top: "-9999px",
+              width: "230px",
+              zIndex: 25,
+              pointerEvents: "none",
+            }),
             borderRadius: "16px",
             border: `1px solid ${visual.ring}`,
             background: "rgba(18,16,15,0.98)",
@@ -2127,6 +2213,16 @@ function SkillLoadoutPopover({
     cost: number;
     damageMultiplier: number;
     critChanceBonus: number;
+    cooldownTurns?: number;
+    requirements?: {
+      minLevel?: number;
+      notes?: string[];
+    };
+    unlock?: {
+      kind: "item" | "book" | "trainer" | "quest" | "default";
+      sourceName?: string;
+      note?: string;
+    };
     armorPenetrationPercentBonus: DamageProfile;
     effects?: CombatRuleEffectSummary[];
   }>;
@@ -2290,6 +2386,21 @@ function SkillLoadoutPopover({
                       >
                         {skill.cost} {formatResourceLabel(skill.resourceType)}
                       </div>
+                      {typeof skill.cooldownTurns === "number" ? (
+                        <div
+                          style={{
+                            fontSize: "9px",
+                            fontWeight: 700,
+                            color: "#b8cbff",
+                            borderRadius: "999px",
+                            padding: "3px 7px",
+                            background: "rgba(115,149,230,0.12)",
+                            border: "1px solid rgba(115,149,230,0.22)",
+                          }}
+                        >
+                          CD {skill.cooldownTurns}T
+                        </div>
+                      ) : null}
                       <button
                         type="button"
                         aria-label={isEquipped ? `Remove ${skill.name} from panel skills` : `Add ${skill.name} to panel skills`}
@@ -2571,6 +2682,16 @@ function formatSkillDetailLines(skill: {
   damageMultiplier: number;
   critChanceBonus: number;
   armorPenetrationPercentBonus: DamageProfile;
+  cooldownTurns?: number;
+  requirements?: {
+    minLevel?: number;
+    notes?: string[];
+  };
+  unlock?: {
+    kind: "item" | "book" | "trainer" | "quest" | "default";
+    sourceName?: string;
+    note?: string;
+  };
   effects?: CombatRuleEffectSummary[];
 } | null) {
   if (!skill) {
@@ -2581,6 +2702,22 @@ function formatSkillDetailLines(skill: {
 
   if (skill.critChanceBonus > 0) {
     lines.push(`Crit: Adds +${skill.critChanceBonus}% crit chance.`);
+  }
+
+  if (typeof skill.cooldownTurns === "number") {
+    lines.push(`Cooldown: ${skill.cooldownTurns} turn${skill.cooldownTurns === 1 ? "" : "s"}.`);
+  }
+
+  if (typeof skill.requirements?.minLevel === "number") {
+    lines.push(`Level: Requires level ${skill.requirements.minLevel}.`);
+  }
+
+  if (skill.requirements?.notes?.length) {
+    lines.push(`Requirements: ${skill.requirements.notes.join(" | ")}.`);
+  }
+
+  if (skill.unlock) {
+    lines.push(`Unlock: ${formatSkillUnlockSummary(skill.unlock)}.`);
   }
 
   lines.push(
@@ -2628,6 +2765,18 @@ function formatConsumableDetailLines(item: {
   }
 
   return lines;
+}
+
+function formatSkillUnlockSummary(unlock: {
+  kind: "item" | "book" | "trainer" | "quest" | "default";
+  sourceName?: string;
+  note?: string;
+}) {
+  const label = formatMaybeTitle(unlock.kind);
+  const source = unlock.sourceName ? `via ${unlock.sourceName}` : null;
+  const note = unlock.note ?? null;
+
+  return [label, source, note].filter((value) => value !== null).join(" ");
 }
 
 function formatEffectSummary(effect: CombatRuleEffectSummary) {
@@ -2830,6 +2979,10 @@ function resolveImpactVariant(result: CombatSandboxModel["playerIncomingResult"]
     return "block_break" as const;
   }
 
+  if (result.penetrated) {
+    return "penetration" as const;
+  }
+
   if (result.blocked && result.finalDamage <= 0) {
     return "block" as const;
   }
@@ -3018,8 +3171,8 @@ function buildProfileDerivedStats(input: {
   const totalArmorPenetration = totalProfileValue(input.armorPenetrationPercent);
 
   return [
-    { label: "Damage", value: String(input.totalDamage), helper: "Current total damage after weapon, stat and gear bonuses." },
-    { label: "Armor", value: String(input.totalArmor), helper: "Total armor across all damage types." },
+    { label: "Damage", value: formatRangeLabel(damageRange(input.totalDamage)), helper: "Current rolled damage range after weapon, stat and gear bonuses." },
+    { label: "Armor", value: formatRangeLabel(armorRange(input.totalArmor)), helper: "Current rolled armor range across all damage types." },
     { label: "Dodge", value: `${totalDodge}%`, helper: `Base ${baseDodgeChance(input.stats.agility)}% + bonuses ${input.dodgeBonus}%.` },
     { label: "Crit Chance", value: `${totalCrit}%`, helper: `Base ${baseCritChance(input.stats.rage)}% + bonuses ${input.critBonus}%.` },
     { label: "Anti-Dodge", value: `${antiDodge}%`, helper: "How much enemy dodge is suppressed by your agility." },
@@ -3028,6 +3181,10 @@ function buildProfileDerivedStats(input: {
     { label: "Block Penetration", value: `${input.baseBlockPenetrationValue}%`, helper: "Base pressure through guarded hits from strength." },
     { label: "Armor Pen", value: `${totalArmorPenetration}%`, helper: "Combined item-based armor penetration profile." },
   ];
+}
+
+function formatRangeLabel(range: { min: number; max: number }) {
+  return `${range.min}-${range.max}`;
 }
 
 function formatIdLabel(value: string) {

@@ -1,6 +1,6 @@
 # Combat Formulas And Effects
 
-> Last updated: 2026-03-14 14:58 MSK
+> Last updated: 2026-03-16 02:35 MSK
 
 ## Resources
 
@@ -34,18 +34,19 @@ Current live coefficients from `combatConfig.ts` and `combatFormulas.ts`:
 ### Progression
 
 - base HP: `100`
-- HP per endurance: `10`
+- HP per endurance: `8`
 - minimum stat value after resolution: `1`
 - percent clamp for stat or profile scaling: `-100` to `1000`
 
 ### Base formulas
 
-- base damage: `10 + strength * 1.5`
+- base damage: `8 + strength * 1.2`
 - base dodge seed: `5 + defenderAgility * 2`
 - dodge penalty from attacker agility: `2` per point
 - base crit seed: `3 + attackerRage * 3`
 - crit penalty from defender rage: `2` per point
-- crit multiplier: `1.5 + endurance * 0.03`
+- crit multiplier: `1.35 + rage * 0.03 + endurance * 0.01`
+- damage and armor variance range: `85% - 115%`
 
 ### Chance caps
 
@@ -64,7 +65,12 @@ Current live coefficients from `combatConfig.ts` and `combatFormulas.ts`:
 - attacker strength factor: `3`
 - defender strength penalty factor: `2`
 - armor penetration profile divisor contribution: `3.2`
-- base blocked percent: `34`
+- base blocked percent floor: `40`
+- blocked percent ceiling: `70`
+- strong block threshold: `55`
+- base strong block chance: `18`
+- endurance to strong block chance factor: `4`
+- block power to strong block chance factor: `1`
 - block focus-strength divisor for zone armor emphasis: `160`
 
 ### Attack profile mixing
@@ -114,7 +120,18 @@ Live formula:
 
 Live formula:
 
-- `critMultiplier = 1.5 + endurance * 0.03 + critMultiplierBonus`
+- `critMultiplier = 1.35 + attackerRage * 0.03 + attackerEndurance * 0.01 + critMultiplierBonus`
+
+### Block roll
+
+Live runtime behavior:
+
+- if a defended-zone hit is not penetrated, the remaining damage is reduced by a rolled block value
+- weak block range: `40-54`
+- strong block range: `55-70`
+- chance to enter the strong block band rises with:
+  - defender endurance
+  - defender block power bonus
 
 ### Armor mitigation
 
@@ -131,6 +148,21 @@ This happens separately for:
 - `chop`
 
 Then the result profile is summed and floored into `finalDamage`.
+
+### Zone armor weighting
+
+The runtime now also applies zone-weighted armor during defended hits.
+
+Current live behavior:
+
+- a defended zone gets weighted contributions from equipped slots
+- slot weights differ by zone:
+  - `head` leans on helmet, earring, off-hand
+  - `chest` leans on armor, shirt, off-hand, bracers, gloves
+  - `belly` leans on armor, shirt, belt, off-hand, rings
+  - `waist` leans on armor, belt, pants, off-hand, rings, gloves
+  - `legs` leans on boots, pants, armor
+- generic zone-defense profiles still exist underneath this slot-weighted layer
 
 ---
 
@@ -252,7 +284,7 @@ The effective hit result depends on:
 
 - attack profile construction
 - zone multiplier
-- armor by slot and generic zone defense
+- armor by slot, zone armor, and generic zone defense
 - flat armor penetration
 - percent armor penetration
 - block outcome
@@ -316,4 +348,4 @@ This result contract drives:
 
 ---
 
-> Last updated: 2026-03-14 13:16 MSK
+> Last updated: 2026-03-16 02:35 MSK

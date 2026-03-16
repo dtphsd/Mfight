@@ -6,12 +6,15 @@ import {
   zeroArmorProfile,
   zeroCombatBonuses,
   zeroDamageProfile,
+  zeroZoneArmorProfile,
   type ArmorProfile,
   type DamageProfile,
+  type ZoneArmorProfile,
 } from "@/modules/inventory";
 import {
   cloneCombatBonuses,
   cloneDamageProfile,
+  cloneZoneArmorProfile,
   type CombatSnapshot,
   type CombatSnapshotBuilderInput,
 } from "@/orchestration/combat/combatSnapshot";
@@ -23,7 +26,9 @@ export function buildCombatSnapshot(input: CombatSnapshotBuilderInput): CombatSn
     percentBonuses,
     baseDamage = zeroDamageProfile,
     baseArmor = zeroArmorProfile,
+    baseZoneArmor = zeroZoneArmorProfile,
     armorBySlot = {},
+    zoneArmorBySlot = {},
     combatBonuses = zeroCombatBonuses,
     preferredDamageType = null,
     weaponClass = null,
@@ -47,6 +52,11 @@ export function buildCombatSnapshot(input: CombatSnapshotBuilderInput): CombatSn
     normalizedCombatBonuses.armorFlat,
     normalizedCombatBonuses.armorPercent
   );
+  const zoneArmor = resolveZoneArmorProfile(
+    baseZoneArmor,
+    normalizedCombatBonuses.armorFlat,
+    normalizedCombatBonuses.armorPercent
+  );
 
   return {
     characterId: character.id,
@@ -55,7 +65,9 @@ export function buildCombatSnapshot(input: CombatSnapshotBuilderInput): CombatSn
     maxHp: calculateMaxHp(stats.endurance),
     damage,
     armor,
+    zoneArmor,
     armorBySlot: cloneArmorProfilesBySlot(armorBySlot),
+    zoneArmorBySlot: cloneZoneArmorProfilesBySlot(zoneArmorBySlot),
     critChanceBonus: normalizedCombatBonuses.critChance,
     critMultiplierBonus: normalizedCombatBonuses.critMultiplier,
     dodgeChanceBonus: normalizedCombatBonuses.dodgeChance,
@@ -65,6 +77,25 @@ export function buildCombatSnapshot(input: CombatSnapshotBuilderInput): CombatSn
     armorPenetrationPercent: cloneDamageProfile(normalizedCombatBonuses.armorPenetrationPercent),
     preferredDamageType,
     weaponClass,
+  };
+}
+
+function resolveZoneArmorProfile(
+  baseProfile: ZoneArmorProfile,
+  flatBonuses: ArmorProfile,
+  percentBonuses: ArmorProfile
+): ZoneArmorProfile {
+  const averageFlatBonus = Math.floor((flatBonuses.slash + flatBonuses.pierce + flatBonuses.blunt + flatBonuses.chop) / 4);
+  const averagePercentBonus = Math.floor(
+    (percentBonuses.slash + percentBonuses.pierce + percentBonuses.blunt + percentBonuses.chop) / 4
+  );
+
+  return {
+    head: resolveArmorValue(baseProfile.head, averageFlatBonus, averagePercentBonus),
+    chest: resolveArmorValue(baseProfile.chest, averageFlatBonus, averagePercentBonus),
+    belly: resolveArmorValue(baseProfile.belly, averageFlatBonus, averagePercentBonus),
+    waist: resolveArmorValue(baseProfile.waist, averageFlatBonus, averagePercentBonus),
+    legs: resolveArmorValue(baseProfile.legs, averageFlatBonus, averagePercentBonus),
   };
 }
 
@@ -171,4 +202,12 @@ function cloneArmorProfilesBySlot(
       },
     ])
   ) as Partial<Record<EquipmentSlot, ArmorProfile>>;
+}
+
+function cloneZoneArmorProfilesBySlot(
+  profilesBySlot: Partial<Record<EquipmentSlot, ZoneArmorProfile>>
+): Partial<Record<EquipmentSlot, ZoneArmorProfile>> {
+  return Object.fromEntries(
+    Object.entries(profilesBySlot).map(([slot, profile]) => [slot, cloneZoneArmorProfile(profile)])
+  ) as Partial<Record<EquipmentSlot, ZoneArmorProfile>>;
 }

@@ -73,7 +73,7 @@ describe("roundDraft", () => {
         id: "feint",
         name: "Feint",
         description: "Test skill",
-        sourceItemCode: "training-sword",
+        sourceItemCode: "bk-item-6",
         resourceType: "momentum",
         cost: 20,
         damageMultiplier: 1.2,

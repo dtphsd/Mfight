@@ -1,6 +1,6 @@
 # Combat Design Reference
 
-> Last updated: 2026-03-14 12:52 MSK
+> Last updated: 2026-03-16 02:35 MSK
 
 **Project:** Fight Club  
 **Status:** structured reference from live runtime
@@ -32,7 +32,7 @@ It exists to make combat changes safer without forcing readers through one overs
   </div>
   <div class="docs-hub-card">
     <h3>Formulas &amp; Effects</h3>
-    <p>Damage math, dodge, crit, block, resources, passives, effects, consumables, and runtime outputs.</p>
+    <p>Damage math, dodge, crit, roll-based block, zone armor, resources, passives, effects, consumables, and runtime outputs.</p>
   </div>
   <div class="docs-hub-card">
     <h3>Integrations</h3>
@@ -54,8 +54,24 @@ It exists to make combat changes safer without forcing readers through one overs
 - `src/modules/combat/model/RoundResult.ts`
 - `src/modules/combat/config/combatConfig.ts`
 - `src/modules/combat/config/combatWeaponPassives.ts`
+- `src/modules/combat/services/combatFormulas.ts`
 - `src/orchestration/combat/buildCombatSnapshot.ts`
 - `src/orchestration/combat/combatSandboxController.ts`
+
+## Current Live Baseline
+
+The current combat baseline is no longer the old handcrafted training sandbox.
+
+It now includes:
+
+- generated Battle Kings starter items as the live item pool
+- expanded equipment slots across combat UI and snapshot assembly
+- zone-based armor as part of the real mitigation model
+- random damage and armor ranges
+- roll-based block reduction in the `40-70%` band, biased by `Endurance`
+- crit multiplier scaling from both `Rage` and `Endurance`
+- runtime skill cooldown tracking
+- synchronized `Combat Rules` content in both `ru` and `en`
 
 ---
 
@@ -99,4 +115,4 @@ It exists to make combat changes safer without forcing readers through one overs
 
 ---
 
-> Last updated: 2026-03-14 12:52 MSK
+> Last updated: 2026-03-16 02:35 MSK

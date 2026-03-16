@@ -1,6 +1,6 @@
 # Combat Expansion
 
-> Last updated: 2026-03-15 17:30 MSK
+> Last updated: 2026-03-16 02:35 MSK
 
 **Feature:** Combat Expansion  
 **Status:** IN PROGRESS
@@ -53,6 +53,14 @@ The current combat loop is readable and functional, but it can become repetitive
 
 `IN PROGRESS`
 
+Current live baseline has moved beyond the old handcrafted training sandbox:
+
+- the legacy `training-*` item pool is no longer active in combat flow
+- the sandbox now runs on generated `BazaBK` starter items
+- the combat runtime now uses zone-based armor, random damage and armor ranges, and roll-based block reduction
+- cooldown metadata is now supported by the live skill model and combatant runtime state
+- `Combat Rules` content has been rebuilt in UTF-8 and re-synced with the current formulas
+
 Planned focus:
 
 - add a first wave of new readable combat states such as `Exposed` and `Staggered`
@@ -88,6 +96,7 @@ Current slice:
 - `COMBAT-009` is now complete for the first-wave state layer: runtime, rules screen, and verification docs are back in sync
 - the curated build browser has now gone through a compact one-page UI pass with avatar previews, archetype color zoning, and denser preset inspection
 - combat impact feedback has also been hardened so text and block / crit / block-break overlays are emitted as one-shot pulses and do not reappear after fading out
+- penetration now has its own dedicated `PIERCE` impact treatment instead of borrowing another feedback lane
 
 ---
 
@@ -254,6 +263,11 @@ Move into `COMBAT-010` and use the fresh matrix snapshot to steer the next comba
 
 That means the next gameplay adjustments should be balance-informed rather than purely additive.
 
+The current expansion track now has a second requirement:
+
+1. keep the base formulas, `BazaBK` item imports, and rules docs aligned
+2. only then continue archetype-by-archetype tuning on top of that stable base
+
 ---
 
 ## Current Balance Snapshot
@@ -342,4 +356,4 @@ Current working conclusion:
 
 ---
 
-> Last updated: 2026-03-14 16:31 MSK
+> Last updated: 2026-03-16 02:35 MSK

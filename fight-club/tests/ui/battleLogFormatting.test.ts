@@ -413,7 +413,7 @@ describe("battle log phrase selection", () => {
       explanation: "test",
       tagGroups: {
         outcome: ["Critical"],
-        context: ["Skill: Feint Slash", "Zone: Head"],
+        context: ["Skill: Strong Hit", "Zone: Head"],
         reasons: ["Guard Broken"],
         effects: ["Gain: Rage +10", "Def: Guard +4"],
       },
@@ -421,7 +421,7 @@ describe("battle log phrase selection", () => {
 
     expect(getBattleLogVisibleTags(entry)).toEqual([
       "Critical",
-      "Skill: Feint Slash",
+      "Skill: Strong Hit",
       "Zone: Head",
       "Guard Broken",
     ]);
@@ -615,3 +615,4 @@ describe("battle log phrase selection", () => {
     expect(entry.isEffectTick).toBe(true);
   });
 });
+

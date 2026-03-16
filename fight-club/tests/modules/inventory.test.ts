@@ -31,10 +31,10 @@ const stackablePotion: Item = {
   percentBonuses: zeroCharacterStats,
 };
 
-const trainingSword: Item = {
-  id: "training-sword",
-  code: "training-sword",
-  name: "Training Sword",
+const sampleWeapon: Item = {
+  id: "sample-weapon",
+  code: "sample-weapon",
+  name: "Sample Weapon",
   category: "weapon",
   type: "weapon",
   rarity: "common",
@@ -79,7 +79,7 @@ describe("inventory module", () => {
   });
 
   it("adds a non-stackable item as a single entry", () => {
-    const result = addItem(createInventory(), trainingSword);
+    const result = addItem(createInventory(), sampleWeapon);
 
     expect(result.success).toBe(true);
     if (!result.success) {
@@ -189,3 +189,5 @@ describe("inventory module", () => {
     expect(getItemQuantity(inventory, "arena-token")).toBe(5);
   });
 });
+
+

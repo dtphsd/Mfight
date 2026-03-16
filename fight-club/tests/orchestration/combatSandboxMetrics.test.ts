@@ -13,7 +13,7 @@ import { SeededRandom } from "@/core/rng/SeededRandom";
 describe("combatSandboxMetrics", () => {
   it("builds combat metrics from snapshots and equipped items", () => {
     const inventory = createStarterInventory();
-    const equipped = equipPlayerLoadout(inventory, ["training-sword", "oak-shield"]);
+    const equipped = equipPlayerLoadout(inventory, ["bk-item-6", "bk-item-366"]);
     const equipmentBonuses = getEquipmentBonuses(equipped, inventory);
     const { playerSnapshot, botSnapshot } = createSandboxSnapshots(equipmentBonuses);
     const equippedItems = getEquippedItems(equipped, inventory);
@@ -25,18 +25,24 @@ describe("combatSandboxMetrics", () => {
       offHandItem: equippedItems.find((entry) => entry.slot === "offHand")?.item ?? null,
     });
 
-    expect(metrics.mainHandLabel).toBe("Training Sword");
-    expect(metrics.offHandLabel).toBe("Oak Shield");
+    expect(metrics.mainHandLabel).toBe(
+      inventory.entries.find((entry) => entry.item.code === "bk-item-6")?.item.name ?? null
+    );
+    expect(metrics.offHandLabel).toBeNull();
     expect(metrics.weaponHandedness).toBe("one_hand");
     expect(metrics.weaponDamageType).toBe("slash");
     expect(metrics.opponentMaxHp).toBe(botSnapshot.maxHp);
+    expect(metrics.totalDamageRange.min).toBeLessThanOrEqual(metrics.totalDamageRange.max);
+    expect(metrics.totalArmorRange.min).toBeLessThanOrEqual(metrics.totalArmorRange.max);
+    expect(metrics.opponentTotalDamageRange.min).toBeLessThanOrEqual(metrics.opponentTotalDamageRange.max);
+    expect(metrics.opponentTotalArmorRange.min).toBeLessThanOrEqual(metrics.opponentTotalArmorRange.max);
     expect(metrics.matchup.playerPrimaryType).toBe("slash");
     expect(metrics.matchup.playerZonePressure.zones).toHaveLength(5);
   });
 
   it("derives latest log entries, resource views, and battle log entries from combat state", () => {
     const inventory = createStarterInventory();
-    const equipped = equipPlayerLoadout(inventory, ["training-sword"]);
+    const equipped = equipPlayerLoadout(inventory, ["bk-item-6"]);
     const equipmentBonuses = getEquipmentBonuses(equipped, inventory);
     const { playerSnapshot, botSnapshot } = createSandboxSnapshots(equipmentBonuses);
     const state = startCombat(playerSnapshot, botSnapshot);
@@ -74,7 +80,9 @@ describe("combatSandboxMetrics", () => {
     expect(derived.battleLogEntries.length).toBeGreaterThan(0);
     expect(derived.playerResources).not.toBeNull();
     expect(derived.botResources).not.toBeNull();
-    expect(derived.metrics.mainHandLabel).toBe("Training Sword");
+    expect(derived.metrics.mainHandLabel).toBe(
+      inventory.entries.find((entry) => entry.item.code === "bk-item-6")?.item.name ?? null
+    );
   });
 });
 

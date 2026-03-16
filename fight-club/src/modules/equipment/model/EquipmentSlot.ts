@@ -2,7 +2,14 @@ export type EquipmentSlot =
   | "mainHand"
   | "offHand"
   | "helmet"
+  | "shirt"
   | "armor"
+  | "bracers"
+  | "belt"
+  | "pants"
   | "boots"
   | "gloves"
-  | "accessory";
+  | "ring"
+  | "ring2"
+  | "earring"
+;

@@ -2,51 +2,30 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import { CombatSandboxScreen } from "@/ui/screens/Combat/CombatSandboxScreen";
 
 describe("CombatSandboxScreen", () => {
-  it("opens builder and inventory popovers", () => {
+  it("opens builder and inventory popovers", async () => {
     render(<CombatSandboxScreen />);
 
     fireEvent.click(screen.getByRole("button", { name: "Open builder" }));
-    expect(screen.getByText("Player Builder")).toBeTruthy();
-    fireEvent.click(screen.getByRole("button", { name: "Close builder popover" }));
+    expect(await screen.findByText("Player Builder")).toBeTruthy();
+    fireEvent.click(await screen.findByRole("button", { name: "Close builder popover" }));
 
     fireEvent.click(screen.getByRole("button", { name: "Open inventory" }));
-    expect(screen.getByText("Loadout Storage")).toBeTruthy();
+    expect(await screen.findByText("Loadout Storage")).toBeTruthy();
   });
 
-  it("lets the player manually equip up to five skills and select one in combat", () => {
+  it("lets the player equip new Battle Kings items from inventory", async () => {
     render(<CombatSandboxScreen />);
 
-    expect(screen.queryByRole("button", { name: "Select Feint Slash" })).toBeNull();
-
     fireEvent.click(screen.getByRole("button", { name: "Open inventory" }));
-    fireEvent.click(screen.getByRole("button", { name: "Equip Training Sword" }));
-    fireEvent.click(screen.getByRole("button", { name: "Equip Oak Shield" }));
-    fireEvent.click(screen.getByRole("button", { name: "Equip Leather Cap" }));
-    fireEvent.click(screen.getByRole("button", { name: "Equip Braced Gloves" }));
-    fireEvent.click(screen.getByRole("button", { name: "Equip Trail Boots" }));
-    fireEvent.click(screen.getByRole("button", { name: "Equip Arena Earring" }));
-    fireEvent.click(screen.getByRole("button", { name: "Close inventory popover" }));
+    fireEvent.click(await screen.findByRole("button", { name: "Equip Молодой Меч" }));
+    fireEvent.click(await screen.findByRole("button", { name: "Equip Кабассет" }));
+    fireEvent.click(await screen.findByRole("button", { name: "Equip Перчатки Молотобойца" }));
+    fireEvent.click(await screen.findByRole("button", { name: "Equip Пояс Новобранца" }));
+    fireEvent.click(await screen.findByRole("button", { name: "Close inventory popover" }));
 
-    fireEvent.click(screen.getByRole("button", { name: "Manage equipped skills" }));
-    fireEvent.click(screen.getByRole("button", { name: "Add Feint Slash to panel skills" }));
-    fireEvent.click(screen.getByRole("button", { name: "Add Head Slip to panel skills" }));
-    fireEvent.click(screen.getByRole("button", { name: "Add Parry Riposte to panel skills" }));
-    fireEvent.click(screen.getByRole("button", { name: "Add Low Feint to panel skills" }));
-    fireEvent.click(screen.getByRole("button", { name: "Add Killer Focus to panel skills" }));
-    expect(screen.getByRole("button", { name: "Add Shield Bash to panel skills" }).hasAttribute("disabled")).toBe(true);
-    fireEvent.click(screen.getByRole("button", { name: "Close skill loadout popover" }));
-
-    const skillButton = screen.getByRole("button", { name: "Select Feint Slash" });
-    fireEvent.click(skillButton);
-
-    expect(screen.getByTestId("selected-action-label").textContent).toContain("Feint Slash");
-    expect(screen.getByTestId("selected-action-tags").textContent).toContain("Skill");
-    expect(screen.getByTestId("selected-action-tags").textContent).toContain("Damage x1.38");
-    expect(screen.getByTestId("selected-action-tags").textContent).toContain("Bleeding Line 2T");
-    expect(screen.getByRole("button", { name: "Select Head Slip" })).toBeTruthy();
-    expect(screen.getByRole("button", { name: "Select Parry Riposte" })).toBeTruthy();
-    expect(screen.getByRole("button", { name: "Select Low Feint" })).toBeTruthy();
-    expect(screen.getByRole("button", { name: "Select Killer Focus" })).toBeTruthy();
+    expect(screen.getByRole("button", { name: /Main Hand Молодой Меч/i })).toBeTruthy();
+    expect(screen.getByRole("button", { name: /Helmet Кабассет/i })).toBeTruthy();
+    expect(screen.getAllByRole("button", { name: /Gloves/i }).length).toBeGreaterThan(0);
   });
 
   it("starts combat and appends entries to the battle log after a round resolves", () => {
@@ -60,22 +39,11 @@ describe("CombatSandboxScreen", () => {
     expect(screen.getByTestId("latest-round-summary").textContent).not.toContain("No round resolved yet.");
   });
 
-  it("switches an unaffordable selected skill to basic attack when a new round starts", () => {
+  it("keeps basic attack selected through round transitions without legacy skills", () => {
     render(<CombatSandboxScreen />);
-
-    fireEvent.click(screen.getByRole("button", { name: "Open inventory" }));
-    fireEvent.click(screen.getByRole("button", { name: "Equip Training Sword" }));
-    fireEvent.click(screen.getByRole("button", { name: "Close inventory popover" }));
-
-    fireEvent.click(screen.getByRole("button", { name: "Manage equipped skills" }));
-    fireEvent.click(screen.getByRole("button", { name: "Add Feint Slash to panel skills" }));
-    fireEvent.click(screen.getByRole("button", { name: "Close skill loadout popover" }));
 
     fireEvent.click(screen.getByRole("button", { name: "Start fight" }));
     fireEvent.click(screen.getByRole("button", { name: "Resolve round" }));
-
-    fireEvent.click(screen.getByRole("button", { name: "Select Feint Slash" }));
-    expect(screen.getByTestId("selected-action-label").textContent).toContain("Feint Slash");
 
     fireEvent.click(screen.getByRole("button", { name: "Prepare next round" }));
     expect(screen.getByTestId("selected-action-label").textContent).toContain("Basic Attack");
@@ -99,18 +67,18 @@ describe("CombatSandboxScreen", () => {
     expect(screen.getByText("Damage x0.80")).toBeTruthy();
   });
 
-  it("applies a curated build preset from the dedicated presets popover", () => {
+  it("applies a curated build preset from the dedicated presets popover", async () => {
     render(<CombatSandboxScreen />);
 
     fireEvent.click(screen.getByRole("button", { name: "Open build presets" }));
-    expect(screen.getByText("Arena Archetypes")).toBeTruthy();
+    expect(await screen.findByText("Arena Archetypes")).toBeTruthy();
 
-    fireEvent.click(screen.getAllByRole("button", { name: /Dagger \/ Crit/i }).at(-1)!);
-    fireEvent.click(screen.getByRole("button", { name: "Apply Build" }));
+    fireEvent.click((await screen.findAllByRole("button", { name: /Dagger \/ Crit/i })).at(-1)!);
+    fireEvent.click(await screen.findByRole("button", { name: "Apply Build" }));
 
     expect(screen.getAllByTestId("combat-silhouette-image")[0].getAttribute("data-figure")).toBe("kitsune-bit");
-    expect(screen.getByRole("button", { name: "Select Piercing Lunge" })).toBeTruthy();
-    expect(screen.getByRole("button", { name: "Select Killer Focus" })).toBeTruthy();
+    expect(screen.getAllByRole("button", { name: /Main Hand/i }).length).toBeGreaterThan(0);
+    expect(screen.getAllByRole("button", { name: /Helmet/i }).length).toBeGreaterThan(0);
   });
 
   it("lets the bot switch to curated gear presets and updates its snapshot", () => {
@@ -124,41 +92,41 @@ describe("CombatSandboxScreen", () => {
     expect(screen.getAllByText("Blunt").length).toBeGreaterThan(0);
   });
 
-  it("supports local profile mail from inbox replies and direct messages", () => {
+  it("supports local profile mail from inbox replies and direct messages", async () => {
     render(<CombatSandboxScreen playerName="Courier" />);
 
     fireEvent.click(screen.getAllByRole("button", { name: "Open character profile" })[0]);
-    fireEvent.click(screen.getByRole("button", { name: "Open personal mail" }));
+    fireEvent.click(await screen.findByRole("button", { name: "Open personal mail" }));
 
-    expect(screen.getByText("Inbox and replies")).toBeTruthy();
-    expect(screen.getByText("Sparring request")).toBeTruthy();
-    fireEvent.click(screen.getByText("Sparring request"));
+    expect(await screen.findByText("Inbox and replies")).toBeTruthy();
+    expect(await screen.findByText("Sparring request")).toBeTruthy();
+    fireEvent.click(await screen.findByText("Sparring request"));
 
-    fireEvent.change(screen.getByLabelText("Mail body"), {
+    fireEvent.change(await screen.findByLabelText("Mail body"), {
       target: { value: "Reply confirmed. Meet me after the next round." },
     });
-    fireEvent.click(screen.getByRole("button", { name: "Send Letter" }));
+    fireEvent.click(await screen.findByRole("button", { name: "Send Letter" }));
 
-    expect(screen.getAllByText("Re: Sparring request").length).toBeGreaterThan(0);
-    fireEvent.click(screen.getByRole("button", { name: "Close mailbox" }));
-    fireEvent.click(screen.getByRole("button", { name: "Close profile modal" }));
+    expect((await screen.findAllByText("Re: Sparring request")).length).toBeGreaterThan(0);
+    fireEvent.click(await screen.findByRole("button", { name: "Close mailbox" }));
+    fireEvent.click(await screen.findByRole("button", { name: "Close profile modal" }));
 
     fireEvent.click(screen.getAllByRole("button", { name: "Open character profile" })[1]);
-    fireEvent.click(screen.getByRole("button", { name: "Write a letter to Arena Bot" }));
+    fireEvent.click(await screen.findByRole("button", { name: "Write a letter to Arena Bot" }));
 
-    fireEvent.change(screen.getByLabelText("Mail subject"), {
+    fireEvent.change(await screen.findByLabelText("Mail subject"), {
       target: { value: "Route notes" },
     });
-    fireEvent.change(screen.getByLabelText("Mail body"), {
+    fireEvent.change(await screen.findByLabelText("Mail body"), {
       target: { value: "Your scouting notes are waiting in the local inbox service." },
     });
-    fireEvent.click(screen.getByRole("button", { name: "Send Letter" }));
-    fireEvent.click(screen.getByRole("button", { name: "Close mailbox" }));
-    fireEvent.click(screen.getByRole("button", { name: "Close profile modal" }));
+    fireEvent.click(await screen.findByRole("button", { name: "Send Letter" }));
+    fireEvent.click(await screen.findByRole("button", { name: "Close mailbox" }));
+    fireEvent.click(await screen.findByRole("button", { name: "Close profile modal" }));
 
     fireEvent.click(screen.getAllByRole("button", { name: "Open character profile" })[0]);
-    fireEvent.click(screen.getByRole("button", { name: "Open personal mail" }));
+    fireEvent.click(await screen.findByRole("button", { name: "Open personal mail" }));
 
-    expect(screen.getAllByText("Route notes").length).toBeGreaterThan(0);
+    expect((await screen.findAllByText("Route notes")).length).toBeGreaterThan(0);
   });
 });

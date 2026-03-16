@@ -8,7 +8,7 @@ interface PanelCardProps {
 const baseStyle: CSSProperties = {
   borderRadius: "16px",
   padding: "12px",
-  background: "rgba(255,255,255,0.03)",
+  background: "rgb(28,30,36)",
   border: "1px solid rgba(255,255,255,0.08)",
 };
 

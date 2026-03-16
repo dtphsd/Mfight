@@ -45,13 +45,19 @@ interface CombatSilhouetteProps {
 }
 
 const equipmentSlotPositions: Record<EquipmentSlot, CSSProperties> = {
-  helmet: { top: 8, left: 2 },
-  armor: { top: 8, left: 165 },
-  mainHand: { top: 82, left: 2 },
-  offHand: { top: 82, left: 165 },
-  gloves: { top: 156, left: 2 },
-  accessory: { top: 220, left: 165 },
-  boots: { top: 290, left: 165 },
+  helmet: { top: 8, left: 86 },
+  earring: { top: 34, left: 166 },
+  bracers: { top: 44, left: 4 },
+  mainHand: { top: 96, left: 4 },
+  armor: { top: 148, left: 4 },
+  shirt: { top: 200, left: 4 },
+  gloves: { top: 252, left: 4 },
+  belt: { top: 304, left: 4 },
+  offHand: { top: 96, left: 166 },
+  ring2: { top: 148, left: 166 },
+  ring: { top: 200, left: 166 },
+  pants: { top: 252, left: 166 },
+  boots: { top: 304, left: 166 },
 };
 
 export function CombatSilhouette({
@@ -242,8 +248,7 @@ function SilhouetteBoard({
           style={{
             position: "absolute",
             top: "10px",
-            left: "50%",
-            transform: "translateX(-50%)",
+            left: "10px",
             width: "22px",
             height: "22px",
             borderRadius: "999px",
@@ -384,7 +389,7 @@ function SilhouetteEquipmentLayer({
   onEquipmentSlotClick?: (slot: EquipmentSlot) => void;
 }) {
   return (
-    <div style={{ position: "absolute", inset: 0, opacity: 0.52 }}>
+    <div style={{ position: "absolute", inset: 0 }}>
       {equipmentSlots.map(({ slot, item }) => (
         <EquipmentSlotButton
           key={slot}
@@ -735,6 +740,7 @@ function EquipmentSlotButton({
               : "0 0 0 transparent",
           transition: "background 140ms ease, border-color 140ms ease, box-shadow 140ms ease, transform 140ms ease",
           transform: hovered ? "translateY(-1px)" : "translateY(0)",
+          opacity: hovered ? 1 : 0.52,
         }}
       >
         <div
@@ -818,13 +824,25 @@ function renderEquipmentSlotIcon(slot: EquipmentSlot, size: number): ReactNode {
       return <ShieldIcon size={size} />;
     case "helmet":
       return <HelmetIcon size={size} />;
+    case "shirt":
+      return <ArmorIcon size={size} />;
     case "armor":
       return <ArmorIcon size={size} />;
+    case "bracers":
+      return <GlovesIcon size={size} />;
+    case "belt":
+      return <ArmorIcon size={size} />;
+    case "pants":
+      return <BootsIcon size={size} />;
     case "boots":
       return <BootsIcon size={size} />;
     case "gloves":
       return <GlovesIcon size={size} />;
-    case "accessory":
+    case "ring":
+      return <RingIcon size={size} />;
+    case "ring2":
+      return <RingIcon size={size} />;
+    case "earring":
       return <RingIcon size={size} />;
     default:
       return null;
@@ -839,14 +857,26 @@ function formatEquipmentSlotLabel(slot: EquipmentSlot) {
       return "Off Hand";
     case "helmet":
       return "Helmet";
+    case "shirt":
+      return "Shirt";
     case "armor":
       return "Armor";
+    case "bracers":
+      return "Bracers";
+    case "belt":
+      return "Belt";
+    case "pants":
+      return "Pants";
     case "boots":
       return "Boots";
     case "gloves":
       return "Gloves";
-    case "accessory":
-      return "Accessory";
+    case "ring":
+      return "Ring";
+    case "ring2":
+      return "Ring II";
+    case "earring":
+      return "Earring";
     default:
       return slot;
   }

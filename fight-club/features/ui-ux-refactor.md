@@ -1,6 +1,6 @@
 # UI / UX Refactor
 
-> Last updated: 2026-03-14 16:36 MSK
+> Last updated: 2026-03-16 20:02 MSK
 
 **Feature:** UI / UX Refactor  
 **Status:** 🟡 IN PROGRESS
@@ -56,6 +56,8 @@ UI перегружен крупными компонентами, плотны�
 Current state:
 
 UI / UX audit and phased roadmap are complete. `UI-002`, `UI-003`, and `UI-004` are finished. The active implementation steps are `UI-008` for structural decomposition and `UI-010` for the first visual polish slice.
+
+The current `UI-008` reality is broader than the initial silhouette-only pass: `CombatSandboxScreen` now works as a thin orchestration shell over extracted `stage`, `overlays`, `setup`, `state`, `derived`, `popover`, `layout`, `targeting`, `controls`, `actions`, `panels`, and `resource-grid` siblings; `BuilderPopover`, `BuildPresetsPopover`, `InventoryPopover`, `ItemPresentationCard`, and `BattleLogPanel` also route major helper, primitive, render, and panel layers through sibling modules, reducing local formatting and presentation duplication without changing player-facing behavior.
 
 The next product-facing focus is a dedicated UX cleanup track for the combat loop:
 
@@ -126,6 +128,16 @@ Keep the structural refactor safe, but shift the next UX work toward a cleaner c
     - extracted `SilhouetteLegend` from `src/ui/components/combat/CombatSilhouette.tsx`
     - extracted `SilhouetteEquipmentLayer` from `src/ui/components/combat/CombatSilhouette.tsx`
     - extracted `SilhouetteStatusEffects` from `src/ui/components/combat/CombatSilhouette.tsx`
+  - completed in the later `UI-008` cleanup slices:
+    - extracted `combatSandboxScreenState.ts`, `combatSandboxScreenDerived.ts`, and `combatSandboxScreenPopovers.tsx` support layers around `CombatSandboxScreen`
+    - extracted `combatSandboxScreenSetup.tsx`, `combatSandboxScreenStage.tsx`, and `combatSandboxScreenOverlays.tsx` so `CombatSandboxScreen.tsx` can behave as a thinner orchestration shell
+    - extracted `builderPopoverHelpers.tsx`, `builderPopoverPrimitives.tsx`, and `builderPopoverPanels.tsx` from `src/ui/components/combat/BuilderPopover.tsx`
+    - extracted `buildPresetsPopoverHelpers.ts` from `src/ui/components/combat/BuildPresetsPopover.tsx`
+    - extracted `inventoryPopoverHelpers.tsx` from `src/ui/components/combat/InventoryPopover.tsx`
+    - extracted `itemPresentationCardHelpers.tsx` from `src/ui/components/combat/ItemPresentationCard.tsx`
+    - extracted equipment-slot helpers and glyphs into `combatSilhouetteHelpers.tsx` from `src/ui/components/combat/CombatSilhouette.tsx`
+    - extracted `battleLogPanelHelpers.tsx`, `battleLogPanelCards.tsx`, and `battleLogPanelPrimitives.tsx` from `src/ui/components/combat/BattleLogPanel.tsx`
+    - extracted `battleLogFormattingHelpers.ts` from `src/ui/components/combat/battleLogFormatting.ts`
   - completed in the previous screen-decomposition slices:
     - extracted `PlayerCombatPanel` from `src/ui/screens/Combat/CombatSandboxScreen.tsx`
     - extracted `FightControlsPanel` from `src/ui/screens/Combat/CombatSandboxScreen.tsx`
@@ -139,7 +151,8 @@ Keep the structural refactor safe, but shift the next UX work toward a cleaner c
     - `npm run test -- tests/ui/combatSandboxScreen.test.tsx`
     - `npm run build`
   - next in the same phase:
-    - decide whether to continue inside `CombatSilhouette.tsx` with status-effect popup internals or move to the next heavyweight component
+    - continue trimming remaining legacy/helper tails in older files like `CombatSilhouette.tsx`
+    - or keep moving laterally across remaining heavyweight UI surfaces after the combat-screen shell refactor is stabilized
   - queued after the current structural pass:
     - `UI-010`
     - focus: visual polish across combat UI without changing product flow
@@ -156,6 +169,7 @@ Keep the structural refactor safe, but shift the next UX work toward a cleaner c
       - `VP-M02` ready-state pulse is now active for `Resolve Round` when the round is ready
       - `VP-M03` silhouette hit reaction is now active when an incoming combat result deals damage
       - `VP-M01` resource ring is now active for skill buttons while the required resource is still building
+      - `BattleLogPanel` header and card hierarchy now use stronger grouping, clearer sections, refreshed pills, and updated battle-log wording for better scanability during longer sessions
       - verified with:
         - `npm run test -- tests/ui/combatSandboxScreen.test.tsx`
         - `npm run build`
@@ -505,4 +519,4 @@ The next product-facing work should focus on making the combat loop easier to re
 
 ---
 
-> Last updated: 2026-03-15 02:18 MSK
+> Last updated: 2026-03-16 18:31 MSK

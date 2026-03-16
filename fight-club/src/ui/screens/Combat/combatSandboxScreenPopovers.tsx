@@ -1,4 +1,6 @@
 import type { CSSProperties } from "react";
+import type { DamageProfile } from "@/modules/inventory";
+import { formatMaybeTitle, formatResourceLabel, formatSkillDetailLines, getActionVisual, getSkillIcon, splitDetailLine, type CombatRuleEffectSummary } from "./combatSandboxScreenHelpers";
 
 export function BotBuildPresetsPopover({
   panelStyle,
@@ -271,6 +273,285 @@ export function BotBuildPresetsPopover({
           ))}
         </div>
       </div>
+    </div>
+  );
+}
+
+export function SkillLoadoutPopover({
+  buttonStyle,
+  unlockedSkills,
+  equippedSkillIds,
+  maxEquippedSkills,
+  onToggleSkill,
+  onClose,
+}: {
+  buttonStyle: CSSProperties;
+  unlockedSkills: Array<{
+    id: string;
+    name: string;
+    description: string;
+    sourceItemCode: string;
+    resourceType: string;
+    cost: number;
+    damageMultiplier: number;
+    critChanceBonus: number;
+    cooldownTurns?: number;
+    requirements?: {
+      minLevel?: number;
+      notes?: string[];
+    };
+    unlock?: {
+      kind: "item" | "book" | "trainer" | "quest" | "default";
+      sourceName?: string;
+      note?: string;
+    };
+    armorPenetrationPercentBonus: DamageProfile;
+    effects?: CombatRuleEffectSummary[];
+  }>;
+  equippedSkillIds: string[];
+  maxEquippedSkills: number;
+  onToggleSkill: (skillId: string) => void;
+  onClose: () => void;
+}) {
+  return (
+    <div
+      style={{
+        position: "fixed",
+        inset: 0,
+        zIndex: 45,
+        display: "grid",
+        placeItems: "center",
+        padding: "20px",
+      }}
+    >
+      <button
+        type="button"
+        aria-label="Close skill loadout popover"
+        onClick={onClose}
+        style={{
+          position: "absolute",
+          inset: 0,
+          border: "none",
+          background: "rgba(7, 8, 12, 0.72)",
+          cursor: "pointer",
+        }}
+      />
+      <div
+        style={{
+          position: "relative",
+          width: "min(760px, 100%)",
+          maxHeight: "min(720px, calc(100vh - 36px))",
+          overflow: "hidden",
+          borderRadius: "22px",
+          border: "1px solid rgba(255,255,255,0.12)",
+          background:
+            "linear-gradient(180deg, rgba(25,22,27,0.98), rgba(14,13,18,0.98)), radial-gradient(circle at top, rgba(255,214,164,0.08), transparent 32%)",
+          boxShadow: "0 28px 72px rgba(0,0,0,0.48)",
+          display: "grid",
+          gridTemplateRows: "auto minmax(0, 1fr)",
+        }}
+      >
+        <div
+          style={{
+            padding: "14px 16px 12px",
+            borderBottom: "1px solid rgba(255,255,255,0.08)",
+            display: "grid",
+            gap: "8px",
+          }}
+        >
+          <div style={{ display: "flex", justifyContent: "space-between", gap: "10px", alignItems: "start" }}>
+            <div style={{ display: "grid", gap: "3px" }}>
+              <div style={{ fontSize: "10px", fontWeight: 800, letterSpacing: "0.08em", color: "#d8c7b1", textTransform: "uppercase" }}>
+                Combat Actions
+              </div>
+              <div style={{ fontSize: "20px", fontWeight: 800, color: "#fff7ea", lineHeight: 1.05 }}>
+                Equipped Skills
+              </div>
+              <div style={{ fontSize: "11px", lineHeight: 1.35, color: "#cabfb0" }}>
+                Choose up to {maxEquippedSkills} active skills from all equipped items. These are the skills shown in the battle panel.
+              </div>
+            </div>
+            <button type="button" onClick={onClose} style={{ ...buttonStyle, padding: "6px 10px", fontSize: "10px" }}>
+              Close
+            </button>
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: `repeat(${maxEquippedSkills}, minmax(0, 1fr))`, gap: "6px" }}>
+            {Array.from({ length: maxEquippedSkills }, (_, index) => {
+              const skillId = equippedSkillIds[index] ?? null;
+              const skill = unlockedSkills.find((entry) => entry.id === skillId) ?? null;
+
+              return (
+                <div
+                  key={`equipped-skill-slot-${index + 1}`}
+                  style={{
+                    borderRadius: "16px",
+                    padding: "10px",
+                    minHeight: "96px",
+                    background: skill ? "rgba(207,106,50,0.10)" : "rgba(255,255,255,0.03)",
+                    border: skill ? "1px solid rgba(255,171,97,0.28)" : "1px dashed rgba(255,255,255,0.14)",
+                    display: "grid",
+                    gap: "6px",
+                    alignContent: "start",
+                  }}
+                >
+                  <div style={{ display: "flex", justifyContent: "space-between", gap: "8px", alignItems: "start" }}>
+                    <div style={{ fontSize: "8px", textTransform: "uppercase", opacity: 0.68 }}>Slot {index + 1}</div>
+                    {skill ? <div style={{ fontSize: "20px", lineHeight: 1 }}>{getSkillIcon(skill.name, skill.sourceItemCode)}</div> : null}
+                  </div>
+                  <div style={{ fontSize: "11px", fontWeight: 800, lineHeight: 1.2 }}>{skill?.name ?? "Empty"}</div>
+                  <div style={{ fontSize: "9px", opacity: 0.68, lineHeight: 1.25 }}>
+                    {skill ? formatMaybeTitle(skill.sourceItemCode.replace(/-/g, " ")) : "Assign a skill below"}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        <div style={{ overflowY: "auto", padding: "12px 16px 16px", display: "grid", gap: "8px" }}>
+          {unlockedSkills.length === 0 ? (
+            <div style={{ fontSize: "11px", opacity: 0.66, lineHeight: 1.4 }}>
+              Equip items with `skills[]` to unlock combat actions here.
+            </div>
+          ) : (
+            unlockedSkills.map((skill) => {
+              const equippedIndex = equippedSkillIds.indexOf(skill.id);
+              const isEquipped = equippedIndex >= 0;
+              const canEquip = isEquipped || equippedSkillIds.length < maxEquippedSkills;
+
+              return (
+                <div
+                  key={skill.id}
+                  style={{
+                    borderRadius: "15px",
+                    padding: "12px",
+                    background: isEquipped ? "rgba(207,106,50,0.08)" : "rgba(255,255,255,0.03)",
+                    border: isEquipped ? "1px solid rgba(255,171,97,0.28)" : "1px solid rgba(255,255,255,0.08)",
+                    display: "grid",
+                    gap: "6px",
+                  }}
+                >
+                  <div style={{ display: "flex", justifyContent: "space-between", gap: "10px", alignItems: "start" }}>
+                    <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+                      <div
+                        style={{
+                          width: "34px",
+                          height: "34px",
+                          borderRadius: "12px",
+                          display: "grid",
+                          placeItems: "center",
+                          background: getActionVisual(skill.name, skill.sourceItemCode).innerBackground,
+                          border: `1px solid ${getActionVisual(skill.name, skill.sourceItemCode).ring}`,
+                          fontSize: "18px",
+                        }}
+                      >
+                        {getSkillIcon(skill.name, skill.sourceItemCode)}
+                      </div>
+                      <div style={{ display: "grid", gap: "3px" }}>
+                        <div style={{ fontSize: "11px", fontWeight: 800 }}>{skill.name}</div>
+                        <div style={{ fontSize: "9px", opacity: 0.68 }}>
+                          {formatMaybeTitle(skill.sourceItemCode.replace(/-/g, " "))}
+                        </div>
+                      </div>
+                    </div>
+                    <div style={{ display: "grid", gap: "4px", justifyItems: "end" }}>
+                      <div
+                        style={{
+                          fontSize: "10px",
+                          fontWeight: 800,
+                          color: "#ffd9b1",
+                          borderRadius: "999px",
+                          padding: "4px 8px",
+                          background: "linear-gradient(180deg, rgba(255,200,132,0.18), rgba(214,129,63,0.08))",
+                          border: "1px solid rgba(255,200,132,0.28)",
+                        }}
+                      >
+                        {skill.cost} {formatResourceLabel(skill.resourceType)}
+                      </div>
+                      {typeof skill.cooldownTurns === "number" ? (
+                        <div
+                          style={{
+                            fontSize: "9px",
+                            fontWeight: 700,
+                            color: "#b8cbff",
+                            borderRadius: "999px",
+                            padding: "3px 7px",
+                            background: "rgba(115,149,230,0.12)",
+                            border: "1px solid rgba(115,149,230,0.22)",
+                          }}
+                        >
+                          CD {skill.cooldownTurns}T
+                        </div>
+                      ) : null}
+                      <button
+                        type="button"
+                        aria-label={isEquipped ? `Remove ${skill.name} from panel skills` : `Add ${skill.name} to panel skills`}
+                        onClick={() => onToggleSkill(skill.id)}
+                        disabled={!canEquip}
+                        style={{
+                          ...buttonStyle,
+                          padding: "5px 8px",
+                          fontSize: "9px",
+                          opacity: canEquip ? 1 : 0.5,
+                          cursor: canEquip ? "pointer" : "not-allowed",
+                        }}
+                      >
+                        {isEquipped ? `Slot ${equippedIndex + 1}` : "Add To Panel"}
+                      </button>
+                    </div>
+                  </div>
+                  <FactList rows={formatSkillDetailLines(skill)} />
+                </div>
+              );
+            })
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function FactList({ rows }: { rows: string[] }) {
+  return (
+    <div
+      style={{
+        display: "grid",
+        gap: "4px",
+        borderRadius: "12px",
+        padding: "8px 9px",
+        background: "rgba(255,255,255,0.025)",
+        border: "1px solid rgba(255,255,255,0.08)",
+      }}
+    >
+      {rows.map((line) => {
+        const entry = splitDetailLine(line);
+        return (
+          <div
+            key={`${entry.label}-${entry.value}`}
+            style={{
+              display: "grid",
+              gridTemplateColumns: "54px minmax(0, 1fr)",
+              gap: "7px",
+              alignItems: "start",
+            }}
+          >
+            <div
+              style={{
+                fontSize: "7px",
+                textTransform: "uppercase",
+                letterSpacing: "0.14em",
+                color: "#d3bfab",
+                opacity: 0.82,
+                fontWeight: 800,
+                paddingTop: "2px",
+              }}
+            >
+              {entry.label}
+            </div>
+            <div style={{ fontSize: "8px", color: "#f4e8d9", lineHeight: 1.28, fontWeight: 700 }}>{entry.value}</div>
+          </div>
+        );
+      })}
     </div>
   );
 }

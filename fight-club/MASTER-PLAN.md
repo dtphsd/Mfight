@@ -1,6 +1,6 @@
 # MASTER-PLAN - Fight Club
 
-> Last updated: 2026-03-16 13:55 MSK
+> Last updated: 2026-03-16 20:02 MSK
 
 **Project:** Fight Club  
 **Scope:** active product planning, task tracking, and sprint history
@@ -28,9 +28,9 @@
 | UI-005 | Rework build flow into one clear UX path | UX | 🔴 TODO | `features/ui-ux-refactor.md` | Merge presets, builder, inventory, and skills into one mental model |
 | UI-006 | Rework round setup into guided action flow | UX | 🔴 TODO | `features/ui-ux-refactor.md` | Make action selection procedural and easier to read |
 | UI-007 | Reduce combat screen information density | UX | 🔴 TODO | `features/ui-ux-refactor.md` | Demote advanced analytics and surface key actions first |
-| UI-008 | Split heavyweight combat components | UI Architecture | 🟡 IN PROGRESS | `features/ui-ux-refactor.md` | `CombatSilhouette` now has extracted header, hp bar, board shell, figure, equipment layer, status-effects layer, and a dedicated combat-motion sublayer (`combatImpactMotion.ts`, `CombatImpactOverlay.tsx`, `combat-motion.css`) |
+| UI-008 | Split heavyweight combat components | UI Architecture | 🟡 IN PROGRESS | `features/ui-ux-refactor.md` | `CombatSilhouette` now has extracted header, hp bar, board shell, figure, equipment layer, status-effects layer, and a dedicated combat-motion sublayer; `CombatSandboxScreen` is now reduced to a thin orchestration shell over extracted stage, overlays, setup, state, derived, popover, layout, targeting, controls, actions, panels, and resource-grid siblings; `BuilderPopover`, `BuildPresetsPopover`, `InventoryPopover`, `ItemPresentationCard`, and `BattleLogPanel` also shed local helper, primitive, and render layers into sibling modules |
 | UI-009 | Add UI contract tests for critical flows | QA / UI | 🔴 TODO | `features/ui-ux-refactor.md` | Protect build flow, action flow, and modal behavior during refactor |
-| UI-010 | Run visual polish pass across combat UI | Visual Design | 🟡 IN PROGRESS | `features/ui-ux-refactor.md` | `VP-M01`, `VP-M02`, and `VP-M03` are live; combat now also ships a layered impact-motion system for `hit`, `crit`, `block`, `dodge`, and `block break`, plus post-fight silhouette freeze states |
+| UI-010 | Run visual polish pass across combat UI | Visual Design | 🟡 IN PROGRESS | `features/ui-ux-refactor.md` | `VP-M01`, `VP-M02`, and `VP-M03` are live; combat now also ships a layered impact-motion system for `hit`, `crit`, `block`, `dodge`, and `block break`, plus post-fight silhouette freeze states, refreshed battle-log cards, and a stronger battle-log header hierarchy |
 | COMBAT-001 | Create complete combat design and rules reference | Combat Design / Docs | ✅ DONE | `features/combat-design-reference.md` | Source-of-truth combat reference now covers runtime model, formulas, passives, turn-order examples, verification rules, bot assumptions, and Combat Rules alignment |
 | COMBAT-002 | Document combat resolution pipeline and turn order | Combat Design / Docs | ✅ DONE | `features/combat-design-reference.md` | Combat pipeline docs now cover exact sequencing, edge cases, traceability, and a regression-test target matrix for follow-up QA work |
 | COMBAT-003 | Add composition regression tests for combat rules | Combat QA | 🟡 IN PROGRESS | `features/combat-design-reference.md` | Protect combinations like skills plus consumables, effects plus death, and block plus penetration from silent regressions |
@@ -55,7 +55,7 @@
 | CLEAN-003 | Separate source from generated and build artifacts | Architecture Hygiene | 🟡 IN PROGRESS | `features/project-cleanup-program.md` | Build artifacts are now separated and ignored; the remaining follow-up is clarifying long-lived generated content boundaries like Battle Kings starter items |
 | CLEAN-004 | Prune stub bootstrap and future-only module layers | Runtime Architecture | ✅ DONE | `features/project-cleanup-program.md` | Placeholder bootstrap/application stubs were removed from the active runtime graph |
 | CLEAN-005 | Reduce sandbox orchestration and hook surface area | UI / Orchestration | ✅ DONE | `features/project-cleanup-program.md` | `useCombatSandbox` is now split into data, actions, and flow helpers, shrinking the main hook into a clearer coordinator |
-| CLEAN-006 | Continue heavyweight UI decomposition | UI Architecture | 🟡 IN PROGRESS | `features/project-cleanup-program.md` | `CombatSandboxScreen` now renders through extracted actions, controls, targeting, layout, panels, resource-grid, and popover siblings; next step is deleting remaining legacy helper blocks and continuing with the next oversized UI surface |
+| CLEAN-006 | Continue heavyweight UI decomposition | UI Architecture | 🟡 IN PROGRESS | `features/project-cleanup-program.md` | `CombatSandboxScreen` is now mostly a coordinator over extracted stage, overlays, setup, actions, controls, targeting, layout, panels, resource-grid, state, derived, and popover siblings; follow-up slices also decomposed `BuilderPopover`, `BuildPresetsPopover`, `InventoryPopover`, `ItemPresentationCard`, and `BattleLogPanel`, so the next cleanup pressure is in older heavy files like `CombatSilhouette` and remaining legacy surfaces |
 | CLEAN-007 | Lower combat core risk through safe decomposition | Combat Refactor | 🔴 TODO | `features/project-cleanup-program.md` | Break `resolveRound.ts` into smaller rule units only behind regression coverage |
 | CLEAN-008 | Harden save loading and compatibility rules | Persistence / Safety | 🔴 TODO | `features/project-cleanup-program.md` | Validate save payloads on read, normalize older payloads, and add safe fallback behavior |
 | CLEAN-009 | Sync docs and workflow after the cleanup pass | Docs / Workflow | 🟡 IN PROGRESS | `features/project-cleanup-program.md` | Root docs and structure notes are being synchronized with the cleanup track so the next refactor pass can resume from documented reality |
@@ -450,6 +450,9 @@ Execution rules:
 | v0.85 | Profile Modal Track Opened | Added a dedicated `Profile Modal` feature track, formalized `PROFILE-001` through `PROFILE-005`, and scoped the first release as a local client-side modal instead of a full social system | `PROFILE-001`, `PROFILE-002`, `PROFILE-003`, `PROFILE-004`, `PROFILE-005` |
 | v0.86 | Project Cleanup Track Added | Added a dedicated cleanup program with phased repo hygiene, source-boundary cleanup, stub pruning, UI/runtime decomposition, persistence hardening, and docs-sync follow-up tasks | `CLEAN-001`, `CLEAN-002`, `CLEAN-003`, `CLEAN-004`, `CLEAN-005`, `CLEAN-006`, `CLEAN-007`, `CLEAN-008`, `CLEAN-009` |
 | v0.87 | Cleanup Progress Synced | Closed cleanup inventory, safe junk removal, stub pruning, and sandbox hook decomposition; continued combat-screen file-splitting and synced docs so the next session can resume directly from the current cleanup frontier | `CLEAN-001`, `CLEAN-002`, `CLEAN-004`, `CLEAN-005`, `CLEAN-006`, `CLEAN-009` |
+| v0.88 | Builder Surface Decomposition Extended | Split `BuilderPopover` into sibling state, derived, popover, primitive, and panel modules so the main file now acts as a thinner coordinator | `UI-008`, `CLEAN-006` |
+| v0.89 | Preset, Inventory, And Item Card Helper Layers Extracted | Moved helper and visual-support code out of `BuildPresetsPopover`, `InventoryPopover`, and `ItemPresentationCard` into sibling modules to keep the main files focused on composition | `UI-008`, `CLEAN-006` |
+| v0.90 | Battle Log Surface Refactored And Polished | Split `BattleLogPanel` into helper, card, and primitive layers, unified battle-log wording helpers, and refreshed the log header/cards without changing combat behavior | `UI-008`, `UI-010`, `CLEAN-006` |
 
 ---
 
@@ -464,4 +467,4 @@ When work changes state:
 
 ---
 
-> Last updated: 2026-03-16 13:55 MSK
+> Last updated: 2026-03-16 18:31 MSK

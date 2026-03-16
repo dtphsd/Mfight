@@ -1,0 +1,1287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evolution Tamagotchi — AI Agent Evolution Visualizer</title>
+    <meta name="description" content="Gamified visualization of AI agent evolution. Track XP, levels, patterns, and anti-patterns in a beautiful Tamagotchi interface.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* ==================== RESET & BASE ==================== */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg-primary: #0a0a1a;
+            --bg-secondary: #0f0f2a;
+            --bg-card: rgba(20, 20, 50, 0.6);
+            --bg-card-hover: rgba(30, 30, 70, 0.7);
+            --border-card: rgba(120, 80, 255, 0.15);
+            --border-card-hover: rgba(120, 80, 255, 0.35);
+            --text-primary: #e8e6f0;
+            --text-secondary: #9b97b0;
+            --text-muted: #6b6780;
+            --accent-purple: #8b5cf6;
+            --accent-cyan: #06d6a0;
+            --accent-pink: #ec4899;
+            --accent-amber: #f59e0b;
+            --accent-red: #ef4444;
+            --gradient-main: linear-gradient(135deg, #8b5cf6, #06d6a0);
+            --gradient-xp: linear-gradient(90deg, #8b5cf6, #06d6a0, #8b5cf6);
+            --gradient-card: linear-gradient(135deg, rgba(139,92,246,0.1), rgba(6,214,160,0.05));
+            --glass-blur: 20px;
+            --glass-bg: rgba(15, 15, 42, 0.75);
+            --radius-sm: 8px;
+            --radius-md: 14px;
+            --radius-lg: 20px;
+            --radius-xl: 28px;
+            --font-body: 'Inter', -apple-system, sans-serif;
+            --font-display: 'Outfit', 'Inter', sans-serif;
+            --shadow-glow: 0 0 30px rgba(139, 92, 246, 0.15);
+            --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.3);
+            --transition-smooth: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body {
+            font-family: var(--font-body);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* ==================== GRID BACKGROUND ==================== */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background:
+                linear-gradient(rgba(139,92,246,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(139,92,246,0.03) 1px, transparent 1px);
+            background-size: 60px 60px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at 30% 20%, rgba(139,92,246,0.08), transparent 50%),
+                        radial-gradient(circle at 70% 80%, rgba(6,214,160,0.05), transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* ==================== LAYOUT ==================== */
+        .app {
+            position: relative;
+            z-index: 1;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem 4rem;
+        }
+
+        /* ==================== HEADER ==================== */
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .header__logo {
+            font-family: var(--font-display);
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: var(--gradient-main);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.02em;
+            margin-bottom: 0.5rem;
+        }
+
+        .header__subtitle {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            font-weight: 400;
+        }
+
+        /* ==================== INPUT SECTION ==================== */
+        .input-section {
+            margin-bottom: 3rem;
+        }
+
+        .input-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(var(--glass-blur));
+            -webkit-backdrop-filter: blur(var(--glass-blur));
+            border: 1px solid var(--border-card);
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            box-shadow: var(--shadow-card);
+            transition: border-color var(--transition-smooth);
+        }
+
+        .input-card:hover {
+            border-color: var(--border-card-hover);
+        }
+
+        .input-card__title {
+            font-family: var(--font-display);
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .input-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .input-tab {
+            padding: 0.5rem 1.2rem;
+            background: transparent;
+            border: 1px solid var(--border-card);
+            border-radius: var(--radius-sm);
+            color: var(--text-secondary);
+            font-family: var(--font-body);
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all var(--transition-smooth);
+        }
+
+        .input-tab:hover {
+            border-color: var(--accent-purple);
+            color: var(--text-primary);
+        }
+
+        .input-tab.active {
+            background: rgba(139, 92, 246, 0.15);
+            border-color: var(--accent-purple);
+            color: var(--accent-purple);
+        }
+
+        .drop-zone {
+            border: 2px dashed var(--border-card);
+            border-radius: var(--radius-md);
+            padding: 3rem 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all var(--transition-smooth);
+            position: relative;
+        }
+
+        .drop-zone:hover, .drop-zone.drag-over {
+            border-color: var(--accent-purple);
+            background: rgba(139, 92, 246, 0.05);
+        }
+
+        .drop-zone__icon {
+            font-size: 2.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .drop-zone__text {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .drop-zone__text strong {
+            color: var(--accent-purple);
+        }
+
+        .drop-zone input[type="file"] {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .paste-area {
+            display: none;
+        }
+
+        .paste-area.active {
+            display: block;
+        }
+
+        .paste-area textarea {
+            width: 100%;
+            min-height: 160px;
+            background: rgba(10, 10, 26, 0.8);
+            border: 1px solid var(--border-card);
+            border-radius: var(--radius-md);
+            padding: 1rem;
+            color: var(--text-primary);
+            font-family: 'Courier New', monospace;
+            font-size: 0.8rem;
+            resize: vertical;
+            transition: border-color var(--transition-smooth);
+        }
+
+        .paste-area textarea:focus {
+            outline: none;
+            border-color: var(--accent-purple);
+        }
+
+        .paste-area textarea::placeholder {
+            color: var(--text-muted);
+        }
+
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.7rem 1.8rem;
+            background: var(--gradient-main);
+            border: none;
+            border-radius: var(--radius-sm);
+            color: #fff;
+            font-family: var(--font-body);
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all var(--transition-smooth);
+            margin-top: 1rem;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 20px rgba(139, 92, 246, 0.3);
+        }
+
+        .btn-demo {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 2rem;
+            background: rgba(6, 214, 160, 0.08);
+            border: 2px solid var(--accent-cyan);
+            border-radius: var(--radius-sm);
+            color: var(--accent-cyan);
+            font-family: var(--font-body);
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all var(--transition-smooth);
+            margin-top: 0;
+            animation: demoPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes demoPulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(6, 214, 160, 0.2); }
+            50% { box-shadow: 0 0 16px 4px rgba(6, 214, 160, 0.15); }
+        }
+
+        .btn-demo:hover {
+            background: rgba(6, 214, 160, 0.15);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 20px rgba(6, 214, 160, 0.25);
+            animation: none;
+        }
+
+        .input-divider {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin: 1.5rem 0;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .input-divider::before, .input-divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border-card);
+        }
+
+        /* ==================== MAIN DASHBOARD (hidden until data) ==================== */
+        .dashboard {
+            display: none;
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        .dashboard.visible { display: block; }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ==================== HERO — AVATAR + STATUS ==================== */
+        .hero {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .avatar-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(var(--glass-blur));
+            -webkit-backdrop-filter: blur(var(--glass-blur));
+            border: 1px solid var(--border-card);
+            border-radius: var(--radius-xl);
+            padding: 2.5rem 2rem;
+            box-shadow: var(--shadow-glow), var(--shadow-card);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .avatar-card::before {
+            content: '';
+            position: absolute;
+            top: -80px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(139,92,246,0.12), transparent 70%);
+            pointer-events: none;
+        }
+
+        .avatar-creature {
+            font-size: 5rem;
+            line-height: 1;
+            margin-bottom: 1rem;
+            position: relative;
+            z-index: 1;
+            animation: breathe 3s ease-in-out infinite;
+            filter: drop-shadow(0 0 20px rgba(139, 92, 246, 0.3));
+        }
+
+        @keyframes breathe {
+            0%, 100% { transform: scale(1) translateY(0); }
+            50% { transform: scale(1.06) translateY(-4px); }
+        }
+
+        .avatar-ring {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            margin: 0 auto 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: conic-gradient(var(--accent-purple), var(--accent-cyan), var(--accent-purple));
+            padding: 4px;
+            animation: ringRotate 8s linear infinite;
+            position: relative;
+            z-index: 1;
+        }
+
+        @keyframes ringRotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .avatar-ring__inner {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: var(--bg-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: ringRotateReverse 8s linear infinite;
+        }
+
+        @keyframes ringRotateReverse {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(-360deg); }
+        }
+
+        .avatar-name {
+            font-family: var(--font-display);
+            font-size: 1.6rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .avatar-project {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ==================== XP CARD ==================== */
+        .xp-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(var(--glass-blur));
+            -webkit-backdrop-filter: blur(var(--glass-blur));
+            border: 1px solid var(--border-card);
+            border-radius: var(--radius-xl);
+            padding: 2.5rem 2rem;
+            box-shadow: var(--shadow-card);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .level-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.4rem 1rem;
+            border-radius: 50px;
+            font-family: var(--font-display);
+            font-size: 0.85rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            width: fit-content;
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+            border: 1px solid;
+        }
+
+        .xp-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 0.75rem;
+        }
+
+        .xp-label__current {
+            font-family: var(--font-display);
+            font-size: 2.2rem;
+            font-weight: 800;
+            background: var(--gradient-main);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .xp-label__next {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        .xp-bar-container {
+            width: 100%;
+            height: 14px;
+            background: rgba(139, 92, 246, 0.1);
+            border-radius: 50px;
+            overflow: hidden;
+            position: relative;
+            margin-bottom: 0.75rem;
+        }
+
+        .xp-bar-fill {
+            height: 100%;
+            border-radius: 50px;
+            background: var(--gradient-xp);
+            background-size: 200% 100%;
+            animation: xpShimmer 2s ease-in-out infinite;
+            transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            box-shadow: 0 0 12px rgba(139, 92, 246, 0.4);
+        }
+
+        @keyframes xpShimmer {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .xp-percent {
+            text-align: right;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .xp-meta {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border-card);
+        }
+
+        .xp-meta-item {
+            text-align: center;
+        }
+
+        .xp-meta-item__value {
+            font-family: var(--font-display);
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .xp-meta-item__label {
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-top: 0.15rem;
+        }
+
+        /* ==================== STATS ROW ==================== */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.25rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(var(--glass-blur));
+            -webkit-backdrop-filter: blur(var(--glass-blur));
+            border: 1px solid var(--border-card);
+            border-radius: var(--radius-md);
+            padding: 1.5rem;
+            box-shadow: var(--shadow-card);
+            text-align: center;
+            transition: all var(--transition-smooth);
+        }
+
+        .stat-card:hover {
+            border-color: var(--border-card-hover);
+            transform: translateY(-2px);
+        }
+
+        .stat-card__icon {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-card__value {
+            font-family: var(--font-display);
+            font-size: 1.8rem;
+            font-weight: 800;
+            margin-bottom: 0.15rem;
+        }
+
+        .stat-card__label {
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+
+        /* ==================== TIMELINE ==================== */
+        .section-title {
+            font-family: var(--font-display);
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .timeline {
+            display: grid;
+            gap: 1rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .evo-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(var(--glass-blur));
+            -webkit-backdrop-filter: blur(var(--glass-blur));
+            border: 1px solid var(--border-card);
+            border-radius: var(--radius-md);
+            padding: 1.5rem;
+            box-shadow: var(--shadow-card);
+            transition: all var(--transition-smooth);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .evo-card::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: var(--gradient-main);
+            border-radius: 0 3px 3px 0;
+        }
+
+        .evo-card:hover {
+            border-color: var(--border-card-hover);
+            transform: translateX(4px);
+        }
+
+        .evo-card__header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+
+        .evo-card__id {
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: 0.95rem;
+            background: var(--gradient-main);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .evo-card__date {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+
+        .evo-card__title {
+            font-weight: 600;
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .evo-card__meta {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .evo-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            padding: 0.2rem 0.7rem;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            background: rgba(139, 92, 246, 0.12);
+            color: var(--accent-purple);
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            white-space: nowrap;
+        }
+
+        .evo-badge.impact-high {
+            background: rgba(239, 68, 68, 0.12);
+            color: var(--accent-red);
+            border-color: rgba(239, 68, 68, 0.2);
+        }
+
+        .evo-badge.impact-mid {
+            background: rgba(245, 158, 11, 0.12);
+            color: var(--accent-amber);
+            border-color: rgba(245, 158, 11, 0.2);
+        }
+
+        .evo-badge.xp-badge {
+            background: rgba(6, 214, 160, 0.12);
+            color: var(--accent-cyan);
+            border-color: rgba(6, 214, 160, 0.2);
+        }
+
+        /* ==================== PATTERN REGISTRY ==================== */
+        .patterns-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .pattern-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(var(--glass-blur));
+            -webkit-backdrop-filter: blur(var(--glass-blur));
+            border: 1px solid var(--border-card);
+            border-radius: var(--radius-md);
+            padding: 1.25rem;
+            box-shadow: var(--shadow-card);
+            transition: all var(--transition-smooth);
+        }
+
+        .pattern-card:hover {
+            border-color: var(--accent-cyan);
+            transform: translateY(-2px);
+        }
+
+        .pattern-card__id {
+            font-family: var(--font-display);
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--accent-cyan);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            margin-bottom: 0.4rem;
+        }
+
+        .pattern-card__name {
+            font-weight: 600;
+            font-size: 0.95rem;
+            margin-bottom: 0.4rem;
+        }
+
+        .pattern-card__source {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+
+        /* ==================== ANTI-PATTERNS ==================== */
+        .anti-patterns-list {
+            display: grid;
+            gap: 0.5rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .ap-item {
+            background: rgba(239, 68, 68, 0.04);
+            border: 1px solid rgba(239, 68, 68, 0.1);
+            border-radius: var(--radius-sm);
+            padding: 0.75rem 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 0.85rem;
+            transition: all var(--transition-smooth);
+        }
+
+        .ap-item:hover {
+            border-color: rgba(239, 68, 68, 0.25);
+            background: rgba(239, 68, 68, 0.08);
+        }
+
+        .ap-item__id {
+            font-family: var(--font-display);
+            font-weight: 700;
+            color: var(--accent-red);
+            font-size: 0.75rem;
+            min-width: 55px;
+        }
+
+        .ap-item__name {
+            font-weight: 500;
+        }
+
+        /* ==================== FOOTER ==================== */
+        .footer {
+            text-align: center;
+            padding-top: 3rem;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+
+        .footer a {
+            color: var(--accent-purple);
+            text-decoration: none;
+        }
+
+        /* ==================== RESPONSIVE ==================== */
+        @media (max-width: 768px) {
+            .hero { grid-template-columns: 1fr; }
+            .stats-row { grid-template-columns: repeat(2, 1fr); }
+            .patterns-grid { grid-template-columns: 1fr; }
+            .header__logo { font-size: 1.8rem; }
+            .avatar-creature { font-size: 3.5rem; }
+            .avatar-ring { width: 110px; height: 110px; }
+        }
+
+        @media (max-width: 480px) {
+            .app { padding: 1rem 0.75rem 3rem; }
+            .stats-row { grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+            .xp-meta { grid-template-columns: repeat(3, 1fr); gap: 0.5rem; }
+            .input-tabs { flex-wrap: wrap; }
+        }
+
+        /* ==================== LEVEL-UP ANIMATION ==================== */
+        .level-up-flash {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            pointer-events: none;
+            opacity: 0;
+        }
+
+        .level-up-flash.active {
+            animation: flashPulse 1.5s ease-out forwards;
+        }
+
+        @keyframes flashPulse {
+            0% { opacity: 0; background: radial-gradient(circle, rgba(139,92,246,0.3), transparent 70%); }
+            20% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+
+        /* Particle system for level-up */
+        .particle {
+            position: fixed;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 10000;
+        }
+
+        /* =================== EMPTY STATE =================== */
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-muted);
+        }
+
+        .empty-state__icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="level-up-flash" id="levelUpFlash"></div>
+
+    <div class="app">
+        <!-- HEADER -->
+        <header class="header">
+            <h1 class="header__logo">🧬 Evolution Tamagotchi</h1>
+            <p class="header__subtitle">AI Agent Evolution Visualizer — Track XP, Patterns & Growth</p>
+        </header>
+
+        <!-- INPUT SECTION -->
+        <section class="input-section" id="inputSection">
+            <div class="input-card">
+                <h2 class="input-card__title">📂 Load Evolution Data</h2>
+                <div class="input-tabs" id="inputTabs">
+                    <button class="input-tab active" data-tab="file" id="tabFile">📁 Upload .md File</button>
+                    <button class="input-tab" data-tab="paste" id="tabPaste">📋 Paste JSON</button>
+                </div>
+
+                <!-- File Upload -->
+                <div class="drop-zone" id="dropZone">
+                    <div class="drop-zone__icon">📄</div>
+                    <div class="drop-zone__text">
+                        Drag & drop <strong>evolution_journal.md</strong> here<br>
+                        <span style="font-size: 0.8rem; color: var(--text-muted);">or click to browse</span>
+                    </div>
+                    <input type="file" accept=".md,.txt,.json" id="fileInput">
+                </div>
+
+                <!-- Paste Area -->
+                <div class="paste-area" id="pasteArea">
+                    <textarea id="jsonInput" placeholder='Paste the entire evolution_journal.md content here, or just the STATUS_JSON + EVO_JSON blocks...'></textarea>
+                    <button class="btn-primary" id="parseBtn">🚀 Parse & Visualize</button>
+                </div>
+
+            </div>
+
+            <div class="input-divider"><span>or try instantly</span></div>
+
+            <div style="text-align: center;">
+                <button class="btn-demo" id="demoBtn">⚡ Load Demo Data</button>
+            </div>
+        </section>
+
+        <!-- DASHBOARD (hidden until loaded) -->
+        <main class="dashboard" id="dashboard">
+
+            <!-- HERO: Avatar + XP -->
+            <section class="hero">
+                <div class="avatar-card">
+                    <div class="avatar-ring">
+                        <div class="avatar-ring__inner">
+                            <div class="avatar-creature" id="avatarCreature">🦊</div>
+                        </div>
+                    </div>
+                    <div class="avatar-name" id="avatarName">vectory-agent-001</div>
+                    <div class="avatar-project" id="avatarProject">NVE-beta / VECTORY</div>
+                </div>
+
+                <div class="xp-card">
+                    <div class="level-badge" id="levelBadge">
+                        <span id="levelEmoji">🟣</span>
+                        <span>Level <span id="levelNum">23</span> — <span id="levelName">Operative</span></span>
+                    </div>
+                    <div class="xp-label">
+                        <span class="xp-label__current"><span id="xpCurrent">160</span> XP</span>
+                        <span class="xp-label__next">Next: <span id="xpNext">220</span> XP</span>
+                    </div>
+                    <div class="xp-bar-container">
+                        <div class="xp-bar-fill" id="xpBar" style="width: 0%"></div>
+                    </div>
+                    <div class="xp-percent" id="xpPercent">73%</div>
+                    <div class="xp-meta">
+                        <div class="xp-meta-item">
+                            <div class="xp-meta-item__value" id="metaEntries">4</div>
+                            <div class="xp-meta-item__label">Entries</div>
+                        </div>
+                        <div class="xp-meta-item">
+                            <div class="xp-meta-item__value" id="metaStreak">4</div>
+                            <div class="xp-meta-item__label">Streak</div>
+                        </div>
+                        <div class="xp-meta-item">
+                            <div class="xp-meta-item__value" id="metaTopImpact">8</div>
+                            <div class="xp-meta-item__label">Top Impact</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- STATS ROW -->
+            <section class="stats-row" id="statsRow">
+                <div class="stat-card">
+                    <div class="stat-card__icon">📊</div>
+                    <div class="stat-card__value" id="statAvgImpact">7.25</div>
+                    <div class="stat-card__label">Avg Impact</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card__icon">🛡️</div>
+                    <div class="stat-card__value" id="statPreventive">75%</div>
+                    <div class="stat-card__label">Preventive</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card__icon">🧠</div>
+                    <div class="stat-card__value" id="statPatterns">4</div>
+                    <div class="stat-card__label">Patterns</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card__icon">🚫</div>
+                    <div class="stat-card__value" id="statAntiPatterns">11</div>
+                    <div class="stat-card__label">Anti-Patterns</div>
+                </div>
+            </section>
+
+            <!-- EVO TIMELINE -->
+            <section>
+                <h2 class="section-title">📓 Evolution Timeline</h2>
+                <div class="timeline" id="evoTimeline"></div>
+            </section>
+
+            <!-- PATTERNS -->
+            <section>
+                <h2 class="section-title">🧠 Pattern Registry</h2>
+                <div class="patterns-grid" id="patternsGrid"></div>
+            </section>
+
+            <!-- ANTI-PATTERNS -->
+            <section>
+                <h2 class="section-title">🚫 Anti-Pattern Registry</h2>
+                <div class="anti-patterns-list" id="antiPatternsList"></div>
+            </section>
+
+        </main>
+
+        <footer class="footer">
+            <p>Evolution Tamagotchi v1.0 — Universal AI Agent Growth Tracker</p>
+        </footer>
+    </div>
+
+    <script>
+    /* ==================== DATA ==================== */
+    const AVATAR_MAP = {
+        1: { emoji: '🥚', name: 'Egg' },
+        2: { emoji: '🐣', name: 'Chick' },
+        3: { emoji: '🦊', name: 'Fox Cub' },
+        4: { emoji: '🐉', name: 'Dragon' },
+        5: { emoji: '🦅', name: 'Eagle' },
+        6: { emoji: '🐺', name: 'Wolf Guardian' },
+        7: { emoji: '🦁', name: 'Lion' },
+        8: { emoji: '🐲', name: 'Golden Dragon' },
+        9: { emoji: '🦄', name: 'Unicorn' },
+        10: { emoji: '⭐', name: 'Star' },
+    };
+
+    const LEVEL_COLORS = {
+        '🟢': { bg: 'rgba(34,197,94,0.12)', border: 'rgba(34,197,94,0.3)', color: '#22c55e' },
+        '🔵': { bg: 'rgba(59,130,246,0.12)', border: 'rgba(59,130,246,0.3)', color: '#3b82f6' },
+        '🟣': { bg: 'rgba(139,92,246,0.12)', border: 'rgba(139,92,246,0.3)', color: '#8b5cf6' },
+        '🟠': { bg: 'rgba(249,115,22,0.12)', border: 'rgba(249,115,22,0.3)', color: '#f97316' },
+        '🔴': { bg: 'rgba(239,68,68,0.12)', border: 'rgba(239,68,68,0.3)', color: '#ef4444' },
+        '⚫': { bg: 'rgba(100,100,120,0.12)', border: 'rgba(100,100,120,0.3)', color: '#94a3b8' },
+        '🌟': { bg: 'rgba(234,179,8,0.12)', border: 'rgba(234,179,8,0.3)', color: '#eab308' },
+        '💎': { bg: 'rgba(6,182,212,0.12)', border: 'rgba(6,182,212,0.3)', color: '#06b6d4' },
+        '🏆': { bg: 'rgba(245,158,11,0.12)', border: 'rgba(245,158,11,0.3)', color: '#f59e0b' },
+        '👑': { bg: 'rgba(168,85,247,0.12)', border: 'rgba(168,85,247,0.3)', color: '#a855f7' },
+    };
+
+    const DEMO_DATA = {
+        status: {
+            agent_id: "vectory-agent-001",
+            project: "NVE-beta / VECTORY",
+            level: 23,
+            level_name: "Operative",
+            level_emoji: "🟣",
+            xp_current: 160,
+            xp_next_level: 220,
+            total_entries: 4,
+            total_patterns: 4,
+            total_anti_patterns: 11,
+            top_impact: 8,
+            streak: 4,
+            last_updated: "2026-03-16T17:20:00+03:00"
+        },
+        entries: [
+            { id: "EVO-001", date: "2026-03-16", impact: 8, xp: 13, category: "Preventive", type: "Documentation Drift", pattern: "PAT-001", title: "Auth Deploy Trap" },
+            { id: "EVO-002", date: "2026-03-16", impact: 7, xp: 13, category: "Preventive", type: "Process failure", pattern: "PAT-002", title: "Silent Fallback Elimination" },
+            { id: "EVO-003", date: "2026-03-16", impact: 6, xp: 8, category: "Structural", type: "Gap", pattern: "PAT-003", title: "Hardcoded CSS to Style Mirror" },
+            { id: "EVO-004", date: "2026-03-16", impact: 8, xp: 13, category: "Preventive", type: "Credentials Drift", pattern: "PAT-004", title: "Stale Credentials in Build Config" }
+        ],
+        patterns: [
+            { id: "PAT-001", name: "Single Source of Truth Enforcement", source: "EVO-001" },
+            { id: "PAT-002", name: "Loud Failure > Silent Success", source: "EVO-002" },
+            { id: "PAT-003", name: "Data Extraction ≠ Data Usage", source: "EVO-003" },
+            { id: "PAT-004", name: "Multi-Source Credential Sync", source: "EVO-004" }
+        ],
+        antiPatterns: [
+            { id: "AP-001", name: "Feature Sprint Blindness" },
+            { id: "AP-002", name: "Test-Only Validation" },
+            { id: "AP-003", name: "Copy-Paste Deploy Command" },
+            { id: "AP-004", name: "Dismissive Bug Triage" },
+            { id: "AP-005", name: "Fallback Addiction" },
+            { id: "AP-006", name: "Scale Confusion (0-1 vs 0-100)" },
+            { id: "AP-007", name: "Provider/Model Mismatch" },
+            { id: "AP-008", name: "Domain Name as Keyword" },
+            { id: "AP-009", name: "'in dir()' Variable Check" },
+            { id: "AP-010", name: "Documentation Drift" },
+            { id: "AP-011", name: "Partial Credential Migration" }
+        ]
+    };
+
+    /* ==================== PARSER ==================== */
+    function parseMarkdown(text) {
+        const result = { status: null, entries: [], patterns: [], antiPatterns: [] };
+
+        // Extract STATUS_JSON
+        const statusRe = new RegExp('<' + '!--\\s*STATUS_JSON[\\s\\S]*?(\\{[\\s\\S]*?\\})\\s*-' + '->');
+        const statusMatch = text.match(statusRe);
+        if (statusMatch) {
+            try { result.status = JSON.parse(statusMatch[1]); } catch(e) { console.warn('Failed to parse STATUS_JSON:', e); }
+        }
+
+        // Extract all EVO_JSON
+        const evoRe = new RegExp('<' + '!--\\s*EVO_JSON\\s*\\n?\\s*(\\{[\\s\\S]*?\\})\\s*-' + '->', 'g');
+        const evoMatches = text.matchAll(evoRe);
+        for (const m of evoMatches) {
+            try { result.entries.push(JSON.parse(m[1])); } catch(e) { console.warn('Failed to parse EVO_JSON:', e); }
+        }
+
+        // Extract patterns from Pattern Registry table
+        const patLines = text.matchAll(/\|\s*(PAT-\d+)\s*\|\s*\*\*([^*]+)\*\*\s*\|\s*(EVO-\d+)/g);
+        for (const m of patLines) {
+            result.patterns.push({ id: m[1], name: m[2].trim(), source: m[3] });
+        }
+
+        // Extract anti-patterns from Anti-Pattern Registry table
+        const apLines = text.matchAll(/\|\s*(AP-\d+)\s*\|\s*\*\*([^*]+)\*\*/g);
+        for (const m of apLines) {
+            result.antiPatterns.push({ id: m[1], name: m[2].trim() });
+        }
+
+        return result;
+    }
+
+    /* ==================== UI HELPERS ==================== */
+    function getAvatarTier(level) {
+        if (level <= 10) return 1;
+        if (level <= 20) return 2;
+        if (level <= 30) return 3;
+        if (level <= 40) return 4;
+        if (level <= 50) return 5;
+        if (level <= 60) return 6;
+        if (level <= 70) return 7;
+        if (level <= 80) return 8;
+        if (level <= 90) return 9;
+        return 10;
+    }
+
+    function getLevelStart(level) {
+        const ranges = [0, 0, 51, 121, 221, 351, 501, 701, 951, 1251, 1601];
+        return ranges[getAvatarTier(level)] || 0;
+    }
+
+    function impactClass(impact) {
+        if (impact >= 7) return 'impact-high';
+        if (impact >= 5) return 'impact-mid';
+        return '';
+    }
+
+    /* ==================== RENDER ==================== */
+    function renderDashboard(data) {
+        if (!data.status) {
+            alert('No STATUS_JSON found in the data!');
+            return;
+        }
+
+        const s = data.status;
+        const tier = getAvatarTier(s.level);
+        const avatar = AVATAR_MAP[tier];
+        const levelColor = LEVEL_COLORS[s.level_emoji] || LEVEL_COLORS['🟣'];
+
+        // Avatar
+        document.getElementById('avatarCreature').textContent = avatar.emoji;
+        document.getElementById('avatarName').textContent = s.agent_id || 'Unknown Agent';
+        document.getElementById('avatarProject').textContent = s.project || 'Unknown Project';
+
+        // Level Badge
+        const badge = document.getElementById('levelBadge');
+        badge.style.background = levelColor.bg;
+        badge.style.borderColor = levelColor.border;
+        badge.style.color = levelColor.color;
+        document.getElementById('levelEmoji').textContent = s.level_emoji;
+        document.getElementById('levelNum').textContent = s.level;
+        document.getElementById('levelName').textContent = s.level_name;
+
+        // XP
+        document.getElementById('xpCurrent').textContent = s.xp_current;
+        document.getElementById('xpNext').textContent = s.xp_next_level;
+        const xpProgress = s.xp_next_level > 0 ? Math.min(100, Math.round((s.xp_current / s.xp_next_level) * 100)) : 100;
+        document.getElementById('xpPercent').textContent = xpProgress + '%';
+        setTimeout(() => {
+            document.getElementById('xpBar').style.width = xpProgress + '%';
+        }, 100);
+
+        // XP Meta
+        document.getElementById('metaEntries').textContent = s.total_entries;
+        document.getElementById('metaStreak').textContent = s.streak;
+        document.getElementById('metaTopImpact').textContent = s.top_impact;
+
+        // Stats
+        const entries = data.entries;
+        const avgImpact = entries.length > 0
+            ? (entries.reduce((a, e) => a + e.impact, 0) / entries.length).toFixed(2)
+            : '—';
+        const preventiveCount = entries.filter(e => e.category === 'Preventive').length;
+        const preventivePct = entries.length > 0
+            ? Math.round((preventiveCount / entries.length) * 100) + '%'
+            : '—';
+
+        document.getElementById('statAvgImpact').textContent = avgImpact;
+        document.getElementById('statPreventive').textContent = preventivePct;
+        document.getElementById('statPatterns').textContent = s.total_patterns;
+        document.getElementById('statAntiPatterns').textContent = s.total_anti_patterns;
+
+        // EVO Timeline
+        const timeline = document.getElementById('evoTimeline');
+        timeline.innerHTML = '';
+        const sortedEntries = [...entries].sort((a, b) => {
+            const numA = parseInt(a.id.replace('EVO-', ''));
+            const numB = parseInt(b.id.replace('EVO-', ''));
+            return numB - numA;
+        });
+
+        for (const e of sortedEntries) {
+            const card = document.createElement('div');
+            card.className = 'evo-card';
+            card.innerHTML = `
+                <div class="evo-card__header">
+                    <span class="evo-card__id">${e.id}</span>
+                    <span class="evo-card__date">${e.date}</span>
+                </div>
+                <div class="evo-card__title">${e.title}</div>
+                <div class="evo-card__meta">
+                    <span class="evo-badge ${impactClass(e.impact)}">⚡ Impact ${e.impact}/10</span>
+                    <span class="evo-badge xp-badge">+${e.xp} XP</span>
+                    <span class="evo-badge">${e.category}</span>
+                    ${e.pattern ? `<span class="evo-badge">${e.pattern}</span>` : ''}
+                </div>
+            `;
+            timeline.appendChild(card);
+        }
+
+        // Patterns
+        const patternsGrid = document.getElementById('patternsGrid');
+        patternsGrid.innerHTML = '';
+        for (const p of data.patterns) {
+            const card = document.createElement('div');
+            card.className = 'pattern-card';
+            card.innerHTML = `
+                <div class="pattern-card__id">${p.id}</div>
+                <div class="pattern-card__name">${p.name}</div>
+                <div class="pattern-card__source">Source: ${p.source}</div>
+            `;
+            patternsGrid.appendChild(card);
+        }
+
+        // Anti-Patterns
+        const apList = document.getElementById('antiPatternsList');
+        apList.innerHTML = '';
+        for (const ap of data.antiPatterns) {
+            const item = document.createElement('div');
+            item.className = 'ap-item';
+            item.innerHTML = `
+                <span class="ap-item__id">${ap.id}</span>
+                <span class="ap-item__name">${ap.name}</span>
+            `;
+            apList.appendChild(item);
+        }
+
+        // Show dashboard
+        document.getElementById('dashboard').classList.add('visible');
+        document.getElementById('inputSection').style.display = 'none';
+    }
+
+    /* ==================== EVENT HANDLERS ==================== */
+    // Tabs
+    document.querySelectorAll('.input-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            document.querySelectorAll('.input-tab').forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            const isFile = tab.dataset.tab === 'file';
+            document.getElementById('dropZone').style.display = isFile ? 'block' : 'none';
+            document.getElementById('pasteArea').classList.toggle('active', !isFile);
+        });
+    });
+
+    // File Upload
+    function handleFile(file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const text = e.target.result;
+            const data = parseMarkdown(text);
+            if (data.status) {
+                renderDashboard(data);
+            } else {
+                alert('Could not find STATUS_JSON in the uploaded file. Make sure it contains <!-- STATUS_JSON { ... } --> blocks.');
+            }
+        };
+        reader.readAsText(file);
+    }
+
+    document.getElementById('fileInput').addEventListener('change', (e) => {
+        if (e.target.files.length > 0) handleFile(e.target.files[0]);
+    });
+
+    // Drag & Drop
+    const dropZone = document.getElementById('dropZone');
+    dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+    dropZone.addEventListener('dragleave', () => { dropZone.classList.remove('drag-over'); });
+    dropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropZone.classList.remove('drag-over');
+        if (e.dataTransfer.files.length > 0) handleFile(e.dataTransfer.files[0]);
+    });
+
+    // Paste & Parse
+    document.getElementById('parseBtn').addEventListener('click', () => {
+        const text = document.getElementById('jsonInput').value;
+        if (!text.trim()) { alert('Please paste the evolution journal content first.'); return; }
+        const data = parseMarkdown(text);
+        if (data.status) {
+            renderDashboard(data);
+        } else {
+            alert('Could not find STATUS_JSON. Paste the full evolution_journal.md content including <!-- STATUS_JSON ... --> blocks.');
+        }
+    });
+
+    // Demo
+    document.getElementById('demoBtn').addEventListener('click', () => {
+        renderDashboard(DEMO_DATA);
+    });
+    </script>
+</body>
+</html>

@@ -289,10 +289,10 @@ describe("battle log phrase selection", () => {
 
     const entries = createBattleLogEntries(state, "player-1", "bot-1");
 
-    expect(entries.find((entry) => entry.type === "block")?.tagGroups.reasons).toContain("Guard Held");
+    expect(entries.find((entry) => entry.type === "block")?.tagGroups.reasons).toContain("Defense Held");
     expect(entries.find((entry) => entry.type === "penetration")?.tagGroups.reasons).toContain("Guard Broken");
-    expect(entries.find((entry) => entry.type === "dodge")?.tagGroups.reasons).toContain("Clean Evade");
-    expect(entries.find((entry) => entry.type === "block")?.headline).toContain("blocks Player's attack");
+    expect(entries.find((entry) => entry.type === "dodge")?.tagGroups.reasons).toContain("Attack Avoided");
+    expect(entries.find((entry) => entry.type === "block")?.headline).toBe("Arena Bot blocks Player's attack (60% blocked)");
   });
 
   it("formats zero-damage blocked hits as a full block instead of a critical zero hit", () => {
@@ -385,9 +385,9 @@ describe("battle log phrase selection", () => {
 
     const [entry] = createBattleLogEntries(state, "player-1", "bot-1");
 
-    expect(entry.headline).toBe("Arena Bot blocked all damage from Player's attack");
+    expect(entry.headline).toBe("Arena Bot fully blocks Player's attack");
     expect(entry.tagGroups.outcome).toContain("Full Block");
-    expect(entry.tagGroups.reasons).toContain("Blocked All Damage");
+    expect(entry.tagGroups.reasons).toContain("Attack Fully Blocked");
   });
 
   it("prioritizes visible tags by semantic group order", () => {
@@ -517,6 +517,7 @@ describe("battle log phrase selection", () => {
 
     expect(entry.headline).toBe("Player uses Bandage");
     expect(entry.explanation).toContain("Item: Bandage | Zone: Head | Type: Slash | Gain: Focus +6");
+    expect(entry.tagGroups.outcome).toContain("Item Use");
   });
 
   it("shows healing from effect ticks in the battle log explanation", () => {
@@ -609,7 +610,7 @@ describe("battle log phrase selection", () => {
 
     const [entry] = createBattleLogEntries(state, "player-1", "bot-1");
 
-    expect(entry.headline).toBe("Player recovers 6 HP from active effects");
+    expect(entry.headline).toBe("Player resolves active effects: +6 HP");
     expect(entry.explanation).toBe("Heal: +6 HP");
     expect(entry.tagGroups.effects).toContain("Heal: +6 HP");
     expect(entry.isEffectTick).toBe(true);

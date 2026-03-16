@@ -1,6 +1,6 @@
 # MASTER-PLAN - Fight Club
 
-> Last updated: 2026-03-15 03:05 MSK
+> Last updated: 2026-03-16 13:55 MSK
 
 **Project:** Fight Club  
 **Scope:** active product planning, task tracking, and sprint history
@@ -50,6 +50,15 @@
 | HUNT-007 | Document hunting architecture and verification flow | Hunting Docs / Safety | ✅ DONE | `features/hunting-mvp.md` | Hunting runtime reference, reward bridge rules, architecture overview sync, and root doc alignment are now documented and validated |
 | HUNT-008 | Persist hunting state and offline return flow | Hunting Persistence | ✅ DONE | `features/hunting-mvp.md` | Hunting state now round-trips through the shared save envelope, restores route progress between sessions, and ships with a compact no-scroll lodge UI tuned around restored-session flow, route timing, and claim review |
 | HUNT-009 | Add first hunting tool focus layer | Hunting Gameplay | 🟡 IN PROGRESS | `features/hunting-mvp.md` | Tool focus is now live and route stances add the second route-planning lever through `Steady`, `Greedy`, and `Cautious` hunt styles |
+| CLEAN-001 | Build cleanup inventory and classify repo artifacts | Repo Hygiene | ✅ DONE | `features/project-cleanup-program.md` | Cleanup inventory is documented and now tracks backup, generated, stub, and oversized-file targets |
+| CLEAN-002 | Remove low-risk junk from the live source tree | Repo Hygiene | ✅ DONE | `features/project-cleanup-program.md` | Removed orphan fetch script, source-tree backup files, tracked config sidecars, and recurring build junk from the live tree |
+| CLEAN-003 | Separate source from generated and build artifacts | Architecture Hygiene | 🟡 IN PROGRESS | `features/project-cleanup-program.md` | Build artifacts are now separated and ignored; the remaining follow-up is clarifying long-lived generated content boundaries like Battle Kings starter items |
+| CLEAN-004 | Prune stub bootstrap and future-only module layers | Runtime Architecture | ✅ DONE | `features/project-cleanup-program.md` | Placeholder bootstrap/application stubs were removed from the active runtime graph |
+| CLEAN-005 | Reduce sandbox orchestration and hook surface area | UI / Orchestration | ✅ DONE | `features/project-cleanup-program.md` | `useCombatSandbox` is now split into data, actions, and flow helpers, shrinking the main hook into a clearer coordinator |
+| CLEAN-006 | Continue heavyweight UI decomposition | UI Architecture | 🟡 IN PROGRESS | `features/project-cleanup-program.md` | `CombatSandboxScreen` now renders through extracted actions, controls, targeting, layout, panels, resource-grid, and popover siblings; next step is deleting remaining legacy helper blocks and continuing with the next oversized UI surface |
+| CLEAN-007 | Lower combat core risk through safe decomposition | Combat Refactor | 🔴 TODO | `features/project-cleanup-program.md` | Break `resolveRound.ts` into smaller rule units only behind regression coverage |
+| CLEAN-008 | Harden save loading and compatibility rules | Persistence / Safety | 🔴 TODO | `features/project-cleanup-program.md` | Validate save payloads on read, normalize older payloads, and add safe fallback behavior |
+| CLEAN-009 | Sync docs and workflow after the cleanup pass | Docs / Workflow | 🟡 IN PROGRESS | `features/project-cleanup-program.md` | Root docs and structure notes are being synchronized with the cleanup track so the next refactor pass can resume from documented reality |
 
 ---
 
@@ -77,6 +86,33 @@
 - `UI-013` - reduce combat-screen noise and separate play-now information from analysis and log-heavy information
 - `UI-014` - make `Exposed`, `Staggered`, and payoff windows self-explanatory directly in the combat UI
 - `UI-015` - reduce build-editing friction by moving presets, inventory, equipment, and skills toward one clearer build center
+
+---
+
+## Project Cleanup Program
+
+Detailed execution doc:
+
+- `features/project-cleanup-program.md`
+
+Phased order:
+
+1. `CLEAN-001` - produce the concrete delete / move / keep inventory
+2. `CLEAN-002` - remove low-risk repo junk and move backup artifacts out of `src`
+3. `CLEAN-003` - separate hand-written source from generated and build outputs
+4. `CLEAN-004` - prune or quarantine stub bootstrap and future-only module layers
+5. `CLEAN-005` - shrink sandbox orchestration and `useCombatSandbox` complexity
+6. `CLEAN-006` - continue decomposing heavyweight UI files
+7. `CLEAN-007` - reduce `resolveRound.ts` risk behind regression coverage
+8. `CLEAN-008` - harden save loading and compatibility behavior
+9. `CLEAN-009` - sync root docs, project docs, and workflow rules after cleanup
+
+Execution rules:
+
+- do the cleanup track in order; do not mix `CLEAN-007` combat-core work into the early hygiene phases
+- prefer deletion or relocation first, behavior refactor second
+- treat generated content and save compatibility as separate risk domains
+- after each cleanup slice, re-run `npm run test`, `npm run lint`, and `npm run build`
 
 | PROFILE-001 | Define profile model and modal architecture | Profile / Architecture | рџџЎ IN PROGRESS | `features/profile-modal.md` | Profile MVP is scoped as a local client-side social card with a dedicated profile meta model and a combat-opened modal entry point |
 | PROFILE-002 | Build first combat-integrated profile modal | Profile / UI | рџ”ґ TODO | `features/profile-modal.md` | Ship the first four-block profile modal from live combat data before expanding profile entry points |
@@ -412,6 +448,8 @@
 | v0.83 | Combat Motion Layer Refactored | Split combat impact presentation into a dedicated motion helper, overlay component, and CSS layer so `CombatSilhouette` no longer owns all impact rendering details directly | `UI-008`, `UI-010` |
 | v0.84 | Combat Finish And Block-Break Motion Added | Added persistent post-fight silhouette states, `BLOCK BREAK` feedback for penetrated blocks, and hardened impact resets so each new combat event cleanly replaces the previous linger animation | `UI-010` |
 | v0.85 | Profile Modal Track Opened | Added a dedicated `Profile Modal` feature track, formalized `PROFILE-001` through `PROFILE-005`, and scoped the first release as a local client-side modal instead of a full social system | `PROFILE-001`, `PROFILE-002`, `PROFILE-003`, `PROFILE-004`, `PROFILE-005` |
+| v0.86 | Project Cleanup Track Added | Added a dedicated cleanup program with phased repo hygiene, source-boundary cleanup, stub pruning, UI/runtime decomposition, persistence hardening, and docs-sync follow-up tasks | `CLEAN-001`, `CLEAN-002`, `CLEAN-003`, `CLEAN-004`, `CLEAN-005`, `CLEAN-006`, `CLEAN-007`, `CLEAN-008`, `CLEAN-009` |
+| v0.87 | Cleanup Progress Synced | Closed cleanup inventory, safe junk removal, stub pruning, and sandbox hook decomposition; continued combat-screen file-splitting and synced docs so the next session can resume directly from the current cleanup frontier | `CLEAN-001`, `CLEAN-002`, `CLEAN-004`, `CLEAN-005`, `CLEAN-006`, `CLEAN-009` |
 
 ---
 
@@ -426,4 +464,4 @@ When work changes state:
 
 ---
 
-> Last updated: 2026-03-15 03:05 MSK
+> Last updated: 2026-03-16 13:55 MSK

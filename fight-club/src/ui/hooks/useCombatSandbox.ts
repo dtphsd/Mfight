@@ -3,7 +3,6 @@ import { SeededRandom } from "@/core/rng/SeededRandom";
 import {
   createEquipment,
   equipItem,
-  getEquipmentBonuses,
   type EquipmentSlot,
   unequipItem,
 } from "@/modules/equipment";
@@ -11,12 +10,6 @@ import { type CharacterStatName } from "@/modules/character";
 import { combatZones, type CombatState, type CombatZone, type RoundAction, type RoundResult } from "@/modules/combat";
 import type { CombatPhase } from "@/modules/combat/model/CombatPhase";
 import { createStarterInventory } from "@/modules/inventory";
-import { buildCombatSnapshot } from "@/orchestration/combat/buildCombatSnapshot";
-import {
-  prepareSandboxNextRound,
-  resolveSandboxRound,
-  startSandboxFight,
-} from "@/orchestration/combat/combatSandboxController";
 import { buildCombatSandboxDerivedState } from "@/orchestration/combat/combatSandboxMetrics";
 import { type BotRoundPlan } from "@/orchestration/combat/botRoundPlanner";
 import {
@@ -26,17 +19,12 @@ import {
   type BotDifficultyId,
 } from "@/orchestration/combat/combatSandboxConfigs";
 import {
-  applySandboxAllocations,
-  buildSandboxPresetState,
-  fitSandboxAllocationsToBudget,
   getSandboxEquippedItems,
-  getSandboxAllocationBudget,
   getSandboxInventoryOptionsForSlot,
   maxSandboxEquippedSkills,
   reconcileSandboxRoundDraftSelections,
   reconcileSandboxEquippedSkillIds,
   requireSandboxCharacter,
-  toggleSandboxEquippedSkillId,
   type AllocationMap,
 } from "@/orchestration/combat/combatSandboxSupport";
 import {
@@ -49,11 +37,11 @@ import {
 } from "@/orchestration/combat/combatStateMachine";
 import {
   createRoundDraft,
-  setRoundDraftAttackZone,
-  setRoundDraftConsumable,
-  setRoundDraftSkill,
   toggleRoundDraftDefenseZone,
 } from "@/orchestration/combat/roundDraft";
+import { createCombatSandboxActions } from "@/ui/hooks/useCombatSandboxActions";
+import { buildCombatSandboxData } from "@/ui/hooks/useCombatSandboxData";
+import { createCombatSandboxFlow } from "@/ui/hooks/useCombatSandboxFlow";
 
 export function useCombatSandbox() {
   const randomRef = useRef(new SeededRandom(1337));
@@ -73,58 +61,30 @@ export function useCombatSandbox() {
   const [roundError, setRoundError] = useState<string | null>(null);
   const [equippedSkillIds, setEquippedSkillIds] = useState<string[]>([]);
 
-  const equipmentBonuses = getEquipmentBonuses(equipment, inventory);
-  const unlockedSkills = equipmentBonuses.skills;
-  const availableSkills = unlockedSkills.filter((skill) => equippedSkillIds.includes(skill.id));
-  const availableConsumables = inventory.entries.filter((entry) => entry.item.consumableEffect && entry.quantity > 0);
-  const selectedAction = roundDraft.selectedAction;
-  const playerCharacter = applySandboxAllocations(playerBaseRef.current, playerAllocations);
-  const playerAllocationBudget = getSandboxAllocationBudget(playerAllocations);
-  const selectedBotDifficulty = botDifficultyConfigs.find((entry) => entry.id === botDifficulty) ?? botDifficultyConfigs[1];
-  const selectedBotPreset = combatBuildPresets.find((entry) => entry.id === botBuildPresetId) ?? combatBuildPresets[1];
-  const botAllocations = fitSandboxAllocationsToBudget(selectedBotPreset.allocations, playerAllocationBudget);
-  const botCharacter = applySandboxAllocations(botBaseRef.current, botAllocations);
-  const botEquipment = buildSandboxPresetState({
+  const {
+    unlockedSkills,
+    availableSkills,
+    availableConsumables,
+    playerCharacter,
+    selectedBotDifficulty,
+    selectedBotPreset,
+    botEquipment,
+    playerSnapshot,
+    botSnapshot,
+    botAvailableSkills,
+    currentPlayerCombatant,
+  } = buildCombatSandboxData({
     inventory,
-    preset: {
-      loadout: selectedBotPreset.loadout,
-      allocations: selectedBotPreset.allocations,
-      skillLoadout: selectedBotPreset.skillLoadout,
-    },
-  }).equipment;
-  const botEquipmentBonuses = getEquipmentBonuses(botEquipment, inventory);
-
-  const playerSnapshot = buildCombatSnapshot({
-    character: playerCharacter,
-    flatBonuses: equipmentBonuses.flatBonuses,
-    percentBonuses: equipmentBonuses.percentBonuses,
-    baseDamage: equipmentBonuses.baseDamage,
-    baseArmor: equipmentBonuses.baseArmor,
-    baseZoneArmor: equipmentBonuses.baseZoneArmor,
-    armorBySlot: equipmentBonuses.armorBySlot,
-    zoneArmorBySlot: equipmentBonuses.zoneArmorBySlot,
-    combatBonuses: equipmentBonuses.combatBonuses,
-    preferredDamageType: equipmentBonuses.preferredDamageType,
-    weaponClass: equipmentBonuses.mainHandWeaponClass,
+    equipment,
+    equippedSkillIds,
+    playerAllocations,
+    botDifficulty,
+    botBuildPresetId,
+    playerBaseCharacter: playerBaseRef.current,
+    botBaseCharacter: botBaseRef.current,
+    combatState,
   });
-  const botSnapshot = buildCombatSnapshot({
-    character: botCharacter,
-    flatBonuses: botEquipmentBonuses.flatBonuses,
-    percentBonuses: botEquipmentBonuses.percentBonuses,
-    baseDamage: botEquipmentBonuses.baseDamage,
-    baseArmor: botEquipmentBonuses.baseArmor,
-    baseZoneArmor: botEquipmentBonuses.baseZoneArmor,
-    armorBySlot: botEquipmentBonuses.armorBySlot,
-    zoneArmorBySlot: botEquipmentBonuses.zoneArmorBySlot,
-    combatBonuses: botEquipmentBonuses.combatBonuses,
-    preferredDamageType: botEquipmentBonuses.preferredDamageType,
-    weaponClass: botEquipmentBonuses.mainHandWeaponClass,
-  });
-  const botAvailableSkills = botEquipmentBonuses.skills.filter((skill) =>
-    selectedBotPreset.skillLoadout.includes(skill.id)
-  );
-  const currentPlayerCombatant =
-    combatState?.combatants.find((combatant) => combatant.id === playerSnapshot.characterId) ?? null;
+  const selectedAction = roundDraft.selectedAction;
 
   useEffect(() => {
     setCombatState(null);
@@ -201,69 +161,6 @@ export function useCombatSandbox() {
     setRoundError(null);
   }
 
-  function startFight() {
-    const result = startSandboxFight({
-      playerSnapshot,
-      botSnapshot,
-    });
-
-    setCombatState(result.combatState);
-    setCombatPhase(result.combatPhase);
-    setBotLastAction(result.botLastAction);
-    setBotLastPlan(result.botLastPlan);
-    setRoundError(result.roundError);
-  }
-
-  function prepareNextRound() {
-    const result = prepareSandboxNextRound({ combatPhase });
-
-    if (!result) {
-      return;
-    }
-
-    setCombatPhase(result.combatPhase);
-    setRoundDraft((current) =>
-      reconcileSandboxRoundDraftSelections(
-        current,
-        availableSkills,
-        availableConsumables,
-        playerCombatant?.resources,
-        playerCombatant?.skillCooldowns
-      )
-    );
-    setRoundError(result.roundError);
-  }
-
-  function resolveNextRound() {
-    const result = resolveSandboxRound({
-      combatPhase,
-      combatState,
-      roundDraft,
-      inventory,
-      playerSnapshot,
-      botSnapshot,
-      availableSkills,
-      availableConsumables,
-      botAvailableSkills,
-      selectedBotDifficulty,
-      selectedBotBuild: selectedBotPreset,
-      random: randomRef.current,
-    });
-
-    setBotLastPlan(result.botLastPlan);
-    setBotLastAction(result.botLastAction);
-    setCombatPhase(result.combatPhase);
-    setRoundError(result.roundError);
-
-    if (!result.success) {
-      return;
-    }
-
-    setInventory(result.inventory);
-    setRoundDraft(result.roundDraft);
-    setCombatState(result.combatState);
-  }
-
   const equippedItems = getSandboxEquippedItems(equipment, inventory);
   const botEquippedItems = getSandboxEquippedItems(botEquipment, inventory);
   const {
@@ -282,6 +179,39 @@ export function useCombatSandbox() {
     playerSnapshot,
     botSnapshot,
     equippedItems,
+  });
+  const actions = createCombatSandboxActions({
+    inventory,
+    unlockedSkills,
+    availableConsumables,
+    getInventoryOptionsForSlot: (slot: EquipmentSlot) => getSandboxInventoryOptionsForSlot(inventory, slot),
+    setRoundDraft,
+    setEquippedSkillIds,
+    setEquipment,
+    setPlayerAllocations,
+    setBotBuildPresetId,
+  });
+  const flow = createCombatSandboxFlow({
+    combatPhase,
+    combatState,
+    roundDraft,
+    inventory,
+    playerSnapshot,
+    botSnapshot,
+    availableSkills,
+    availableConsumables,
+    botAvailableSkills,
+    selectedBotDifficulty,
+    selectedBotPreset,
+    playerCombatant,
+    random: randomRef.current,
+    setCombatState,
+    setCombatPhase,
+    setRoundDraft,
+    setInventory,
+    setBotLastAction,
+    setBotLastPlan,
+    setRoundError,
   });
 
   return {
@@ -336,81 +266,15 @@ export function useCombatSandbox() {
       used: inventory.entries.length,
       max: inventory.maxSlots,
     },
-    setSelectedAttackZone: (zone: CombatZone) => setRoundDraft((current) => setRoundDraftAttackZone(current, zone)),
-    selectBasicAction: () => {
-      setRoundDraft((current) => setRoundDraftSkill(current, null));
-    },
-    setSelectedSkillAction: (skillId: string | null) => {
-      setRoundDraft((current) => setRoundDraftSkill(current, skillId));
-    },
-    toggleEquippedSkill: (skillId: string) => {
-      setEquippedSkillIds((current) => toggleSandboxEquippedSkillId(current, skillId, unlockedSkills));
-    },
-    setSelectedConsumableAction: (itemCode: string | null) => {
-      const usageMode =
-        availableConsumables.find((entry) => entry.item.code === itemCode)?.item.consumableEffect?.usageMode ?? null;
-      setRoundDraft((current) => setRoundDraftConsumable(current, itemCode, usageMode));
-    },
     toggleDefenseZone,
     increaseStat,
     decreaseStat,
     resetBuild,
     equipItemByCode,
     unequipSlot,
-    getInventoryOptionsForSlot: (slot: EquipmentSlot) => getSandboxInventoryOptionsForSlot(inventory, slot),
-    applyPreset: (presetId: string) => {
-      const preset = combatBuildPresets.find((entry) => entry.id === presetId);
-
-      if (!preset) {
-        return;
-      }
-
-      const nextState = buildSandboxPresetState({
-        inventory,
-        preset,
-      });
-
-      setEquipment(nextState.equipment);
-      setPlayerAllocations(nextState.playerAllocations);
-      setEquippedSkillIds(nextState.equippedSkillIds);
-    },
-    applyPresetItemsOnly: (presetId: string) => {
-      const preset = combatBuildPresets.find((entry) => entry.id === presetId);
-
-      if (!preset) {
-        return;
-      }
-
-      const nextState = buildSandboxPresetState({
-        inventory,
-        preset,
-      });
-
-      setEquipment(nextState.equipment);
-    },
-    applyPresetSkillsOnly: (presetId: string) => {
-      const preset = combatBuildPresets.find((entry) => entry.id === presetId);
-
-      if (!preset) {
-        return;
-      }
-
-      const availableSkillIds = new Set(unlockedSkills.map((skill) => skill.id));
-      setEquippedSkillIds(
-        preset.skillLoadout.filter((skillId) => availableSkillIds.has(skillId)).slice(0, maxSandboxEquippedSkills)
-      );
-    },
     setBotDifficulty,
-    setBotBuildPreset: (presetId: string) => {
-      if (!combatBuildPresets.some((entry) => entry.id === presetId)) {
-        return;
-      }
-
-      setBotBuildPresetId(presetId);
-    },
-    startFight,
-    prepareNextRound,
-    resolveNextRound,
+    ...actions,
+    ...flow,
   };
 }
 

@@ -1,6 +1,6 @@
 # PROJECT_STRUCTURE - Fight Club
 
-> Last updated: 2026-03-16 02:35 MSK
+> Last updated: 2026-03-16 13:55 MSK
 
 **Project root:** `c:/Users/dtphs/.vscode/Project`
 
@@ -46,7 +46,7 @@ Notes:
 - `dist/` is generated output, never source
 - `ART/Avatars/` now stores the raw `.png` source portraits; `src/assets/combat/*.jpg` are the compressed runtime silhouettes
 - `BazaBK/` now stores raw library dump, normalized pages, item images, and generated parsed JSON artifacts
-- `vite.config.js` / `vitest.config.js` and matching `.d.ts` files are generated beside the TypeScript sources
+- Vite and Vitest now keep the TypeScript config sources only; generated JS sidecars and `tsbuildinfo` files are not part of the tracked project structure
 - `docs/balance/` stores generated preset matchup reports
 - `docs/backup-points/` now stores both documentation markers and restorable UI baseline snapshots
 - `docs/README.md` is the GitBook-style documentation landing page
@@ -109,8 +109,7 @@ src/
 |-- orchestration/         # Cross-module assembly
 |-- ui/                    # React UI
 |-- main.tsx
-|-- styles.css
-`-- styles.backup-2026-03-11-ui-polish.css
+`-- styles.css
 ```
 
 ---
@@ -120,9 +119,7 @@ src/
 - `App.tsx` - screen switcher for menu, rules, and sandbox
 - `providers/AppProviders.tsx` - React provider shell
 - `config/gameConfig.ts` - gameplay/save config
-- `bootstrap/createGameApp.ts` - logger, RNG, storage, and app services
-- `bootstrap/registerModules.ts` - bootstrap stub
-- `bootstrap/wireDependencies.ts` - bootstrap stub
+- `bootstrap/createGameApp.ts` - logger, RNG, storage, and app services bootstrap
 
 ---
 
@@ -228,7 +225,7 @@ Current item model supports:
 - `shop`
 - `commentator`
 
-These still contain partial contracts/models/events with stub application logic.
+These now keep only partial contracts, models, and events for future expansion; placeholder application stubs were removed from the live tree.
 
 ---
 
@@ -264,7 +261,8 @@ Current preset fact:
 - `CombatSilhouette.tsx` - silhouette, body zones, expanded equipment slot buttons, status effects above HP, and latched one-shot impact overlays
 - `BattleLogPanel.tsx` - battle log UI
 - `battleLogFormatting.ts` - battle log formatter
-- `BuilderPopover.tsx` - build and matchup panel
+- `BuilderPopover.tsx` - build and matchup panel with locally extracted builder sections
+- `builderPopoverTypes.ts` - shared builder popover prop and matchup types
 - `BuildPresetsPopover.tsx` - dedicated curated build browser and preset applier with compact `2 x 3` layout and styled detail zones
 - `InventoryPopover.tsx` - MMO-style inventory browser with tabs, bag grid, and paper-doll equipment layout
 - `EquipmentSlotPopover.tsx` - slot gear manager
@@ -281,18 +279,18 @@ Current preset fact:
 - `PreviewSurface.tsx` - shared hover-preview and anchored item-preview shell
 - `PreviewTag.tsx` - shared compact tag used inside preview headers
 
-Backup artifacts intentionally kept:
+Backup policy:
 
-- `CombatSilhouette.backup-2026-03-11.tsx`
-- `BattleLogPanel.backup-2026-03-11.tsx`
-- `CombatSandboxScreen.backup-2026-03-11.tsx`
-- `CombatSandboxScreen.backup-2026-03-11-ui-polish.tsx`
-- `MainMenuScreen.backup-2026-03-11-ui-polish.tsx`
+- runtime source no longer keeps backup files inside `src/`
+- restorable checkpoints belong under `docs/backup-points/`
 
 ### `hooks`
 
 - `useGameApp.ts` - app context access
+- `useCombatSandboxActions.ts` - extracted sandbox action wiring for presets, loadout changes, and round-action selection
 - `useCombatSandbox.ts` - React adapter between UI and orchestration/combat runtime
+- `useCombatSandboxData.ts` - extracted pure sandbox data assembly for snapshots, bot preset resolution, and available actions
+- `useCombatSandboxFlow.ts` - extracted fight lifecycle wiring for start, prepare-next-round, and resolve-round transitions
 - `useHuntingSandbox.ts` - React adapter for the live hunting loop and reward-claim flow
 - `useAnchoredPopup.ts` - shared viewport-aware popup positioning for hover previews and anchored equipment popovers
 
@@ -300,6 +298,15 @@ Backup artifacts intentionally kept:
 
 - `MainMenu/MainMenuScreen.tsx`
 - `Combat/CombatSandboxScreen.tsx`
+- `Combat/combatSandboxScreenActionRail.tsx` - extracted action-rail and action-button UI primitives used by combat screen sections
+- `Combat/combatSandboxScreenActions.tsx` - extracted combat action section wiring for skills and consumables
+- `Combat/combatSandboxScreenControls.tsx` - extracted fight controls and round-advance controls
+- `Combat/combatSandboxScreenHelpers.ts` - extracted formatter, icon, and visual helper layer for combat screen display logic
+- `Combat/combatSandboxScreenLayout.tsx` - extracted battle-log and side-panel layout primitives
+- `Combat/combatSandboxScreenPanels.tsx` - extracted player and bot side panels, equipment-slot overlay, and related panel widgets
+- `Combat/combatSandboxScreenPopovers.tsx` - extracted bot build preset popover and its display-tone helpers
+- `Combat/combatSandboxScreenResourceGrid.tsx` - shared combat resource meter grid used across screen sections and side panels
+- `Combat/combatSandboxScreenTargeting.tsx` - extracted attack-target and defense-zone selection UI
 - `CombatRules/CombatRulesScreen.tsx`
 - `Hunting/HuntingScreen.tsx`
 - `components/profile/ProfileModal.tsx` - local profile card with mailbox mini modal, reply flow, and direct letters
@@ -320,6 +327,7 @@ Current UI facts:
 - `src/ui/hooks/useAnchoredPopup.ts` is the first shared infrastructure piece for `UI-004`
 - preview chrome and preview item shell are now unified through `PreviewSurface.tsx`, `PreviewTag.tsx`, and `ItemPreviewPopover.tsx`
 - silhouette impact overlays now include a dedicated `PIERCE` treatment for penetration events
+- `CombatSandboxScreen.tsx` is now mostly a coordinator over extracted sibling modules rather than a single monolithic screen file
 
 ---
 
@@ -379,8 +387,8 @@ Current status:
 
 - this is still one frontend project, not a monorepo
 - no backend/API tree exists
-- `registerModules.ts` and `wireDependencies.ts` are still scaffolding, not a full runtime graph
+- bootstrap is currently minimal and direct through `createGameApp.ts`, not a full dependency-registration graph
 
 ---
 
-> Last updated: 2026-03-16 02:35 MSK
+> Last updated: 2026-03-16 13:55 MSK

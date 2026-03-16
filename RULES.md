@@ -1,6 +1,6 @@
 # RULES.md - Documentation And Safe Change Rules
 
-> Last updated: 2026-03-14 00:53 MSK
+> Last updated: 2026-03-16 10:48 MSK
 
 **Project:** Fight Club  
 **Path:** `c:/Users/dtphs/.vscode/Project`
@@ -102,7 +102,7 @@ Before any code change:
 3. Check relevant tests.
 4. Check whether the change touches the combat chain:
    `ui -> useCombatSandbox -> combat/character/equipment/orchestration -> config`
-5. For risky UI recovery or handoff work, create a backup copy next to the original file before editing.
+5. For risky UI recovery or handoff work, create a backup copy under `fight-club/docs/backup-points/` instead of keeping it inside `src/`.
 
 Do not:
 
@@ -193,5 +193,4 @@ Whenever you edit these root docs:
 
 ---
 
-> Last updated: 2026-03-13 18:40 MSK
-> Last updated: 2026-03-14 00:53 MSK
+> Last updated: 2026-03-16 10:48 MSK

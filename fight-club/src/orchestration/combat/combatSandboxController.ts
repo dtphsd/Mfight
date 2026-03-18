@@ -193,7 +193,6 @@ export function resolveSandboxRound(input: SandboxRoundFlowInput): ResolveRoundR
     defenderCombatant: playerCombatant,
     availableSkills: input.botAvailableSkills,
     difficulty: input.selectedBotDifficulty.plannerProfile,
-    opponentAttackZone: input.roundDraft.attackZone,
     archetype: input.selectedBotBuild?.archetype ?? null,
   });
   const botAction = buildBotRoundAction(botPlan, botCombatant.id, input.botAvailableSkills);

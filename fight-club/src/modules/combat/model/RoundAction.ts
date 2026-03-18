@@ -1,5 +1,6 @@
 import type { CombatZone } from "@/modules/combat/model/CombatZone";
 import type { CombatSkill } from "@/modules/combat/model/CombatSkill";
+import type { CombatIntent } from "@/modules/combat/model/CombatIntent";
 import type { ConsumableEffect } from "@/modules/inventory/model/Item";
 
 export interface CombatConsumableAction {
@@ -12,6 +13,7 @@ interface BaseRoundAction {
   attackerId: string;
   attackZone: CombatZone;
   defenseZones: [CombatZone, CombatZone];
+  intent: CombatIntent;
 }
 
 export interface BasicAttackRoundAction extends BaseRoundAction {
@@ -39,32 +41,42 @@ export type RoundAction =
   | ConsumableRoundAction
   | ConsumableAttackRoundAction;
 
-export function createBasicAttackAction(input: Omit<BasicAttackRoundAction, "kind">): BasicAttackRoundAction {
+export function createBasicAttackAction(
+  input: Omit<BasicAttackRoundAction, "kind" | "intent"> & { intent?: CombatIntent }
+): BasicAttackRoundAction {
   return {
     kind: "basic_attack",
+    intent: input.intent ?? "neutral",
     ...input,
   };
 }
 
-export function createSkillAttackAction(input: Omit<SkillAttackRoundAction, "kind">): SkillAttackRoundAction {
+export function createSkillAttackAction(
+  input: Omit<SkillAttackRoundAction, "kind" | "intent"> & { intent?: CombatIntent }
+): SkillAttackRoundAction {
   return {
     kind: "skill_attack",
+    intent: input.intent ?? "neutral",
     ...input,
   };
 }
 
-export function createConsumableAction(input: Omit<ConsumableRoundAction, "kind">): ConsumableRoundAction {
+export function createConsumableAction(
+  input: Omit<ConsumableRoundAction, "kind" | "intent"> & { intent?: CombatIntent }
+): ConsumableRoundAction {
   return {
     kind: "consumable",
+    intent: input.intent ?? "neutral",
     ...input,
   };
 }
 
 export function createConsumableAttackAction(
-  input: Omit<ConsumableAttackRoundAction, "kind">
+  input: Omit<ConsumableAttackRoundAction, "kind" | "intent"> & { intent?: CombatIntent }
 ): ConsumableAttackRoundAction {
   return {
     kind: "consumable_attack",
+    intent: input.intent ?? "neutral",
     ...input,
   };
 }
@@ -83,4 +95,8 @@ export function isConsumableOnlyAction(action: RoundAction) {
 
 export function isConsumableAttackAction(action: RoundAction) {
   return action.kind === "consumable_attack";
+}
+
+export function getRoundActionIntent(action: RoundAction): CombatIntent {
+  return action.intent;
 }

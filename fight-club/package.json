@@ -15,7 +15,11 @@
     "docs:preview": "vitepress preview docs",
     "docs:validate": "node scripts/validate-content.mjs",
     "generate:module": "node scripts/generate-module.mjs",
+    "specialist:entry": "node scripts/generate-specialist-entry.mjs",
     "balance:matrix": "node scripts/run-build-matrix.cjs",
+    "combat:audit-zones": "node scripts/run-combat-zone-audit.cjs",
+    "combat:audit-skills": "node scripts/run-skill-usage-audit.cjs",
+    "combat:audit-intents": "node scripts/run-intent-usage-audit.cjs",
     "baza:parse": "node scripts/parse-bazakbk-pages.mjs",
     "baza:generate-items": "node scripts/generate-bazakbk-starter-items.mjs"
   },

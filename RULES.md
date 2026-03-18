@@ -1,6 +1,6 @@
 # RULES.md - Documentation And Safe Change Rules
 
-> Last updated: 2026-03-16 10:48 MSK
+> Last updated: 2026-03-19 17:26 MSK
 
 **Project:** Fight Club  
 **Path:** `c:/Users/dtphs/.vscode/Project`
@@ -81,6 +81,11 @@ Update when:
 - If docs are prepared for GitBook publishing, keep `fight-club/docs/README.md` and `fight-club/docs/SUMMARY.md` in sync with the actual document structure.
 - Before publishing docs changes, run `npm run docs:validate` from `fight-club/`.
 - If docs are also published as a static site, keep the VitePress entry pages and config under `fight-club/docs/.vitepress/` in sync with the markdown structure.
+- If a change meaningfully affects a specialist domain surface, sync that specialist memory too:
+  - combat work -> `fight-club/TAMA_start/combat_patch_notes.md` and, when meaningful, `fight-club/TAMA_start/combat_agent_journal.md`
+  - UI work -> `fight-club/TAMA_start/ui_patch_notes.md` and, when meaningful, `fight-club/TAMA_start/ui_agent_journal.md`
+- If one task spans multiple specialist domains, every affected specialist must log its own side of the work.
+  - Example: a combat mechanic with a new sandbox selector belongs in both combat and UI specialist records.
 
 ---
 
@@ -103,6 +108,8 @@ Before any code change:
 4. Check whether the change touches the combat chain:
    `ui -> useCombatSandbox -> combat/character/equipment/orchestration -> config`
 5. For risky UI recovery or handoff work, create a backup copy under `fight-club/docs/backup-points/` instead of keeping it inside `src/`.
+6. If the task belongs to a specialist surface, keep its patch notes and journal in sync before calling the work complete.
+7. If the task changes both system logic and its user-facing specialist surface, update both specialist channels before calling the work complete.
 
 Do not:
 
@@ -180,6 +187,17 @@ And manually verify sandbox flow:
 - Item and preset cards now surface the most important mechanics as primary UI blocks:
   - `Weapon Passive`
   - `Signature Skill`
+- The app now includes an `Ecosystem Agents` hub with at least:
+  - `Combat Master`
+  - `UI Master`
+- `Combat Master` uses:
+  - `fight-club/TAMA_start/combat_agent_journal.md`
+  - `fight-club/TAMA_start/combat_patch_notes.md`
+- `UI Master` uses:
+  - `fight-club/TAMA_start/ui_agent_journal.md`
+  - `fight-club/TAMA_start/ui_patch_notes.md`
+- If a change touches more than one specialist domain, every affected master must be updated automatically in the same work pass.
+- Never wait for a reminder to sync the second master when a fix spans both system logic and UI behavior.
 
 ---
 
@@ -193,4 +211,4 @@ Whenever you edit these root docs:
 
 ---
 
-> Last updated: 2026-03-16 10:48 MSK
+> Last updated: 2026-03-19 17:26 MSK

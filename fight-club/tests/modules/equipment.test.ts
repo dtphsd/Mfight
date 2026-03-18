@@ -186,6 +186,31 @@ describe("equipment module", () => {
     });
   });
 
+  it("keeps starter skill carriers neutral in damage profiles and preserves weapon damage typing", () => {
+    const inventory = createStarterInventory();
+    let equipment = createEquipment();
+
+    for (const itemCode of ["bk-item-206", "starter-sigil-pressure"]) {
+      const result = equipItem(equipment, inventory, itemCode);
+      if (!result.success) {
+        throw new Error(result.reason);
+      }
+
+      equipment = result.data;
+    }
+
+    const bonuses = getEquipmentBonuses(equipment, inventory);
+
+    expect(bonuses.baseDamage).toEqual({
+      slash: 7,
+      pierce: 0,
+      blunt: 0,
+      chop: 0,
+    });
+    expect(bonuses.preferredDamageType).toBe("slash");
+    expect(bonuses.mainHandWeaponClass).toBe("sword");
+  });
+
   it("ignores equipped codes missing from inventory", () => {
     const equipment = {
       slots: {

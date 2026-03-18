@@ -69,6 +69,7 @@ Use it when you need to understand where logic belongs before making code change
 - [Hunting MVP Blueprint](./hunting-mvp-blueprint)
 - [Combat System](./combat/)
 - [Combat Model And Flow](./combat/model-and-flow)
+- [Combat Round Walkthrough](./combat/round-walkthrough)
 - [Combat Formulas And Effects](./combat/formulas-and-effects)
 - [Combat Integrations And Verification](./combat/integrations-and-verification)
 - [Combat Verification And Tests](./combat/tests-and-traceability)

@@ -1,4 +1,4 @@
-import { combatZoneDamageModifiers } from "@/modules/combat";
+import { combatIntentDescriptions, combatZoneDamageModifiers, formatCombatIntentLabel } from "@/modules/combat";
 import type { useCombatSandbox } from "@/ui/hooks/useCombatSandbox";
 import { formatConsumableDetailLines, formatMaybeTitle, formatSkillDetailLines } from "./combatSandboxScreenHelpers";
 
@@ -25,9 +25,19 @@ export function resolveSelectedActionSummary(sandbox: CombatSandboxModel) {
 
   switch (selectedAction.kind) {
     case "skill_attack":
-      return formatSkillDetailLines(sandbox.equippedSkills.find((skill) => skill.id === selectedAction.skillId) ?? null);
+      return [
+        ...formatSkillDetailLines(sandbox.equippedSkills.find((skill) => skill.id === selectedAction.skillId) ?? null),
+        `Intent: ${formatCombatIntentLabel(sandbox.selectedIntent)}.`,
+        combatIntentDescriptions[sandbox.selectedIntent],
+      ];
     case "consumable":
-      return formatConsumableDetailLines(sandbox.availableConsumables.find((entry) => entry.item.code === selectedAction.consumableCode)?.item ?? null);
+      return [
+        ...formatConsumableDetailLines(
+          sandbox.availableConsumables.find((entry) => entry.item.code === selectedAction.consumableCode)?.item ?? null
+        ),
+        `Intent: ${formatCombatIntentLabel(sandbox.selectedIntent)}.`,
+        combatIntentDescriptions[sandbox.selectedIntent],
+      ];
     case "basic_attack":
     default:
       return [
@@ -35,6 +45,8 @@ export function resolveSelectedActionSummary(sandbox: CombatSandboxModel) {
         `Damage x${zoneMultiplier.toFixed(2)}`,
         `Hit: Deals x${zoneMultiplier.toFixed(2)} basic damage.`,
         "Cost: 0.",
+        `Intent: ${formatCombatIntentLabel(sandbox.selectedIntent)}.`,
+        combatIntentDescriptions[sandbox.selectedIntent],
       ];
   }
 }
@@ -46,6 +58,7 @@ export function resolveSelectedActionTags(sandbox: CombatSandboxModel) {
   switch (selectedAction.kind) {
     case "skill_attack": {
       const skill = sandbox.equippedSkills.find((entry) => entry.id === selectedAction.skillId) ?? null;
+      tags.push(`Intent ${formatCombatIntentLabel(sandbox.selectedIntent)}`);
       tags.push("Skill");
       if (skill) {
         tags.push(`Damage x${skill.damageMultiplier.toFixed(2)}`);
@@ -61,6 +74,7 @@ export function resolveSelectedActionTags(sandbox: CombatSandboxModel) {
     case "consumable": {
       const consumable =
         sandbox.availableConsumables.find((entry) => entry.item.code === selectedAction.consumableCode)?.item ?? null;
+      tags.push(`Intent ${formatCombatIntentLabel(sandbox.selectedIntent)}`);
       tags.push(selectedAction.usageMode === "with_attack" ? "With Attack" : "Separate Action");
       if (consumable?.consumableEffect?.heal) {
         tags.push(`Heal ${consumable.consumableEffect.heal} HP`);
@@ -72,6 +86,7 @@ export function resolveSelectedActionTags(sandbox: CombatSandboxModel) {
     }
     case "basic_attack":
     default:
+      tags.push(`Intent ${formatCombatIntentLabel(sandbox.selectedIntent)}`);
       tags.push("Basic");
       tags.push(`Target ${formatMaybeTitle(sandbox.selectedAttackZone)}`);
       tags.push(`Zone x${combatZoneDamageModifiers[sandbox.selectedAttackZone].toFixed(2)}`);

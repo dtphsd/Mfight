@@ -19,6 +19,11 @@ export const importedMomentumSkills: CombatSkill[] = [
     critChanceBonus: 0,
     armorPenetrationPercentBonus: zeroPenetration,
     cooldownTurns: 5,
+    roles: ["sustain", "tempo"],
+    preferredZones: ["chest", "belly"],
+    aiHints: {
+      useWhenLowHp: true,
+    },
     requirements: {
       minLevel: 3,
     },
@@ -59,6 +64,12 @@ export const importedMomentumSkills: CombatSkill[] = [
       pierce: 8,
       blunt: 0,
       chop: 4,
+    },
+    roles: ["setup", "control"],
+    preferredZones: ["head", "chest"],
+    aiHints: {
+      prefersTaggedTargets: true,
+      prefersArmoredTargets: true,
     },
     requirements: {
       minLevel: 5,

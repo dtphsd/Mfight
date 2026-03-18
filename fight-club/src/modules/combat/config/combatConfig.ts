@@ -1,15 +1,16 @@
 import type { CombatZone } from "@/modules/combat/model/CombatZone";
+import type { CombatIntent } from "@/modules/combat/model/CombatIntent";
 import type { EquipmentSlot } from "@/modules/equipment";
 import type { ArmorProfile, DamageProfile, DamageType, WeaponClass } from "@/modules/inventory";
 
 export const combatDamageTypes: DamageType[] = ["slash", "pierce", "blunt", "chop"];
 
 export const combatZoneDamageModifiers: Record<CombatZone, number> = {
-  head: 1.2,
-  chest: 1.1,
+  head: 1.15,
+  chest: 1.05,
   belly: 1,
-  waist: 0.9,
-  legs: 0.8,
+  waist: 0.95,
+  legs: 0.92,
 };
 
 export const combatChanceCaps = {
@@ -23,10 +24,10 @@ export const combatChanceCaps = {
 } as const;
 
 export const combatBlockConfig = {
-  penetrationArmorDivisor: 3.2,
-  baseBlockedPercent: 40,
+  penetrationArmorDivisor: 5.4,
+  baseBlockedPercent: 46,
   maxBlockedPercent: 70,
-  strongBlockThresholdPercent: 55,
+  strongBlockThresholdPercent: 63,
   baseStrongBlockChance: 18,
   enduranceToStrongBlockChanceFactor: 4,
   blockPowerToStrongBlockChanceFactor: 1,
@@ -38,11 +39,11 @@ export const combatBlockConfig = {
 } as const;
 
 export const combatResourceRewards = {
-  dodgeDefenderFocus: 10,
-  blockDefenderGuard: 8,
-  penetrationAttackerMomentum: 8,
-  critAttackerRage: 14,
-  cleanHitAttackerMomentum: 12,
+  dodgeDefenderFocus: 8,
+  blockDefenderGuard: 7,
+  penetrationAttackerMomentum: 7,
+  critAttackerRage: 11,
+  cleanHitAttackerMomentum: 10,
 } as const;
 
 export const combatProgressionConfig = {
@@ -63,8 +64,8 @@ export const combatFormulaConfig = {
   critMultiplierBase: 1.35,
   rageToCritMultiplierFactor: 0.03,
   enduranceToCritMultiplierFactor: 0.01,
-  baseDamage: 8,
-  strengthToBaseDamageFactor: 1.2,
+  baseDamage: 7,
+  strengthToBaseDamageFactor: 1.1,
   damageRollMinFactor: 0.85,
   damageRollMaxFactor: 1.15,
 } as const;
@@ -79,11 +80,66 @@ export const combatBotPlannerConfig = {
   closeDamageGapThreshold: 2,
   championVarianceRate: 18,
   veteranVarianceRate: 35,
+  defenseVariancePoolSize: 4,
+  defenseCloseScoreThreshold: 1.5,
+  lowLineDefenseFloorChance: 14,
   veteranSkillDamageThreshold: 1.24,
+  championSkillScoreThreshold: 120,
   skillDamageMultiplierWeight: 100,
   skillCritChanceWeight: 2,
   skillArmorPenetrationWeightDivisor: 3,
   skillCostPenaltyFactor: 0.35,
+  payoffResourceHoldThreshold: 10,
+} as const;
+
+export const combatIntentConfig: Record<
+  CombatIntent,
+  {
+    outgoingDamageMultiplier: number;
+    critChanceBonus: number;
+    dodgeChanceBonus: number;
+    blockChanceBonus: number;
+    blockPowerBonus: number;
+    dodgeSuppression: number;
+    stateBonusMultiplier: number;
+  }
+> = {
+  neutral: {
+    outgoingDamageMultiplier: 1,
+    critChanceBonus: 0,
+    dodgeChanceBonus: 0,
+    blockChanceBonus: 0,
+    blockPowerBonus: 0,
+    dodgeSuppression: 0,
+    stateBonusMultiplier: 1,
+  },
+  aggressive: {
+    outgoingDamageMultiplier: 1.08,
+    critChanceBonus: 4,
+    dodgeChanceBonus: -6,
+    blockChanceBonus: -8,
+    blockPowerBonus: -6,
+    dodgeSuppression: 0,
+    stateBonusMultiplier: 1,
+  },
+  guarded: {
+    outgoingDamageMultiplier: 0.94,
+    critChanceBonus: 0,
+    dodgeChanceBonus: 8,
+    blockChanceBonus: 10,
+    blockPowerBonus: 8,
+    dodgeSuppression: 0,
+    stateBonusMultiplier: 1,
+  },
+  precise: {
+    outgoingDamageMultiplier: 0.96,
+    critChanceBonus: 2,
+    dodgeChanceBonus: -2,
+    blockChanceBonus: -2,
+    blockPowerBonus: -2,
+    dodgeSuppression: 8,
+    stateBonusMultiplier: 1.3,
+  },
 } as const;
 
 export const combatZoneDefenseSlots: Record<CombatZone, Array<{ slot: EquipmentSlot; weight: number }>> = {
@@ -125,11 +181,11 @@ export const combatZoneDefenseSlots: Record<CombatZone, Array<{ slot: EquipmentS
 };
 
 export const combatGenericZoneDefenseProfiles: Record<CombatZone, ArmorProfile> = {
-  head: { slash: 1, pierce: 2, blunt: 2, chop: 1 },
-  chest: { slash: 1, pierce: 1, blunt: 2, chop: 1 },
-  belly: { slash: 1, pierce: 1, blunt: 1, chop: 1 },
-  waist: { slash: 0, pierce: 0, blunt: 1, chop: 1 },
-  legs: { slash: 0, pierce: 0, blunt: 1, chop: 1 },
+  head: { slash: 1, pierce: 2, blunt: 1.2, chop: 1 },
+  chest: { slash: 1, pierce: 1, blunt: 1.25, chop: 1 },
+  belly: { slash: 1, pierce: 1, blunt: 0.8, chop: 1 },
+  waist: { slash: 0, pierce: 0, blunt: 0.6, chop: 1 },
+  legs: { slash: 0, pierce: 0, blunt: 0.6, chop: 1 },
 };
 
 export const combatZoneFallbackProfiles: Record<CombatZone, DamageProfile> = {

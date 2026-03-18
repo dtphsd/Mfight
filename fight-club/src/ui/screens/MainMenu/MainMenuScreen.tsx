@@ -5,6 +5,7 @@ interface MainMenuScreenProps {
   onOpenCombatSandbox: () => void;
   onOpenCombatRules: () => void;
   onOpenHunting: () => void;
+  onOpenCombatAgent: () => void;
 }
 
 export function MainMenuScreen({
@@ -12,6 +13,7 @@ export function MainMenuScreen({
   onOpenCombatSandbox,
   onOpenCombatRules,
   onOpenHunting,
+  onOpenCombatAgent,
 }: MainMenuScreenProps) {
   const { logger } = useGameApp();
 
@@ -44,6 +46,16 @@ export function MainMenuScreen({
             </button>
             <button type="button" className="main-menu__ghost" onClick={onOpenCombatRules}>
               Read Combat Rules
+            </button>
+            <button
+              type="button"
+              className="main-menu__ghost"
+              onClick={() => {
+                logger.info("Combat agent opened");
+                onOpenCombatAgent();
+              }}
+            >
+              🫡 Ecosystem Agents
             </button>
             <button
               type="button"

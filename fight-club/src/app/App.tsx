@@ -17,6 +17,11 @@ const HuntingScreen = lazy(() =>
     default: module.HuntingScreen,
   }))
 );
+const CombatAgentScreen = lazy(() =>
+  import("@/ui/screens/CombatAgent/CombatAgentScreen").then((module) => ({
+    default: module.CombatAgentScreen,
+  }))
+);
 
 const screenLoadingFallback = (
   <div
@@ -36,7 +41,7 @@ const screenLoadingFallback = (
 );
 
 export function App() {
-  const [screen, setScreen] = useState<"menu" | "combat" | "rules" | "hunting">("menu");
+  const [screen, setScreen] = useState<"menu" | "combat" | "rules" | "hunting" | "combat-agent">("menu");
   const [playerName, setPlayerName] = useState("Player");
 
   return (
@@ -47,11 +52,17 @@ export function App() {
           onOpenCombatSandbox={() => setScreen("combat")}
           onOpenCombatRules={() => setScreen("rules")}
           onOpenHunting={() => setScreen("hunting")}
+          onOpenCombatAgent={() => setScreen("combat-agent")}
         />
       ) : (
         <Suspense fallback={screenLoadingFallback}>
           {screen === "rules" ? (
             <CombatRulesScreen
+              onBack={() => setScreen("menu")}
+              onOpenCombatSandbox={() => setScreen("combat")}
+            />
+          ) : screen === "combat-agent" ? (
+            <CombatAgentScreen
               onBack={() => setScreen("menu")}
               onOpenCombatSandbox={() => setScreen("combat")}
             />

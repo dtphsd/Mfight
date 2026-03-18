@@ -1,6 +1,15 @@
 import type { CombatEffectDefinition } from "@/modules/combat/model/CombatEffect";
 import type { CombatResourceType } from "@/modules/combat/model/CombatResources";
+import type { CombatZone } from "@/modules/combat/model/CombatZone";
 import type { DamageProfile } from "@/modules/inventory";
+
+export type CombatSkillRole = "setup" | "payoff" | "counter" | "tempo" | "sustain" | "control";
+
+export interface CombatSkillAiHints {
+  useWhenLowHp?: boolean;
+  prefersTaggedTargets?: boolean;
+  prefersArmoredTargets?: boolean;
+}
 
 export interface CombatSkillStateBonus {
   requiredEffectId: string;
@@ -31,6 +40,9 @@ export interface CombatSkill {
   critChanceBonus: number;
   armorPenetrationPercentBonus: DamageProfile;
   cooldownTurns?: number;
+  roles?: CombatSkillRole[];
+  preferredZones?: CombatZone[];
+  aiHints?: CombatSkillAiHints;
   requirements?: CombatSkillRequirementMetadata;
   unlock?: CombatSkillUnlockMetadata;
   effects?: CombatEffectDefinition[];

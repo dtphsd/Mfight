@@ -9,6 +9,7 @@
     - [Hunting Runtime Reference](architecture/hunting-runtime-reference.md)
     - [Hunting MVP Blueprint](architecture/hunting-mvp-blueprint.md)
     - [Combat System Roadmap](architecture/combat-system-roadmap.md)
+    - [Combat Round Walkthrough](architecture/combat/round-walkthrough.md)
   - [Architecture Decisions](decisions/README.md)
     - [ADR-001: Modular Headless Core](decisions/ADR-001-architecture.md)
   - [GitBook Publish Setup](gitbook-publish-setup.md)

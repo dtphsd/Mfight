@@ -1,0 +1,354 @@
+{
+  "generatedAt": "2026-03-18T22:13:10.500Z",
+  "options": {
+    "runs": 10,
+    "maxRounds": 40,
+    "difficulty": "champion",
+    "write": true
+  },
+  "presets": [
+    {
+      "id": "sustain-regen",
+      "label": "Sustain / Armor",
+      "archetype": "Sustain",
+      "fights": 140,
+      "wins": 109,
+      "losses": 31,
+      "draws": 0,
+      "totalRounds": 971,
+      "turns": 971,
+      "totalDamage": 12468,
+      "totalStateBonuses": 0,
+      "intents": {
+        "neutral": {
+          "turns": 500,
+          "totalDamage": 6947,
+          "kills": 4,
+          "stateBonuses": 0,
+          "pickRate": 51.5,
+          "averageDamage": 13.9
+        },
+        "aggressive": {
+          "turns": 0,
+          "totalDamage": 0,
+          "kills": 0,
+          "stateBonuses": 0,
+          "pickRate": 0,
+          "averageDamage": 0
+        },
+        "guarded": {
+          "turns": 361,
+          "totalDamage": 3850,
+          "kills": 46,
+          "stateBonuses": 0,
+          "pickRate": 37.2,
+          "averageDamage": 10.7
+        },
+        "precise": {
+          "turns": 110,
+          "totalDamage": 1671,
+          "kills": 5,
+          "stateBonuses": 0,
+          "pickRate": 11.3,
+          "averageDamage": 15.2
+        }
+      },
+      "averageFightRounds": 6.9,
+      "averageDamagePerTurn": 12.8
+    },
+    {
+      "id": "sword-bleed",
+      "label": "Sword / Bleed",
+      "archetype": "Pressure",
+      "fights": 140,
+      "wins": 91,
+      "losses": 49,
+      "draws": 0,
+      "totalRounds": 980,
+      "turns": 980,
+      "totalDamage": 11893,
+      "totalStateBonuses": 0,
+      "intents": {
+        "neutral": {
+          "turns": 640,
+          "totalDamage": 8527,
+          "kills": 6,
+          "stateBonuses": 0,
+          "pickRate": 65.3,
+          "averageDamage": 13.3
+        },
+        "aggressive": {
+          "turns": 36,
+          "totalDamage": 452,
+          "kills": 10,
+          "stateBonuses": 0,
+          "pickRate": 3.7,
+          "averageDamage": 12.6
+        },
+        "guarded": {
+          "turns": 253,
+          "totalDamage": 2228,
+          "kills": 29,
+          "stateBonuses": 0,
+          "pickRate": 25.8,
+          "averageDamage": 8.8
+        },
+        "precise": {
+          "turns": 51,
+          "totalDamage": 686,
+          "kills": 2,
+          "stateBonuses": 0,
+          "pickRate": 5.2,
+          "averageDamage": 13.5
+        }
+      },
+      "averageFightRounds": 7,
+      "averageDamagePerTurn": 12.1
+    },
+    {
+      "id": "heavy-two-hand",
+      "label": "Heavy / Steel",
+      "archetype": "Heavy",
+      "fights": 140,
+      "wins": 90,
+      "losses": 50,
+      "draws": 0,
+      "totalRounds": 1014,
+      "turns": 1014,
+      "totalDamage": 12415,
+      "totalStateBonuses": 0,
+      "intents": {
+        "neutral": {
+          "turns": 747,
+          "totalDamage": 9944,
+          "kills": 18,
+          "stateBonuses": 0,
+          "pickRate": 73.7,
+          "averageDamage": 13.3
+        },
+        "aggressive": {
+          "turns": 0,
+          "totalDamage": 0,
+          "kills": 0,
+          "stateBonuses": 0,
+          "pickRate": 0,
+          "averageDamage": 0
+        },
+        "guarded": {
+          "turns": 264,
+          "totalDamage": 2424,
+          "kills": 40,
+          "stateBonuses": 0,
+          "pickRate": 26,
+          "averageDamage": 9.2
+        },
+        "precise": {
+          "turns": 3,
+          "totalDamage": 47,
+          "kills": 0,
+          "stateBonuses": 0,
+          "pickRate": 0.3,
+          "averageDamage": 15.7
+        }
+      },
+      "averageFightRounds": 7.2,
+      "averageDamagePerTurn": 12.2
+    },
+    {
+      "id": "axe-pressure",
+      "label": "Axe / Pressure",
+      "archetype": "Tempo",
+      "fights": 140,
+      "wins": 82,
+      "losses": 58,
+      "draws": 0,
+      "totalRounds": 980,
+      "turns": 980,
+      "totalDamage": 18478,
+      "totalStateBonuses": 13,
+      "intents": {
+        "neutral": {
+          "turns": 551,
+          "totalDamage": 10764,
+          "kills": 9,
+          "stateBonuses": 0,
+          "pickRate": 56.2,
+          "averageDamage": 19.5
+        },
+        "aggressive": {
+          "turns": 8,
+          "totalDamage": 107,
+          "kills": 4,
+          "stateBonuses": 0,
+          "pickRate": 0.8,
+          "averageDamage": 13.4
+        },
+        "guarded": {
+          "turns": 258,
+          "totalDamage": 3941,
+          "kills": 58,
+          "stateBonuses": 7,
+          "pickRate": 26.3,
+          "averageDamage": 15.3
+        },
+        "precise": {
+          "turns": 163,
+          "totalDamage": 3666,
+          "kills": 11,
+          "stateBonuses": 6,
+          "pickRate": 16.6,
+          "averageDamage": 22.5
+        }
+      },
+      "averageFightRounds": 7,
+      "averageDamagePerTurn": 18.9
+    },
+    {
+      "id": "shield-guard",
+      "label": "Blunt / Guard",
+      "archetype": "Defense",
+      "fights": 140,
+      "wins": 42,
+      "losses": 98,
+      "draws": 0,
+      "totalRounds": 1165,
+      "turns": 1165,
+      "totalDamage": 15576,
+      "totalStateBonuses": 0,
+      "intents": {
+        "neutral": {
+          "turns": 548,
+          "totalDamage": 8490,
+          "kills": 0,
+          "stateBonuses": 0,
+          "pickRate": 47,
+          "averageDamage": 15.5
+        },
+        "aggressive": {
+          "turns": 0,
+          "totalDamage": 0,
+          "kills": 0,
+          "stateBonuses": 0,
+          "pickRate": 0,
+          "averageDamage": 0
+        },
+        "guarded": {
+          "turns": 550,
+          "totalDamage": 6119,
+          "kills": 38,
+          "stateBonuses": 0,
+          "pickRate": 47.2,
+          "averageDamage": 11.1
+        },
+        "precise": {
+          "turns": 67,
+          "totalDamage": 967,
+          "kills": 4,
+          "stateBonuses": 0,
+          "pickRate": 5.8,
+          "averageDamage": 14.4
+        }
+      },
+      "averageFightRounds": 8.3,
+      "averageDamagePerTurn": 13.4
+    },
+    {
+      "id": "mace-control",
+      "label": "Mace / Control",
+      "archetype": "Control",
+      "fights": 140,
+      "wins": 41,
+      "losses": 99,
+      "draws": 0,
+      "totalRounds": 1185,
+      "turns": 1185,
+      "totalDamage": 15899,
+      "totalStateBonuses": 1,
+      "intents": {
+        "neutral": {
+          "turns": 581,
+          "totalDamage": 8572,
+          "kills": 3,
+          "stateBonuses": 0,
+          "pickRate": 49,
+          "averageDamage": 14.8
+        },
+        "aggressive": {
+          "turns": 0,
+          "totalDamage": 0,
+          "kills": 0,
+          "stateBonuses": 0,
+          "pickRate": 0,
+          "averageDamage": 0
+        },
+        "guarded": {
+          "turns": 502,
+          "totalDamage": 5538,
+          "kills": 33,
+          "stateBonuses": 1,
+          "pickRate": 42.4,
+          "averageDamage": 11
+        },
+        "precise": {
+          "turns": 102,
+          "totalDamage": 1789,
+          "kills": 5,
+          "stateBonuses": 0,
+          "pickRate": 8.6,
+          "averageDamage": 17.5
+        }
+      },
+      "averageFightRounds": 8.5,
+      "averageDamagePerTurn": 13.4
+    },
+    {
+      "id": "dagger-crit",
+      "label": "Dagger / Crit",
+      "archetype": "Burst",
+      "fights": 140,
+      "wins": 35,
+      "losses": 105,
+      "draws": 0,
+      "totalRounds": 1197,
+      "turns": 1197,
+      "totalDamage": 15070,
+      "totalStateBonuses": 4,
+      "intents": {
+        "neutral": {
+          "turns": 711,
+          "totalDamage": 9454,
+          "kills": 0,
+          "stateBonuses": 0,
+          "pickRate": 59.4,
+          "averageDamage": 13.3
+        },
+        "aggressive": {
+          "turns": 62,
+          "totalDamage": 938,
+          "kills": 3,
+          "stateBonuses": 0,
+          "pickRate": 5.2,
+          "averageDamage": 15.1
+        },
+        "guarded": {
+          "turns": 419,
+          "totalDamage": 4628,
+          "kills": 32,
+          "stateBonuses": 4,
+          "pickRate": 35,
+          "averageDamage": 11
+        },
+        "precise": {
+          "turns": 5,
+          "totalDamage": 50,
+          "kills": 0,
+          "stateBonuses": 0,
+          "pickRate": 0.4,
+          "averageDamage": 10
+        }
+      },
+      "averageFightRounds": 8.6,
+      "averageDamagePerTurn": 12.6
+    }
+  ]
+}

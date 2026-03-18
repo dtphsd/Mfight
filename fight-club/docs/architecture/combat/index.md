@@ -24,6 +24,10 @@ Use it when you need to understand how the combat system behaves without reading
     <p>Damage math, dodge, block, crit, resources, passives, effects, and consumables.</p>
   </div>
   <div class="docs-hub-card">
+    <h3>Round Walkthrough</h3>
+    <p>One end-to-end round from snapshot and planner choice to resolve, effects, log, and UI.</p>
+  </div>
+  <div class="docs-hub-card">
     <h3>Integrations</h3>
     <p>How combat behavior affects sandbox orchestration, bot planning, UI, and Combat Rules.</p>
   </div>
@@ -39,7 +43,8 @@ Use it when you need to understand how the combat system behaves without reading
 
 1. [Combat Design Reference](../combat-design-reference.md)
 2. [Combat Model And Flow](./model-and-flow.md)
-3. [Combat Formulas And Effects](./formulas-and-effects.md)
+3. [Combat Round Walkthrough](./round-walkthrough.md)
+4. [Combat Formulas And Effects](./formulas-and-effects.md)
 
 ### Change Combat Safely
 
@@ -53,6 +58,7 @@ Use it when you need to understand how the combat system behaves without reading
 
 - [Combat Design Reference](../combat-design-reference.md)
 - [Combat Model And Flow](./model-and-flow.md)
+- [Combat Round Walkthrough](./round-walkthrough.md)
 - [Combat Formulas And Effects](./formulas-and-effects.md)
 - [Combat Integrations And Verification](./integrations-and-verification.md)
 - [Combat Verification And Tests](./tests-and-traceability.md)

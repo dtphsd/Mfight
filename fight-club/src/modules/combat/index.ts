@@ -7,6 +7,7 @@ export * from "./model/CombatSkill";
 export * from "./model/CombatSnapshot";
 export * from "./model/CombatantState";
 export * from "./model/CombatState";
+export * from "./model/CombatIntent";
 export * from "./model/RoundAction";
 export * from "./model/RoundResult";
 export * from "./config/combatConfig";

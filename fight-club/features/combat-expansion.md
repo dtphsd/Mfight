@@ -1,6 +1,6 @@
 # Combat Expansion
 
-> Last updated: 2026-03-16 02:35 MSK
+> Last updated: 2026-03-18 18:28 MSK
 
 **Feature:** Combat Expansion  
 **Status:** IN PROGRESS
@@ -97,6 +97,211 @@ Current slice:
 - the curated build browser has now gone through a compact one-page UI pass with avatar previews, archetype color zoning, and denser preset inspection
 - combat impact feedback has also been hardened so text and block / crit / block-break overlays are emitted as one-shot pulses and do not reappear after fading out
 - penetration now has its own dedicated `PIERCE` impact treatment instead of borrowing another feedback lane
+- the combat recovery track also changed the baseline under skills:
+  - mitigation is now explicitly `per-damage-type`
+  - defended zones now document `zoneArmor + zoneArmorBySlot` as the truth model
+  - bot omniscience was removed from the sandbox planner
+  - the next meaningful skill work should build on this stabilized core instead of continuing early preset-only balance loops
+- `COMBAT-015` has now started with the first production-safe metadata slice:
+  - `CombatSkill` now supports explicit role metadata
+  - skills can now carry preferred zone hints
+  - skills can now carry soft AI usage hints
+  - builder and item UI now surface those hints
+  - bot planning now treats that metadata as soft scoring guidance instead of hard scripting
+- `COMBAT-016` has now started too:
+  - a hand-written starter skill layer now sits on top of the generated starter item pool
+  - curated accessory skill carriers now inject real first-wave combat kits into the seven sandbox presets
+  - presets no longer ship with empty `skillLoadout` arrays
+  - sustain uses the imported momentum manual, while the other archetypes now get compact setup/payoff pairs aligned to their intended style
+  - the first rollout also exposed a real content/runtime integration bug:
+    - starter skill carriers were importing zero-value item profiles through a broad inventory barrel
+    - that circular path corrupted combat snapshots with `NaN`
+    - audits then misreported sword attacks as `blunt`, and matrix output drifted into fake draw-heavy combat
+  - that bug is now fixed, so post-skill analytics are trustworthy again
+
+---
+
+## Skills Foundation Decision
+
+The next expansion priority is now `skills`, not another isolated preset-balance pass.
+
+Reason:
+
+- the sandbox already supports active skills, cooldowns, effects, and named-state payoff windows
+- but most curated presets still run with empty `skillLoadout` arrays, so combat feel is still too close to basic-hit trading
+- future MMORPG combat depth will come more from build identity, unlock paths, counterplay, and tactical buttons than from endlessly tuning seven temporary presets against each other
+
+This means the project should now treat combat skills as the main bridge between:
+
+- base combat math
+- itemization
+- archetype identity
+- future progression and unlock systems
+- future trauma or injury hooks
+
+---
+
+## Skills Goals
+
+The production goal for skills is:
+
+- make turns feel different from one another
+- create readable setup, payoff, counter, sustain, and tempo windows
+- keep player-facing rules understandable without hidden exceptions
+- let itemization and later MMO progression deepen the combat loop without replacing the core combat model
+
+What skills should not become:
+
+- a pile of flat damage buttons with slightly different costs
+- a hidden scripting layer the player cannot read from the UI
+- a second combat engine disconnected from the base `skill_attack` path
+
+---
+
+## Current Runtime Strengths
+
+The live runtime already gives us useful foundations:
+
+- `CombatSkill` supports cost, cooldown, damage multiplier, crit bonus, penetration bonus, active effects, and state-aware bonuses
+- `resolveRound(...)` already resolves `skill_attack` through the same main combat pipeline
+- active effects already support setup states like `Exposed` and `Staggered`
+- UI already supports a 5-slot skill loadout and cooldown display
+- docs and rules screen already explain named-state windows
+
+These are strong enough to ship a real first skill layer without inventing a totally new engine.
+
+## Combat Intent Track
+
+The first new combat-variety layer now starts with `Combat Intent`, not another class-only balance loop.
+
+Why this layer matters:
+
+- it gives each round a directional choice without adding permanent stance complexity
+- it creates expressive tradeoffs before adding more archetype-only tuning
+- it increases decision density while preserving the existing combat truth model
+
+Current v1 target:
+
+- `Neutral`
+- `Aggressive`
+- `Guarded`
+- `Precise`
+
+This should be treated as the first reusable combat-expression mechanic before reactive windows are introduced.
+
+---
+
+## Current Gaps
+
+The model is still missing several pieces that will matter for a real MMORPG-facing skill layer:
+
+- no explicit skill role metadata such as `setup`, `payoff`, `counter`, `tempo`, `sustain`, or `control`
+- no AI-facing metadata to help the bot understand when a skill is worth using
+- no zone preference or targeting hint metadata for skills that conceptually want high-line or low-line pressure
+- no progression-aware unlock plan beyond optional metadata fields
+- no formal skill-pack baseline per archetype, because most presets still ship with no equipped skills
+- no trauma hook surface yet for future injury-linked skills
+
+Because of these gaps, the next skill pass should start with structure and curation, not with a giant content dump.
+
+---
+
+## Skills Architecture Plan
+
+### Phase 1 - Foundation
+
+- define the canonical skill roles:
+  - `setup`
+  - `payoff`
+  - `counter`
+  - `tempo`
+  - `sustain`
+  - `control`
+- extend the skill model only where it creates real clarity:
+  - role metadata
+  - optional zone preference hints
+  - optional AI usage hints
+- keep all skills on the existing `skill_attack` runtime path
+
+### Phase 2 - Curated First Packs
+
+Each archetype should get a compact and readable first pack, not a huge library.
+
+Recommended minimum pack shape:
+
+- 1 setup skill
+- 1 payoff skill
+- 1 defensive or counter skill
+- 1 tempo or sustain skill
+
+This should be enough to make a preset feel like an archetype instead of a stat block.
+
+### Phase 3 - Preset Integration
+
+- equip real skill loadouts on the curated presets
+- tune the packs around identity first, not mirror-balance
+- verify that each preset now has at least one recognizable turn pattern instead of pure basic-attack flow
+
+### Phase 4 - Verification
+
+- add targeted tests around cooldown, cost thresholds, state windows, and payoff interactions
+- add playtest checks that confirm the bot can use skill-equipped builds coherently
+- refresh rules-screen facts and architecture docs after each skill wave
+
+### Phase 5 - Future Hooks
+
+Once skills are stable, they become the right place to attach:
+
+- progression unlocks
+- richer item identity
+- trauma-aware finishers or anti-injury tools
+- broader MMO combat kits
+
+---
+
+## First Production Skill Packs
+
+The first real skill wave should stay intentionally small.
+
+Recommended packs:
+
+### Duelist / Precision
+
+- opener that creates `Exposed`
+- payoff strike that spikes against `Exposed`
+- light defensive read or riposte button
+- tempo button that helps keep initiative or focus pressure
+
+### Breaker / Control
+
+- setup strike that creates `Staggered`
+- payoff strike that breaks through weakened defense
+- anti-guard tool
+- sustain or tempo button that keeps pressure live for one more exchange
+
+### Warden / Guard
+
+- defensive counter skill
+- punish button that cashes in on `Staggered`
+- guard recovery or brace tool
+- measured setup tool that does not overlap too much with Breaker fantasy
+
+### Executioner / Finisher
+
+- setup or mark skill
+- heavy payoff hit against `Exposed`
+- rage-tempo tool
+- survival button that helps the finisher survive long enough to cash in
+
+---
+
+## Guardrails
+
+- do not add a huge generic skill pool before curated packs exist
+- do not rebalance the entire combat meta around empty-skill presets anymore
+- do not create skills that bypass the main combat pipeline
+- do not add trauma-linked skills before the trauma model exists
+- do not add complex scouting or reveal mechanics until the UI can surface them clearly
 
 ---
 
@@ -254,19 +459,14 @@ Recommended shape:
 
 ## Next Step
 
-Move into `COMBAT-010` and use the fresh matrix snapshot to steer the next combat pass:
+The next execution pivot is now:
 
-- `Shield / Guard` is currently the clear top performer
-- `Sustain / Regen` is also strong
-- `Dagger / Crit` and `Heavy / Two-Hand` are the clearest underperformers
-- `Mace / Control` looks durable but slow and draw-heavy
+1. keep the first production skill packs live and stable
+2. audit planner rhythm, cooldown cadence, and setup/payoff conversion on the repaired post-skill baseline
+3. add verification for cooldowns, setup/payoff windows, and bot coherence
+4. defer trauma-linked skill ideas until the injury model exists
 
-That means the next gameplay adjustments should be balance-informed rather than purely additive.
-
-The current expansion track now has a second requirement:
-
-1. keep the base formulas, `BazaBK` item imports, and rules docs aligned
-2. only then continue archetype-by-archetype tuning on top of that stable base
+That means the next gameplay adjustments should be usage-informed rather than purely additive or purely numeric.
 
 ---
 
@@ -276,73 +476,202 @@ Latest matrix source:
 
 - `docs/balance/latest-build-matrix.md`
 
-Observed read from the current snapshot:
+Observed read from the repaired post-skill snapshot:
 
-- `Shield / Guard`
-  - strongest net performer in the current field
-  - long average fights, strong survivability, and broad matchup dominance
-- `Sustain / Regen`
-  - still overperforming in many slower matchups
-- `Mace / Control`
-  - healthy control identity, but many draws suggest high stall potential
-- `Dagger / Crit`
-  - underperforming despite the new precision payoffs
-  - likely too fragile or too burst-dependent in current bot-driven loops
-- `Heavy / Two-Hand`
-  - still too weak for a supposed high-commitment power archetype
-  - likely needs either stronger payoff windows or more reliable baseline pressure
-
-Recommended next balance direction:
-
-1. avoid buffing `Shield / Guard` or `Sustain / Regen` further for now
-2. look first at `Dagger / Crit` and `Heavy / Two-Hand`
-3. keep `Exposed` / `Staggered` rules stable while tuning content around them
-4. prefer small numeric and skill-identity nudges over new mechanics
-
-Latest follow-up pass:
-
-- a preset-focused balance pass reduced offensive spillover from `Shield / Guard` and improved `Heavy / Two-Hand`
-- `Heavy / Two-Hand` moved from clear bottom-tier to a still-weak but much healthier position
-- `Dagger / Crit` got worse after moving away from the accessory burst package, which means its issue is not simply "needs exposed setup"
-- `Shield / Guard` remains the strongest build in the field even after the preset adjustment
-
-Latest dagger rescue pass:
-
-- `Dagger / Crit` was moved back toward a more direct burst conversion with `Arena Earring` and a stronger `Killer Focus`
-- the matrix read improved dagger materially:
-  - from `Net -54` to `Net -18`
-- `Shield / Guard` softened slightly:
-  - from `Net 48` to `Net 43`
-- the top cluster is now shared by `Shield / Guard` and `Sustain / Regen`
-
-Latest heavy rescue pass:
-
-- trying to solve heavy through a more aggressive rage loop made the preset worse, which confirmed that the issue was not simply "skills are too expensive"
-- the better result came from restoring the stable preset shell and raising baseline greatsword pressure instead:
-  - `great-training-sword` base slash and pierce damage were raised slightly
-  - its native slash / pierce penetration was also raised
-  - `Execution Arc` got a modest base damage increase
-- the matrix read improved heavy modestly:
-  - from `Net -27` to `Net -24`
-- tradeoff:
-  - `Mace / Control` slipped from `Net 2` to `Net -3`
-  - `Shield / Guard` and `Sustain / Regen` stayed on top
+- the earlier draw-heavy matrix was invalid
+  - it was caused by a real skill-carrier integration bug, not by a subtle balance issue
+  - starter skill carriers were poisoning combat snapshots with `NaN`, which pushed attacks into fallback damage typing and distorted both audit and matrix output
+- after the fix, combat pace is fast again
+  - most matchups now resolve in roughly `5-8` rounds instead of drifting toward `40`
+- the current honest matrix is highly polar, not stalled
+  - `Sword / Bleed` and `Axe / Pressure` are the new visible top cluster
+  - `Sustain / Armor` is still strong
+  - `Mace / Control` is the clearest weak outlier
 
 Current working read:
 
-- rescuing dagger through direct burst identity worked better than forcing it deeper into setup-only play
-- a narrow heavy buff can help, but the current meta ceiling is still dictated by the sustain/guard cluster
-- `Heavy / Two-Hand` is still below the healthy middle, even after the better rescue pass
-- the next balance target should either be the top sustain/guard cluster or an even more isolated heavy-only buff that does not splash onto `Mace / Control`
+- the next problem is no longer fake stall
+- the next problem is whether the new skill kits are being used coherently enough to create readable setup -> payoff loops
+- before more balance levers move, the project should verify:
+  - how often planners choose setup skills versus payoff skills
+  - whether cooldowns and costs delay payoff windows too much
+  - whether weaker kits are losing because of numbers or because they fail to convert state windows into damage
+
+Latest skill-usage audit:
+
+- `docs/balance/latest-skill-audit.md` is now the live reference for post-fix skill behavior
+- the first read is very clear:
+  - every preset currently picks a skill on `100%` of turns where at least one skill is affordable
+  - setup skills dominate most kits:
+    - `Opening Sense` used `41` times while `Execution Arc` used `0`
+    - `Execution Mark` used `119` times while `Heartseeker` used `3`
+    - `Body Check` used `2` times while `Killer Focus` used `10`, but heavy only reached `13` total affordable skill turns
+    - `Armor Crush` used `184` times while `Crushing Blow` used `8`
+  - state-bonus conversion is nearly absent for most presets:
+    - `Sword / Bleed`: `0`
+    - `Blunt / Guard`: `0`
+    - `Dagger / Crit`: `0`
+    - `Heavy / Steel`: `0`
+    - only `Mace / Control` and `Axe / Pressure` show visible payoff triggering
+
+What this means:
+
+- the immediate problem is not "skills are too weak" in the abstract
+- the immediate problem is that the planner currently overspends skills whenever it can and does not preserve enough resources or tempo for payoff turns
+- setup windows are being created much more often than they are being cashed in
+- the next tuning pass should therefore target planner rhythm, skill scoring, cost cadence, or cooldown pacing before broad damage retuning
+
+Follow-up planner experiment:
+
+- a narrow planner pass was added to allow "hold for payoff" behavior when a setup-like skill would spend the same resource that a nearby payoff skill needs
+- the isolated planner test passed, so the behavior exists as a supported option now
+- but the live audit barely moved afterward, which is the more important result:
+  - `Sword / Bleed` still never reaches `Execution Arc`
+  - `Dagger / Crit` still almost never reaches `Heartseeker`
+  - `Mace / Control` still rarely reaches `Crushing Blow`
+
+Revised read after that experiment:
+
+- planner greed is part of the story, but not the main bottleneck for the live roster
+- the stronger bottleneck is resource economy and cost shape:
+  - several payoff skills are simply too expensive relative to how their archetypes earn that resource
+  - some kits create setup states on one resource and try to cash them in on a second, slower resource
+- so the next corrective pass should prioritize:
+  - payoff costs
+  - resource gain cadence
+  - and only secondarily more planner scoring changes
+
+Follow-up payoff-window pass:
+
+- planner scoring now also understands live payoff windows directly:
+  - affordable payoff skills are now preferred when their required state is already active
+  - active `stateBonuses` are now scored instead of being treated as invisible planner value
+- the next content pass then narrowed the `Exposed` bottleneck:
+  - `Exposed` duration increased from `2` to `3`
+  - `Execution Arc` cost dropped from `18` to `16`
+  - `Heartseeker` cost dropped from `20` to `16`
+
+What changed after the pass:
+
+- `Sword / Bleed` improved structurally:
+  - `Execution Arc` usage rose from `0` to `40`
+  - the sword kit now actually reads as setup -> payoff in the live audit
+- `Dagger / Crit` improved only slightly:
+  - `Heartseeker` still fires rarely, although it now shows at least one real tagged payoff trigger
+- `Mace / Control` remains stable on the earlier guard-aligned payoff path
+
+Latest economic pass:
+
+- a narrow live-content economy pass is now in:
+  - `Execution Arc` cost reduced from `24` to `18`
+  - `Heartseeker` moved from `focus` to `rage` and its cost dropped from `24` to `20`
+  - `Crushing Blow` moved from `momentum` to `guard` and its cost dropped from `23` to `19`
+
+What changed after the pass:
+
+- `Mace / Control` improved materially:
+  - `Crushing Blow` usage rose from `8` to `37`
+  - matrix net improved from `-36` to `-26`
+- `Dagger / Crit` changed only slightly:
+  - `Heartseeker` still fires rarely, but when it does the hit quality is excellent
+  - this suggests dagger still needs more than just a resource-type alignment
+- `Sword / Bleed` did not improve yet:
+  - `Execution Arc` still does not come online in the live audit
+  - that means sword pressure is bottlenecked somewhere beyond raw cost alone
+
+Current best read:
+
+- the economy pass validated the method
+- `Mace / Control` was genuinely suffering from payoff access
+- `Sword / Bleed` and `Dagger / Crit` still likely need either:
+  - stronger resource cadence
+  - less setup overspend inside burst loops
+  - or less front-loaded setup spending
 
 Current working conclusion:
 
-- keep the improved greatsword baseline pressure direction for now
-- do not buff `Shield / Guard`
-- keep the recovered dagger direction for now
-- treat `Sustain / Regen` and the broader sustain/guard package as the next likely nerf target
-- be careful with shared blunt / guard levers, because `Mace / Control` is now more fragile than before
-- prefer nerfing survivability loops before adding more damage elsewhere
+- do not resume blind archetype tuning from the pre-fix notes
+- treat the repaired matrix as a new baseline
+- audit skill usage and combat rhythm first
+- only then retune the weakest and strongest archetypes on top of valid data
+- treat planner overspending and payoff starvation as the primary follow-up problem
+
+Latest dagger handoff fix:
+
+- the next narrow burst pass is now in and it clarified the problem further:
+  - `Dagger / Crit` was not mainly failing because `Heartseeker` numbers were too low
+  - it was failing because `Execution Mark` opened `Exposed` and spent the same zero-start `rage` economy that the finisher needed
+- the live fix stayed archetype-specific instead of changing global resource rules:
+  - `Execution Mark` now also applies `Killing Window`
+  - `Killing Window` is a one-turn self-buff that grants `+16 rage` at the start of the next turn
+  - that creates an explicit burst handoff instead of asking the dagger kit to crit at exactly the right moment just to afford its own payoff
+- the result is large enough to count as a real loop repair:
+  - `Heartseeker` usage rose from `2` to `74`
+  - tagged payoff triggers rose from `1` to `67`
+  - `Dagger / Crit` improved from `38-102` to `48-92`
+- current read after the fix:
+  - the burst lane now behaves like a readable setup -> payoff kit
+  - the next weakest live archetypes are now more clearly in the guard/control cluster, not in dagger burst
+
+## Combat System Build Order
+
+The next combat phase should be treated as system construction, not rotating archetype repair.
+
+Current live read from runtime and audits:
+
+- the combat core already has a strong execution pipeline:
+  - initiative order by agility
+  - declared attack and defense zones
+  - typed mitigation through `zoneArmor + zoneArmorBySlot`
+  - dodge, block, penetration, crit, and damage resolution
+  - turn-start effect ticks
+  - cooldowns and active-effect state windows
+- the content layer also already has a readable first skill language:
+  - `setup`
+  - `payoff`
+  - `control`
+  - `counter`
+  - `tempo`
+  - `sustain`
+- the weak point is the layer between them:
+  - resource cadence
+  - planner rhythm
+  - payoff conversion reliability
+  - role identity under pressure
+
+So the build order from here should be:
+
+1. protect the combat foundation
+   - keep `resolveRound(...)`, typed mitigation, turn-start effects, and cooldown behavior as the canonical truth model
+   - avoid changing this layer casually for single-archetype pain unless the bug is clearly systemic
+2. formalize combat pillars
+   - burst must create and cash in on a short kill window
+   - pressure must steadily amplify threat across repeated exchanges
+   - control must disrupt defense quality or enemy tempo in a measurable way
+   - defense must survive peaks and convert safety into counter-pressure
+   - sustain must win longer exchanges without creating dead fights
+3. stabilize shared economy rules
+   - each archetype needs a believable way to reach its payoff button
+   - setup and payoff should not accidentally compete on impossible timing by default
+   - resource rewards should reinforce intended combat identity instead of only generic hit quality
+4. improve planner behavior only where it expresses system truth
+   - planner should recognize open payoff windows
+   - planner should preserve resources when a real conversion turn is near
+   - planner should not be used as a hidden patch for broken combat economics
+5. rebalance archetypes only after the system layer is stable
+   - class or preset changes should become the finishing pass, not the main repair loop
+
+Practical development rule:
+
+- if a combat problem appears in one kit only, prefer an archetype fix
+- if it appears across multiple kits with the same failure shape, fix the shared system layer first
+
+This means the next combat work should be framed as:
+
+- build combat economy truth
+- build readable role identity
+- build reliable setup -> payoff conversion
+- only then reopen broad archetype tuning
 
 ---
 
@@ -356,4 +685,4 @@ Current working conclusion:
 
 ---
 
-> Last updated: 2026-03-16 02:35 MSK
+> Last updated: 2026-03-18 18:28 MSK

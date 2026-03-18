@@ -1,6 +1,6 @@
 # Combat Formulas And Effects
 
-> Last updated: 2026-03-16 02:35 MSK
+> Last updated: 2026-03-16 23:45 MSK
 
 ## Resources
 
@@ -64,7 +64,7 @@ Current live coefficients from `combatConfig.ts` and `combatFormulas.ts`:
 - base penetration floor: `10`
 - attacker strength factor: `3`
 - defender strength penalty factor: `2`
-- armor penetration profile divisor contribution: `3.2`
+- armor penetration profile divisor contribution: `4.4`
 - base blocked percent floor: `40`
 - blocked percent ceiling: `70`
 - strong block threshold: `55`
@@ -105,7 +105,7 @@ Live formula:
 
 - `baseBlockPenetration = min(75, max(10, 20 + attackerStrength * 3))`
 - `blockPenetration = min(80, max(10, baseBlockPenetration - defenderStrength * 2))`
-- runtime then adds total percent armor penetration pressure divided by `3.2`
+- runtime then adds total percent armor penetration pressure divided by `4.4`
 - runtime then subtracts defender block chance bonus
 
 ### Crit
@@ -155,14 +155,16 @@ The runtime now also applies zone-weighted armor during defended hits.
 
 Current live behavior:
 
-- a defended zone gets weighted contributions from equipped slots
+- a defended zone starts from `zoneArmor`
+- the runtime adds weighted contributions from `zoneArmorBySlot`
 - slot weights differ by zone:
   - `head` leans on helmet, earring, off-hand
   - `chest` leans on armor, shirt, off-hand, bracers, gloves
   - `belly` leans on armor, shirt, belt, off-hand, rings
   - `waist` leans on armor, belt, pants, off-hand, rings, gloves
   - `legs` leans on boots, pants, armor
-- generic zone-defense profiles still exist underneath this slot-weighted layer
+- the reinforced zone defense is then distributed across `slash`, `pierce`, `blunt`, and `chop`
+- generic zone-defense profiles still exist underneath this slot-weighted layer as typed fallback pressure
 
 ---
 
@@ -235,19 +237,19 @@ Current passive catalog from `combatWeaponPassives.ts`:
   - target: defender
   - duration: 2 turns
   - stacks: up to 3
-  - effect: `4` periodic damage per stack
+  - effect: `3` periodic damage per stack
 - `dagger` -> `Vital Mark`
   - trigger: on crit
   - target: defender
   - duration: 2 turns
   - stacks: up to 3
-  - effect: `+8%` incoming damage and `-6` dodge chance bonus per stack
+  - effect: `+10%` incoming damage and `-8` dodge chance bonus per stack
 - `mace` / `greatmace` -> `Concussed Guard`
   - trigger: on hit
   - target: defender
-  - duration: 1 turn
+  - duration: 2 turns
   - stacks: up to 2
-  - effect: `-6` block power and `-2` blunt armor per stack
+  - effect: `-8` block power, `+4%` incoming damage, and `-4` blunt armor per stack
 - `axe` / `greataxe` -> `Rending Hook`
   - trigger: on hit
   - target: defender
@@ -284,7 +286,9 @@ The effective hit result depends on:
 
 - attack profile construction
 - zone multiplier
-- armor by slot, zone armor, and generic zone defense
+- `zoneArmor`
+- `zoneArmorBySlot`
+- generic zone defense fallback
 - flat armor penetration
 - percent armor penetration
 - block outcome
@@ -307,6 +311,15 @@ Combat consumables may:
 - heal HP
 - apply combat effects
 - alter the attack before hit resolution
+
+Current live sustain example:
+
+- `regen-potion`
+  - use mode: `replace_attack`
+  - direct heal: `0`
+  - effect: `Regeneration`
+  - duration: `2` turns
+  - periodic heal: `3`
 
 Sandbox rule:
 

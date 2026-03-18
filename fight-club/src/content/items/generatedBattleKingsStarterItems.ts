@@ -6127,9 +6127,9 @@ export const starterItems: Array<{ item: Item; quantity: number }> = [
             kind: "buff",
             target: "self",
             trigger: "on_use",
-            durationTurns: 3,
+            durationTurns: 2,
             periodic: {
-              heal: 4
+              heal: 3
             }
           }
         ]

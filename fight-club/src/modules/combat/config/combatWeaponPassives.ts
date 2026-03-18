@@ -18,7 +18,7 @@ export function getWeaponClassPassivePreview(weaponClass: WeaponClass | null): W
         trigger: "On hit",
         duration: "2 rounds",
         stacks: "Up to 3",
-        effect: "Deals 4 bleed damage per stack at turn start.",
+        effect: "Deals 3 bleed damage per stack at turn start.",
       };
     case "dagger":
       return {
@@ -26,16 +26,16 @@ export function getWeaponClassPassivePreview(weaponClass: WeaponClass | null): W
         trigger: "On crit",
         duration: "2 rounds",
         stacks: "Up to 3",
-        effect: "Target takes +8% incoming damage and -6% dodge per stack.",
+        effect: "Target takes +10% incoming damage and -8% dodge per stack.",
       };
     case "mace":
     case "greatmace":
       return {
         name: "Concussed Guard",
         trigger: "On hit",
-        duration: "1 round",
+        duration: "2 rounds",
         stacks: "Up to 2",
-        effect: "Target loses -6% block power and -2 blunt armor per stack.",
+        effect: "Target loses guard quality and takes extra blunt pressure per stack.",
       };
     case "axe":
     case "greataxe":
@@ -79,7 +79,7 @@ export function getWeaponClassPassiveEffect(
         durationTurns: 2,
         maxStacks: 3,
         periodic: {
-          damage: 4,
+          damage: 3,
         },
       };
     case "dagger":
@@ -94,8 +94,8 @@ export function getWeaponClassPassiveEffect(
             durationTurns: 2,
             maxStacks: 3,
             modifiers: {
-              incomingDamagePercent: 8,
-              dodgeChanceBonus: -6,
+              incomingDamagePercent: 10,
+              dodgeChanceBonus: -8,
             },
           }
         : null;
@@ -104,18 +104,19 @@ export function getWeaponClassPassiveEffect(
       return {
         id: "weapon-passive-mace-concussed-guard",
         name: "Concussed Guard",
-        description: "Hits reduce block power and blunt armor.",
+        description: "Hits soften guard and make follow-up blunt pressure stick.",
         kind: "debuff",
         target: "target",
         trigger: "on_hit",
-        durationTurns: 1,
+        durationTurns: 2,
         maxStacks: 2,
         modifiers: {
-          blockPowerBonus: -6,
+          blockPowerBonus: -8,
+          incomingDamagePercent: 4,
           armorFlatBonus: {
             slash: 0,
             pierce: 0,
-            blunt: -2,
+            blunt: -4,
             chop: 0,
           },
         },

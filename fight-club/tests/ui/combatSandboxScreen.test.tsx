@@ -50,6 +50,15 @@ describe("CombatSandboxScreen", () => {
     expect(screen.getByTestId("selected-action-tags").textContent).toContain("Basic");
   });
 
+  it("lets the player switch combat intent from the action panel", () => {
+    render(<CombatSandboxScreen />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Set combat intent aggressive" }));
+
+    expect(screen.getByTestId("selected-action-tags").textContent).toContain("Intent Aggressive");
+    expect(screen.getAllByText(/Push harder this turn/i).length).toBeGreaterThan(0);
+  });
+
   it("shows attack zone damage multipliers in fight controls", () => {
     render(<CombatSandboxScreen />);
 
@@ -59,12 +68,12 @@ describe("CombatSandboxScreen", () => {
     expect(screen.getByText("Damage x1.00")).toBeTruthy();
 
     fireEvent.click(screen.getByRole("button", { name: "Select attack zone head" }));
-    expect(actionTags.textContent).toContain("Zone x1.20");
-    expect(screen.getByText("Damage x1.20")).toBeTruthy();
+    expect(actionTags.textContent).toContain("Zone x1.15");
+    expect(screen.getByText("Damage x1.15")).toBeTruthy();
 
     fireEvent.click(screen.getByRole("button", { name: "Select attack zone legs" }));
-    expect(actionTags.textContent).toContain("Zone x0.80");
-    expect(screen.getByText("Damage x0.80")).toBeTruthy();
+    expect(actionTags.textContent).toContain("Zone x0.92");
+    expect(screen.getByText("Damage x0.92")).toBeTruthy();
   });
 
   it("applies a curated build preset from the dedicated presets popover", async () => {

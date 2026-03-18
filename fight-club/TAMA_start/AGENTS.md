@@ -36,6 +36,8 @@
   - `.agents/workflows/auto-evolution.md`
   - `evolution_journal.md`
   - `README.md`
+- If the project also uses a specialist journal such as `combat_agent_journal.md`, sync that surface too when workflow, parser, or user-facing rules change.
+- If the project uses `ui_agent_journal.md` and `ui_patch_notes.md`, keep those surfaces in sync too when UI-specialist behavior, parser assumptions, or visible specialist-console rules change.
 - Prefer additive changes over format-breaking rewrites.
 - If introducing a new field, document it in the workflow and keep old journal content parseable when possible.
 - Keep this folder portable: it should still make sense when copied into another project root.
@@ -50,5 +52,7 @@
 ## Current Notes
 
 - The visualizer currently extracts `STATUS_JSON` and `EVO_JSON` directly from Markdown comments.
+- The visualizer can also extract combat-specialist data from `COMBAT_AGENT_JSON` and `CMB_JSON` comment blocks when they exist.
+- The in-app `Ecosystem Agents` console now also reads UI-specialist data from `ui_agent_journal.md` and `ui_patch_notes.md`, reusing the same machine-readable block shape.
 - The visualizer also reads the Pattern and Anti-Pattern tables from Markdown text, so structural changes to those sections are high-risk.
 - The content appears intended for UTF-8; keep new files and edits UTF-8-friendly and avoid accidental encoding regressions.

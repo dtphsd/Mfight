@@ -397,6 +397,327 @@ textarea {
   color: #e6ded3;
 }
 
+.combat-agent-screen {
+  display: grid;
+  gap: 16px;
+}
+
+.combat-agent-screen__hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.12fr) minmax(290px, 0.88fr);
+  gap: 16px;
+  align-items: stretch;
+}
+
+.combat-agent-screen__panel,
+.combat-agent-screen__portrait-card,
+.combat-agent-screen__section {
+  border: 1px solid rgba(255, 244, 225, 0.09);
+  border-radius: 28px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.02));
+  box-shadow:
+    var(--shadow-card),
+    inset 0 1px 0 rgba(255, 255, 255, 0.035);
+}
+
+.combat-agent-screen__panel {
+  position: relative;
+  overflow: hidden;
+  padding: 22px;
+}
+
+.combat-agent-screen__panel::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 84% 18%, rgba(240, 203, 136, 0.12), transparent 24%),
+    radial-gradient(circle at 12% 100%, rgba(102, 224, 138, 0.08), transparent 28%);
+  pointer-events: none;
+}
+
+.combat-agent-screen__eyebrow,
+.combat-agent-screen__section-kicker {
+  margin: 0;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  font-size: 12px;
+  color: #d0b498;
+}
+
+.combat-agent-screen__title {
+  margin: 8px 0 10px;
+  font-size: clamp(30px, 4vw, 48px);
+  line-height: 0.92;
+  letter-spacing: 0.02em;
+}
+
+.combat-agent-screen__subtitle-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.combat-agent-screen__pill,
+.combat-agent-screen__tag {
+  padding: 7px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 244, 231, 0.86);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.combat-agent-screen__copy {
+  max-width: 720px;
+  margin: 0;
+  color: var(--text-dim);
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.combat-agent-screen__actions {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+}
+
+.combat-agent-screen__tags {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+
+.combat-agent-screen__tags--portrait {
+  margin-top: 2px;
+}
+
+.combat-agent-screen__portrait-card {
+  padding: 16px;
+  display: grid;
+  gap: 12px;
+}
+
+.combat-agent-screen__xp-head {
+  display: grid;
+  gap: 8px;
+}
+
+.combat-agent-screen__xp-head-label {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(244, 239, 227, 0.72);
+}
+
+.combat-agent-screen__xp-bar,
+.combat-agent-screen__track-bar {
+  height: 10px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.combat-agent-screen__xp-fill,
+.combat-agent-screen__track-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #f0cb88 0%, #e28755 45%, #66e08a 100%);
+  box-shadow: 0 0 16px rgba(226, 135, 85, 0.22);
+}
+
+.combat-agent-screen__portrait-wrap {
+  position: relative;
+  min-height: 220px;
+  border-radius: 20px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(18, 12, 12, 0.42);
+}
+
+.combat-agent-screen__portrait {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.combat-agent-screen__tool,
+.combat-agent-screen__level-badge {
+  position: absolute;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(10, 12, 26, 0.72);
+  color: #fff5e7;
+  backdrop-filter: blur(12px);
+}
+
+.combat-agent-screen__tool {
+  right: 14px;
+  bottom: 14px;
+  width: 40px;
+  height: 40px;
+  font-size: 18px;
+}
+
+.combat-agent-screen__level-badge {
+  top: 14px;
+  right: 14px;
+  padding: 7px 12px;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #f0cb88;
+}
+
+.combat-agent-screen__snapshot-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.combat-agent-screen__snapshot-card {
+  border-radius: 18px;
+  padding: 12px;
+  background:
+    radial-gradient(circle at top right, rgba(255, 255, 255, 0.06), transparent 42%),
+    rgba(255, 255, 255, 0.035);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.combat-agent-screen__snapshot-value {
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.combat-agent-screen__snapshot-label {
+  margin-top: 6px;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(244, 239, 227, 0.62);
+}
+
+.combat-agent-screen__systems {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  padding: 16px;
+  border: 1px solid rgba(255, 244, 225, 0.09);
+  border-radius: 28px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.018));
+  box-shadow:
+    var(--shadow-card),
+    inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+.combat-agent-screen__module {
+  display: grid;
+  gap: 12px;
+  align-content: start;
+  min-width: 0;
+}
+
+.combat-agent-screen__module-head {
+  display: grid;
+  gap: 4px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.combat-agent-screen__section-note {
+  font-size: 12px;
+  color: rgba(244, 239, 227, 0.64);
+}
+
+.combat-agent-screen__track-list,
+.combat-agent-screen__tool-list,
+.combat-agent-screen__achievement-list {
+  display: grid;
+  gap: 10px;
+}
+
+.combat-agent-screen__track-card,
+.combat-agent-screen__tool-card,
+.combat-agent-screen__achievement-card {
+  border-radius: 16px;
+  padding: 12px;
+  background:
+    radial-gradient(circle at top right, rgba(255, 255, 255, 0.045), transparent 42%),
+    rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.combat-agent-screen__track-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: flex-start;
+  margin-bottom: 10px;
+}
+
+.combat-agent-screen__track-label,
+.combat-agent-screen__achievement-name,
+.combat-agent-screen__tool-card-label {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.combat-agent-screen__track-note,
+.combat-agent-screen__achievement-note,
+.combat-agent-screen__tool-card-purpose {
+  margin-top: 6px;
+  font-size: 12px;
+  line-height: 1.4;
+  color: rgba(244, 239, 227, 0.7);
+}
+
+.combat-agent-screen__track-value {
+  font-size: 13px;
+  font-weight: 700;
+  color: #f0cb88;
+}
+
+.combat-agent-screen__tool-card-command {
+  display: inline-flex;
+  margin-top: 8px;
+  padding: 7px 10px;
+  border-radius: 12px;
+  background: rgba(12, 14, 30, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #f4efe3;
+  font-size: 12px;
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+.combat-agent-screen__loop {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding-left: 18px;
+}
+
+.combat-agent-screen__loop-item {
+  color: rgba(255, 244, 231, 0.84);
+  line-height: 1.42;
+  font-size: 12px;
+}
+
 .hunting-lodge {
   display: grid;
   gap: 24px;
@@ -2089,6 +2410,203 @@ textarea {
   animation: combat-resource-focus 2.2s ease-in-out infinite;
 }
 
+/* Combat Agent Screen Override */
+.combat-agent-screen {
+  gap: 12px;
+}
+
+.combat-agent-screen__hero {
+  grid-template-columns: minmax(300px, 0.72fr) minmax(0, 1.28fr);
+  gap: 14px;
+  align-items: start;
+}
+
+.combat-agent-screen__portrait-card,
+.combat-agent-screen__systems {
+  border: 1px solid rgba(255, 244, 225, 0.09);
+  border-radius: 28px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.02));
+  box-shadow:
+    var(--shadow-card),
+    inset 0 1px 0 rgba(255, 255, 255, 0.035);
+}
+
+.combat-agent-screen__portrait-card {
+  padding: 14px;
+  gap: 10px;
+}
+
+.combat-agent-screen__identity {
+  display: grid;
+  gap: 4px;
+}
+
+.combat-agent-screen__title {
+  margin: 4px 0 6px;
+  font-size: clamp(24px, 2.8vw, 34px);
+  line-height: 0.96;
+}
+
+.combat-agent-screen__role {
+  color: #f0cb88;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.combat-agent-screen__domain {
+  color: rgba(244, 239, 227, 0.66);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.combat-agent-screen__portrait-wrap {
+  min-height: 170px;
+  border-radius: 18px;
+}
+
+.combat-agent-screen__tool {
+  right: 10px;
+  bottom: 10px;
+  width: 34px;
+  height: 34px;
+  font-size: 16px;
+}
+
+.combat-agent-screen__level-badge {
+  top: 10px;
+  right: 10px;
+  padding: 6px 10px;
+  font-size: 10px;
+}
+
+.combat-agent-screen__progression-card {
+  display: grid;
+  gap: 8px;
+  padding: 12px;
+  border-radius: 18px;
+  background:
+    radial-gradient(circle at top right, rgba(255, 255, 255, 0.05), transparent 42%),
+    rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.combat-agent-screen__progression-rank {
+  color: rgba(244, 239, 227, 0.64);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.combat-agent-screen__xp-head {
+  gap: 6px;
+}
+
+.combat-agent-screen__xp-head-label {
+  font-size: 10px;
+}
+
+.combat-agent-screen__xp-bar,
+.combat-agent-screen__track-bar {
+  height: 8px;
+}
+
+.combat-agent-screen__track-list,
+.combat-agent-screen__tool-list,
+.combat-agent-screen__achievement-list {
+  gap: 8px;
+}
+
+.combat-agent-screen__track-card,
+.combat-agent-screen__tool-card,
+.combat-agent-screen__achievement-card {
+  padding: 10px;
+  border-radius: 16px;
+}
+
+.combat-agent-screen__track-card--compact {
+  padding: 8px 9px;
+}
+
+.combat-agent-screen__track-head {
+  gap: 10px;
+  margin-bottom: 7px;
+}
+
+.combat-agent-screen__track-label,
+.combat-agent-screen__achievement-name,
+.combat-agent-screen__tool-card-label {
+  font-size: 13px;
+}
+
+.combat-agent-screen__track-value {
+  font-size: 11px;
+}
+
+.combat-agent-screen__track-note,
+.combat-agent-screen__achievement-note,
+.combat-agent-screen__tool-card-purpose,
+.combat-agent-screen__loop-item {
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+.combat-agent-screen__snapshot-grid {
+  gap: 8px;
+}
+
+.combat-agent-screen__snapshot-card {
+  padding: 10px;
+  border-radius: 16px;
+}
+
+.combat-agent-screen__snapshot-value {
+  font-size: 18px;
+}
+
+.combat-agent-screen__snapshot-label,
+.combat-agent-screen__tag {
+  font-size: 10px;
+}
+
+.combat-agent-screen__tags {
+  gap: 6px;
+  margin-top: 0;
+}
+
+.combat-agent-screen__actions {
+  gap: 10px;
+  margin-top: 0;
+}
+
+.combat-agent-screen__systems {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  padding: 14px;
+  min-height: 100%;
+}
+
+.combat-agent-screen__module {
+  gap: 10px;
+}
+
+.combat-agent-screen__module-head {
+  padding-bottom: 6px;
+}
+
+.combat-agent-screen__tool-card-command {
+  margin-top: 6px;
+  padding: 6px 8px;
+  border-radius: 10px;
+  font-size: 11px;
+}
+
+.combat-agent-screen__loop {
+  gap: 6px;
+}
+
 @media (max-width: 1080px) {
   .app-shell {
     padding: 18px;
@@ -2099,6 +2617,11 @@ textarea {
   }
 
   .main-menu__hero {
+    grid-template-columns: 1fr;
+  }
+
+  .combat-agent-screen__hero,
+  .combat-agent-screen__systems {
     grid-template-columns: 1fr;
   }
 
@@ -2135,6 +2658,28 @@ textarea {
 }
 
 @media (max-width: 720px) {
+  .combat-agent-screen__panel,
+  .combat-agent-screen__portrait-card,
+  .combat-agent-screen__systems {
+    padding: 16px;
+  }
+
+  .combat-agent-screen__title {
+    font-size: clamp(28px, 9vw, 42px);
+  }
+
+  .combat-agent-screen__copy,
+  .combat-agent-screen__track-note,
+  .combat-agent-screen__achievement-note,
+  .combat-agent-screen__tool-card-purpose,
+  .combat-agent-screen__loop-item {
+    font-size: 13px;
+  }
+
+  .combat-agent-screen__snapshot-grid {
+    grid-template-columns: 1fr;
+  }
+
   .combat-rules-library__hero,
   .combat-rules-library__section {
     border-radius: 22px;

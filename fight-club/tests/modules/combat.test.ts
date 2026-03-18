@@ -7,6 +7,7 @@ import {
   createBasicAttackAction,
   createConsumableAction,
   createConsumableAttackAction,
+  createSkillAttackAction,
 } from "@/modules/combat/model/RoundAction";
 import { zeroCombatBonuses } from "@/modules/inventory";
 
@@ -229,6 +230,135 @@ describe("combat module", () => {
     expect(
       resolved.data.combatants.find((combatant) => combatant.id === defender.characterId)?.currentHp
     ).toBeLessThan(defender.maxHp);
+  });
+
+  it("lets aggressive intent hit harder than neutral intent on the same opening", () => {
+    const first = createCharacter("Alpha");
+    const second = createCharacter("Beta");
+
+    if (!first.success || !second.success) {
+      throw new Error("character creation failed");
+    }
+
+    const alpha = buildCombatSnapshot({
+      character: first.data,
+      flatBonuses: [],
+      percentBonuses: [],
+      baseDamage: {
+        slash: 18,
+        pierce: 0,
+        blunt: 0,
+        chop: 0,
+      },
+    });
+    const beta = buildCombatSnapshot({
+      character: second.data,
+      flatBonuses: [],
+      percentBonuses: [],
+      combatBonuses: {
+        ...zeroCombatBonuses,
+        dodgeChance: -10,
+      },
+    });
+
+    const neutralResolved = resolveRound(
+      startCombat(alpha, beta),
+      [
+        createBasicAttackAction({
+          attackerId: alpha.characterId,
+          attackZone: "head",
+          defenseZones: ["waist", "legs"],
+          intent: "neutral",
+        }),
+        createBasicAttackAction({
+          attackerId: beta.characterId,
+          attackZone: "legs",
+          defenseZones: ["waist", "belly"],
+          intent: "neutral",
+        }),
+      ],
+      new SeededRandom(2)
+    );
+    const aggressiveResolved = resolveRound(
+      startCombat(alpha, beta),
+      [
+        createBasicAttackAction({
+          attackerId: alpha.characterId,
+          attackZone: "head",
+          defenseZones: ["waist", "legs"],
+          intent: "aggressive",
+        }),
+        createBasicAttackAction({
+          attackerId: beta.characterId,
+          attackZone: "legs",
+          defenseZones: ["waist", "belly"],
+          intent: "neutral",
+        }),
+      ],
+      new SeededRandom(2)
+    );
+
+    expect(neutralResolved.success).toBe(true);
+    expect(aggressiveResolved.success).toBe(true);
+    if (!neutralResolved.success || !aggressiveResolved.success) {
+      return;
+    }
+
+    const neutralHit = neutralResolved.data.log.find((entry) => entry.attackerId === alpha.characterId);
+    const aggressiveHit = aggressiveResolved.data.log.find((entry) => entry.attackerId === alpha.characterId);
+
+    expect(aggressiveHit?.finalDamage ?? 0).toBeGreaterThan(neutralHit?.finalDamage ?? 0);
+  });
+
+  it("lets guarded intent reduce incoming damage on the same opening", () => {
+    const { alpha, beta } = createSnapshots();
+    const neutralResolved = resolveRound(
+      startCombat(alpha, beta),
+      [
+        createBasicAttackAction({
+          attackerId: alpha.characterId,
+          attackZone: "head",
+          defenseZones: ["waist", "legs"],
+          intent: "neutral",
+        }),
+        createBasicAttackAction({
+          attackerId: beta.characterId,
+          attackZone: "legs",
+          defenseZones: ["head", "chest"],
+          intent: "neutral",
+        }),
+      ],
+      new SeededRandom(9)
+    );
+    const guardedResolved = resolveRound(
+      startCombat(alpha, beta),
+      [
+        createBasicAttackAction({
+          attackerId: alpha.characterId,
+          attackZone: "head",
+          defenseZones: ["waist", "legs"],
+          intent: "neutral",
+        }),
+        createBasicAttackAction({
+          attackerId: beta.characterId,
+          attackZone: "legs",
+          defenseZones: ["head", "chest"],
+          intent: "guarded",
+        }),
+      ],
+      new SeededRandom(9)
+    );
+
+    expect(neutralResolved.success).toBe(true);
+    expect(guardedResolved.success).toBe(true);
+    if (!neutralResolved.success || !guardedResolved.success) {
+      return;
+    }
+
+    const neutralTarget = neutralResolved.data.combatants.find((combatant) => combatant.id === beta.characterId);
+    const guardedTarget = guardedResolved.data.combatants.find((combatant) => combatant.id === beta.characterId);
+
+    expect(guardedTarget?.currentHp ?? 0).toBeGreaterThanOrEqual(neutralTarget?.currentHp ?? 0);
   });
 
   it("prefers damage type from weapon metadata over raw profile dominance", () => {
@@ -856,6 +986,129 @@ describe("combat module", () => {
 
     expect(regenTickLog?.healedHp).toBe(6);
     expect(attackerAfterTick?.activeEffects.find((effect) => effect.name === "Regeneration")?.turnsRemaining).toBe(4);
+  });
+
+  it("supports setup skills that prime a follow-up resource window on the next turn", () => {
+    const { alpha, beta } = createSnapshots();
+    const state = startCombat(alpha, beta);
+    const primedState = {
+      ...state,
+      combatants: [
+        {
+          ...state.combatants[0],
+          resources: {
+            rage: 14,
+            guard: 0,
+            momentum: 0,
+            focus: 0,
+          },
+        },
+        state.combatants[1],
+      ] as typeof state.combatants,
+    };
+
+    const executionMark = {
+      id: "execution-mark",
+      name: "Execution Mark",
+      description: "Setup strike that primes the next burst turn.",
+      sourceItemCode: "test-burst-sigil",
+      resourceType: "rage" as const,
+      cost: 14,
+      damageMultiplier: 1.01,
+      critChanceBonus: 0,
+      armorPenetrationPercentBonus: {
+        slash: 0,
+        pierce: 12,
+        blunt: 0,
+        chop: 0,
+      },
+      effects: [
+        {
+          id: "state-exposed",
+          name: "Exposed",
+          description: "Target is opened up for a stronger follow-up.",
+          kind: "debuff" as const,
+          target: "target" as const,
+          trigger: "on_hit" as const,
+          durationTurns: 3,
+          maxStacks: 2,
+          modifiers: {
+            incomingDamagePercent: 8,
+          },
+        },
+        {
+          id: "execution-mark-killing-window",
+          name: "Killing Window",
+          description: "The finisher line is primed for the next exchange.",
+          kind: "buff" as const,
+          target: "self" as const,
+          trigger: "on_use" as const,
+          durationTurns: 1,
+          periodic: {
+            resourceDelta: {
+              rage: 16,
+            },
+          },
+        },
+      ],
+    };
+
+    const firstRound = resolveRound(
+      primedState,
+      [
+        createSkillAttackAction({
+          attackerId: alpha.characterId,
+          attackZone: "head",
+          defenseZones: ["chest", "belly"],
+          skill: executionMark,
+        }),
+        createBasicAttackAction({
+          attackerId: beta.characterId,
+          attackZone: "legs",
+          defenseZones: ["head", "waist"],
+        }),
+      ],
+      new SeededRandom(9)
+    );
+
+    expect(firstRound.success).toBe(true);
+    if (!firstRound.success) {
+      return;
+    }
+
+    const attackerAfterFirstRound = firstRound.data.combatants.find((combatant) => combatant.id === alpha.characterId);
+    expect(attackerAfterFirstRound?.activeEffects.map((effect) => effect.name)).toContain("Killing Window");
+
+    const secondRound = resolveRound(
+      firstRound.data,
+      [
+        createBasicAttackAction({
+          attackerId: alpha.characterId,
+          attackZone: "head",
+          defenseZones: ["chest", "belly"],
+        }),
+        createBasicAttackAction({
+          attackerId: beta.characterId,
+          attackZone: "legs",
+          defenseZones: ["head", "waist"],
+        }),
+      ],
+      new SeededRandom(12)
+    );
+
+    expect(secondRound.success).toBe(true);
+    if (!secondRound.success) {
+      return;
+    }
+
+    const turnStartLog = secondRound.data.log.find(
+      (entry) => entry.attackerId === alpha.characterId && entry.messages.includes("effects")
+    );
+    const attackerAfterSecondRound = secondRound.data.combatants.find((combatant) => combatant.id === alpha.characterId);
+
+    expect(turnStartLog?.attackerResourceGain.rage).toBe(16);
+    expect(attackerAfterSecondRound?.resources.rage ?? 0).toBeGreaterThanOrEqual(16);
+    expect(attackerAfterSecondRound?.activeEffects.find((effect) => effect.name === "Killing Window")).toBeUndefined();
   });
 });
 

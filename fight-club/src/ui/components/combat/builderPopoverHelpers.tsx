@@ -141,6 +141,31 @@ function buildSkillFactRows(skill: CombatSkill) {
     },
   ];
 
+  if (skill.roles?.length) {
+    rows.push({
+      label: "Role",
+      value: skill.roles.map(formatSkillRole).join(" | "),
+      color: "#9fd3ff",
+    });
+  }
+
+  if (skill.preferredZones?.length) {
+    rows.push({
+      label: "Zones",
+      value: skill.preferredZones.map(formatZoneLabel).join(" | "),
+      color: "#f4c58e",
+    });
+  }
+
+  const aiHints = formatAiHintSummary(skill);
+  if (aiHints) {
+    rows.push({
+      label: "AI Hint",
+      value: aiHints,
+      color: "#b9dbb4",
+    });
+  }
+
   if (skill.critChanceBonus) {
     rows.push({
       label: "Crit",
@@ -308,6 +333,48 @@ function formatSkillUnlockKind(kind: NonNullable<CombatSkill["unlock"]>["kind"])
     case "default":
       return "Default";
   }
+}
+
+function formatSkillRole(role: NonNullable<CombatSkill["roles"]>[number]) {
+  switch (role) {
+    case "setup":
+      return "Setup";
+    case "payoff":
+      return "Payoff";
+    case "counter":
+      return "Counter";
+    case "tempo":
+      return "Tempo";
+    case "sustain":
+      return "Sustain";
+    case "control":
+      return "Control";
+  }
+}
+
+function formatZoneLabel(zone: NonNullable<CombatSkill["preferredZones"]>[number]) {
+  switch (zone) {
+    case "head":
+      return "Head";
+    case "chest":
+      return "Chest";
+    case "belly":
+      return "Belly";
+    case "waist":
+      return "Waist";
+    case "legs":
+      return "Legs";
+  }
+}
+
+function formatAiHintSummary(skill: CombatSkill) {
+  const parts: string[] = [];
+
+  if (skill.aiHints?.useWhenLowHp) parts.push("Stronger as a low-HP stabilizer.");
+  if (skill.aiHints?.prefersTaggedTargets) parts.push("Prefers targets that are already tagged with active effects.");
+  if (skill.aiHints?.prefersArmoredTargets) parts.push("Prefers armored targets.");
+
+  return parts.join(" ");
 }
 
 function formatDamageTypeName(name: string) {

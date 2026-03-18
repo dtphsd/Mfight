@@ -7,6 +7,7 @@ import {
   getRoundDraftSelectedSkillId,
   setRoundDraftAttackZone,
   setRoundDraftConsumable,
+  setRoundDraftIntent,
   setRoundDraftSkill,
   toggleRoundDraftDefenseZone,
 } from "@/orchestration/combat/roundDraft";
@@ -17,6 +18,7 @@ describe("roundDraft", () => {
 
     expect(draft.attackZone).toBe("head");
     expect(draft.defenseZones).toEqual(["chest", "belly"]);
+    expect(draft.intent).toBe("neutral");
     expect(draft.selectedAction).toEqual({ kind: "basic_attack" });
     expect(getRoundDraftSelectedSkillId(draft)).toBeNull();
     expect(getRoundDraftSelectedConsumableCode(draft)).toBeNull();
@@ -26,9 +28,11 @@ describe("roundDraft", () => {
     const draft = createRoundDraft();
     const withAttackZone = setRoundDraftAttackZone(draft, "legs");
     const withDefenseToggle = toggleRoundDraftDefenseZone(withAttackZone, "head");
+    const withIntent = setRoundDraftIntent(withDefenseToggle, "guarded");
 
     expect(withAttackZone.attackZone).toBe("legs");
     expect(withDefenseToggle.defenseZones).toEqual(["belly", "head"]);
+    expect(withIntent.intent).toBe("guarded");
   });
 
   it("switches between skill, consumable, and basic attack selection", () => {
@@ -117,7 +121,9 @@ describe("roundDraft", () => {
     });
 
     expect(basicAction.kind).toBe("basic_attack");
+    expect(basicAction.intent).toBe("neutral");
     expect(skillAction.kind).toBe("skill_attack");
+    expect(skillAction.intent).toBe("neutral");
     expect(consumableAction.kind).toBe("consumable");
     expect(consumableAttackAction.kind).toBe("consumable_attack");
   });

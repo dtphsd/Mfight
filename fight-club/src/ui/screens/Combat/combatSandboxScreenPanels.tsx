@@ -1,5 +1,6 @@
 import { Suspense, lazy, useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import type { CharacterStatName, CharacterStats } from "@/modules/character";
+import { combatIntentConfig, formatCombatIntentLabel, type CombatIntent } from "@/modules/combat";
 import type { EquipmentSlot } from "@/modules/equipment";
 import type { Item } from "@/modules/inventory";
 import { CombatSilhouette, type CombatFigureId } from "@/ui/components/combat/CombatSilhouette";
@@ -11,6 +12,41 @@ import { ResourceGrid } from "./combatSandboxScreenResourceGrid";
 type CombatSandboxModel = ReturnType<typeof useCombatSandbox>;
 
 type StatMeta = Record<CharacterStatName, { short: string; color: string; background: string; border: string }>;
+
+const playerIntentSilhouetteTone: Record<
+  CombatIntent,
+  {
+    accent: string;
+    fill: string;
+    edge: string;
+    glow: string;
+  }
+> = {
+  neutral: {
+    accent: "#f0a286",
+    fill: "rgba(240,162,134,0.11)",
+    edge: "rgba(240,162,134,0.28)",
+    glow: "rgba(240,162,134,0.18)",
+  },
+  aggressive: {
+    accent: "#ee9abb",
+    fill: "rgba(238,154,187,0.12)",
+    edge: "rgba(238,154,187,0.3)",
+    glow: "rgba(238,154,187,0.2)",
+  },
+  guarded: {
+    accent: "#b7d5ff",
+    fill: "rgba(183,213,255,0.12)",
+    edge: "rgba(183,213,255,0.3)",
+    glow: "rgba(183,213,255,0.2)",
+  },
+  precise: {
+    accent: "#87e2cf",
+    fill: "rgba(135,226,207,0.12)",
+    edge: "rgba(135,226,207,0.3)",
+    glow: "rgba(135,226,207,0.2)",
+  },
+};
 
 const EquipmentSlotPopover = lazy(() =>
   import("@/ui/components/combat/EquipmentSlotPopover").then((module) => ({ default: module.EquipmentSlotPopover }))
@@ -56,6 +92,7 @@ export function PlayerCombatPanel({
   silhouetteState?: "victory" | "defeat" | null;
 }) {
   const impactEvent = useCombatImpactPulse(sandbox.playerIncomingResult);
+  const selectedIntentTone = playerIntentSilhouetteTone[sandbox.selectedIntent];
 
   return (
     <SidePanel
@@ -63,6 +100,16 @@ export function PlayerCombatPanel({
       panelStyle={panelStyle}
       silhouette={
         <CombatOutcomeSilhouetteWrap side="player" state={silhouetteState}>
+          <div
+            style={{
+              borderRadius: "30px",
+              padding: "8px",
+              background: `linear-gradient(180deg, ${selectedIntentTone.fill}, rgba(255,255,255,0.02))`,
+              border: `1px solid ${selectedIntentTone.edge}`,
+              boxShadow: `0 0 24px ${selectedIntentTone.glow}, inset 2px 0 0 ${selectedIntentTone.edge}, inset -2px 0 0 ${selectedIntentTone.edge}`,
+              transition: "border-color 160ms ease, box-shadow 160ms ease, background 160ms ease",
+            }}
+          >
           <CombatSilhouette
             title={playerName}
             currentHp={sandbox.playerCombatant?.currentHp ?? sandbox.playerSnapshot.maxHp}
@@ -77,6 +124,7 @@ export function PlayerCombatPanel({
             impactValue={impactEvent?.value ?? null}
             onEquipmentSlotClick={onSelectEquipmentSlot}
           />
+          </div>
         </CombatOutcomeSilhouetteWrap>
       }
       sidebar={
@@ -174,6 +222,8 @@ function PlayerCombatPanelSidebar({
   onOpenBuildPresets: () => void;
   onOpenInventory: () => void;
 }) {
+  const [snapshotExpanded, setSnapshotExpanded] = useState(false);
+
   return (
     <div style={{ display: "grid", gap: "8px", alignContent: "start", height: "100%" }}>
       <MiniPanel panelStyle={panelStyle} title="Utility">
@@ -214,20 +264,53 @@ function PlayerCombatPanelSidebar({
           onDecrease={sandbox.decreaseStat}
         />
       </MiniPanel>
-      <MiniPanel panelStyle={panelStyle} title="Snapshot">
-        <MetricGrid
-          items={[
-            { label: "HP", value: String(sandbox.metrics.maxHp) },
-            { label: "DMG", value: formatRangeLabel(sandbox.metrics.totalDamageRange), tone: "warm" },
-            { label: "Armor", value: formatRangeLabel(sandbox.metrics.totalArmorRange) },
-            { label: "Crit", value: `${sandbox.metrics.baseCritChance + sandbox.metrics.critChanceBonus}%` },
-            { label: "Dodge", value: `${sandbox.metrics.baseDodgeChance + sandbox.metrics.dodgeChanceBonus}%` },
-            { label: "Type", value: formatMaybeTitle(sandbox.metrics.weaponDamageType) },
-          ]}
-        />
-      </MiniPanel>
+      <CollapsibleSnapshotPanel
+        panelStyle={panelStyle}
+        expanded={snapshotExpanded}
+        onToggle={() => setSnapshotExpanded((current) => !current)}
+        items={buildIntentAwareSnapshotItems(sandbox)}
+      />
     </div>
   );
+}
+
+function buildIntentAwareSnapshotItems(sandbox: CombatSandboxModel) {
+  const intentConfig = combatIntentConfig[sandbox.selectedIntent];
+  const damageMultiplier = intentConfig.outgoingDamageMultiplier;
+  const adjustedDamageRange = {
+    min: Math.max(0, Math.round(sandbox.metrics.totalDamageRange.min * damageMultiplier)),
+    max: Math.max(0, Math.round(sandbox.metrics.totalDamageRange.max * damageMultiplier)),
+  };
+  const adjustedBaseCrit = clampDisplayChance(
+    sandbox.metrics.baseCritChance + sandbox.metrics.critChanceBonus + intentConfig.critChanceBonus
+  );
+  const adjustedCritVsTarget = clampDisplayChance(
+    sandbox.metrics.critVsBot + sandbox.metrics.critChanceBonus + intentConfig.critChanceBonus
+  );
+  const adjustedDodge = sandbox.metrics.baseDodgeChance + sandbox.metrics.dodgeChanceBonus + intentConfig.dodgeChanceBonus;
+  const adjustedBlock = sandbox.metrics.blockChanceBonus + intentConfig.blockChanceBonus;
+  const adjustedBlockPower = sandbox.metrics.blockPowerBonus + intentConfig.blockPowerBonus;
+
+  return [
+    { label: "HP", value: String(sandbox.metrics.maxHp) },
+    { label: "DMG", value: formatRangeLabel(adjustedDamageRange), tone: "warm" as const },
+    { label: "Armor", value: formatRangeLabel(sandbox.metrics.totalArmorRange) },
+    { label: "Base Crit", value: `${adjustedBaseCrit}%` },
+    { label: "Crit vs Target", value: `${adjustedCritVsTarget}%`, tone: "warm" as const },
+    { label: "Dodge", value: `${adjustedDodge}%` },
+    { label: "Block", value: formatSignedValue(adjustedBlock) },
+    { label: "Block Power", value: formatSignedValue(adjustedBlockPower) },
+    { label: "Intent", value: formatCombatIntentLabel(sandbox.selectedIntent), tone: "warm" as const },
+    { label: "Type", value: formatMaybeTitle(sandbox.metrics.weaponDamageType) },
+  ];
+}
+
+function formatSignedValue(value: number) {
+  return value > 0 ? `+${value}` : `${value}`;
+}
+
+function clampDisplayChance(value: number) {
+  return Math.max(0, Math.min(95, Math.round(value)));
 }
 
 function PlayerEquipmentSlotOverlay({
@@ -314,6 +397,8 @@ function BotCombatPanelSidebar({
   buttonStyle: CSSProperties;
   onOpenBuildPresets: () => void;
 }) {
+  const [snapshotExpanded, setSnapshotExpanded] = useState(false);
+
   return (
     <div style={{ display: "grid", gap: "8px", alignContent: "start", height: "100%" }}>
       <MiniPanel panelStyle={panelStyle} title="Utility">
@@ -328,17 +413,53 @@ function BotCombatPanelSidebar({
           />
         </div>
       </MiniPanel>
-      <MiniPanel panelStyle={panelStyle} title="Snapshot">
-        <StatGrid stats={sandbox.botSnapshot.stats} />
-        <MetricGrid
-          items={[
-            { label: "HP", value: String(sandbox.metrics.opponentMaxHp) },
-            { label: "DMG", value: formatRangeLabel(sandbox.metrics.opponentTotalDamageRange), tone: "warm" },
-            { label: "Armor", value: formatRangeLabel(sandbox.metrics.opponentTotalArmorRange) },
-            { label: "Type", value: formatMaybeTitle(sandbox.metrics.opponentWeaponDamageType) },
-          ]}
-        />
-      </MiniPanel>
+      <div
+        style={{
+          ...panelStyle,
+          padding: "10px",
+          display: "grid",
+          gap: "7px",
+        }}
+      >
+        <button
+          type="button"
+          onClick={() => setSnapshotExpanded((current) => !current)}
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            gap: "8px",
+            alignItems: "center",
+            padding: 0,
+            background: "transparent",
+            border: 0,
+            color: "inherit",
+            cursor: "pointer",
+          }}
+        >
+          <span style={{ fontSize: "9px", textTransform: "uppercase", opacity: 0.66, letterSpacing: "0.1em", color: "#d9b28b" }}>
+            Snapshot
+          </span>
+          <span style={{ fontSize: "9px", color: "#e7d9c8", opacity: 0.8 }}>{snapshotExpanded ? "Hide" : "Show"}</span>
+        </button>
+        {snapshotExpanded ? (
+          <>
+            <StatGrid stats={sandbox.botSnapshot.stats} />
+            <MetricGrid
+              items={[
+                { label: "HP", value: String(sandbox.metrics.opponentMaxHp) },
+                { label: "DMG", value: formatRangeLabel(sandbox.metrics.opponentTotalDamageRange), tone: "warm" },
+                { label: "Armor", value: formatRangeLabel(sandbox.metrics.opponentTotalArmorRange) },
+                { label: "Crit vs You", value: `${clampDisplayChance(sandbox.metrics.matchup.botCritVsPlayer)}%` },
+                { label: "Type", value: formatMaybeTitle(sandbox.metrics.opponentWeaponDamageType) },
+              ]}
+            />
+          </>
+        ) : (
+          <div style={{ fontSize: "9px", color: "rgba(231,217,200,0.72)", lineHeight: 1.3 }}>
+            HP, damage, armor and stance-facing values stay here.
+          </div>
+        )}
+      </div>
     </div>
   );
 }
@@ -424,12 +545,69 @@ function CombatOutcomeSilhouetteWrap({
   );
 }
 
-function MetricGrid({ items }: { items: Array<{ label: string; value: string; tone?: "neutral" | "warm" }> }) {
+function MetricGrid({
+  items,
+  columns = 2,
+}: {
+  items: Array<{ label: string; value: string; tone?: "neutral" | "warm" }>;
+  columns?: 2 | 3;
+}) {
   return (
-    <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: "5px" }}>
+    <div style={{ display: "grid", gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))`, gap: "5px" }}>
       {items.map((item) => (
         <MetricChip key={`${item.label}-${item.value}`} label={item.label} value={item.value} tone={item.tone} />
       ))}
+    </div>
+  );
+}
+
+function CollapsibleSnapshotPanel({
+  panelStyle,
+  expanded,
+  onToggle,
+  items,
+}: {
+  panelStyle: CSSProperties;
+  expanded: boolean;
+  onToggle: () => void;
+  items: Array<{ label: string; value: string; tone?: "neutral" | "warm" }>;
+}) {
+  return (
+    <div
+      style={{
+        ...panelStyle,
+        padding: "10px",
+        display: "grid",
+        gap: "7px",
+      }}
+    >
+      <button
+        type="button"
+        onClick={onToggle}
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          gap: "8px",
+          alignItems: "center",
+          padding: 0,
+          background: "transparent",
+          border: 0,
+          color: "inherit",
+          cursor: "pointer",
+        }}
+      >
+        <span style={{ fontSize: "9px", textTransform: "uppercase", opacity: 0.66, letterSpacing: "0.1em", color: "#d9b28b" }}>
+          Snapshot
+        </span>
+        <span style={{ fontSize: "9px", color: "#e7d9c8", opacity: 0.8 }}>{expanded ? "Hide" : "Show"}</span>
+      </button>
+      {expanded ? (
+        <MetricGrid columns={3} items={items} />
+      ) : (
+        <div style={{ fontSize: "9px", color: "rgba(231,217,200,0.72)", lineHeight: 1.3 }}>
+          HP, damage, armor and current stance values stay here.
+        </div>
+      )}
     </div>
   );
 }

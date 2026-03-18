@@ -1,6 +1,6 @@
 # Combat Model And Flow
 
-> Last updated: 2026-03-16 02:35 MSK
+> Last updated: 2026-03-16 23:45 MSK
 
 ## Combat Model
 
@@ -67,11 +67,11 @@ Zone choice matters in three ways:
 
 Live zone damage modifiers:
 
-- `head`: `1.2`
-- `chest`: `1.1`
+- `head`: `1.15`
+- `chest`: `1.05`
 - `belly`: `1.0`
-- `waist`: `0.9`
-- `legs`: `0.8`
+- `waist`: `0.95`
+- `legs`: `0.92`
 
 ---
 

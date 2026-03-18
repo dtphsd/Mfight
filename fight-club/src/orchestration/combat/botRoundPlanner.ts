@@ -2,6 +2,7 @@ import type { Random } from "@/core/rng/Random";
 import {
   combatBotPlannerConfig,
   combatZones,
+  type CombatIntent,
   type CombatSkill,
   type CombatSnapshot,
   type CombatZone,
@@ -15,6 +16,7 @@ import type { BotDifficultyConfig } from "@/orchestration/combat/combatSandboxCo
 export interface BotRoundPlan {
   attackZone: CombatZone;
   defenseZones: [CombatZone, CombatZone];
+  intent: CombatIntent;
   skillId: string | null;
   consumableCode: string | null;
   reason: "pressure" | "counter_guard" | "skill_pressure" | "recruit_scramble";
@@ -50,6 +52,13 @@ export function planBotRound(input: {
   const attackZone = selectAttackZone(random, rankedAttackZones, difficulty, strategy, attackerCombatant);
   const defenseZones = selectDefenseZones(random, rankedDefenseZones, opponentAttackZone, difficulty, strategy, attackerCombatant);
   const selectedSkill = selectSkill(availableSkills, attackerCombatant, defenderCombatant, difficulty, strategy, attackZone);
+  const intent = resolveBotIntent({
+    attackerCombatant,
+    defenderCombatant,
+    selectedSkill,
+    difficulty,
+    strategy,
+  });
   const reason = selectedSkill
     ? "skill_pressure"
     : difficulty === "recruit"
@@ -61,6 +70,7 @@ export function planBotRound(input: {
   return {
     attackZone,
     defenseZones,
+    intent,
     skillId: selectedSkill?.id ?? null,
     consumableCode: null,
     reason,
@@ -79,6 +89,7 @@ export function buildBotRoundAction(
       attackerId,
       attackZone: plan.attackZone,
       defenseZones: plan.defenseZones,
+      intent: plan.intent,
       skill: selectedSkill,
     });
   }
@@ -87,7 +98,109 @@ export function buildBotRoundAction(
     attackerId,
     attackZone: plan.attackZone,
     defenseZones: plan.defenseZones,
+    intent: plan.intent,
   });
+}
+
+function resolveBotIntent(input: {
+  attackerCombatant: CombatantState;
+  defenderCombatant: CombatantState | null;
+  selectedSkill: CombatSkill | null;
+  difficulty: BotDifficultyConfig["plannerProfile"];
+  strategy?: BotStrategyProfile;
+}): CombatIntent {
+  const { attackerCombatant, defenderCombatant, selectedSkill, difficulty, strategy } = input;
+  const selfHpRatio = attackerCombatant.currentHp / Math.max(1, attackerCombatant.maxHp);
+  const targetHpRatio = defenderCombatant
+    ? defenderCombatant.currentHp / Math.max(1, defenderCombatant.maxHp)
+    : 1;
+  const style = strategy?.style ?? "pressure";
+  const taggedTarget = defenderCombatant?.activeEffects.length ? 1 : 0;
+  const setupLike = selectedSkill?.roles?.some((role) => role === "setup" || role === "control" || role === "tempo") ?? false;
+  const payoffLike = selectedSkill?.roles?.includes("payoff") ?? false;
+  const sustainLike = selectedSkill?.roles?.includes("sustain") ?? false;
+  const stateAware = (selectedSkill?.stateBonuses?.length ?? 0) > 0;
+  const effectHeavy = (selectedSkill?.effects?.length ?? 0) > 0;
+  const rawDamageWeight =
+    (selectedSkill?.damageMultiplier ?? 1) * 100 +
+    (selectedSkill?.critChanceBonus ?? 0) * 1.4 +
+    (selectedSkill?.armorPenetrationPercentBonus.slash ?? 0) * 0.08 +
+    (selectedSkill?.armorPenetrationPercentBonus.pierce ?? 0) * 0.08 +
+    (selectedSkill?.armorPenetrationPercentBonus.blunt ?? 0) * 0.08 +
+    (selectedSkill?.armorPenetrationPercentBonus.chop ?? 0) * 0.08;
+  const retaliationRisk =
+    (1 - selfHpRatio) * 30 +
+    ((defenderCombatant?.resources.rage ?? 0) * 0.18 +
+      (defenderCombatant?.resources.momentum ?? 0) * 0.14 +
+      (defenderCombatant?.resources.focus ?? 0) * 0.12);
+  const capitalizeWindow = (1 - targetHpRatio) * 28 + (payoffLike ? 16 : 0) + (rawDamageWeight >= 150 ? 8 : 0);
+  const precisionWindow =
+    (setupLike ? 12 : 0) +
+    (stateAware ? 16 : 0) +
+    (effectHeavy ? 8 : 0) +
+    (taggedTarget ? 12 : 0) +
+    ((selectedSkill?.aiHints?.prefersTaggedTargets ?? false) ? 8 : 0);
+  const burstPayoffPressure =
+    (style === "burst" && payoffLike ? 14 : 0) +
+    (style === "burst" && (selectedSkill?.critChanceBonus ?? 0) >= 20 ? 8 : 0) +
+    (style === "burst" && taggedTarget && payoffLike ? 8 : 0);
+  const setupPrecisionPressure =
+    (style === "control" && (setupLike || effectHeavy) ? 10 : 0) +
+    (style === "control" && taggedTarget ? 6 : 0) +
+    (style === "burst" && setupLike ? 8 : 0) +
+    (style === "burst" && stateAware ? 6 : 0);
+  const retaliationWeight =
+    style === "burst" ? 0.28 : style === "control" ? 0.34 : style === "tempo" || style === "pressure" ? 0.38 : 0.42;
+
+  let aggressiveScore =
+    capitalizeWindow +
+    burstPayoffPressure +
+    (style === "burst" ? 12 : 0) +
+    (style === "pressure" || style === "tempo" ? 6 : 0) +
+    (selfHpRatio >= 0.58 ? 4 : 0) -
+    retaliationRisk * retaliationWeight;
+
+  let guardedScore =
+    retaliationRisk +
+    (selfHpRatio <= 0.55 ? 8 : 0) +
+    (style === "defense" || style === "sustain" ? 10 : 0) +
+    (style === "control" ? 5 : 0) +
+    (sustainLike ? 8 : 0) -
+    capitalizeWindow * (style === "burst" || style === "tempo" ? 0.34 : 0.24) -
+    (payoffLike ? 6 : 0);
+
+  let preciseScore =
+    precisionWindow +
+    setupPrecisionPressure +
+    (style === "control" ? 10 : 0) +
+    (style === "burst" ? 5 : 0) +
+    (style === "tempo" ? 4 : 0) +
+    (targetHpRatio <= 0.45 && payoffLike ? 6 : 0) -
+    (difficulty === "recruit" ? 10 : 0);
+
+  if (selfHpRatio <= 0.38) {
+    return "guarded";
+  }
+
+  if (!selectedSkill) {
+    aggressiveScore += style === "pressure" ? 4 : 0;
+    guardedScore += selfHpRatio <= 0.5 ? 4 : 0;
+    preciseScore -= 8;
+  }
+
+  if (aggressiveScore >= preciseScore && aggressiveScore >= guardedScore && aggressiveScore >= 28) {
+    return "aggressive";
+  }
+
+  if (preciseScore >= aggressiveScore && preciseScore >= guardedScore && preciseScore >= 24) {
+    return "precise";
+  }
+
+  if (guardedScore >= 30) {
+    return "guarded";
+  }
+
+  return "neutral";
 }
 
 function selectAttackZone(
@@ -165,11 +278,51 @@ function selectDefenseZones(
     return [opponentAttackZone, backup];
   }
 
-  const first = scoredZones[0]?.zone ?? "head";
-  const second =
-    scoredZones.find((entry) => entry.zone !== first)?.zone ?? combatZones.find((zone) => zone !== first) ?? "chest";
+  const first = pickDefenseZone(random, scoredZones, []);
+  const second = pickDefenseZone(random, scoredZones, [first]);
 
   return [first, second];
+}
+
+function pickDefenseZone(
+  random: Random,
+  scoredZones: Array<{ zone: CombatZone; openDamage: number; guardedDamage: number; score: number }>,
+  excludedZones: CombatZone[]
+): CombatZone {
+  const availableZones = scoredZones.filter((entry) => !excludedZones.includes(entry.zone));
+  const fallback = availableZones[0]?.zone ?? combatZones.find((zone) => !excludedZones.includes(zone)) ?? "chest";
+
+  if (availableZones.length === 0) {
+    return fallback;
+  }
+
+  const bestScore = availableZones[0]?.score ?? 0;
+  const closePool = availableZones
+    .filter((entry) => bestScore - entry.score <= combatBotPlannerConfig.defenseCloseScoreThreshold)
+    .slice(0, combatBotPlannerConfig.defenseVariancePoolSize);
+  const weightedPool = closePool.length > 0 ? closePool : availableZones.slice(0, combatBotPlannerConfig.defenseVariancePoolSize);
+  const legsCandidate = availableZones.find((entry) => entry.zone === "legs");
+
+  if (legsCandidate && random.int(0, 99) < combatBotPlannerConfig.lowLineDefenseFloorChance) {
+    return "legs";
+  }
+
+  const totalWeight = weightedPool.reduce((sum, entry) => sum + Math.max(1, Math.round(entry.score * 10)), 0);
+
+  if (totalWeight <= 0) {
+    return weightedPool[0]?.zone ?? fallback;
+  }
+
+  let roll = random.int(1, totalWeight);
+
+  for (const entry of weightedPool) {
+    roll -= Math.max(1, Math.round(entry.score * 10));
+    if (roll <= 0) {
+      return entry.zone;
+    }
+  }
+
+  return weightedPool[weightedPool.length - 1]?.zone ?? fallback;
 }
 
 function selectSkill(
@@ -194,20 +347,36 @@ function selectSkill(
     return null;
   }
 
-  const rankedSkills = [...affordableSkills].sort(
+  const payoffWindowSkills = affordableSkills.filter(
+    (skill) => (skill.roles?.includes("payoff") ?? false) && isPayoffWindowOpen(skill, defenderCombatant)
+  );
+  const candidateSkills = payoffWindowSkills.length > 0 ? payoffWindowSkills : affordableSkills;
+  const rankedSkills = [...candidateSkills].sort(
     (left, right) =>
       scoreSkill(right, attackerCombatant, defenderCombatant, strategy, attackZone) -
       scoreSkill(left, attackerCombatant, defenderCombatant, strategy, attackZone)
   );
+  const bestSkill = rankedSkills[0];
+
+  if (!bestSkill) {
+    return null;
+  }
+
+  if (shouldHoldResourcesForPayoff(bestSkill, availableSkills, attackerCombatant, defenderCombatant)) {
+    return null;
+  }
 
   if (difficulty === "veteran") {
-    return scoreSkill(rankedSkills[0], attackerCombatant, defenderCombatant, strategy, attackZone) >=
+    return scoreSkill(bestSkill, attackerCombatant, defenderCombatant, strategy, attackZone) >=
         combatBotPlannerConfig.veteranSkillDamageThreshold * combatBotPlannerConfig.skillDamageMultiplierWeight
-      ? rankedSkills[0]
+      ? bestSkill
       : null;
   }
 
-  return rankedSkills[0];
+  return scoreSkill(bestSkill, attackerCombatant, defenderCombatant, strategy, attackZone) >=
+      combatBotPlannerConfig.championSkillScoreThreshold
+    ? bestSkill
+    : null;
 }
 
 function scoreSkill(
@@ -270,15 +439,108 @@ function scoreSkill(
     strategy.style === "burst"
       ? skill.damageMultiplier * 22 + skill.critChanceBonus * 1.2
       : 0;
+  const roleBonus = (skill.roles ?? []).reduce((total, role) => {
+    switch (role) {
+      case "setup":
+        return total + (strategy.style === "control" || strategy.style === "tempo" ? 10 : 4);
+      case "payoff":
+        return total + (strategy.style === "burst" ? 12 : 5);
+      case "counter":
+        return total + (strategy.style === "defense" ? 12 : 4);
+      case "tempo":
+        return total + (strategy.style === "tempo" || strategy.style === "pressure" ? 9 : 3);
+      case "sustain":
+        return total + (strategy.style === "sustain" || hpRatio <= 0.5 ? 12 : 4);
+      case "control":
+        return total + (strategy.style === "control" ? 12 : 5);
+    }
+  }, 0);
+  const preferredZoneBonus = skill.preferredZones?.includes(attackZone) ? 8 : 0;
+  const aiHintBonus =
+    (skill.aiHints?.useWhenLowHp && hpRatio <= 0.5 ? 14 : 0) +
+    (skill.aiHints?.prefersTaggedTargets && (defenderCombatant?.activeEffects.length ?? 0) > 0 ? 10 : 0) +
+    (skill.aiHints?.prefersArmoredTargets && defenderArmorValue >= 40 ? 10 : 0);
+  const activeStateBonus = (skill.stateBonuses ?? []).reduce((total, bonus) => {
+    const stateIsActive =
+      defenderCombatant?.activeEffects.some((effect) => effect.effectId === bonus.requiredEffectId) ?? false;
+
+    if (!stateIsActive) {
+      return total;
+    }
+
+    const penetrationValue = bonus.armorPenetrationPercentBonus
+      ? bonus.armorPenetrationPercentBonus.slash +
+        bonus.armorPenetrationPercentBonus.pierce +
+        bonus.armorPenetrationPercentBonus.blunt +
+        bonus.armorPenetrationPercentBonus.chop
+      : 0;
+
+    return (
+      total +
+      (bonus.damageMultiplierBonus ?? 0) * 100 +
+      (bonus.critChanceBonus ?? 0) * 2 +
+      penetrationValue / combatBotPlannerConfig.skillArmorPenetrationWeightDivisor +
+      24
+    );
+  }, 0);
 
   return (
     skill.damageMultiplier * combatBotPlannerConfig.skillDamageMultiplierWeight * zoneBias +
     skill.critChanceBonus * combatBotPlannerConfig.skillCritChanceWeight * strategy.critBias +
     antiArmorBonus +
     burstDamageBonus +
+    roleBonus +
+    preferredZoneBonus +
+    aiHintBonus +
+    activeStateBonus +
     finisherBonus -
     skill.cost * combatBotPlannerConfig.skillCostPenaltyFactor * strategy.costSensitivity +
     effectScore
+  );
+}
+
+function shouldHoldResourcesForPayoff(
+  selectedSkill: CombatSkill,
+  availableSkills: CombatSkill[],
+  attackerCombatant: CombatantState,
+  defenderCombatant: CombatantState | null
+) {
+  if (selectedSkill.roles?.includes("payoff")) {
+    return false;
+  }
+
+  const currentResource = attackerCombatant.resources[selectedSkill.resourceType];
+  const futurePayoffSkill = availableSkills.find(
+    (skill) =>
+      skill.id !== selectedSkill.id &&
+      skill.resourceType === selectedSkill.resourceType &&
+      skill.roles?.includes("payoff") &&
+      skill.cost > currentResource &&
+      skill.cost - currentResource <= combatBotPlannerConfig.payoffResourceHoldThreshold &&
+      isPayoffWindowOpen(skill, defenderCombatant)
+  );
+
+  if (!futurePayoffSkill) {
+    return false;
+  }
+
+  const selectedSkillIsSetupLike =
+    selectedSkill.roles?.some((role) => role === "setup" || role === "tempo" || role === "control") ?? false;
+
+  return selectedSkillIsSetupLike;
+}
+
+function isPayoffWindowOpen(skill: CombatSkill, defenderCombatant: CombatantState | null) {
+  if (!skill.stateBonuses?.length) {
+    return true;
+  }
+
+  if (!defenderCombatant) {
+    return false;
+  }
+
+  return skill.stateBonuses.some((bonus) =>
+    defenderCombatant.activeEffects.some((effect) => effect.effectId === bonus.requiredEffectId)
   );
 }
 

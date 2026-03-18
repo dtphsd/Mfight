@@ -135,6 +135,28 @@ describe("combatSandboxSupport", () => {
     });
   });
 
+  it("keeps only unlocked preset skills when the loadout includes a skill carrier item", () => {
+    const inventory = createStarterInventory();
+
+    const result = buildSandboxPresetState({
+      inventory,
+      preset: {
+        loadout: ["bk-item-206", "starter-sigil-pressure"],
+        allocations: {
+          strength: 2,
+          agility: 0,
+          rage: 1,
+          endurance: 0,
+        },
+        skillLoadout: ["opening-sense", "execution-arc", "missing-skill"],
+      },
+    });
+
+    expect(result.equipment.slots.mainHand).toBe("bk-item-206");
+    expect(result.equipment.slots.earring).toBe("starter-sigil-pressure");
+    expect(result.equippedSkillIds).toEqual(["opening-sense", "execution-arc"]);
+  });
+
   it("reconciles equipped skill ids and limits the manual skill loadout to five slots", () => {
     const availableSkills = [
       { id: "skill-1" },

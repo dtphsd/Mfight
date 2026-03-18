@@ -8,9 +8,10 @@ import {
 import {
   setRoundDraftAttackZone,
   setRoundDraftConsumable,
+  setRoundDraftIntent,
   setRoundDraftSkill,
 } from "@/orchestration/combat/roundDraft";
-import type { CombatZone } from "@/modules/combat";
+import type { CombatIntent, CombatZone } from "@/modules/combat";
 import type { EquipmentSlot, Equipment } from "@/modules/equipment";
 import type { Inventory } from "@/modules/inventory";
 import type { RoundDraft } from "@/orchestration/combat/roundDraft";
@@ -33,6 +34,9 @@ export function createCombatSandboxActions(input: CreateCombatSandboxActionsInpu
   return {
     setSelectedAttackZone: (zone: CombatZone) => {
       input.setRoundDraft((current) => setRoundDraftAttackZone(current, zone));
+    },
+    setSelectedIntent: (intent: CombatIntent) => {
+      input.setRoundDraft((current) => setRoundDraftIntent(current, intent));
     },
     selectBasicAction: () => {
       input.setRoundDraft((current) => setRoundDraftSkill(current, null));

@@ -99,6 +99,7 @@ export function BuildPresetsPopover({
   void onApplyItemsOnly;
   void onApplySkillsOnly;
   const [selectedPresetId, setSelectedPresetId] = useState(buildPresets[0]?.id ?? "");
+  const [hoveredPresetId, setHoveredPresetId] = useState<string | null>(null);
   const [hoveredSkillId, setHoveredSkillId] = useState<string | null>(null);
   const [hoveredConsumableCode, setHoveredConsumableCode] = useState<string | null>(null);
 
@@ -240,10 +241,19 @@ export function BuildPresetsPopover({
         >
           <div style={{ display: "grid", gap: "8px" }}>
             <MiniSectionTitle title="Presets" note="Compact selector" />
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: "8px" }}>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+                gap: "8px",
+                padding: "10px 14px 18px 10px",
+                overflow: "visible",
+              }}
+            >
             {buildPresets.map((preset) => {
               const tone = getPresetTone(preset.archetype);
               const selected = preset.id === activePreset?.id;
+              const hovered = preset.id === hoveredPresetId;
 
               return (
                 <button
@@ -254,6 +264,8 @@ export function BuildPresetsPopover({
                     setHoveredSkillId(null);
                     setHoveredConsumableCode(null);
                   }}
+                  onMouseEnter={() => setHoveredPresetId(preset.id)}
+                  onMouseLeave={() => setHoveredPresetId((current) => (current === preset.id ? null : current))}
                   aria-pressed={selected}
                   aria-label={preset.label}
                   style={{
@@ -261,18 +273,28 @@ export function BuildPresetsPopover({
                     display: "grid",
                     gridTemplateColumns: "48px minmax(0, 1fr)",
                     gap: "8px",
-                    padding: "7px",
+                    padding: "8px",
                     borderRadius: "14px",
                     cursor: "pointer",
-                    border: `2px solid ${selected ? tone.border : "rgba(255,255,255,0.1)"}`,
+                    position: "relative",
+                    zIndex: hovered ? 12 : selected ? 2 : 1,
+                    border: `2px solid ${selected ? tone.border : hovered ? "rgba(255,255,255,0.22)" : "rgba(255,255,255,0.1)"}`,
                     background: selected
-                      ? `linear-gradient(180deg, ${tone.soft}, rgba(255,255,255,0.05) 54%, rgba(0,0,0,0.12))`
-                      : "linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02))",
+                      ? `linear-gradient(180deg, ${tone.soft}, rgba(40,32,28,0.96) 56%, rgba(22,18,16,0.96))`
+                      : hovered
+                        ? "linear-gradient(180deg, rgba(64,54,46,0.98), rgba(34,28,25,0.98))"
+                        : "linear-gradient(180deg, rgba(48,40,35,0.98), rgba(28,24,21,0.98))",
                     color: "#fff6ea",
-                    minHeight: "88px",
+                    minHeight: "92px",
                     boxShadow: selected
-                      ? `0 0 0 1px rgba(255,255,255,0.04) inset, 0 12px 24px rgba(0,0,0,0.24), 0 0 28px ${tone.soft}`
-                      : "0 10px 18px rgba(0,0,0,0.18)",
+                      ? `0 0 0 1px rgba(255,255,255,0.05) inset, 0 12px 24px rgba(0,0,0,0.24), 0 0 18px ${tone.soft}`
+                      : hovered
+                        ? `0 18px 34px rgba(0,0,0,0.34), 0 0 0 1px rgba(255,255,255,0.06) inset, 0 0 22px ${tone.soft}`
+                        : "0 10px 18px rgba(0,0,0,0.18)",
+                    transform: hovered ? "translateY(-6px) scale(1.18)" : "translateY(0) scale(1)",
+                    transformOrigin: "center center",
+                    transition: "transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease, background 180ms ease",
+                    willChange: "transform",
                   }}
                 >
                   <img
@@ -284,14 +306,20 @@ export function BuildPresetsPopover({
                       height: "42px",
                       objectFit: "cover",
                       borderRadius: "10px",
-                      border: `1px solid ${selected ? tone.border : "rgba(255,255,255,0.14)"}`,
-                      boxShadow: selected ? `0 0 0 2px ${tone.soft}` : "none",
+                      border: `1px solid ${selected || hovered ? tone.border : "rgba(255,255,255,0.14)"}`,
+                      boxShadow: selected
+                        ? `0 0 0 2px ${tone.soft}`
+                        : hovered
+                          ? `0 0 0 2px ${tone.soft}, 0 10px 18px rgba(0,0,0,0.24)`
+                          : "none",
                     }}
                   />
                   <div style={{ display: "grid", gap: "5px", minWidth: 0 }}>
                     <div style={{ display: "flex", justifyContent: "space-between", gap: "8px", alignItems: "start" }}>
                       <div style={{ display: "grid", gap: "2px", minWidth: 0 }}>
-                        <div style={{ fontSize: "11px", fontWeight: 900, lineHeight: 1.02 }}>{preset.label}</div>
+                        <div style={{ fontSize: "11px", fontWeight: 900, lineHeight: 1.04, color: "#fff6ea" }}>
+                          {preset.label}
+                        </div>
                         <div
                           style={{
                             fontSize: "8px",
@@ -304,12 +332,33 @@ export function BuildPresetsPopover({
                           {preset.archetype}
                         </div>
                       </div>
-                      <span style={{ fontSize: "8px", color: "#cbb8a5", whiteSpace: "nowrap" }}>{shortFightLength(preset.targetFightLength)}</span>
+                      <span style={{ fontSize: "8px", color: "#d6c4b4", whiteSpace: "nowrap" }}>
+                        {shortFightLength(preset.targetFightLength)}
+                      </span>
                     </div>
-                    <div style={{ fontSize: "8px", lineHeight: 1.14, color: "#ccbcae" }}>{clampText(preset.description, 44)}</div>
+                    <div style={{ fontSize: "8px", lineHeight: 1.16, color: "#ddcdbd" }}>
+                      {clampText(preset.description, 52)}
+                    </div>
                     <div style={{ display: "grid", gap: "3px" }}>
                       {Object.entries(preset.allocations).map(([statName, value]) => (
                         <CompactStatBar key={`${preset.id}-${statName}`} statName={statName} value={value} />
+                      ))}
+                    </div>
+                    <div style={{ display: "flex", gap: "4px", flexWrap: "wrap" }}>
+                      {preset.tags.slice(0, 2).map((tag) => (
+                        <span
+                          key={`${preset.id}-tag-${tag}`}
+                          style={{
+                            borderRadius: "999px",
+                            padding: "2px 5px",
+                            fontSize: "7px",
+                            border: `1px solid ${selected ? tone.border : "rgba(255,255,255,0.10)"}`,
+                            background: selected ? "rgba(22,18,16,0.72)" : "rgba(255,255,255,0.04)",
+                            color: "#efe2d3",
+                          }}
+                        >
+                          {tag}
+                        </span>
                       ))}
                     </div>
                   </div>

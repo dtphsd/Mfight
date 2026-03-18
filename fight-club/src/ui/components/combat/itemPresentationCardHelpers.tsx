@@ -140,6 +140,14 @@ export function formatResourceLabel(resourceType: CombatSkill["resourceType"]) {
 export function buildSkillFeatureTags(skill: CombatSkill) {
   const tags = [`Damage x${skill.damageMultiplier.toFixed(2)}`];
 
+  if (skill.roles?.length) {
+    tags.push(...skill.roles.map((role) => formatSkillRole(role)));
+  }
+
+  if (skill.preferredZones?.length) {
+    tags.push(`Zones: ${skill.preferredZones.map((zone) => formatZoneLabel(zone)).join(" / ")}`);
+  }
+
   if (skill.critChanceBonus > 0) {
     tags.push(`Crit +${skill.critChanceBonus}%`);
   }
@@ -166,6 +174,38 @@ export function buildSkillFeatureTags(skill: CombatSkill) {
   });
 
   return tags;
+}
+
+function formatSkillRole(role: NonNullable<CombatSkill["roles"]>[number]) {
+  switch (role) {
+    case "setup":
+      return "Setup";
+    case "payoff":
+      return "Payoff";
+    case "counter":
+      return "Counter";
+    case "tempo":
+      return "Tempo";
+    case "sustain":
+      return "Sustain";
+    case "control":
+      return "Control";
+  }
+}
+
+function formatZoneLabel(zone: NonNullable<CombatSkill["preferredZones"]>[number]) {
+  switch (zone) {
+    case "head":
+      return "Head";
+    case "chest":
+      return "Chest";
+    case "belly":
+      return "Belly";
+    case "waist":
+      return "Waist";
+    case "legs":
+      return "Legs";
+  }
 }
 
 export function getDamageTypeIcon(type: DamageType) {

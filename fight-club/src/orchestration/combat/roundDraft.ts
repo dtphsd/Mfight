@@ -1,4 +1,4 @@
-import type { CombatSkill, CombatZone, RoundAction } from "@/modules/combat";
+import type { CombatIntent, CombatSkill, CombatZone, RoundAction } from "@/modules/combat";
 import {
   createBasicAttackAction,
   createConsumableAction,
@@ -15,6 +15,7 @@ export type RoundDraftSelectedAction =
 export interface RoundDraft {
   attackZone: CombatZone;
   defenseZones: [CombatZone, CombatZone];
+  intent: CombatIntent;
   selectedAction: RoundDraftSelectedAction;
 }
 
@@ -22,6 +23,7 @@ export function createRoundDraft(): RoundDraft {
   return {
     attackZone: "head",
     defenseZones: ["chest", "belly"],
+    intent: "neutral",
     selectedAction: { kind: "basic_attack" },
   };
 }
@@ -46,6 +48,13 @@ export function setRoundDraftSkill(draft: RoundDraft, skillId: string | null): R
   return {
     ...draft,
     selectedAction: skillId ? { kind: "skill_attack", skillId } : { kind: "basic_attack" },
+  };
+}
+
+export function setRoundDraftIntent(draft: RoundDraft, intent: CombatIntent): RoundDraft {
+  return {
+    ...draft,
+    intent,
   };
 }
 
@@ -96,6 +105,7 @@ export function buildPlayerRoundAction(input: {
       attackerId: input.attackerId,
       attackZone: input.draft.attackZone,
       defenseZones: input.draft.defenseZones,
+      intent: input.draft.intent,
       consumable: input.consumable,
     });
   }
@@ -105,6 +115,7 @@ export function buildPlayerRoundAction(input: {
       attackerId: input.attackerId,
       attackZone: input.draft.attackZone,
       defenseZones: input.draft.defenseZones,
+      intent: input.draft.intent,
       skill: input.skill,
     });
   }
@@ -114,6 +125,7 @@ export function buildPlayerRoundAction(input: {
       attackerId: input.attackerId,
       attackZone: input.draft.attackZone,
       defenseZones: input.draft.defenseZones,
+      intent: input.draft.intent,
       consumable: input.consumable,
     });
   }
@@ -122,6 +134,7 @@ export function buildPlayerRoundAction(input: {
     attackerId: input.attackerId,
     attackZone: input.draft.attackZone,
     defenseZones: input.draft.defenseZones,
+    intent: input.draft.intent,
   });
 }
 

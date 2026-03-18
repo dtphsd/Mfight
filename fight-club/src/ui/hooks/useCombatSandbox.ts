@@ -250,6 +250,7 @@ export function useCombatSandbox() {
     botOutgoingResult: latestBotLogEntry,
     selectedAttackZone: roundDraft.attackZone,
     selectedDefenseZones: roundDraft.defenseZones,
+    selectedIntent: roundDraft.intent,
     metrics,
     inventory,
     equipment,

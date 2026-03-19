@@ -2,7 +2,7 @@
 
 Browser-only combat sandbox built with React, TypeScript, and Vite.
 
-Last updated: 2026-03-16
+Last updated: 2026-03-20
 
 ## Current State
 
@@ -12,6 +12,7 @@ It now includes:
 
 - live `Combat Sandbox`
 - live `Hunting Lodge`
+- live `Online Duel` prototype
 - generated Battle Kings combat items
 - zone-based armor and defended-zone weighting
 - random damage and armor ranges
@@ -29,6 +30,7 @@ It now includes:
 - `npm run lint`
 - `npm run docs:validate`
 - `npm run balance:matrix`
+- `npm run online:server`
 - `npm run baza:parse`
 - `npm run baza:generate-items`
 
@@ -87,6 +89,26 @@ Current curated presets:
 - combatants now track skill cooldown state
 - penetration has its own `PIERCE` impact feedback lane
 
+## Online Duel
+
+The app now includes a separate `1v1` online duel surface backed by a local authority service.
+
+Current flow:
+
+- host creates a room and gets a room code
+- guest joins by room code
+- both sides pass a ready check
+- each side locks a round through a small attack/defense planner
+- the normal player flow uses a single active `Your Side` panel
+- duel state prefers the local HTTP/SSE authority service and falls back to the in-memory arena service when the server is unavailable
+
+Current scope:
+
+- no auth
+- no server persistence
+- reconnect / timeout diagnostics still live under `Debug Tools`
+- the local backend entrypoint is `npm run online:server`
+
 ## Item And Data Pipeline
 
 The active starter combat pool now comes from local Battle Kings source data.
@@ -134,3 +156,8 @@ For item-pool changes also run:
 
 - `npm run baza:parse`
 - `npm run baza:generate-items`
+
+Current verified suite size:
+
+- `28` test files
+- `178` tests

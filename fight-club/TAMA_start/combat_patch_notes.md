@@ -1,6 +1,6 @@
 # Combat Patch Notes
 
-> Last updated: 2026-03-19 01:05 MSK
+> Last updated: 2026-03-20 01:00 MSK
 
 Use this file as the canonical running log only for combat-system changes connected to the Combat Systems Agent.
 
@@ -39,6 +39,21 @@ Patch note rule for balance work:
   - keep the stronger block and penetration layer
   - reopen a little more payoff access for burst and pressure kits
 - Validation pending on build, targeted combat tests, skill audit, and matrix review.
+
+## 2026-03-19 - Combat Specialist Surface Joined The Three-Agent Console
+
+- Extended the shared `Ecosystem Agents` shell from `2 -> 3` tabs.
+- Kept `Combat Master` on the same mirrored surface while adding `Backend Master`.
+- Preserved the same combat-agent journal and patch-note channels so combat memory did not move or fork.
+
+## 2026-03-20 - Combat Master Progression Docs Synced To The Shared TAMA Ladder
+
+- Re-synced `combat_agent_profile.md` and `combat_agent_journal.md` with the real shared specialist progression logic.
+- `Combat Master` docs now treat `Total XP` as the source of truth for derived level display.
+- Current documented combat snapshot:
+  - `Total XP: 48`
+  - `Level: 10`
+  - `Next Level XP: 51`
 
 ## 2026-03-18 - Combat Tempo Formula Pass II
 

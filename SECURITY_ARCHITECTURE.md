@@ -1,10 +1,10 @@
 # SECURITY_ARCHITECTURE - Fight Club
 
-> Last updated: 2026-03-13 02:00 MSK
+> Last updated: 2026-03-20 01:00 MSK
 
-**Status:** browser-only SPA  
-**Risk level:** low to medium  
-**Reason:** still no backend/auth/secrets surface, but runtime complexity and local persistence have grown
+**Status:** browser-first SPA plus local online-duel backend slice  
+**Risk level:** medium  
+**Reason:** there is still no auth/secrets surface, but the repo now includes a real local HTTP/SSE authority runtime for online duel on top of the existing client and persistence complexity
 
 ---
 
@@ -12,17 +12,18 @@
 
 The project still has no:
 
-- backend
-- external API calls
+- third-party external API dependency
 - auth
 - cookies or sessions
 - `.env`
-- `fetch`
 - `axios`
 - `process.env`
 - `import.meta.env`
 
-That means the classic network attack surface is still very small.
+The classic public-internet attack surface is still small, but it is no longer purely local-state only:
+
+- the frontend uses `fetch` for backend health checks and HTTP duel transport
+- the repo now includes a local online-duel server entrypoint and SSE room stream
 
 ---
 
@@ -48,11 +49,18 @@ Important runtime shapes are typed:
 
 This matters because the app now includes timed combat effects, richer consumables, and more UI formatting layers.
 
-### 3. Static content only
+The same typed-contract benefit now also applies to the local online-duel seam:
+
+- `OnlineDuel`
+- `OnlineDuelStateSync`
+- `OnlineDuelClientMessage`
+- `OnlineDuelServerMessage`
+
+### 3. Static content plus local authority runtime
 
 Current items, skills, combat effects, combat-rules content, and commentator phrases are internal project content.
 
-There is still no untrusted remote content pipeline in the real app.
+There is still no untrusted third-party content pipeline in the real app.
 
 ### 4. No dangerous HTML rendering in active flow
 
@@ -65,6 +73,16 @@ There is still no evidence of `dangerouslySetInnerHTML` in the live app flow.
 Current limitation remains:
 
 - read path is still not validated through Zod in `LocalStorageSaveRepository.load()`
+
+### 6. Local backend contracts are typed too
+
+The online-duel runtime now moves through typed local contracts across the backend slice:
+
+- HTTP duel message schema
+- SSE room-event payloads
+- `revision` freshness markers
+- `resumeToken` recovery
+- `sessionId` ownership checks
 
 ---
 
@@ -96,6 +114,15 @@ The combat runtime now includes:
 
 This is not a network risk, but it increases the chance of local logic regressions and bad state transitions if models drift.
 
+The same is now true for the local online-duel backend slice:
+
+- room lifecycle and room-code join flow
+- HTTP message handling
+- SSE event replay
+- reconnect / disconnect state
+- ready-state coordination
+- authority sync between two client sessions
+
 High-risk files:
 
 - `fight-club/src/modules/combat/application/resolveRound.ts`
@@ -103,6 +130,9 @@ High-risk files:
 - `fight-club/src/modules/combat/config/combatWeaponPassives.ts`
 - `fight-club/src/ui/components/combat/battleLogFormatting.ts`
 - `fight-club/src/content/items/starterItems.ts`
+- `fight-club/src/modules/arena/application/createInMemoryOnlineDuelService.ts`
+- `fight-club/src/modules/arena/application/joinOnlineDuelRoom.ts`
+- `fight-club/src/ui/screens/OnlineDuel/OnlineDuelScreen.tsx`
 
 ### 3. IDs are not security identifiers
 
@@ -135,6 +165,7 @@ Acceptable for a local sandbox, not for competitive or multi-user trust.
 - manual client-side state editing through devtools
 - combat/runtime regressions from item/effect/config changes
 - UI and formatter drift from domain result contracts
+- local duel-room tampering through devtools or client message abuse against the local backend
 
 ### Not applicable right now
 
@@ -158,7 +189,7 @@ Reason:
 - do not weaken strict typing
 - do not replace typed contracts with `any`
 - if persistence expands, update validation and compatibility first
-- if network/auth/backend appears, rewrite this file immediately
+- if auth, secrets, public deployment, or remote persistence appears, rewrite this file immediately
 
 ---
 
@@ -166,25 +197,24 @@ Reason:
 
 This document must be revised again if the project adds:
 
-- `fetch` or any API client
 - `.env`
 - auth/session logic
 - remote persistence
 - account-based saves
 - file upload
-- multiplayer
+- public multiplayer exposure beyond the current local authority slice
 
 ---
 
 ## Current Summary
 
-Today the security model is still simple:
+Today the security model is still relatively compact:
 
-- local-only browser app
-- no backend trust boundary
-- no secrets handling
-- main real risk is unsafe local persistence plus local runtime regressions in combat/effect logic
+- local-first frontend app plus a local online-duel backend slice
+- no auth or secrets handling yet
+- no real account trust boundary yet
+- main real risks are unsafe local persistence, authority-message misuse in the local duel service, and runtime regressions in combat/effect logic
 
 ---
 
-> Last updated: 2026-03-13 02:00 MSK
+> Last updated: 2026-03-20 01:00 MSK

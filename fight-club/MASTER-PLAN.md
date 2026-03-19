@@ -1,6 +1,6 @@
 # MASTER-PLAN - Fight Club
 
-> Last updated: 2026-03-17 00:55 MSK
+> Last updated: 2026-03-20 01:00 MSK
 
 **Project:** Fight Club  
 **Scope:** active product planning, task tracking, and sprint history
@@ -10,6 +10,7 @@
 ## How To Use
 
 - Add every active task to the table below.
+- Track sprint-sized product slices here, not every micro-task or tiny local edit.
 - Use one status only: `🔴 TODO`, `🟡 IN PROGRESS`, `✅ DONE`, `⏸️ DEFERRED`.
 - Keep task names short and stable.
 - Link to a feature file in `features/` when the task belongs to a specific feature or refactor track.
@@ -47,6 +48,11 @@
 | COMBAT-014 | Add trauma hooks after core combat stabilization | Combat Recovery | 🔴 TODO | `features/combat-design-reference.md` | Introduce an injury layer only after the base hit, defense, mitigation, and crit pipeline is stable and covered by regression tests |
 | COMBAT-015 | Formalize production skill architecture and role taxonomy | Combat Systems | 🟡 IN PROGRESS | `features/combat-expansion.md` | The first live slice has landed: `CombatSkill` now supports role metadata, preferred zone hints, and soft AI hints, with UI surfacing and planner scoring support; next step is applying the model to curated production packs |
 | COMBAT-016 | Equip curated presets with first production skill packs | Combat Content / Balance | 🟡 IN PROGRESS | `features/combat-expansion.md` | Curated presets now run on live first-wave skill kits through accessory carriers; post-fix audits showed payoff starvation, a narrow planner hold-for-payoff pass barely moved the live roster, and the first skill-economy pass confirmed the next real bottleneck: `Mace / Control` improved once payoff access was cheaper and same-resource, while `Sword / Bleed` and `Dagger / Crit` still need more resource-cadence work |
+| BACKEND-001 | Formalize 1v1 online architecture and authority boundaries | Backend / Architecture | 🟡 IN PROGRESS | `features/online-duel-1v1.md` | The project now has a dedicated online-duel roadmap; the current slice is Phase 1: room contracts, participant/session state, and authority-side round lifecycle around the existing combat core |
+| BACKEND-002 | Build authority-ready duel room domain and state machine | Backend / Runtime | 🟡 IN PROGRESS | `features/online-duel-1v1.md` | Shared duel-room models and pure application functions should own join, action submission, and round resolution before any real transport is added |
+| BACKEND-003 | Define transport contracts for realtime duel sync | Backend / Contracts | ???? IN PROGRESS | `features/online-duel-1v1.md` | The realtime slice now has SSE room updates, client-side stale-push guards, authoritative resync on stream attach or error, server-issued resume tokens, event-cursor replay, explicit session handoff, and replay of core round lifecycle events; the next step is deciding whether reconnect should restore deeper combat/action history beyond the current room-focused stream |
+| BACKEND-004 | Add first local-authority adapter and verification flow | Backend / QA | ???? IN PROGRESS | `features/online-duel-1v1.md` | The transport seam now carries server-owned round summaries into the online screen, and the product flow now covers match-finish UX plus a server-owned `Play Another Match` reset inside the same room instead of a UI-only clear |
+| BACKEND-005 | Stand up first live 1v1 online service slice | Backend / Service | ???? IN PROGRESS | `features/online-duel-1v1.md` | The live HTTP authority slice now includes health checks, room-message handling, server-owned round summaries, revision-tagged sync, stale round-submit rejection, SSE room updates, attach/error resync, resume-token validation, event-cursor replay, explicit displacement of older live sessions after handoff, round lifecycle replay after reconnect, server-owned rematch reset, server-owned leave-room closure, a dedicated live two-client validation test, a player-facing `Your Side` online view, a cleaner `Create Match / Join Match` entry split that only shows one onboarding intent at a time, and a single active-side match panel for normal play; the next step is trimming the remaining in-screen remote-opponent simulation from the non-debug flow |
 | HUNT-001 | Define hunting domain model and save boundaries | Hunting Architecture | ✅ DONE | `features/hunting-mvp.md` | Hunting model contracts, starter zones, creation helpers, and the `state.hunting.*` save-boundary draft are now established |
 | HUNT-002 | Implement autonomous idle hunt loop and session resolution | Hunting Runtime | ✅ DONE | `features/hunting-mvp.md` | `startHunt` and `resolveHunt` now provide deterministic idle hunt simulation with test coverage |
 | HUNT-003 | Add reward bridge from hunting into shared inventory | Hunting Economy | ✅ DONE | `features/hunting-mvp.md` | `claimHuntRewards` now converts pending hunt rewards into shared inventory items through the existing inventory module |
@@ -129,6 +135,188 @@ Execution rules:
 ---
 
 ## Sprint History
+
+### v1.26 - Single Active Match Panel Landed
+
+- unified the normal match surface into one neutral `Your Side` panel instead of keeping separate host and guest blocks in the player-facing flow
+- added direct role and opponent context to that active-side card, so the room reads more like one player's match view than a two-seat operator console
+- preserved explicit host/guest switching for local verification, but kept it under `Debug Tools` where it belongs
+- revalidated the online screen again after the match-panel unification
+
+### v1.25 - Focused Room Entry Flow Landed
+
+- replaced the old simultaneously visible create/join onboarding with a focused `Match Entry` switch, so the player now sees only one room-entry intent at a time
+- kept the host path on `Create Match -> Create Room` and the guest path on `Join Match -> Join Room Code`, which reduces the last obvious feeling that one person is meant to operate both onboarding roles at once
+- preserved the existing local verification path and debug-side tools underneath, so the cleaner entry UX did not cost the team the current dual-client simulation hooks
+- revalidated the online screen again so create, join, leave, and the local room flow still pass after the onboarding split
+### v1.24 - Split Match Entry Paths Landed
+
+- replaced the old side-by-side `Create Room` and `Join Room` setup with a clearer `Create Match / Join Match` entry switch, so players now choose one intent before seeing the corresponding room form
+- kept the create path host-focused and the join path guest-focused, which reduces the feeling that one screen is asking a single player to operate both onboarding roles at once
+- preserved the underlying dual-client lab support in the background, but moved the product surface closer to a true one-player room setup flow
+- revalidated the online screen after the entry split so room creation, joining, leave, and the local verification path still pass
+### v1.23 - Single-Player Online View Step Landed
+
+- removed the top-level `Host Side / Guest Side` switch from the default product path so the online screen no longer opens as a two-operator control deck
+- turned the active combat panel into `Your Side`, which keeps the current room flow readable while making the screen feel closer to a real player-facing online mode
+- preserved host/guest side switching for development under `Debug Tools`, so diagnostics and local dual-client simulation still work without dominating the default UX
+- revalidated the online screen after the view shift so the main room flow still passes its dedicated UI tests
+### v1.22 - Online Duel Product Surface Cleanup Landed
+
+- removed player/session identity details from the default online match panels so the main screen no longer reads like a transport debugger during normal play
+- moved host/guest manual refresh actions fully into `Debug Tools`, keeping the core room flow focused on `Create`, `Join`, `Ready`, `Lock Attack`, `Leave`, and `Play Another Match`
+- kept all developer recovery controls available behind the debug section instead of deleting useful diagnostics outright
+- revalidated the product screen after the cleanup so the online duel UI still passes its dedicated screen tests
+### v1.21 - Live Two-Client Validation Landed
+
+- added a dedicated live integration test that runs two independent HTTP duel clients plus two SSE streams against one real online duel server process
+- validated the full product-critical room path end to end: `create -> join -> ready -> resolve -> leave`
+- confirmed that live room closure propagates to the opposing client over the realtime channel, not only through local request/response refresh
+- turned the next backend question from “does live two-client flow work at all?” into “what remaining lab-only UX assumptions still need to be removed?”
+
+### v1.20 - Server-Owned Leave Room Policy Landed
+
+- added a dedicated `leave_duel` authority contract so `Leave Room` is now distinct from temporary disconnect and closes the room through backend-owned policy
+- defined the first room-end rule: when a participant leaves, the room becomes `abandoned`, clears ready state, and stops pretending the match is still live
+- wired the online screen to call the leave contract before returning to the create/join state, so the product surface now exits through the authority layer instead of only clearing local UI state
+- widened arena, HTTP, and UI verification again so leave-room closure is covered end to end
+### v1.19 - Server-Owned Rematch Flow Landed
+
+- added a real `rematch_duel` authority contract, so `Play Another Match` now resets the duel inside the same room instead of only clearing local UI state
+- reset rematched rooms back to a fresh `lobby` with cleared ready state, a new round-1 combat state, and the same room identity for both connected participants
+- wired the online screen to call that backend-shaped rematch flow and refresh both local client views after a closed or completed match
+- widened arena, HTTP, and UI verification again so room reset is covered through the authority service, the live endpoint, and the product-facing screen
+
+### v1.18 - Playable Match Flow Landed
+
+- added explicit match-finish UX to `Online Duel`, so closed or completed rooms now surface a dedicated finish card instead of leaving the player inside raw room state only
+- added `Leave Room` and `Play Another Match` actions to the live room flow, which reset the current duel session back to a clean create/join state without relying on debug-only controls
+- extended `Match Status` with an outcome summary so the screen can show `winner`, `Room closed`, or `In progress` as part of the main product path
+- widened the online UI verification slice so timeout-to-reset flow is covered end to end through the product-facing buttons
+### v1.17 - Round Lifecycle Replay Landed
+
+- expanded SSE replay from plain `duel_state_sync` recovery into core round lifecycle events, so reconnect can now catch `round_ready` and `round_resolved` instead of only the latest room snapshot
+- kept the replay stream seat-specific and resume-token guarded, so lifecycle replay still belongs to the active server-owned recovery session
+- updated the online screen event tracking so reconnect cursors stay current across non-sync SSE events too
+- widened backend verification to cover reconnect after a resolved round and confirm that lifecycle events replay before the latest synced room state
+
+### v1.16 - Session Handoff Ownership Landed
+
+- promoted `sessionId` into live duel mutations, so `ready`, `submit`, and connection changes now belong to the currently owned seat session instead of only a shared `playerId`
+- allowed same-player rejoin with a newer live session to hand off seat ownership instead of hard-failing while the old session is still marked connected
+- displaced the older live session after handoff, so stale clients now get `displaced_session` instead of being able to keep mutating the room
+- widened arena verification to cover explicit seat handoff and old-session rejection
+
+### v1.15 - Event Cursor Replay Landed
+
+- started tagging pushed SSE room updates with event ids and keeping a short per-seat history on the server
+- taught reconnecting clients to pass `afterEventId`, so the backend can replay missed room sync events instead of always jumping straight to a blind fresh snapshot
+- kept the existing resume-token validation in place, so replay still belongs to the current server-owned recovery session
+- widened backend verification to cover cursor-based replay after reconnect
+
+### v1.14 - Resume Token Recovery Landed
+
+- issued server-owned `resumeToken` values per duel seat and surfaced them through seat-specific state sync
+- required that token on sync recovery paths, so `requestSync` and SSE reattach now bind to the current server-owned resume session instead of trusting only `playerId`
+- invalidated stale recovery tokens when a player rejoins with a fresh session, which gives reconnect flow clearer ownership semantics without changing the core room model
+- widened backend and arena verification to cover stale-session rejection and latest-token recovery
+
+### v1.13 - SSE Recovery Pass Landed
+
+- hardened the duel client seam so pushed sync payloads now ignore stale revisions instead of rolling room state backward
+- taught the online duel screen to run an authoritative sync when the SSE channel opens or errors, so stream reattach can recover live room state instead of waiting on manual refresh
+- widened backend verification to cover event-stream reattach and latest-state replay for a reconnecting player
+- kept the current HTTP + SSE service slice simple while improving state-resume behavior without forking a second transport stack
+
+### v1.12 - SSE Realtime Push Slice Landed
+
+- added a first realtime delivery path through `GET /api/online-duel/events`, so active players can receive duel sync updates over server-sent events
+- taught the online duel client seam and screen to accept pushed `duel_state_sync` messages instead of relying only on request/response refresh
+- kept the backend-first HTTP authority flow intact while adding safe cleanup for long-lived event-stream subscribers
+- widened backend verification again so the live service now covers health, message flow, and room sync push behavior
+### v1.11 - Stale Round Submit Guard Landed
+
+- added revision metadata to duel sync payloads so the backend and client now share an explicit freshness marker
+- hardened the authority contract to reject round submissions that target an old round instead of silently accepting stale client state
+- kept the current HTTP request/response flow playable by guarding stale combat actions without blocking normal ready-check interactions
+- widened verification again across backend, arena, and the online screen so guarded submit behavior stays covered
+
+### v1.10 - Server-Owned Round Result Card Landed
+
+- extended the online authority contract with compact round summaries instead of exposing raw combat internals
+- returned that summary from both `round_resolved` and duel sync payloads so reconnect and refresh flows can still restore the latest exchange
+- added a product-facing `Round Result` card to `Online Duel` with commentary, damage outcome, and live HP state for both fighters
+- widened backend, arena, and UI verification again so the summary path is covered end to end
+
+### v1.09 - Backend-First Duel Transport Landed
+
+- switched the duel transport seam to async so the same client contract now works across local and HTTP adapters
+- connected the `Online Duel` screen to prefer the live backend service and automatically fall back to local authority when the backend is unavailable
+- kept session reset, reconnect, and planner flow working across that transport split instead of forking the UI into separate debug paths
+- widened verification again so arena client-seam tests and the online screen test both cover the async transport flow
+
+### v1.08 - First HTTP Authority Slice Landed
+
+- stood up the first real backend process for online duel flow behind `npm run online:server`
+- mounted the existing duel authority handler behind HTTP `POST /api/online-duel/message` and `GET /health`
+- kept room creation, room-code join, ready-state, and round resolution on the same shared arena contracts instead of forking server-only logic
+- added end-to-end backend verification for health, create-room, join-by-code, and malformed-request handling
+
+### v1.07 - Planner-Driven Round Submit Landed
+
+- replaced hardcoded round submits with a real attack/defense planner on the online screen
+- each side now selects one attack zone and two defense zones before `Lock Attack`
+- the local online flow now mirrors the same zone-based combat language used in the bot and sandbox combat loop
+- widened the online UI test again so the room flow verifies zone selection before round resolution
+
+### v1.06 - Online Duel Product Surface Landed
+
+- renamed the frontend-safe prototype from `Online Duel Lab` to `Online Duel`
+- reworked the screen into `Create Room`, `Join Match`, `Match Status`, `Host Side`, and `Guest Side`
+- moved reconnect, session reset, timeout, and raw message review into `Debug Tools` so the default flow reads like a playable room
+- widened the UI verification slice so the product-facing screen is covered instead of only the older lab shell
+
+### v1.05 - Stale Room Timeout Slice Landed
+
+- added an authority-side timeout sweep so stale duel rooms can fall into `abandoned` instead of lingering forever
+- exposed a safe `Force Timeout` control in `Online Duel Lab` so timeout hardening can be verified without waiting on real clocks
+- widened online verification again so stale-room behavior is covered by both arena and UI tests
+
+### v1.04 - Room Code And Reconnect Slice Landed
+
+- added a dedicated `roomCode` to duel state sync and surfaced it in `Online Duel Lab`
+- added first-pass disconnect and reconnect messages so room participants can flip between `connected` and `offline` without mutating combat internals directly
+- pausing a participant now drops the room back to `lobby` instead of pretending planning is still safe
+
+### v1.03 - Pre-Fight Lobby Gate Landed
+
+- added an explicit `lobby -> ready -> planning` gate before the first duel exchange
+- transport and client layers now support player readiness instead of jumping straight from join into attacks
+- `Online Duel Lab` now behaves more like a real room flow and no longer skips pre-fight confirmation
+
+### v1.02 - Local Client Seam Landed
+
+- added a frontend-facing local duel client and transport wrapper over the backend authority service
+- the online stack can now be exercised as `client -> transport -> authority -> server messages` without introducing a real socket runtime
+- prepared the project for a future minimal host/join UI surface that can talk to the online backend seam instead of directly mutating duel state
+
+### v1.01 - Duel Transport Adapter Slice Landed
+
+- added the first transport-facing client/server message handler on top of the in-memory authority service
+- transport messages can now create a duel, join it, request sync, submit actions, emit `round_ready`, and auto-resolve into `round_resolved`
+- widened online-duel tests again so the next frontend or realtime layer can target verified message contracts instead of raw service calls
+
+### v1.00 - In-Memory Duel Authority Service Landed
+
+- extended the pure duel-room domain into a real in-memory authority service with room storage, state sync, and mutation entry points
+- gave the online track its first backend-like API surface without introducing a real server process yet
+- widened the backend verification slice so the next transport phase can target a stable service boundary instead of raw room objects
+
+### v0.99 - Online Duel Backend Track Opened
+
+- opened a dedicated `1v1 online` feature track with a backend-authoritative architecture plan
+- added `BACKEND-001` through `BACKEND-005` to the master plan so online work now has an explicit execution order
+- started the first implementation slice around authority-ready duel room contracts instead of jumping straight into transport or UI
 
 ### v0.1 - Planning Workflow Added
 
@@ -478,7 +666,14 @@ When work changes state:
 2. update or create the matching file in `features/`
 3. add completed work to `Sprint History`
 4. update the timestamp at the top of this file
+5. record sprint-level outcomes here, not every micro-step taken inside the sprint
 
 ---
 
-> Last updated: 2026-03-17 00:55 MSK
+> Last updated: 2026-03-20 01:00 MSK
+
+
+
+
+
+

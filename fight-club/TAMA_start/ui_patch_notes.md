@@ -1,6 +1,6 @@
 # UI Patch Notes
 
-> Last updated: 2026-03-19 17:22 MSK
+> Last updated: 2026-03-20 01:00 MSK
 
 Use this file as the canonical running log only for UI-system changes connected to the UI Systems Agent.
 
@@ -154,3 +154,78 @@ Patch note rule for UI work:
 - The bot snapshot now mirrors the same truth with `Crit vs You`.
 - Added display clamping for chance readouts:
   - `uncapped display -> 0..95%`
+
+## 2026-03-19 - Specialist Console Expanded To A Third Agent
+
+- Extended the in-app `Ecosystem Agents` console from `2 -> 3` specialist tabs.
+- Added `Backend Master` on the same shared shell as `Combat Master` and `UI Master`.
+- Preserved the same mirrored surface model:
+  - activity log
+  - patch notes modal
+  - progression and track cards
+  - shared tab interaction
+- This keeps the specialist hub scalable without fragmenting the UI language into separate screens.
+
+## 2026-03-19 - Online Duel Lab Added
+
+- Added a separate `Online Duel Lab` screen instead of mixing early online flow into the live combat sandbox.
+- Added a dedicated main-menu entry for the new surface.
+- The first host/join prototype now exposes:
+  - room creation
+  - guest join
+  - host and guest sync
+  - host and guest attack submission
+  - live backend message feed
+- This keeps the online UI discoverable while protecting the existing sandbox flow from early multiplayer changes.
+
+## 2026-03-19 - Online Duel Lab Gained A Real Ready Lobby
+
+- Added explicit `Host Ready` / `Guest Ready` and matching unready controls.
+- The lab now surfaces a real `lobby` state before attacks are allowed.
+- Client sync cards now show both participant readiness states.
+- The prototype now feels closer to a real online room instead of an immediate post-join attack sandbox.
+
+## 2026-03-19 - Online Duel Lab Learned Room Code And Offline State
+
+- Expanded the lobby stats strip:
+  - `stat cards: 3 -> 4`
+  - added a dedicated `Room Code` card instead of leaving room identity buried in raw message JSON
+- Expanded lobby controls:
+  - `pre-fight controls: 4 -> 8`
+  - added `Host Disconnect`, `Host Reconnect`, `Guest Disconnect`, `Guest Reconnect`
+- Participant sync cards now distinguish:
+  - `Ready`
+  - `Waiting`
+  - `Offline`
+- This keeps the lab readable as a real room surface instead of a raw transport debug panel.
+
+## 2026-03-19 - Online Duel Lab Gained A Safe Timeout Trigger
+
+- Added a dedicated `Force Timeout` control to the lab lobby controls.
+- The control lets the prototype surface authority-side stale-room handling without waiting on real elapsed minutes.
+- This makes timeout UX and abandoned-room state verifiable inside the app instead of living only in backend tests.
+
+## 2026-03-19 - Online Duel Flow Was Cleaned Into A Match-First Screen
+
+- Renamed the prototype surface from `Online Duel Lab` to `Online Duel`.
+- Reworked the top-level flow around:
+  - `Create Room`
+  - `Join Match`
+  - `Match Status`
+  - `Host Side`
+  - `Guest Side`
+- Moved disconnect, reconnect, session reset, timeout, and raw message review into `Debug Tools` so the main screen reads like a playable room instead of a dual-operator debug console.
+- Added a compact round planner to each side:
+  - `Attack Zone`
+  - `Defense Zones`
+  - summary chip for the selected plan before `Lock Attack`
+- The online screen now feels closer to a real pre-match and round-submit UX while still staying safely local.
+
+## 2026-03-20 - Specialist Progression Docs And Online Duel Wording Re-Synced
+
+- Re-synced specialist docs so `Combat Master`, `UI Master`, and `Backend Master` all derive visible level progression from `Total XP` on the shared `1 -> 100` ladder.
+- Current documented UI snapshot:
+  - `Total XP: 86`
+  - `Level: 16`
+  - `Next Level XP: 93`
+- Updated the docs guidance so active online surfaces use current `Online Duel` wording, while older `Online Duel Lab` notes remain only as historical patch-log context.

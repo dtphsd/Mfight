@@ -1,9 +1,9 @@
 # PROJECT-INFO - Fight Club
 
-> Last updated: 2026-03-16 02:35 MSK
+> Last updated: 2026-03-20 01:00 MSK
 
 **Project:** Fight Club  
-**Type:** browser-only SPA / combat sandbox  
+**Type:** browser-first SPA plus local online-duel authority slice  
 **Stack:** React 19, TypeScript, Vite, Vitest, ESLint, Zod  
 **Current state:** working combat sandbox with Battle Kings item imports, zone-based armor, cooldown-aware item skills, consumables, stackable timed status effects, a rich combat log, and a combat rules reference screen
 
@@ -30,16 +30,21 @@ The app root now also contains a local planning workflow:
 - `fight-club/docs/architecture/combat-design-reference.md` as the current source-of-truth combat runtime reference
 - `fight-club/docs/architecture/hunting-mvp-blueprint.md` as the original architecture blueprint for the autonomous hunting module
 - `fight-club/docs/architecture/hunting-runtime-reference.md` as the live hunting runtime reference and verification guide
-- `fight-club/ART/Avatars/` as the raw character-art source folder for combat silhouettes
+- `fight-club/Art/Avatars/` as the raw character-art source folder for combat silhouettes
 - `fight-club/BazaBK/` as the local Battle Kings HTML/image/catalog workspace
 
 It has:
 
-- no backend
-- no API
 - no auth
 - no real database
 - no router
+- no external third-party API dependency in the live player flow
+
+It now also has a first local backend slice:
+
+- `fight-club/server/` hosts the online-duel HTTP authority runtime
+- `npm run online:server` starts the local duel service
+- the frontend prefers that HTTP/SSE backend and falls back to the in-memory authority seam when the server is unavailable
 
 The main implemented user flow is:
 
@@ -60,6 +65,25 @@ The app now also has a second live flow:
 - resolve the completed session
 - claim rewards into shared inventory
 - gain hunter EXP and continue the hunting loop
+
+The app also exposes a shared specialist console through `Ecosystem Agents`:
+
+- `Combat Master`
+- `UI Master`
+- `Backend Master`
+
+The app also now exposes a separate `Online Duel` screen:
+
+- backend-first `1v1` host / join surface with local fallback
+- room-code based entry flow
+- single active `Your Side` match panel in the normal player flow
+- pre-fight ready check and live match-status summary
+- in-screen round planner for attack zone and two defense zones before round submit
+- server-owned `Leave Room` and `Play Another Match`
+- SSE-driven sync, reconnect recovery, and room lifecycle ownership in the backend slice
+- reconnect / timeout / session diagnostics hidden behind debug tools
+- powered by the local HTTP authority service first, with in-memory authority fallback
+- intentionally isolated from the main `Combat Sandbox`
 
 ---
 
@@ -99,6 +123,19 @@ The app now also has a second live flow:
 - explicit reward-claim bridge into shared inventory
 - first hunting screen shell with menu navigation
 - save-backed offline return and compact lodge UI
+
+### Online Duel Backend
+
+- authority-owned duel-room domain in `src/modules/arena/`
+- local Node HTTP service in `server/`
+- `POST /api/online-duel/message` authority endpoint
+- `GET /api/online-duel/events` SSE stream for room updates
+- revision-tagged room sync
+- resume-token recovery
+- event-cursor replay
+- session handoff ownership
+- server-owned rematch and leave-room flows
+- live two-client validation test coverage
 
 ### Combat Runtime
 
@@ -263,13 +300,19 @@ There is also a dedicated balance runner:
 - `fight-club/src/content/hunting/pets.ts`
 - `fight-club/src/ui/hooks/useHuntingSandbox.ts`
 - `fight-club/src/ui/screens/Hunting/HuntingScreen.tsx`
+- `fight-club/src/ui/screens/CombatAgent/CombatAgentScreen.tsx`
+- `fight-club/src/modules/arena/application/*`
+- `fight-club/src/modules/arena/model/OnlineDuel.ts`
+- `fight-club/src/ui/screens/OnlineDuel/OnlineDuelScreen.tsx`
+- `fight-club/server/onlineDuelHttpServer.ts`
+- `fight-club/server/onlineDuelServer.ts`
 
 ---
 
 ## Constraints
 
-- no server trust boundary
-- no multiplayer
+- no auth or account trust boundary yet
+- no real networked multiplayer yet
 - bot now uses build-aware skill planning, but still does not use consumables
 - sandbox bot stat allocations are clipped to the current player allocation budget
 - persistence still means browser `localStorage`, not a real save profile system
@@ -291,6 +334,8 @@ These files are the highest-risk change points:
 - `fight-club/src/ui/components/combat/battleLogFormatting.ts`
 - `fight-club/src/ui/components/combat/ItemPresentationCard.tsx`
 - `fight-club/src/content/items/starterItems.ts`
+- `fight-club/src/modules/arena/application/handleOnlineDuelClientMessage.ts`
+- `fight-club/server/onlineDuelHttpServer.ts`
 
 Reason:
 
@@ -312,7 +357,7 @@ Current validated state:
 
 Current automated coverage count:
 
-- `22` test files / `127` tests
+- `28` test files / `178` tests
 
 ---
 
@@ -326,6 +371,7 @@ npm run dev
 npm run test
 npm run lint
 npm run build
+npm run online:server
 npm run balance:matrix
 ```
 
@@ -338,4 +384,4 @@ From repo root:
 
 ---
 
-> Last updated: 2026-03-16 02:35 MSK
+> Last updated: 2026-03-20 01:00 MSK

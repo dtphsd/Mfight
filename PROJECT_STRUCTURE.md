@@ -1,6 +1,6 @@
 # PROJECT_STRUCTURE - Fight Club
 
-> Last updated: 2026-03-16 13:55 MSK
+> Last updated: 2026-03-20 01:00 MSK
 
 **Project root:** `c:/Users/dtphs/.vscode/Project`
 
@@ -21,13 +21,15 @@ Main app tree:
 
 ```text
 fight-club/
-|-- ART/                   # Raw art source files for avatars and future visual assets
+|-- Art/                   # Raw art source files for avatars and future visual assets
 |-- BazaBK/                # Local Battle Kings HTML dump, images, parsed catalogs, and normalized sources
+|-- TAMA_start/            # Specialist-agent journals, patch notes, workflow rules, and visualizer
 |-- features/              # Feature-level task and change tracking docs
 |-- MASTER-PLAN.md         # Global master plan for active tasks and sprint history
 |-- docs/                  # Local project notes, backup points, and balance artifacts
 |-- node_modules/          # Installed packages
 |-- scripts/               # Helper scripts
+|-- server/                # Local online-duel HTTP authority runtime
 |-- src/                   # App source
 |-- tests/                 # Unit and UI tests
 |-- dist/                  # Generated production build output
@@ -44,7 +46,7 @@ fight-club/
 Notes:
 
 - `dist/` is generated output, never source
-- `ART/Avatars/` now stores the raw `.png` source portraits; `src/assets/combat/*.jpg` are the compressed runtime silhouettes
+- `Art/Avatars/` now stores the raw `.png` source portraits; `src/assets/combat/*.jpg` are the compressed runtime silhouettes
 - `BazaBK/` now stores raw library dump, normalized pages, item images, and generated parsed JSON artifacts
 - Vite and Vitest now keep the TypeScript config sources only; generated JS sidecars and `tsbuildinfo` files are not part of the tracked project structure
 - `docs/balance/` stores generated preset matchup reports
@@ -61,6 +63,8 @@ Notes:
 - `features/_TEMPLATE.md` - base template for feature tracking files
 - `features/ui-ux-refactor.md` - current tracked refactor thread for UI / UX audit and planning
 - `features/combat-design-reference.md` - tracked combat-system documentation and safety workstream
+- `features/backend-agent.md` - tracked backend specialist setup and online-architecture memory surface
+- `features/online-duel-1v1.md` - tracked backend-authoritative roadmap and phased implementation plan for real `1v1 online`
 - `features/hunting-mvp.md` - tracked MVP scope and implementation roadmap for the autonomous hunting module
 - `docs/README.md` - docs home page for GitBook-style navigation
 - `docs/SUMMARY.md` - GitBook navigation tree for the primary documentation flow
@@ -87,6 +91,7 @@ Notes:
 - `run-build-matrix.ts` - TypeScript helper version of the same balance matrix logic
 - `parse-bazakbk-pages.mjs` - parses normalized local Battle Kings HTML pages into item catalogs
 - `generate-bazakbk-starter-items.mjs` - generates the live starter item pool from parsed Battle Kings data
+- `generate-specialist-entry.mjs` - prints the next specialist journal / patch-note templates for combat, UI, or backend masters
 
 ---
 
@@ -116,7 +121,7 @@ src/
 
 ## `src/app`
 
-- `App.tsx` - screen switcher for menu, rules, and sandbox
+- `App.tsx` - screen switcher for menu, rules, combat, hunting, agents, and online duel
 - `providers/AppProviders.tsx` - React provider shell
 - `config/gameConfig.ts` - gameplay/save config
 - `bootstrap/createGameApp.ts` - logger, RNG, storage, and app services bootstrap
@@ -219,13 +224,24 @@ Current item model supports:
 - gear, tool, and pet-lite modifiers
 - first module tests for start, resolve, claim, progression, and loadout bonuses
 
-### Stub modules
+### Future and expanding modules
 
-- `arena`
+- `arena` - now hosts the first authority-ready `1v1 online` duel-room domain and transport contracts
 - `shop`
 - `commentator`
 
-These now keep only partial contracts, models, and events for future expansion; placeholder application stubs were removed from the live tree.
+`shop` and `commentator` still remain mostly future-facing. `arena` is no longer only a stub: it now owns the first backend-safe room lifecycle layer for online duels.
+
+### `server`
+
+- `onlineDuelHttpServer.ts` - local HTTP authority service for online-duel messages and SSE room updates
+- `onlineDuelServer.ts` - Node entrypoint used by `npm run online:server`
+
+Current backend facts:
+
+- the frontend now prefers this local HTTP/SSE authority runtime when it is reachable
+- the UI falls back to the in-memory duel authority only when the local server is unavailable
+- live verification now includes dedicated server tests and a two-client end-to-end room validation
 
 ---
 
@@ -309,6 +325,7 @@ Backup policy:
 - `Combat/combatSandboxScreenTargeting.tsx` - extracted attack-target and defense-zone selection UI
 - `CombatRules/CombatRulesScreen.tsx`
 - `Hunting/HuntingScreen.tsx`
+- `CombatAgent/CombatAgentScreen.tsx`
 - `components/profile/ProfileModal.tsx` - local profile card with mailbox mini modal, reply flow, and direct letters
 - `CombatRules/combatRulesContent.ts` - localized Combat Codex content
 - `CombatRules/combatRulesFacts.ts` - generated item/skill facts from live starter content
@@ -319,6 +336,13 @@ Current UI facts:
 - consumables come from inventory
 - hunting is now accessible from the main menu through `Hunting Lodge`
 - hunting has its own live UI shell, separate from combat sandbox
+- `Ecosystem Agents` now includes `Combat Master`, `UI Master`, and `Backend Master`
+- `Online Duel` is now accessible from the main menu as a separate host/join prototype over the local online-duel backend seam
+- the screen now uses room code entry, a single active `Your Side` panel in the normal flow, and a live match-status summary
+- round submission now goes through an on-screen planner for attack zone plus two defense zones
+- disconnect/reconnect/session reset controls are now hidden in `Debug Tools` instead of the main player flow
+- the room flow now includes server-owned `Leave Room` and `Play Another Match`
+- the screen still includes a safe timeout trigger for stale-room verification against the local authority layer
 - status effects live above HP to avoid spending extra vertical space
 - combat impact text and block/crit/break visuals now use one-shot pulse wiring plus fade-safe CSS so overlays do not reappear after their animation ends
 - hover popups for items and effects are now part of the real live UI contract
@@ -373,22 +397,28 @@ Current test files cover:
 - combat sandbox screen
 - hunting
 - hunting persistence
+- online duel arena domain
+- online duel HTTP server
+- live two-client online duel validation
+- combat-agent progression
 
 Current status:
 
 - `npm run build` passes
 - `npm run test` passes
 - `npm run lint` passes
+- `npm run docs:validate` passes
 - `npm run balance:matrix` writes current matchup artifacts to `docs/balance/`
+- current coverage is `28` test files / `178` tests
 
 ---
 
 ## Structural Notes
 
 - this is still one frontend project, not a monorepo
-- no backend/API tree exists
+- the repo now also contains a small local backend tree under `server/` for `Online Duel`
 - bootstrap is currently minimal and direct through `createGameApp.ts`, not a full dependency-registration graph
 
 ---
 
-> Last updated: 2026-03-16 13:55 MSK
+> Last updated: 2026-03-20 01:00 MSK

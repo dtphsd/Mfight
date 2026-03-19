@@ -1,6 +1,6 @@
 # Fight Club Docs
 
-> Last updated: 2026-03-16 02:42 MSK
+> Last updated: 2026-03-20 01:00 MSK
 
 This folder is the GitBook-ready documentation set for the `Fight Club` project.
 
@@ -12,6 +12,7 @@ The current docs baseline now reflects:
 - zone-based armor and roll-based block
 - cooldown-aware combat skills
 - synchronized `Combat Rules` content and verification guidance
+- the current backend-first `Online Duel` host/join flow with room code, SSE sync, and live two-client verification
 
 ---
 
@@ -47,6 +48,7 @@ For GitBook navigation, use [SUMMARY.md](./SUMMARY.md).
 - [Architecture Overview](./architecture/overview.md)
 - [Combat Design Reference](./architecture/combat-design-reference.md)
 - [Combat System Roadmap](./architecture/combat-system-roadmap.md)
+- [Hunting Runtime Reference](./architecture/hunting-runtime-reference.md)
 
 ### Decisions
 
@@ -71,6 +73,8 @@ These operational folders are useful for engineering work, but they are not the 
 - If documentation diverges from runtime behavior, update the docs from real code.
 - Combat-system changes must keep the combat reference synchronized.
 - UI and player-facing rule explanations must stay aligned with runtime and generated facts.
+- online-duel screen flow and docs must use the current product names, not retired `Lab` wording.
+- specialist-master docs should derive visible level progression from `Total XP`, not from stale hardcoded level values.
 
 ---
 
@@ -91,4 +95,4 @@ These operational folders are useful for engineering work, but they are not the 
 
 ---
 
-> Last updated: 2026-03-16 02:42 MSK
+> Last updated: 2026-03-20 01:00 MSK

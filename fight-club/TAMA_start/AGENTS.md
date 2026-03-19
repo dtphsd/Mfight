@@ -37,6 +37,7 @@
   - `evolution_journal.md`
   - `README.md`
 - If the project also uses a specialist journal such as `combat_agent_journal.md`, sync that surface too when workflow, parser, or user-facing rules change.
+- If the project also uses `backend_agent_journal.md` and `backend_patch_notes.md`, keep those surfaces in sync too when backend-specialist behavior, parser assumptions, or visible specialist-console rules change.
 - If the project uses `ui_agent_journal.md` and `ui_patch_notes.md`, keep those surfaces in sync too when UI-specialist behavior, parser assumptions, or visible specialist-console rules change.
 - Prefer additive changes over format-breaking rewrites.
 - If introducing a new field, document it in the workflow and keep old journal content parseable when possible.
@@ -54,5 +55,7 @@
 - The visualizer currently extracts `STATUS_JSON` and `EVO_JSON` directly from Markdown comments.
 - The visualizer can also extract combat-specialist data from `COMBAT_AGENT_JSON` and `CMB_JSON` comment blocks when they exist.
 - The in-app `Ecosystem Agents` console now also reads UI-specialist data from `ui_agent_journal.md` and `ui_patch_notes.md`, reusing the same machine-readable block shape.
+- The in-app `Ecosystem Agents` console now also reads backend-specialist data from `backend_agent_journal.md` and `backend_patch_notes.md`, reusing the same machine-readable block shape.
+- The specialist consoles now derive visible level progression from journal `Total XP` on the shared `1 -> 100` TAMA ladder, so journals should not leave stale hardcoded `Level: 1` blocks behind once XP grows.
 - The visualizer also reads the Pattern and Anti-Pattern tables from Markdown text, so structural changes to those sections are high-risk.
 - The content appears intended for UTF-8; keep new files and edits UTF-8-friendly and avoid accidental encoding regressions.

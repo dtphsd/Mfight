@@ -1,6 +1,6 @@
 # UI Agent Journal
 
-> Last updated: 2026-03-19 17:22 MSK
+> Last updated: 2026-03-20 01:00 MSK
 
 **Agent:** Interface Systems Specialist  
 **Project:** Fight Club  
@@ -88,22 +88,23 @@ XP rule:
 
 - Name: Interface Systems Specialist
 - Rank: Initiate
-- Level: 1
-- Total XP: 49
-- Next Rank XP: 50
+- Level: 16
+- Total XP: 86
+- Next Level XP: 93
 
 ## Mastery Tracks
 
 - Visual Systems: 10
-- Interaction Design: 14
-- UX Clarity: 21
+- Interaction Design: 22
+- UX Clarity: 23
 - Interaction Design: 15
-- Design Consistency: 9
-- UI Safety: 7
+- Design Consistency: 14
+- UI Safety: 9
 
 ## Achievements
 
-- None yet
+- Safe Online Dock
+- Ready Room
 
 <!-- COMBAT_AGENT_JSON
 {
@@ -111,31 +112,175 @@ XP rule:
   "role": "UI Systems Agent",
   "domain": "Fight Club UI, UX, interaction flow and presentation systems",
   "summary": "Tracks UI bugs, interaction drift, design-system lessons, UI-safe fixes, and readable interface evolution over time.",
-  "level": 1,
+  "level": 16,
   "rank": "Initiate",
-  "xpCurrent": 49,
-  "xpNext": 50,
-  "entries": 12,
+  "xpCurrent": 86,
+  "xpNext": 93,
+  "entries": 18,
   "bugsLogged": 2,
   "bugsKilled": 2,
-  "safeFixes": 12,
+  "safeFixes": 18,
   "battleWins": 0,
-  "achievements": [],
+  "achievements": ["Safe Online Dock", "Ready Room"],
   "tags": ["Visual Systems", "Interaction Design", "UX Clarity", "Design Consistency", "UI Safety"],
   "tracks": [
     { "label": "Visual Systems", "value": 20 },
-    { "label": "Interaction Design", "value": 30 },
-    { "label": "UX Clarity", "value": 40 },
-    { "label": "Design Consistency", "value": 18 },
-    { "label": "UI Safety", "value": 14 }
+    { "label": "Interaction Design", "value": 42 },
+    { "label": "UX Clarity", "value": 42 },
+    { "label": "Design Consistency", "value": 31 },
+    { "label": "UI Safety", "value": 24 }
   ],
-  "lastUpdated": "2026-03-19T17:22:00+03:00"
+  "lastUpdated": "2026-03-20T01:00:00+03:00"
 }
 -->
 
 ---
 
 ## UI Entries
+
+### UI-018 - Online Duel Screen Stopped Acting Like A Two-Operator Lab
+**Date**: 2026-03-19
+**Impact**: 6/10
+**XP**: +6
+**Track**: Interaction Design | UX Clarity | UI Safety
+**Type**: UX Improvement
+**Achievement**: none
+
+#### What happened
+The online prototype was cleaned from `Online Duel Lab` into a more product-like `Online Duel` screen with `Create Room`, `Join Match`, `Match Status`, separate `Host Side` / `Guest Side` views, and a small round planner for attack and defense zones.
+
+#### Why it mattered
+The original lab screen proved the seam, but it still looked like two developers driving both clients from one debugging console. Moving lifecycle controls under `Debug Tools` and promoting the room flow made the screen feel like a match surface instead of a transport demo.
+
+#### UI lesson
+Once a prototype proves the system boundary, the next UI job is to remove debug-first framing from the default path and let the real player journey become the primary layout.
+
+#### Pattern
+Keep risky lifecycle controls available behind an explicit debug toggle, while the default multiplayer screen focuses on room entry, ready check, and turn planning.
+
+<!-- CMB_JSON
+{"id":"UI-018","date":"2026-03-19","impact":6,"xp":6,"track":"Interaction Design","achievement":"none","type":"UX Improvement","title":"Online Duel Screen Stopped Acting Like A Two-Operator Lab"}
+-->
+
+### UI-017 - Online Duel Lab Learned To Surface Timeout Failure Safely
+**Date**: 2026-03-19
+**Impact**: 5/10
+**XP**: +5
+**Track**: Interaction Design | UI Safety
+**Type**: UI Systems
+**Achievement**: none
+
+#### What happened
+The `Online Duel Lab` gained a dedicated `Force Timeout` control so stale-room handling can be surfaced and verified in the prototype without waiting on real elapsed time.
+
+#### Why it mattered
+Timeout behavior is part of multiplayer UX, not only backend hygiene. The lab can now demonstrate abandoned-room state directly instead of hiding that safety rule in tests and patch notes.
+
+#### UI lesson
+If a backend safety rule affects room lifecycle, give the prototype a visible way to exercise it.
+
+#### Pattern
+Expose debug-safe lifecycle triggers in prototype multiplayer UI so authority rules stay reviewable.
+
+<!-- CMB_JSON
+{"id":"UI-017","date":"2026-03-19","impact":5,"xp":5,"track":"Interaction Design","achievement":"none","type":"UI Systems","title":"Online Duel Lab Learned To Surface Timeout Failure Safely"}
+-->
+
+### UI-016 - Online Duel Lab Learned To Show Room Identity And Offline State
+**Date**: 2026-03-19
+**Impact**: 6/10
+**XP**: +6
+**Track**: Interaction Design | Design Consistency | UI Safety
+**Type**: UI Systems
+**Achievement**: none
+
+#### What happened
+The `Online Duel Lab` now surfaces a dedicated room code, explicit disconnect and reconnect controls for both seats, and participant cards that distinguish `Ready`, `Waiting`, and `Offline` instead of flattening everything into one status word.
+
+#### Why it mattered
+The backend had already learned connection truth, so the UI needed to stop hiding that state in raw message JSON. The lab now reads more like a real room surface and less like a transport debugger.
+
+#### UI lesson
+If a multiplayer prototype gains a new authority state, surface it directly in the room UI instead of expecting users to infer it from logs.
+
+#### Pattern
+Promote room identity and connection state into first-class lobby UI before adding more match controls.
+
+<!-- CMB_JSON
+{"id":"UI-016","date":"2026-03-19","impact":6,"xp":6,"track":"Interaction Design","achievement":"none","type":"UI Systems","title":"Online Duel Lab Learned To Show Room Identity And Offline State"}
+-->
+
+### UI-014 - Online Duel Lab Opened A Safe UI Dock For Multiplayer
+**Date**: 2026-03-19
+**Impact**: 5/10
+**XP**: +8
+**Track**: Interaction Design | UX Clarity
+**Type**: Prototype Surface
+**Achievement**: Safe Online Dock
+
+#### What happened
+The first online-duel UI surface was added as a separate `Online Duel Lab` screen with host, join, sync, submit, and server-message feedback over the local backend seam.
+
+#### Why it mattered
+The project can now validate online interaction flow without injecting fragile multiplayer controls into the main combat sandbox before the backend stack is stable enough.
+
+#### UI lesson
+When a new system is still experimental, give it its own explicit lab surface instead of overloading a stable gameplay screen.
+
+#### Pattern
+Prototype risky cross-domain UX in a separate lab before merging it into the main game loop.
+
+<!-- CMB_JSON
+{"id":"UI-014","date":"2026-03-19","impact":5,"xp":8,"track":"Interaction Design","achievement":"Safe Online Dock","type":"Prototype Surface","title":"Online Duel Lab Opened A Safe UI Dock For Multiplayer"}
+-->
+
+### UI-015 - Online Duel Lab Stopped Skipping Pre-Fight Consent
+**Date**: 2026-03-19
+**Impact**: 5/10
+**XP**: +8
+**Track**: UX Clarity | UI Safety
+**Type**: UX Improvement
+**Achievement**: Ready Room
+
+#### What happened
+The `Online Duel Lab` gained a real pre-fight lobby with ready and unready controls, and both client panels now show each participant's readiness state before attacks can be submitted.
+
+#### Why it mattered
+The earlier prototype proved the transport and authority flow, but it skipped the social and timing contract players expect before a match begins. The lab now communicates start intent instead of looking like two clients can instantly force combat.
+
+#### UI lesson
+For multiplayer flows, a visible pre-fight confirmation step is part of the interface truth, not optional garnish.
+
+#### Pattern
+Show explicit ready state and gate the first combat action behind it whenever the room represents more than one human-controlled participant.
+
+<!-- CMB_JSON
+{"id":"UI-015","date":"2026-03-19","impact":5,"xp":8,"track":"UI Safety","achievement":"Ready Room","type":"UX Improvement","title":"Online Duel Lab Stopped Skipping Pre-Fight Consent"}
+-->
+
+### UI-013 - Specialist Console Scaled To A Third Master Without Forking The Shell
+**Date**: 2026-03-19
+**Impact**: 4/10
+**XP**: +4
+**Track**: Design Consistency
+**Type**: UI Systems
+**Achievement**: none
+
+#### What happened
+The shared `Ecosystem Agents` console was extended to include `Backend Master` while preserving the same shell, metrics, timeline, and patch-note interaction model already used by the existing specialists.
+
+#### Why it mattered
+Adding a third specialist by cloning the same shell keeps the hub scalable and predictable. It avoids fragmenting the specialist experience into multiple unrelated screens as the project grows.
+
+#### UI lesson
+When a specialist system expands, scale the existing shell before inventing a second UI language.
+
+#### Pattern
+Grow specialist consoles through mirrored data channels and tab expansion, not separate one-off screens.
+
+<!-- CMB_JSON
+{"id":"UI-013","date":"2026-03-19","impact":4,"xp":4,"track":"Design Consistency","achievement":"none","type":"UI Systems","title":"Specialist Console Scaled To A Third Master Without Forking The Shell"}
+-->
 
 ### UI-012 - Snapshot Stopped Presenting Base Crit As If It Were Matchup Truth
 **Date**: 2026-03-19
@@ -468,4 +613,4 @@ As the UI agent becomes real, keep this journal focused on meaningful UI lessons
 
 ---
 
-> Last updated: 2026-03-19 17:22 MSK
+> Last updated: 2026-03-19 22:55 MSK

@@ -1,6 +1,6 @@
 # Combat Agent Journal
 
-> Last updated: 2026-03-19 01:05 MSK
+> Last updated: 2026-03-20 01:00 MSK
 
 **Agent:** Arena Systems Specialist  
 **Project:** Fight Club  
@@ -89,9 +89,9 @@ XP rule:
 
 - Name: Arena Systems Specialist
 - Rank: Initiate
-- Level: 1
-- Total XP: 46
-- Next Rank XP: 50
+- Level: 10
+- Total XP: 48
+- Next Level XP: 51
 
 ## Mastery Tracks
 
@@ -99,7 +99,7 @@ XP rule:
 - AI Tactics: 11
 - Balance Analysis: 12
 - Systems Design: 19
-- Combat Safety: 8
+- Combat Safety: 10
 
 ## Achievements
 
@@ -112,14 +112,14 @@ XP rule:
   "role": "Combat Master",
   "domain": "Fight Club combat systems",
   "summary": "Tracks combat bugs, planner drift, balance lessons, safe fixes, and combat truth so the battle system gets smarter over time.",
-  "level": 1,
+  "level": 10,
   "rank": "Initiate",
-  "xpCurrent": 46,
-  "xpNext": 50,
-  "entries": 7,
+  "xpCurrent": 48,
+  "xpNext": 51,
+  "entries": 8,
   "bugsLogged": 1,
   "bugsKilled": 1,
-  "safeFixes": 5,
+  "safeFixes": 6,
   "battleWins": 0,
   "achievements": ["Skill Smith", "Arena Surgeon"],
   "tags": ["Formula Mastery", "AI Tactics", "Balance Analysis", "Systems Design", "Combat Safety"],
@@ -128,15 +128,39 @@ XP rule:
     { "label": "AI Tactics", "value": 22 },
     { "label": "Balance Analysis", "value": 24 },
     { "label": "Systems Design", "value": 38 },
-    { "label": "Combat Safety", "value": 16 }
+    { "label": "Combat Safety", "value": 20 }
   ],
-  "lastUpdated": "2026-03-19T01:05:00+03:00"
+  "lastUpdated": "2026-03-20T01:00:00+03:00"
 }
 -->
 
 ---
 
 ## Combat Entries
+
+### CMB-008 - Combat Master Surface Stayed Stable During Specialist Console Expansion
+**Date**: 2026-03-19
+**Impact**: 2/10
+**XP**: +2
+**Track**: Combat Safety
+**Type**: Docs Sync
+**Achievement**: none
+
+#### What happened
+The shared `Ecosystem Agents` console was expanded to include `Backend Master`, while `Combat Master` kept the same journal, patch-note, and progression surface.
+
+#### Why it mattered
+Shared specialist UI changes can still break combat memory surfaces even when combat formulas stay untouched. Keeping the combat specialist stable during shell growth is part of combat-safe maintenance.
+
+#### Combat lesson
+When shared specialist infrastructure changes, verify that combat memory surfaces still point to the same truth channels.
+
+#### Pattern
+Treat shared specialist-console changes as combat-safety work if they can affect combat-facing memory surfaces.
+
+<!-- CMB_JSON
+{"id":"CMB-008","date":"2026-03-19","impact":2,"xp":2,"track":"Combat Safety","achievement":"none","type":"Docs Sync","title":"Combat Master Surface Stayed Stable During Specialist Console Expansion"}
+-->
 
 ### CMB-007 - Burst And Control Intent Weighting Exposed The Next Planner Bottleneck
 **Date**: 2026-03-19
@@ -357,7 +381,7 @@ Use this quick intake checklist:
 
 ---
 
-> Last updated: 2026-03-19 01:05 MSK
+> Last updated: 2026-03-19 18:05 MSK
 - `Combat Tooling`
 - `Regression Safety`
 - `Future Systems`

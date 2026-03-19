@@ -9,6 +9,12 @@ It gives us:
 - a local visualizer: `visualizer/index.html`
 - an optional specialist system, now used by the in-app `Ecosystem Agents` hub
 
+All specialist masters now share one progression rule:
+
+- `Total XP` is the source of truth
+- the UI derives `Level` and `Next Level XP` from that total on a shared `1 -> 100` TAMA ladder
+- journals should not leave stale hardcoded `Level: 1` values behind once XP increases
+
 ---
 
 ## Quick Start
@@ -29,6 +35,9 @@ TAMA_start/
 |-- combat_agent_profile.md
 |-- combat_agent_journal.md
 |-- combat_patch_notes.md
+|-- backend_agent_profile.md
+|-- backend_agent_journal.md
+|-- backend_patch_notes.md
 |-- ui_agent_journal.md
 |-- ui_patch_notes.md
 |-- .agents/
@@ -44,12 +53,14 @@ TAMA_start/
 
 - `evolution_journal.md` remains the main source of truth for broad project evolution.
 - `combat_agent_journal.md` is the specialist source of truth for combat-only growth.
+- `backend_agent_journal.md` is the specialist source of truth for backend-only growth.
 - `ui_agent_journal.md` is the specialist source of truth for UI-only growth.
 - `visualizer/index.html` is a parser/viewer, not the source of truth.
 - If workflow rules change, sync:
   - `.agents/workflows/auto-evolution.md`
   - `evolution_journal.md`
   - `combat_agent_journal.md` when combat-agent behavior is affected
+  - `backend_agent_journal.md` when backend-agent behavior is affected
   - `ui_agent_journal.md` when UI-agent behavior is affected
   - `AGENTS.md`
 
@@ -73,6 +84,10 @@ Use these files for it:
 - `combat_patch_notes.md` for combat-only patch history
 - `features/combat-agent.md` for mission, workflow, and operational boundaries
 
+Current documented snapshot:
+
+- `Combat Master`: `48 Total XP`, `Level 10`, `Next Level XP 51`
+
 When a combat-system issue is found or fixed, the AI should update:
 
 1. `evolution_journal.md` if the lesson matters project-wide
@@ -91,6 +106,10 @@ Use these files for it:
 - `ui_agent_journal.md` for UI bugs, UI lessons, safe fixes, and progression
 - `ui_patch_notes.md` for UI-only patch history
 
+Current documented snapshot:
+
+- `UI Master`: `86 Total XP`, `Level 16`, `Next Level XP 93`
+
 When a meaningful UI issue is found or fixed, the AI should update:
 
 1. `evolution_journal.md` if the lesson matters project-wide
@@ -104,16 +123,48 @@ The expected operating rule is:
 
 ---
 
+## Backend Master
+
+This repository now also treats `Backend Master` as a first-class specialist agent built on the same specialist-shell pattern.
+
+It uses the same evolution ideas as the other specialists, but for backend architecture, service truth, realtime sync, and deployment safety.
+
+Use these files for it:
+
+- `backend_agent_profile.md` for backend rank, track, and achievement guidance
+- `backend_agent_journal.md` for backend bugs, backend lessons, safe fixes, and progression
+- `backend_patch_notes.md` for backend-only patch history
+- `features/backend-agent.md` for mission and operating boundaries
+
+Current documented snapshot:
+
+- `Backend Master`: `99 Total XP`, `Level 17`, `Next Level XP 100`
+
+When a meaningful backend issue is found or fixed, the AI should update:
+
+1. `evolution_journal.md` if the lesson matters project-wide
+2. `backend_agent_journal.md` for the backend-specialist record
+3. `backend_patch_notes.md` for the visible backend-facing patch history
+
+The expected operating rule is:
+
+- meaningful backend changes should be reflected in `backend_patch_notes.md`
+- meaningful backend lessons, bugs, reusable patterns, and verified fixes should also be reflected in `backend_agent_journal.md`
+
+---
+
 ## Specialist Entry Helper
 
 To reduce manual entry work, the project now includes a small helper script:
 
 - `npm run specialist:entry -- combat`
 - `npm run specialist:entry -- ui`
+- `npm run specialist:entry -- backend`
 
 It prints:
 
 - the next journal entry template with the next `CMB-NNN` or `UI-NNN` id
+- the next journal entry template with the next `BE-NNN` id for backend work
 - a matching patch-note template for the same specialist domain
 
 This helper does not write files automatically. It is meant to reduce format drift while keeping the final journal edit intentional.
@@ -126,9 +177,14 @@ The app now exposes the specialist system through a shared `Ecosystem Agents` sc
 
 Inside that hub:
 
-- `Combat Master` and `UI Master` share one visual shell
+- `Combat Master`, `UI Master`, and `Backend Master` share one visual shell
 - each specialist keeps separate journals and patch notes
 - activity logs, XP, achievements, impact, type, and patch-note modals are fed from each specialist's own markdown data
+
+The current online-duel workstream should now be described with the live product name:
+
+- use `Online Duel` for the active screen
+- reserve old `Online Duel Lab` wording only for historical notes that describe the earlier prototype stage
 
 ---
 
@@ -158,6 +214,7 @@ The AI should automatically:
 
 - add general evolution entries after meaningful fixes
 - add combat-specialist entries after meaningful combat fixes
+- add backend-specialist entries after meaningful backend fixes
 - extract patterns and anti-patterns
 - increment XP and progression counters
 - keep specialist counters honest:
@@ -203,6 +260,7 @@ For this repository, that now means:
 
 - broad project memory in `evolution_journal.md`
 - combat-system memory in `combat_agent_journal.md`
+- backend-system memory in `backend_agent_journal.md`
 - UI-system memory in `ui_agent_journal.md`
 
-Both should level up over time.
+All specialist masters should level up over time on the same shared progression ladder.

@@ -1,6 +1,6 @@
 # Arena Systems Specialist Profile
 
-> Last updated: 2026-03-17 12:35 MSK
+> Last updated: 2026-03-20 01:00 MSK
 
 **Agent Name:** Arena Systems Specialist  
 **Domain:** Fight Club combat systems  
@@ -51,6 +51,13 @@ An arena engineer who keeps the combat ecosystem healthy, readable, testable, an
 ---
 
 ## XP Rules
+
+The in-app specialist console now resolves mastery progression on a shared TAMA-style scale:
+
+- levels run from `1` to `100`
+- journal `Total XP` is the source of truth
+- displayed `Level` and `Next Level XP` should be derived from that total, not hardcoded manually
+- the first tier spans `0 -> 51 XP`, then later tiers widen so higher levels take more XP to earn
 
 ### Small Progress
 
@@ -206,7 +213,7 @@ Use this as the living profile block.
 - Rank: Initiate
 - Level: 1
 - Total XP: 0
-- Next Rank XP: 50
+- Next Level XP: 5
 
 ## Mastery Tracks
 
@@ -243,8 +250,8 @@ Use this as the living profile block.
 
 ## Next Step
 
-When the combat agent is implemented for real, this file should become the live source of combat XP, rank, achievements, and mastery growth.
+When the combat agent is implemented for real, this file should become the live source of combat XP, rank, achievements, and mastery growth, while the UI derives level progression from `Total XP` on the shared 100-level ladder.
 
 ---
 
-> Last updated: 2026-03-17 12:35 MSK
+> Last updated: 2026-03-20 01:00 MSK

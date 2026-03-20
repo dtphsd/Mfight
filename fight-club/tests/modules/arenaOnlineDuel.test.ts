@@ -14,6 +14,25 @@ import { createBasicAttackAction } from "@/modules/combat";
 import { buildCombatSnapshot } from "@/orchestration/combat/buildCombatSnapshot";
 
 describe("online duel arena domain", () => {
+  function stripCombatState<T>(value: T): T {
+    if (Array.isArray(value)) {
+      return value.map((entry) => stripCombatState(entry)) as T;
+    }
+
+    if (value && typeof value === "object") {
+      const next: Record<string, unknown> = {};
+      for (const [key, entry] of Object.entries(value)) {
+        if (key === "combatState") {
+          continue;
+        }
+        next[key] = stripCombatState(entry);
+      }
+      return next as T;
+    }
+
+    return value;
+  }
+
   function createSnapshots() {
     const first = createCharacter("Alpha");
     const second = createCharacter("Beta");
@@ -535,7 +554,7 @@ describe("online duel arena domain", () => {
     }
 
     const syncBeforeResolve = service.buildStateSync(room.id, "player-alpha");
-    expect(syncBeforeResolve).toEqual({
+    expect(stripCombatState(syncBeforeResolve)).toEqual({
       success: true,
       data: {
         duelId: room.id,
@@ -616,7 +635,7 @@ describe("online duel arena domain", () => {
       snapshot: beta,
     });
 
-    expect(joined).toEqual([
+    expect(stripCombatState(joined)).toEqual([
       {
         type: "duel_state_sync",
         payload: {
@@ -665,7 +684,7 @@ describe("online duel arena domain", () => {
       snapshot: beta,
     });
 
-    expect(joined).toEqual([
+    expect(stripCombatState(joined)).toEqual([
       {
         type: "duel_state_sync",
         payload: {
@@ -737,7 +756,7 @@ describe("online duel arena domain", () => {
       }),
     });
 
-    expect(firstSubmit).toEqual([
+    expect(stripCombatState(firstSubmit)).toEqual([
       {
         type: "duel_state_sync",
         payload: {
@@ -792,7 +811,7 @@ describe("online duel arena domain", () => {
         ],
       },
     });
-    expect(secondSubmit.at(-1)).toEqual({
+    expect(stripCombatState(secondSubmit.at(-1))).toEqual({
       type: "duel_state_sync",
       payload: {
         duelId: room.id,
@@ -822,6 +841,100 @@ describe("online duel arena domain", () => {
             { id: alpha.characterId, name: "Alpha", currentHp: expect.any(Number), maxHp: expect.any(Number) },
             { id: beta.characterId, name: "Beta", currentHp: expect.any(Number), maxHp: expect.any(Number) },
           ],
+        },
+      },
+    });
+  });
+
+  it("returns a fresh sync when round resolution fails so clients can recover room state", () => {
+    const { alpha, beta } = createSnapshots();
+    const service = createInMemoryOnlineDuelService(new SeededRandom(9));
+    const room = service.createRoom({
+      playerId: "player-alpha",
+      sessionId: "session-alpha",
+      displayName: "Alpha",
+      snapshot: alpha,
+      createdAt: 1000,
+    });
+
+    service.joinRoom(room.id, {
+      playerId: "player-beta",
+      sessionId: "session-beta",
+      displayName: "Beta",
+      snapshot: beta,
+      joinedAt: 2000,
+    });
+
+    handleOnlineDuelClientMessage(service, {
+      type: "set_ready",
+      duelId: room.id,
+      seat: "playerA",
+      playerId: "player-alpha",
+      sessionId: "session-alpha",
+      ready: true,
+    });
+    handleOnlineDuelClientMessage(service, {
+      type: "set_ready",
+      duelId: room.id,
+      seat: "playerB",
+      playerId: "player-beta",
+      sessionId: "session-beta",
+      ready: true,
+    });
+
+    handleOnlineDuelClientMessage(service, {
+      type: "submit_round_action",
+      duelId: room.id,
+      seat: "playerA",
+      playerId: "player-alpha",
+      sessionId: "session-alpha",
+      action: createBasicAttackAction({
+        attackerId: alpha.characterId,
+        attackZone: "head",
+        defenseZones: ["chest", "belly"],
+      }),
+    });
+
+    const secondSubmit = handleOnlineDuelClientMessage(service, {
+      type: "submit_round_action",
+      duelId: room.id,
+      seat: "playerB",
+      playerId: "player-beta",
+      sessionId: "session-beta",
+      action: createBasicAttackAction({
+        attackerId: beta.characterId,
+        attackZone: "legs",
+        defenseZones: ["head", "head"],
+      }),
+    });
+
+    expect(secondSubmit.some((message) => message.type === "round_ready")).toBe(true);
+    expect(secondSubmit).toContainEqual({
+      type: "duel_error",
+      duelId: room.id,
+      reason: "duplicate_defense_zones",
+    });
+    expect(stripCombatState(secondSubmit.at(-1))).toEqual({
+      type: "duel_state_sync",
+      payload: {
+        duelId: room.id,
+        roomCode: room.roomCode,
+        revision: 6,
+        status: "ready_to_resolve",
+        round: 1,
+        winnerSeat: null,
+        yourSeat: "playerB",
+        resumeToken: expect.any(String),
+        participants: [
+          { seat: "playerA", displayName: "Alpha", connected: true, ready: true },
+          { seat: "playerB", displayName: "Beta", connected: true, ready: true },
+        ],
+        currentRoundState: {
+          round: 1,
+          submittedSeats: ["playerA", "playerB"],
+          yourActionSubmitted: true,
+          opponentActionSubmitted: true,
+          readyToResolve: true,
         },
       },
     });
@@ -857,7 +970,7 @@ describe("online duel arena domain", () => {
           })();
 
     await betaClient.joinDuel(duelId, beta);
-    expect(betaClient.getLastSync()).toEqual({
+    expect(stripCombatState(betaClient.getLastSync())).toEqual({
       duelId,
       roomCode: expect.any(String),
       revision: 2,
@@ -896,7 +1009,7 @@ describe("online duel arena domain", () => {
 
     expect(betaMessages.some((message) => message.type === "round_ready")).toBe(true);
     expect(betaMessages.some((message) => message.type === "round_resolved")).toBe(true);
-    expect(betaClient.getLastSync()).toEqual({
+    expect(stripCombatState(betaClient.getLastSync())).toEqual({
       duelId,
       roomCode: expect.any(String),
       revision: 7,
@@ -1044,7 +1157,7 @@ describe("online duel arena domain", () => {
     });
 
     expect(disconnected.some((message) => message.type === "connection_updated")).toBe(true);
-    expect(disconnected.at(-1)).toEqual({
+    expect(stripCombatState(disconnected.at(-1))).toEqual({
       type: "duel_state_sync",
       payload: {
         duelId: room.id,
@@ -1083,7 +1196,7 @@ describe("online duel arena domain", () => {
       connected: true,
     });
 
-    expect(reconnected.at(-1)).toEqual({
+    expect(stripCombatState(reconnected.at(-1))).toEqual({
       type: "duel_state_sync",
       payload: {
         duelId: room.id,
@@ -1154,7 +1267,7 @@ describe("online duel arena domain", () => {
       snapshot: beta,
     });
 
-    expect(rejoined).toEqual([
+    expect(stripCombatState(rejoined)).toEqual([
       {
         type: "duel_state_sync",
         payload: {
@@ -1212,7 +1325,7 @@ describe("online duel arena domain", () => {
     expect(expiredCount).toBe(1);
 
     const sync = service.buildStateSync(room.id, "player-alpha");
-    expect(sync).toEqual({
+    expect(stripCombatState(sync)).toEqual({
       success: true,
       data: {
         duelId: room.id,
@@ -1373,7 +1486,7 @@ describe("online duel arena domain", () => {
     });
 
     const freshGuestResume = service.buildStateSync(duelId, "player-beta", betaRejoinSync.resumeToken);
-    expect(freshGuestResume).toEqual({
+    expect(stripCombatState(freshGuestResume)).toEqual({
       success: true,
       data: {
         duelId,
@@ -1433,7 +1546,7 @@ describe("online duel arena domain", () => {
       snapshot: beta,
     });
 
-    expect(handedOff).toEqual([
+    expect(stripCombatState(handedOff)).toEqual([
       {
         type: "duel_state_sync",
         payload: {
@@ -1521,7 +1634,7 @@ describe("online duel arena domain", () => {
       sessionId: "session-alpha",
     });
 
-    expect(rematched).toEqual([
+    expect(stripCombatState(rematched)).toEqual([
       {
         type: "duel_state_sync",
         payload: {
@@ -1581,7 +1694,7 @@ describe("online duel arena domain", () => {
       sessionId: "session-beta",
     });
 
-    expect(left).toEqual([
+    expect(stripCombatState(left)).toEqual([
       {
         type: "duel_state_sync",
         payload: {

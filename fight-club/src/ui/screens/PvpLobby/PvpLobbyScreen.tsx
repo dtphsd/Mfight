@@ -182,6 +182,9 @@ export function PvpLobbyScreen({
     figure: playerFigure,
     playerName,
     equipment: playerEquipment,
+    equipmentState: sandbox.equipment,
+    inventory: sandbox.inventory,
+    equippedSkillIds: sandbox.equippedSkillIds,
   };
 
   return (

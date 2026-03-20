@@ -1,5 +1,7 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { createCharacter } from "@/modules/character";
+import { createEquipment } from "@/modules/equipment";
+import { createStarterInventory } from "@/modules/inventory";
 import { buildCombatSnapshot } from "@/orchestration/combat/buildCombatSnapshot";
 import { OnlineDuelScreen } from "@/ui/screens/OnlineDuel/OnlineDuelScreen";
 
@@ -19,6 +21,9 @@ describe("OnlineDuelScreen", () => {
       figure: "rush-chip" as const,
       playerName: name,
       equipment: [{ slot: "mainHand" as const, item: null }],
+      equipmentState: createEquipment(),
+      inventory: createStarterInventory(),
+      equippedSkillIds: [],
     };
   }
 
@@ -43,9 +48,9 @@ describe("OnlineDuelScreen", () => {
 
     fireEvent.click(screen.getAllByRole("button", { name: "Join Match" })[1]);
     await waitFor(() => {
-      expect(screen.getByText("Combat Arena")).toBeTruthy();
       expect(screen.getByText("Ready check")).toBeTruthy();
       expect(screen.getByText("Fight Controls")).toBeTruthy();
+      expect(screen.getByText("Combat Log")).toBeTruthy();
     });
 
     fireEvent.click(screen.getByRole("button", { name: "Show Debug Tools" }));
@@ -108,12 +113,27 @@ describe("OnlineDuelScreen", () => {
       expect(screen.getAllByText(/Round 1|Round 2/).length).toBeGreaterThan(0);
     });
 
+    fireEvent.click(screen.getByRole("button", { name: "Host Side" }));
+    fireEvent.click(screen.getByRole("button", { name: "Host attack zone chest" }));
+    fireEvent.click(screen.getByRole("button", { name: "Host defense zone head" }));
+    fireEvent.click(screen.getByRole("button", { name: "Lock Selected Attack" }));
+
+    fireEvent.click(screen.getByRole("button", { name: "Guest Side" }));
+    fireEvent.click(screen.getByRole("button", { name: "Guest attack zone legs" }));
+    fireEvent.click(screen.getByRole("button", { name: "Guest defense zone chest" }));
+    fireEvent.click(screen.getByRole("button", { name: "Lock Attack" }));
+
+    await waitFor(() => {
+      expect(screen.getAllByText("Round Result").length).toBeGreaterThan(0);
+      expect(screen.getAllByText(/Round 1|Round 2|Round 3/).length).toBeGreaterThan(0);
+    });
+
     fireEvent.click(screen.getByRole("button", { name: "Force Timeout" }));
     await waitFor(() => {
       expect(screen.getByRole("button", { name: "Create Match" })).toBeTruthy();
       expect(screen.getAllByRole("button", { name: "Join Match" }).length).toBeGreaterThan(0);
     });
-  });
+  }, 15000);
 
   it("returns to the create flow when the player leaves the room", async () => {
     render(<OnlineDuelScreen onBack={() => {}} />);
@@ -168,7 +188,7 @@ describe("OnlineDuelScreen", () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText("PvP Fight")).toBeTruthy();
+      expect(screen.getByText("Fight Status")).toBeTruthy();
       expect(screen.getByText("Opening match...")).toBeTruthy();
       expect(
         screen.getAllByText(
@@ -232,7 +252,7 @@ describe("OnlineDuelScreen", () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText("PvP Fight")).toBeTruthy();
+      expect(screen.getByText("Fight Status")).toBeTruthy();
       expect(screen.getByText("Joining match...")).toBeTruthy();
       expect(
         screen.getAllByText(
@@ -241,7 +261,7 @@ describe("OnlineDuelScreen", () => {
       ).toBeGreaterThan(0);
     });
 
-    expect(screen.getByText("Combat Arena")).toBeTruthy();
+    expect(screen.getByText("Combat Log")).toBeTruthy();
     expect(screen.queryByText("Debug Tools")).toBeNull();
   });
 
@@ -255,7 +275,7 @@ describe("OnlineDuelScreen", () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText("PvP Fight")).toBeTruthy();
+      expect(screen.getByText("Fight Status")).toBeTruthy();
       expect(screen.getAllByText(/Searching for a rival|Searching for another prepared fighter/i).length).toBeGreaterThan(0);
       expect(
         screen.getAllByText(

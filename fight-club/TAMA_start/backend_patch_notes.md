@@ -1,6 +1,6 @@
 # Backend Patch Notes
 
-> Last updated: 2026-03-20 01:00 MSK
+> Last updated: 2026-03-21 00:15 MSK
 
 Use this file as the canonical running log only for backend-system changes connected to the Backend Systems Agent.
 
@@ -37,6 +37,23 @@ Patch note rule for backend work:
 - Extended specialist helper expectations so backend work can evolve through the same journal and patch-note discipline.
 
 ## 2026-03-19 - Online Duel Phase 1 Authority Contracts Started
+
+## 2026-03-20 - PvP Single-Client Realtime Recovery Hardened
+
+- Fixed the live PvP room screen to recover backend sync through the active room client in lobby-launched play instead of always requesting both local debug clients.
+- Fixed backend SSE subscription setup so lobby-launched PvP no longer requires two valid `resumeToken` values before live updates can start.
+- Preserved the two-client subscription and recovery flow for the standalone local debug screen, so the existing host-vs-guest seam still works for local validation.
+
+## 2026-03-21 - PvP Multi-Round Recovery And Public-Prototype Boundaries Clarified
+
+- Added backend-facing regression coverage for repeated live round resolution so the room flow is now verified beyond the first exchange.
+- Kept lobby-launched PvP on the live backend path only, which makes the current prototype boundary explicit: real HTTP/SSE authority for product PvP, local debug seam only for development.
+- Documented the next backend work as authority hardening for public play rather than more UI-only room simulation:
+  - consumable validation
+  - loadout legality validation
+  - reconnect and deployment safety
+
+> Last updated: 2026-03-21 00:15 MSK
 
 - Added a dedicated feature track and execution roadmap for real `1v1 online`:
   - `MASTER-PLAN.md`

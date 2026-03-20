@@ -49,7 +49,7 @@ export function resolveOnlineDuelRound(
   if (!resolved.success) {
     return {
       success: false,
-      reason: "combat_resolution_failed",
+      reason: resolved.reason,
     };
   }
 

@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { SeededRandom } from "@/core/rng/SeededRandom";
 import { createStarterInventory } from "@/modules/inventory";
-import type { Item } from "@/modules/inventory";
+import type { Inventory, Item } from "@/modules/inventory";
 import { getEquipmentBonuses } from "@/modules/equipment";
-import type { EquipmentSlot } from "@/modules/equipment";
+import type { Equipment, EquipmentSlot } from "@/modules/equipment";
 import {
   type OnlineDuelFighterView,
   type OnlineDuelRoundSummary,
@@ -20,13 +20,38 @@ import {
 } from "@/modules/arena";
 import { combatZones, type CombatZone } from "@/modules/combat";
 import { combatBuildPresets, type CombatBuildPreset } from "@/orchestration/combat/combatSandboxConfigs";
-import { buildPlayerRoundAction, createRoundDraft, setRoundDraftAttackZone, toggleRoundDraftDefenseZone, type RoundDraft } from "@/orchestration/combat/roundDraft";
+import {
+  buildPlayerRoundAction,
+  createRoundDraft,
+  getRoundDraftSelectedConsumableCode,
+  getRoundDraftSelectedSkillId,
+  setRoundDraftAttackZone,
+  setRoundDraftConsumable,
+  setRoundDraftIntent,
+  setRoundDraftSkill,
+  toggleRoundDraftDefenseZone,
+  type RoundDraft,
+} from "@/orchestration/combat/roundDraft";
 import { buildCombatSnapshot } from "@/orchestration/combat/buildCombatSnapshot";
 import { buildSandboxPresetState, requireSandboxCharacter, applySandboxAllocations } from "@/orchestration/combat/combatSandboxSupport";
+import { createBattleLogEntries } from "@/ui/components/combat/battleLogFormatting";
+import { BattleLogSection, MiniPanel } from "@/ui/screens/Combat/combatSandboxScreenLayout";
 import { CombatSilhouette } from "@/ui/components/combat/CombatSilhouette";
-import { ArenaStageColumns, ArenaStageShell, MiniPanel, SidePanel } from "@/ui/screens/Combat/combatSandboxScreenLayout";
+import { ArenaStageColumns, ArenaStageShell, SidePanel } from "@/ui/screens/Combat/combatSandboxScreenLayout";
 import { buildProfileDerivedStats, resolvePresetFigure } from "@/ui/screens/Combat/combatSandboxScreenDerived";
+import { ActionButton, ActionRail } from "@/ui/screens/Combat/combatSandboxScreenActionRail";
 import { FightControlsPanel } from "@/ui/screens/Combat/combatSandboxScreenControls";
+import {
+  combatIntentDescriptions,
+  combatIntentOptions,
+  formatCombatIntentLabel,
+} from "@/modules/combat";
+import {
+  formatConsumableDetailLines,
+  formatSkillDetailLines,
+  getConsumableIcon,
+  getSkillIcon,
+} from "@/ui/screens/Combat/combatSandboxScreenHelpers";
 import { AttackTargetRoundPanel } from "@/ui/screens/Combat/combatSandboxScreenTargeting";
 import { ResourceGrid } from "@/ui/screens/Combat/combatSandboxScreenResourceGrid";
 import type { PvpPreparedFighter } from "@/ui/screens/PvpLobby/pvpLobbyTypes";
@@ -45,6 +70,119 @@ type TransportSource = "checking" | "backend" | "local";
 interface OnlineBuildSelection {
   presetId: string;
   snapshot: ReturnType<typeof buildCombatSnapshot>;
+  equipmentState: Equipment;
+  inventory: Inventory;
+  equippedSkillIds: string[];
+  equipment: Array<{ slot: EquipmentSlot; item: Item | null }>;
+}
+
+type OnlineAvailableSkill = ReturnType<typeof getEquipmentBonuses>["skills"][number];
+type OnlineAvailableConsumable = Inventory["entries"][number];
+
+const onlineIntentVisuals: Record<
+  RoundDraft["intent"],
+  {
+    accent: string;
+    border: string;
+    fill: string;
+    glow: string;
+  }
+> = {
+  neutral: {
+    accent: "#f0a286",
+    border: "rgba(240,162,134,0.34)",
+    fill: "rgba(240,162,134,0.12)",
+    glow: "rgba(240,162,134,0.22)",
+  },
+  aggressive: {
+    accent: "#ee9abb",
+    border: "rgba(238,154,187,0.36)",
+    fill: "rgba(238,154,187,0.14)",
+    glow: "rgba(238,154,187,0.24)",
+  },
+  guarded: {
+    accent: "#b7d5ff",
+    border: "rgba(183,213,255,0.36)",
+    fill: "rgba(183,213,255,0.14)",
+    glow: "rgba(183,213,255,0.24)",
+  },
+  precise: {
+    accent: "#87e2cf",
+    border: "rgba(135,226,207,0.36)",
+    fill: "rgba(135,226,207,0.14)",
+    glow: "rgba(135,226,207,0.24)",
+  },
+};
+
+const onlinePlayerIntentSilhouetteTone: Record<
+  RoundDraft["intent"],
+  {
+    accent: string;
+    fill: string;
+    edge: string;
+    glow: string;
+  }
+> = {
+  neutral: {
+    accent: "#f0a286",
+    fill: "rgba(240,162,134,0.11)",
+    edge: "rgba(240,162,134,0.28)",
+    glow: "rgba(240,162,134,0.18)",
+  },
+  aggressive: {
+    accent: "#ee9abb",
+    fill: "rgba(238,154,187,0.12)",
+    edge: "rgba(238,154,187,0.3)",
+    glow: "rgba(238,154,187,0.2)",
+  },
+  guarded: {
+    accent: "#b7d5ff",
+    fill: "rgba(183,213,255,0.12)",
+    edge: "rgba(183,213,255,0.3)",
+    glow: "rgba(183,213,255,0.2)",
+  },
+  precise: {
+    accent: "#87e2cf",
+    fill: "rgba(135,226,207,0.12)",
+    edge: "rgba(135,226,207,0.3)",
+    glow: "rgba(135,226,207,0.2)",
+  },
+};
+
+const playerEquipmentSlots: EquipmentSlot[] = [
+  "helmet",
+  "earring",
+  "shirt",
+  "armor",
+  "bracers",
+  "gloves",
+  "mainHand",
+  "offHand",
+  "belt",
+  "ring",
+  "ring2",
+  "pants",
+  "boots",
+];
+
+export function resolveOnlineRealtimeClientModes({
+  launchedFromLobby,
+  playerMode,
+  modeOverride,
+}: {
+  launchedFromLobby: boolean;
+  playerMode: ClientMode;
+  modeOverride?: ClientMode;
+}): ClientMode[] {
+  if (launchedFromLobby) {
+    return [modeOverride ?? playerMode];
+  }
+
+  return ["host", "guest"];
+}
+
+export function resolveOnlineActionClientMode(playerMode: ClientMode): ClientMode {
+  return playerMode;
 }
 
 export function OnlineDuelScreen({
@@ -147,6 +285,10 @@ export function OnlineDuelScreen({
     const preparedBuild: OnlineBuildSelection = {
       presetId: "custom",
       snapshot: preparedPlayer.snapshot,
+      equipmentState: preparedPlayer.equipmentState,
+      inventory: preparedPlayer.inventory,
+      equippedSkillIds: preparedPlayer.equippedSkillIds,
+      equipment: preparedPlayer.equipment,
     };
 
     if (initialEntryMode === "join") {
@@ -259,6 +401,20 @@ export function OnlineDuelScreen({
     !launchedFromLobby || initialEntryMode === "join" || Boolean(duelId);
   const liveRoomRequired = launchedFromLobby;
   const liveRoomUnavailable = liveRoomRequired && !duelId && transportSource === "local";
+  const playerCombatLoadout = resolveCombatLoadoutForMode({
+    mode: playerMode,
+    playerMode,
+    preparedPlayer,
+    hostBuild,
+    guestBuild,
+  });
+  const playerEquipmentBonuses = getEquipmentBonuses(playerCombatLoadout.equipmentState, playerCombatLoadout.inventory);
+  const playerAvailableSkills = playerEquipmentBonuses.skills.filter((skill) =>
+    playerCombatLoadout.equippedSkillIds.includes(skill.id)
+  );
+  const playerAvailableConsumables = playerCombatLoadout.inventory.entries.filter(
+    (entry) => entry.item.consumableEffect && entry.quantity > 0
+  );
   const selectedActionLabel = getOnlineSelectedActionLabel({
     duelId,
     playerReady,
@@ -266,6 +422,8 @@ export function OnlineDuelScreen({
     matchLocked,
     draft: playerMode === "host" ? hostDraft : guestDraft,
     playerActionSubmitted: playerSync?.currentRoundState?.yourActionSubmitted ?? false,
+    availableSkills: playerAvailableSkills,
+    availableConsumables: playerAvailableConsumables,
   });
   const selectedActionTags = getOnlineSelectedActionTags({
     duelId,
@@ -274,6 +432,8 @@ export function OnlineDuelScreen({
     currentStepBadge: currentStep.badge,
     draft: playerMode === "host" ? hostDraft : guestDraft,
     playerActionSubmitted: playerSync?.currentRoundState?.yourActionSubmitted ?? false,
+    availableSkills: playerAvailableSkills,
+    availableConsumables: playerAvailableConsumables,
   });
   const selectedActionSummary = getOnlineSelectedActionSummary({
     duelId,
@@ -289,6 +449,8 @@ export function OnlineDuelScreen({
     draft: playerMode === "host" ? hostDraft : guestDraft,
     playerActionSubmitted: playerSync?.currentRoundState?.yourActionSubmitted ?? false,
     showPlanner,
+    availableSkills: playerAvailableSkills,
+    availableConsumables: playerAvailableConsumables,
   });
   const lastResolvedRound = hostSync?.lastResolvedRound ?? guestSync?.lastResolvedRound ?? null;
   const playerActionSubmitted = playerSync?.currentRoundState?.yourActionSubmitted ?? false;
@@ -299,18 +461,29 @@ export function OnlineDuelScreen({
     playerParticipant?.fighterView?.figure,
     preparedPlayer?.figure ?? resolvePresetFigure(playerBuild.presetId, playerMode === "host" ? "rush-chip" : "kitsune-bit")
   );
-  const playerEquipment = playerParticipant?.fighterView?.equipment ?? preparedPlayer?.equipment ?? [];
-  const playerCombatant = resolveCombatantSummary(lastResolvedRound, playerDisplayName);
-  const playerCurrentHp = playerCombatant?.currentHp ?? playerBuild.snapshot.maxHp;
+  const playerEquipment = playerParticipant?.fighterView?.equipment ?? playerCombatLoadout.equipment;
+  const playerCombatantState =
+    matchSync?.combatState?.combatants.find((combatant) => combatant.id === playerBuild.snapshot.characterId) ?? null;
+  const playerCombatantSummary = resolveCombatantSummary(lastResolvedRound, playerDisplayName);
+  const playerCurrentHp =
+    playerCombatantState?.currentHp ?? playerCombatantSummary?.currentHp ?? playerBuild.snapshot.maxHp;
   const opponentBuild = playerMode === "host" ? guestBuild : hostBuild;
   const opponentFallbackName = opponentParticipant?.displayName ?? opponentBuild.snapshot.name ?? "Rival";
   const opponentFigure = resolveFighterViewFigure(
     opponentParticipant?.fighterView?.figure,
     resolvePresetFigure(opponentBuild.presetId, "vermin-tek")
   );
-  const opponentEquipment = opponentParticipant?.fighterView?.equipment ?? [];
-  const opponentCombatant = resolveCombatantSummary(lastResolvedRound, opponentFallbackName);
-  const opponentCurrentHp = opponentCombatant?.currentHp ?? opponentBuild.snapshot.maxHp;
+  const opponentEquipment = opponentParticipant?.fighterView?.equipment ?? opponentBuild.equipment;
+  const opponentCombatantState =
+    matchSync?.combatState?.combatants.find((combatant) => combatant.id === opponentBuild.snapshot.characterId) ?? null;
+  const opponentCombatantSummary = resolveCombatantSummary(lastResolvedRound, opponentFallbackName);
+  const opponentCurrentHp =
+    opponentCombatantState?.currentHp ?? opponentCombatantSummary?.currentHp ?? opponentBuild.snapshot.maxHp;
+  const battleLogEntries = createBattleLogEntries(
+    matchSync?.combatState ?? null,
+    playerBuild.snapshot.characterId,
+    opponentBuild.snapshot.characterId
+  );
   const playerDerivedStats = buildProfileDerivedStats({
     totalDamage: totalDamageProfileValue(playerBuild.snapshot.damage),
     stats: playerBuild.snapshot.stats,
@@ -385,13 +558,38 @@ export function OnlineDuelScreen({
     }
   }
 
-  async function recoverRealtimeState(nextDuelId: string) {
-    const hostMessages = await runClientAction(() => setupRef.current.hostClient.requestSync(nextDuelId));
-    const guestMessages = await runClientAction(() => setupRef.current.guestClient.requestSync(nextDuelId));
-    applyInboundMessages([...hostMessages, ...guestMessages]);
+  function getRealtimeClientModes(modeOverride?: ClientMode): ClientMode[] {
+    return resolveOnlineRealtimeClientModes({
+      launchedFromLobby,
+      playerMode,
+      modeOverride,
+    });
   }
 
-  function refreshRealtimeSubscriptions(nextDuelId: string | null) {
+  function getClientForMode(mode: ClientMode) {
+    return mode === "host" ? setupRef.current.hostClient : setupRef.current.guestClient;
+  }
+
+  function getCombatLoadoutForMode(mode: ClientMode) {
+    return resolveCombatLoadoutForMode({
+      mode,
+      playerMode,
+      preparedPlayer,
+      hostBuild,
+      guestBuild,
+    });
+  }
+
+  async function recoverRealtimeState(nextDuelId: string, modeOverride?: ClientMode) {
+    const nextMessages = await Promise.all(
+      getRealtimeClientModes(modeOverride).map((mode) =>
+        runClientAction(() => getClientForMode(mode).requestSync(nextDuelId))
+      )
+    );
+    applyInboundMessages(nextMessages.flat());
+  }
+
+  function refreshRealtimeSubscriptions(nextDuelId: string | null, modeOverride?: ClientMode) {
     hostSubscriptionRef.current?.close();
     guestSubscriptionRef.current?.close();
     hostSubscriptionRef.current = null;
@@ -406,41 +604,35 @@ export function OnlineDuelScreen({
     }
 
     const baseUrl = getOnlineDuelBackendBaseUrl();
-    const hostResumeToken = setupRef.current.hostClient.getLastSync()?.resumeToken;
-    const guestResumeToken = setupRef.current.guestClient.getLastSync()?.resumeToken;
-    if (!hostResumeToken || !guestResumeToken) {
-      setTransportIssue("missing_resume_token");
-      return;
-    }
+    for (const mode of getRealtimeClientModes(modeOverride)) {
+      const client = getClientForMode(mode);
+      const resumeToken = client.getLastSync()?.resumeToken;
+      if (!resumeToken) {
+        setTransportIssue("missing_resume_token");
+        return;
+      }
 
-    hostSubscriptionRef.current = subscribeToOnlineDuelEvents({
-      baseUrl,
-      duelId: nextDuelId,
-      playerId: setupRef.current.hostClient.identity.playerId,
-      resumeToken: hostResumeToken,
-      afterEventId: hostLastEventIdRef.current ?? undefined,
-      onMessage: (message, eventId) =>
-        applyInboundMessages([message], eventId ? { host: eventId } : undefined),
-      onOpen: () => void recoverRealtimeState(nextDuelId),
-      onError: () => {
-        setTransportIssue("event_stream_error");
-        void recoverRealtimeState(nextDuelId);
-      },
-    });
-    guestSubscriptionRef.current = subscribeToOnlineDuelEvents({
-      baseUrl,
-      duelId: nextDuelId,
-      playerId: setupRef.current.guestClient.identity.playerId,
-      resumeToken: guestResumeToken,
-      afterEventId: guestLastEventIdRef.current ?? undefined,
-      onMessage: (message, eventId) =>
-        applyInboundMessages([message], eventId ? { guest: eventId } : undefined),
-      onOpen: () => void recoverRealtimeState(nextDuelId),
-      onError: () => {
-        setTransportIssue("event_stream_error");
-        void recoverRealtimeState(nextDuelId);
-      },
-    });
+      const subscription = subscribeToOnlineDuelEvents({
+        baseUrl,
+        duelId: nextDuelId,
+        playerId: client.identity.playerId,
+        resumeToken,
+        afterEventId: mode === "host" ? hostLastEventIdRef.current ?? undefined : guestLastEventIdRef.current ?? undefined,
+        onMessage: (message, eventId) =>
+          applyInboundMessages([message], eventId ? { [mode]: eventId } : undefined),
+        onOpen: () => void recoverRealtimeState(nextDuelId, mode),
+        onError: () => {
+          setTransportIssue("event_stream_error");
+          void recoverRealtimeState(nextDuelId, mode);
+        },
+      });
+
+      if (mode === "host") {
+        hostSubscriptionRef.current = subscription;
+      } else {
+        guestSubscriptionRef.current = subscription;
+      }
+    }
   }
 
   async function runClientAction(action: () => Promise<OnlineDuelServerMessage[]>) {
@@ -467,6 +659,7 @@ export function OnlineDuelScreen({
         buildClientFighterView({
           preparedPlayer,
           fallbackFigure: resolvePresetFigure(hostBuild.presetId, "rush-chip"),
+          fallbackEquipment: hostBuild.equipment,
         }),
         preparedPlayer?.playerName ?? hostBuild.snapshot.name
       )
@@ -479,7 +672,7 @@ export function OnlineDuelScreen({
       setPlayerMode("host");
       setDebugClientMode("host");
       setEntryMode("create");
-      refreshRealtimeSubscriptions(created.duelId);
+      refreshRealtimeSubscriptions(created.duelId, "host");
     }
     applyInboundMessages(nextMessages);
   }
@@ -496,6 +689,7 @@ export function OnlineDuelScreen({
         buildClientFighterView({
           preparedPlayer,
           fallbackFigure: resolvePresetFigure(hostBuild.presetId, "rush-chip"),
+          fallbackEquipment: hostBuild.equipment,
         }),
         preparedPlayer?.playerName ?? hostBuild.snapshot.name
       )
@@ -510,7 +704,7 @@ export function OnlineDuelScreen({
       setPlayerMode("host");
       setDebugClientMode("host");
       setEntryMode("create");
-      refreshRealtimeSubscriptions(created.duelId);
+      refreshRealtimeSubscriptions(created.duelId, "host");
     } else if (matchSync?.type === "duel_state_sync" && matchSync.payload.yourSeat) {
       setDuelId(matchSync.payload.duelId);
       setHostSeat(matchSync.payload.yourSeat);
@@ -518,7 +712,7 @@ export function OnlineDuelScreen({
       setPlayerMode("host");
       setDebugClientMode("host");
       setEntryMode("create");
-      refreshRealtimeSubscriptions(matchSync.payload.duelId);
+      refreshRealtimeSubscriptions(matchSync.payload.duelId, "host");
     }
 
     applyInboundMessages(nextMessages);
@@ -542,6 +736,7 @@ export function OnlineDuelScreen({
         buildClientFighterView({
           preparedPlayer,
           fallbackFigure: resolvePresetFigure(guestBuild.presetId, "kitsune-bit"),
+          fallbackEquipment: guestBuild.equipment,
         }),
         preparedPlayer?.playerName ?? guestBuild.snapshot.name
       )
@@ -553,7 +748,7 @@ export function OnlineDuelScreen({
       setPlayerMode("guest");
       setDebugClientMode("guest");
       setEntryMode("join");
-      refreshRealtimeSubscriptions(joinSync.payload.duelId);
+      refreshRealtimeSubscriptions(joinSync.payload.duelId, "guest");
     }
     applyInboundMessages(nextMessages);
   }
@@ -637,6 +832,13 @@ export function OnlineDuelScreen({
       return;
     }
 
+    const hostLoadout = getCombatLoadoutForMode("host");
+    const selectedHostSkill =
+      hostLoadout.availableSkills.find((skill) => skill.id === getRoundDraftSelectedSkillId(hostDraft)) ?? null;
+    const selectedHostConsumableItem =
+      hostLoadout.availableConsumables.find((entry) => entry.item.code === getRoundDraftSelectedConsumableCode(hostDraft))
+        ?.item ?? null;
+
     setHostActionSubmitting(true);
     try {
       const submitMessages = await runClientAction(() =>
@@ -646,14 +848,27 @@ export function OnlineDuelScreen({
           buildPlayerRoundAction({
             attackerId: hostBuild.snapshot.characterId,
             draft: hostDraft,
-            skill: null,
-            consumable: null,
+            skill: selectedHostSkill,
+            consumable: selectedHostConsumableItem?.consumableEffect
+              ? {
+                  itemCode: selectedHostConsumableItem.code,
+                  itemName: selectedHostConsumableItem.name,
+                  effect: selectedHostConsumableItem.consumableEffect,
+                }
+              : null,
           })
         )
       );
-      const recoveredMessages = shouldRecoverFromSubmitError(submitMessages)
-        ? await runClientAction(() => setupRef.current.hostClient.requestSync(duelId))
-        : [];
+      const syncModes: ClientMode[] = shouldRefreshClientsAfterRoundResolution(submitMessages)
+        ? getRealtimeClientModes()
+        : shouldRecoverFromSubmitError(submitMessages)
+          ? ["host" satisfies ClientMode]
+          : [];
+      const recoveredMessages = (
+        await Promise.all(
+          syncModes.map((mode) => runClientAction(() => getClientForMode(mode).requestSync(duelId)))
+        )
+      ).flat();
       applyInboundMessages([...submitMessages, ...recoveredMessages]);
     } finally {
       setHostActionSubmitting(false);
@@ -665,6 +880,13 @@ export function OnlineDuelScreen({
       return;
     }
 
+    const guestLoadout = getCombatLoadoutForMode("guest");
+    const selectedGuestSkill =
+      guestLoadout.availableSkills.find((skill) => skill.id === getRoundDraftSelectedSkillId(guestDraft)) ?? null;
+    const selectedGuestConsumableItem =
+      guestLoadout.availableConsumables.find((entry) => entry.item.code === getRoundDraftSelectedConsumableCode(guestDraft))
+        ?.item ?? null;
+
     setGuestActionSubmitting(true);
     try {
       const submitMessages = await runClientAction(() =>
@@ -674,14 +896,27 @@ export function OnlineDuelScreen({
           buildPlayerRoundAction({
             attackerId: guestBuild.snapshot.characterId,
             draft: guestDraft,
-            skill: null,
-            consumable: null,
+            skill: selectedGuestSkill,
+            consumable: selectedGuestConsumableItem?.consumableEffect
+              ? {
+                  itemCode: selectedGuestConsumableItem.code,
+                  itemName: selectedGuestConsumableItem.name,
+                  effect: selectedGuestConsumableItem.consumableEffect,
+                }
+              : null,
           })
         )
       );
-      const recoveredMessages = shouldRecoverFromSubmitError(submitMessages)
-        ? await runClientAction(() => setupRef.current.guestClient.requestSync(duelId))
-        : [];
+      const syncModes: ClientMode[] = shouldRefreshClientsAfterRoundResolution(submitMessages)
+        ? getRealtimeClientModes()
+        : shouldRecoverFromSubmitError(submitMessages)
+          ? ["guest" satisfies ClientMode]
+          : [];
+      const recoveredMessages = (
+        await Promise.all(
+          syncModes.map((mode) => runClientAction(() => getClientForMode(mode).requestSync(duelId)))
+        )
+      ).flat();
       applyInboundMessages([...submitMessages, ...recoveredMessages]);
     } finally {
       setGuestActionSubmitting(false);
@@ -706,13 +941,16 @@ export function OnlineDuelScreen({
       return;
     }
 
+    const activeClient = getClientForMode(resolveOnlineActionClientMode(playerMode));
     const nextMessages = await runClientAction(() =>
-      setupRef.current.hostClient.requestRematch(duelId)
+      activeClient.requestRematch(duelId)
     );
-    const guestSyncMessages = await runClientAction(() =>
-      setupRef.current.guestClient.requestSync(duelId)
+    const recoveredMessages = await Promise.all(
+      getRealtimeClientModes().map((mode) =>
+        runClientAction(() => getClientForMode(mode).requestSync(duelId))
+      )
     );
-    applyInboundMessages([...nextMessages, ...guestSyncMessages]);
+    applyInboundMessages([...nextMessages, ...recoveredMessages.flat()]);
     setDebugClientMode(playerMode);
     setHostDraft(createRoundDraft());
     setGuestDraft(createRoundDraft());
@@ -788,30 +1026,28 @@ export function OnlineDuelScreen({
         color: "rgba(255,244,231,0.94)",
       }}
     >
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          gap: 16,
-          flexWrap: "wrap",
-        }}
-      >
-        <div>
-          <p style={eyebrowStyle}>PvP</p>
-          <h1 style={{ margin: "6px 0 0", fontSize: 32 }}>{launchedFromLobby ? "PvP Fight" : "1v1 Battle"}</h1>
-          <p style={{ margin: "10px 0 0", maxWidth: 780, color: "rgba(255,244,231,0.72)", lineHeight: 1.6 }}>
-            {launchedFromLobby
-              ? matchmakingMode
-                ? "Your fighter is ready. Matchmaking is now searching for another prepared player and will drop you straight into the fight."
-                : "Your fighter is ready. This screen now focuses on your rival, the duel code, and the combat flow."
-              : "Create a match, share the code, bring in the second fighter, and play through a 1v1 battle where both sides stay in step."}
-          </p>
+      {!launchedFromLobby ? (
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            gap: 16,
+            flexWrap: "wrap",
+          }}
+        >
+          <div>
+            <p style={eyebrowStyle}>PvP</p>
+            <h1 style={{ margin: "6px 0 0", fontSize: 32 }}>1v1 Battle</h1>
+            <p style={{ margin: "10px 0 0", maxWidth: 780, color: "rgba(255,244,231,0.72)", lineHeight: 1.6 }}>
+              Create a match, share the code, bring in the second fighter, and play through a 1v1 battle where both sides stay in step.
+            </p>
+          </div>
+          <button type="button" onClick={onBack} style={ghostButtonStyle}>
+            Back to Menu
+          </button>
         </div>
-        <button type="button" onClick={onBack} style={ghostButtonStyle}>
-          {launchedFromLobby ? "Back to PvP Lobby" : "Back to Menu"}
-        </button>
-      </div>
+      ) : null}
 
       {!launchedFromLobby ? (
         <div style={heroGridStyle}>
@@ -974,36 +1210,7 @@ export function OnlineDuelScreen({
             </div>
           </article>
         </div>
-      ) : duelId ? (
-        <article style={panelStyle}>
-          <div style={sectionHeadStyle}>
-            <span style={eyebrowStyle}>Fight Status</span>
-            <span style={chipStyle}>{currentStep.badge}</span>
-          </div>
-          <p style={helperTextStyle}>{currentStep.message}</p>
-          {transportIssue ? <p style={warningTextStyle}>Connection issue: {describeTransportIssue(transportIssue)}</p> : null}
-          <div style={statStripStyle}>
-            <div style={statCardStyle}>
-              <div style={statLabelStyle}>Duel Code</div>
-              <div style={{ ...statValueStyle, letterSpacing: "0.16em", fontFamily: "Consolas, monospace" }}>
-                {hostSync?.roomCode ?? guestSync?.roomCode ?? "------"}
-              </div>
-            </div>
-            <div style={statCardStyle}>
-              <div style={statLabelStyle}>Opponent</div>
-              <div style={statValueStyle}>{opponentParticipant?.displayName ?? "Waiting for rival"}</div>
-            </div>
-            <div style={statCardStyle}>
-              <div style={statLabelStyle}>Ready</div>
-              <div style={statValueStyle}>{readyCount}/2 ready</div>
-            </div>
-            <div style={statCardStyle}>
-              <div style={statLabelStyle}>Connection</div>
-              <div style={statValueStyle}>{transportBadgeLabel(transportSource)}</div>
-            </div>
-          </div>
-        </article>
-      ) : (
+      ) : duelId ? null : (
         <article style={panelStyle}>
           <div style={sectionHeadStyle}>
             <span style={eyebrowStyle}>Fight Status</span>
@@ -1025,18 +1232,6 @@ export function OnlineDuelScreen({
 
       {showPlayerFacingArena ? (
         <>
-          <article style={{ ...panelStyle, padding: 16 }}>
-            <div style={sectionHeadStyle}>
-              <span style={eyebrowStyle}>Combat Arena</span>
-              <div style={combatArenaBadgeRowStyle}>
-                <span style={chipStyle}>{playerSync?.yourSeat ?? playerSeat}</span>
-                <span style={chipStyle}>{hostSync?.roomCode ?? guestSync?.roomCode ?? "------"}</span>
-              </div>
-            </div>
-            <p style={{ ...helperTextStyle, marginTop: 10 }}>{currentStep.message}</p>
-            {transportIssue ? <p style={warningTextStyle}>Connection issue: {describeTransportIssue(transportIssue)}</p> : null}
-          </article>
-
           <ArenaStageShell shellStyle={shellStyle}>
             <ArenaStageColumns>
               <OnlinePlayerCombatPanel
@@ -1045,6 +1240,7 @@ export function OnlineDuelScreen({
                 currentHp={playerCurrentHp}
                 maxHp={playerBuild.snapshot.maxHp}
                 equipment={playerEquipment}
+                selectedIntent={(playerMode === "host" ? hostDraft : guestDraft).intent}
                 shellStyle={shellStyle}
                 panelStyle={panelStyle}
                 derivedStats={playerDerivedStats}
@@ -1070,6 +1266,11 @@ export function OnlineDuelScreen({
                 draft={playerMode === "host" ? hostDraft : guestDraft}
                 playerActionSubmitted={playerActionLocked}
                 latestRoundSummary={lastResolvedRound ? `Round ${lastResolvedRound.round}` : "No round resolved yet."}
+                selectedIntent={(playerMode === "host" ? hostDraft : guestDraft).intent}
+                availableSkills={playerAvailableSkills}
+                availableConsumables={playerAvailableConsumables}
+                playerResources={playerCombatantState?.resources ?? null}
+                playerSkillCooldowns={playerCombatantState?.skillCooldowns ?? {}}
                 onPrimaryAction={() => void (playerMode === "host" ? handleHostReady(true) : handleGuestReady(true))}
                 onCancelReady={() => void (playerMode === "host" ? handleHostReady(false) : handleGuestReady(false))}
                 onAttackZoneChange={(zone) =>
@@ -1081,6 +1282,35 @@ export function OnlineDuelScreen({
                   playerMode === "host"
                     ? setHostDraft((current) => toggleRoundDraftDefenseZone(current, zone))
                     : setGuestDraft((current) => toggleRoundDraftDefenseZone(current, zone))
+                }
+                onIntentChange={(intent) =>
+                  playerMode === "host"
+                    ? setHostDraft((current) => setRoundDraftIntent(current, intent))
+                    : setGuestDraft((current) => setRoundDraftIntent(current, intent))
+                }
+                onSkillChange={(skillId) =>
+                  playerMode === "host"
+                    ? setHostDraft((current) => setRoundDraftSkill(current, skillId))
+                    : setGuestDraft((current) => setRoundDraftSkill(current, skillId))
+                }
+                onConsumableChange={(itemCode) =>
+                  playerMode === "host"
+                    ? setHostDraft((current) =>
+                        setRoundDraftConsumable(
+                          current,
+                          itemCode,
+                          playerAvailableConsumables.find((entry) => entry.item.code === itemCode)?.item.consumableEffect
+                            ?.usageMode ?? null
+                        )
+                      )
+                    : setGuestDraft((current) =>
+                        setRoundDraftConsumable(
+                          current,
+                          itemCode,
+                          playerAvailableConsumables.find((entry) => entry.item.code === itemCode)?.item.consumableEffect
+                            ?.usageMode ?? null
+                        )
+                      )
                 }
                 onLockAttack={() => void (playerMode === "host" ? handleHostAttack() : handleGuestAttack())}
                 actionsDisabled={actionsDisabled}
@@ -1109,6 +1339,14 @@ export function OnlineDuelScreen({
             </ArenaStageColumns>
           </ArenaStageShell>
         </>
+      ) : null}
+      {showPlayerFacingArena ? (
+        <BattleLogSection
+          entries={battleLogEntries}
+          playerId={playerBuild.snapshot.characterId}
+          botId={opponentBuild.snapshot.characterId}
+          shellStyle={shellStyle}
+        />
       ) : null}
 
       {!launchedFromLobby ? (
@@ -1332,7 +1570,7 @@ export function OnlineDuelScreen({
         </article>
       ) : null}
 
-      <RoundResultCard summary={lastResolvedRound} />
+      {!launchedFromLobby ? <RoundResultCard summary={lastResolvedRound} /> : null}
       <MatchFinishCard
         status={matchSync?.status ?? null}
         winnerName={winnerName}
@@ -1368,16 +1606,59 @@ function resolveCombatantSummary(summary: OnlineDuelRoundSummary | null, display
   return summary.combatants.find((combatant) => combatant.name === displayName) ?? null;
 }
 
+function resolveCombatLoadoutForMode({
+  mode,
+  playerMode,
+  preparedPlayer,
+  hostBuild,
+  guestBuild,
+}: {
+  mode: ClientMode;
+  playerMode: ClientMode;
+  preparedPlayer: PvpPreparedFighter | null;
+  hostBuild: OnlineBuildSelection;
+  guestBuild: OnlineBuildSelection;
+}) {
+  const build = mode === "host" ? hostBuild : guestBuild;
+  const loadout =
+    preparedPlayer && mode === playerMode
+      ? {
+          equipmentState: preparedPlayer.equipmentState,
+          inventory: preparedPlayer.inventory,
+          equippedSkillIds: preparedPlayer.equippedSkillIds,
+          equipment: preparedPlayer.equipment,
+        }
+      : {
+          equipmentState: build.equipmentState,
+          inventory: build.inventory,
+          equippedSkillIds: build.equippedSkillIds,
+          equipment: build.equipment,
+        };
+  const bonuses = getEquipmentBonuses(loadout.equipmentState, loadout.inventory);
+  const availableSkills = bonuses.skills.filter((skill) => loadout.equippedSkillIds.includes(skill.id));
+  const availableConsumables = loadout.inventory.entries.filter(
+    (entry) => entry.item.consumableEffect && entry.quantity > 0
+  );
+
+  return {
+    ...loadout,
+    availableSkills,
+    availableConsumables,
+  };
+}
+
 function buildClientFighterView({
   preparedPlayer,
   fallbackFigure,
+  fallbackEquipment = [],
 }: {
   preparedPlayer: PvpPreparedFighter | null;
   fallbackFigure: string;
+  fallbackEquipment?: Array<{ slot: EquipmentSlot; item: Item | null }>;
 }): OnlineDuelFighterView {
   return {
     figure: preparedPlayer?.figure ?? fallbackFigure,
-    equipment: preparedPlayer?.equipment ?? [],
+    equipment: preparedPlayer?.equipment ?? fallbackEquipment,
   };
 }
 
@@ -1544,13 +1825,13 @@ function getCurrentStepSummary({
     if (playerReady) {
       return {
         badge: "Hold",
-        message: "You are ready. Share the duel code and wait for the second fighter to join the fight.",
+        message: "You are ready. Waiting for the second fighter.",
       };
     }
 
     return {
-      badge: "Share code",
-      message: "Share the duel code and wait for the second fighter to appear before the battle can begin.",
+      badge: "Waiting",
+      message: "Waiting for the second fighter.",
     };
   }
 
@@ -1632,10 +1913,18 @@ function OnlineFightSetupPanel({
   playerActionSubmitted,
   actionsDisabled,
   latestRoundSummary,
+  selectedIntent,
+  availableSkills,
+  availableConsumables,
+  playerResources,
+  playerSkillCooldowns,
   onPrimaryAction,
   onCancelReady,
   onAttackZoneChange,
   onDefenseZoneToggle,
+  onIntentChange,
+  onSkillChange,
+  onConsumableChange,
   onLockAttack,
 }: {
   shellStyle: CSSProperties;
@@ -1654,10 +1943,18 @@ function OnlineFightSetupPanel({
   playerActionSubmitted: boolean;
   actionsDisabled: boolean;
   latestRoundSummary: string;
+  selectedIntent: RoundDraft["intent"];
+  availableSkills: OnlineAvailableSkill[];
+  availableConsumables: OnlineAvailableConsumable[];
+  playerResources: { rage: number; guard: number; momentum: number; focus: number } | null;
+  playerSkillCooldowns: Record<string, number>;
   onPrimaryAction: () => void;
   onCancelReady: () => void;
   onAttackZoneChange: (zone: CombatZone) => void;
   onDefenseZoneToggle: (zone: CombatZone) => void;
+  onIntentChange: (intent: RoundDraft["intent"]) => void;
+  onSkillChange: (skillId: string | null) => void;
+  onConsumableChange: (itemCode: string | null) => void;
   onLockAttack: () => void;
 }) {
   return (
@@ -1681,7 +1978,7 @@ function OnlineFightSetupPanel({
 
           <AttackTargetRoundPanel
             panelStyle={panelStyle}
-            resourcePanel={<ResourceGrid panelStyle={panelStyle} resources={null} />}
+            resourcePanel={<ResourceGrid panelStyle={panelStyle} resources={playerResources} />}
             zones={combatZones}
             selectedAttackZone={draft.attackZone}
             selectedDefenseZones={draft.defenseZones}
@@ -1712,39 +2009,213 @@ function OnlineFightSetupPanel({
           />
         </div>
 
-        <MiniPanel panelStyle={panelStyle} title="Combat Actions">
-          <div style={{ display: "grid", gap: 10 }}>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
-              <div style={{ ...panelStyle, padding: 10, display: "grid", gap: 6 }}>
-                <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.12em", textTransform: "uppercase", color: "#dbc5ae" }}>
-                  Round State
-                </div>
-                <div style={{ fontSize: 14, fontWeight: 800 }}>{currentStep.badge}</div>
-                <div style={{ fontSize: 12, color: "rgba(255,244,231,0.72)", lineHeight: 1.45 }}>{currentStep.message}</div>
-              </div>
-              <div style={{ ...panelStyle, padding: 10, display: "grid", gap: 6 }}>
-                <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.12em", textTransform: "uppercase", color: "#dbc5ae" }}>
-                  Action Flow
-                </div>
-                <button
-                  type="button"
-                  aria-label="Cancel Ready"
-                  onClick={onCancelReady}
-                  disabled={!duelId || actionsDisabled || showPlanner || !playerReady}
-                  style={{
-                    ...buttonStyle,
-                    ...(!duelId || actionsDisabled || showPlanner || !playerReady ? { opacity: 0.48, cursor: "not-allowed" } : {}),
-                  }}
-                >
-                  Cancel Ready
-                </button>
-                <div style={{ fontSize: 12, color: "rgba(255,244,231,0.72)", lineHeight: 1.45 }}>
-                  Ready both sides, then choose attack and guard zones exactly like the normal fight screen.
-                </div>
-              </div>
+        <div style={{ display: "grid", gap: 10 }}>
+          {!showPlanner && playerReady ? (
+            <div style={{ display: "flex", justifyContent: "flex-end" }}>
+              <button
+                type="button"
+                aria-label="Cancel Ready"
+                onClick={onCancelReady}
+                disabled={!duelId || actionsDisabled || showPlanner || !playerReady}
+                style={{
+                  ...buttonStyle,
+                  padding: "8px 12px",
+                  ...(!duelId || actionsDisabled || showPlanner || !playerReady ? { opacity: 0.48, cursor: "not-allowed" } : {}),
+                }}
+              >
+                Cancel Ready
+              </button>
+            </div>
+          ) : null}
+
+          <OnlineCombatActionsPanel
+            panelStyle={panelStyle}
+            buttonStyle={buttonStyle}
+            selectedIntent={selectedIntent}
+            selectedAction={draft.selectedAction}
+            availableSkills={availableSkills}
+            availableConsumables={availableConsumables}
+            playerResources={playerResources}
+            playerSkillCooldowns={playerSkillCooldowns}
+            onIntentChange={onIntentChange}
+            onSkillChange={onSkillChange}
+            onConsumableChange={onConsumableChange}
+          />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function OnlineCombatActionsPanel({
+  panelStyle,
+  buttonStyle,
+  selectedIntent,
+  selectedAction,
+  availableSkills,
+  availableConsumables,
+  playerResources,
+  playerSkillCooldowns,
+  onIntentChange,
+  onSkillChange,
+  onConsumableChange,
+}: {
+  panelStyle: CSSProperties;
+  buttonStyle: CSSProperties;
+  selectedIntent: RoundDraft["intent"];
+  selectedAction: RoundDraft["selectedAction"];
+  availableSkills: OnlineAvailableSkill[];
+  availableConsumables: OnlineAvailableConsumable[];
+  playerResources: { rage: number; guard: number; momentum: number; focus: number } | null;
+  playerSkillCooldowns: Record<string, number>;
+  onIntentChange: (intent: RoundDraft["intent"]) => void;
+  onSkillChange: (skillId: string | null) => void;
+  onConsumableChange: (itemCode: string | null) => void;
+}) {
+  const selectedSkillId = selectedAction.kind === "skill_attack" ? selectedAction.skillId : null;
+  const selectedConsumableCode = selectedAction.kind === "consumable" ? selectedAction.consumableCode : null;
+  const selectedTone = onlineIntentVisuals[selectedIntent];
+
+  return (
+    <div style={{ display: "grid", gap: 10 }}>
+      <div
+        style={{
+          display: "grid",
+          gap: 5,
+          padding: 7,
+          borderRadius: 16,
+          border: `1px solid ${selectedTone.border}`,
+          background: `linear-gradient(180deg, ${selectedTone.fill}, rgba(255,255,255,0.02))`,
+          boxShadow: `inset 0 0 0 1px rgba(255,255,255,0.02), 0 0 24px ${selectedTone.glow}`,
+        }}
+      >
+        <div style={{ display: "flex", justifyContent: "space-between", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+          <div style={{ display: "grid", gap: 2 }}>
+            <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.12em", textTransform: "uppercase", color: "#dbc5ae" }}>
+              Combat Intent
+            </div>
+            <div style={{ fontSize: 8, color: selectedTone.accent, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase" }}>
+              {formatCombatIntentLabel(selectedIntent)}
             </div>
           </div>
-        </MiniPanel>
+          <div style={{ fontSize: 8, color: "#bca896", maxWidth: 190, textAlign: "right", lineHeight: 1.25 }}>
+            {combatIntentDescriptions[selectedIntent]}
+          </div>
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, minmax(0, 1fr))", gap: 5 }}>
+          {combatIntentOptions.map((intent) => {
+            const selected = selectedIntent === intent;
+            const tone = onlineIntentVisuals[intent];
+
+            return (
+              <button
+                key={intent}
+                type="button"
+                onClick={() => onIntentChange(intent)}
+                style={{
+                  ...buttonStyle,
+                  padding: "6px 8px",
+                  fontSize: 9,
+                  minHeight: 34,
+                  position: "relative",
+                  overflow: "hidden",
+                  transition: "border-color 140ms ease, box-shadow 140ms ease, background 140ms ease, color 140ms ease",
+                  ...(selected
+                    ? {
+                        border: `1px solid ${tone.border}`,
+                        background: `linear-gradient(180deg, ${tone.fill}, rgba(255,255,255,0.04))`,
+                        color: tone.accent,
+                        boxShadow: `inset 0 0 0 1px ${tone.border}, 0 0 18px ${tone.glow}`,
+                      }
+                    : {
+                        background: "linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.03))",
+                      }),
+                }}
+              >
+                {formatCombatIntentLabel(intent)}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+        <ActionRail
+          panelStyle={panelStyle}
+          title="Skills"
+          emptyLabel=""
+          countLabel={String(availableSkills.length)}
+          headerAction={
+            <button
+              type="button"
+              onClick={() => onSkillChange(null)}
+              style={{
+                ...buttonStyle,
+                padding: "5px 8px",
+                fontSize: 9,
+                ...(selectedAction.kind === "basic_attack"
+                  ? {
+                      border: "1px solid rgba(255,171,97,0.4)",
+                      background: "linear-gradient(180deg, rgba(221,122,68,0.24), rgba(207,106,50,0.12))",
+                      color: "#ffe2c2",
+                    }
+                  : {}),
+              }}
+            >
+              Basic
+            </button>
+          }
+          entries={availableSkills.map((skill) => {
+            const currentValue = (playerResources ?? { rage: 0, guard: 0, momentum: 0, focus: 0 })[skill.resourceType];
+            const cooldownTurns = playerSkillCooldowns[skill.id] ?? 0;
+            const skillReady = currentValue >= skill.cost && cooldownTurns <= 0;
+
+            return (
+              <ActionButton
+                key={skill.id}
+                selected={selectedSkillId === skill.id}
+                muted={currentValue < skill.cost || cooldownTurns > 0}
+                ready={skillReady}
+                resourceProgress={skill.cost > 0 ? Math.min(1, currentValue / skill.cost) : 1}
+                onClick={() =>
+                  cooldownTurns <= 0
+                    ? onSkillChange(selectedSkillId === skill.id ? null : skill.id)
+                    : undefined
+                }
+                label={skill.name}
+                note={cooldownTurns > 0 ? `Cooldown ${cooldownTurns}T` : `${currentValue}/${skill.cost} ${skill.resourceType}`}
+                description={skill.description}
+                detailLines={formatSkillDetailLines(skill)}
+                icon={getSkillIcon(skill.name, skill.sourceItemCode)}
+                iconHint={skill.sourceItemCode}
+                badge={cooldownTurns > 0 ? `${cooldownTurns}` : `${skill.cost}`}
+              />
+            );
+          })}
+        />
+
+        <ActionRail
+          panelStyle={panelStyle}
+          title="Consumables"
+          emptyLabel="No consumables."
+          countLabel={String(availableConsumables.length)}
+          entries={availableConsumables.map((entry) => (
+            <ActionButton
+              key={entry.item.code}
+              selected={selectedConsumableCode === entry.item.code}
+              onClick={() =>
+                onConsumableChange(
+                  selectedConsumableCode === entry.item.code ? null : entry.item.code
+                )
+              }
+              label={entry.item.name}
+              note={`x${entry.quantity}`}
+              description={entry.item.description}
+              detailLines={formatConsumableDetailLines(entry.item)}
+              icon={getConsumableIcon(entry.item.name)}
+            />
+          ))}
+        />
       </div>
     </div>
   );
@@ -1756,6 +2227,7 @@ function OnlinePlayerCombatPanel({
   currentHp,
   maxHp,
   equipment,
+  selectedIntent,
   shellStyle,
   panelStyle,
   derivedStats,
@@ -1769,6 +2241,7 @@ function OnlinePlayerCombatPanel({
   currentHp: number;
   maxHp: number;
   equipment: Array<{ slot: string; item: unknown }>;
+  selectedIntent: RoundDraft["intent"];
   shellStyle: CSSProperties;
   panelStyle: CSSProperties;
   derivedStats: Array<{ label: string; value: string; helper: string }>;
@@ -1777,21 +2250,39 @@ function OnlinePlayerCombatPanel({
   winner: boolean;
   loser: boolean;
 }) {
+  const selectedTone = onlinePlayerIntentSilhouetteTone[selectedIntent];
+
   return (
     <SidePanel
-      shellStyle={shellStyle}
+      shellStyle={{
+        ...shellStyle,
+        border: `1px solid ${selectedTone.edge}`,
+        background: `linear-gradient(180deg, ${selectedTone.fill}, rgba(255,255,255,0.02))`,
+        boxShadow: `0 30px 74px rgba(0,0,0,0.34), 0 0 24px ${selectedTone.glow}`,
+      }}
       panelStyle={panelStyle}
       silhouette={
         <div className={winner ? "combat-postfight-silhouette combat-postfight-silhouette--victory-left" : loser ? "combat-postfight-silhouette combat-postfight-silhouette--defeat-left" : undefined}>
-          <CombatSilhouette
-            title={playerName}
-            currentHp={currentHp}
-            maxHp={maxHp}
-            activeEffects={[]}
-            equipmentSlots={equipment as Array<{ slot: EquipmentSlot; item: Item | null }>}
-            figure={playerFigure as never}
-            mirrored
-          />
+          <div
+            style={{
+              borderRadius: 30,
+              padding: 8,
+              background: `linear-gradient(180deg, ${selectedTone.fill}, rgba(255,255,255,0.02))`,
+              border: `1px solid ${selectedTone.edge}`,
+              boxShadow: `0 0 24px ${selectedTone.glow}, inset 2px 0 0 ${selectedTone.edge}, inset -2px 0 0 ${selectedTone.edge}`,
+              transition: "border-color 160ms ease, box-shadow 160ms ease, background 160ms ease",
+            }}
+          >
+            <CombatSilhouette
+              title={playerName}
+              currentHp={currentHp}
+              maxHp={maxHp}
+              activeEffects={[]}
+              equipmentSlots={equipment as Array<{ slot: EquipmentSlot; item: Item | null }>}
+              figure={playerFigure as never}
+              mirrored
+            />
+          </div>
         </div>
       }
       sidebar={
@@ -1887,6 +2378,8 @@ function getOnlineSelectedActionLabel({
   matchLocked,
   draft,
   playerActionSubmitted,
+  availableSkills,
+  availableConsumables,
 }: {
   duelId: string | null;
   playerReady: boolean;
@@ -1894,12 +2387,22 @@ function getOnlineSelectedActionLabel({
   matchLocked: boolean;
   draft: RoundDraft;
   playerActionSubmitted: boolean;
+  availableSkills: OnlineAvailableSkill[];
+  availableConsumables: OnlineAvailableConsumable[];
 }) {
+  const selectedAction = draft.selectedAction;
+
   if (!duelId) return "Open Match";
   if (matchLocked) return "Fight Complete";
   if (!playerReady) return "Ready Check";
   if (!showPlanner) return "Waiting for Rival";
   if (playerActionSubmitted) return "Action Locked";
+  if (selectedAction.kind === "skill_attack") {
+    return availableSkills.find((skill) => skill.id === selectedAction.skillId)?.name ?? "Skill";
+  }
+  if (selectedAction.kind === "consumable") {
+    return availableConsumables.find((entry) => entry.item.code === selectedAction.consumableCode)?.item.name ?? "Consumable";
+  }
   return `${zoneLabels[draft.attackZone]} Strike`;
 }
 
@@ -1910,6 +2413,8 @@ function getOnlineSelectedActionTags({
   currentStepBadge,
   draft,
   playerActionSubmitted,
+  availableSkills,
+  availableConsumables,
 }: {
   duelId: string | null;
   playerReady: boolean;
@@ -1917,15 +2422,33 @@ function getOnlineSelectedActionTags({
   currentStepBadge: string;
   draft: RoundDraft;
   playerActionSubmitted: boolean;
+  availableSkills: OnlineAvailableSkill[];
+  availableConsumables: OnlineAvailableConsumable[];
 }) {
+  const selectedAction = draft.selectedAction;
+
   if (!duelId) return ["Open"];
   if (!playerReady) return [currentStepBadge, "Ready Check"];
   if (!showPlanner) return [currentStepBadge, "Waiting"];
-  return [
+  const baseTags = [
     currentStepBadge,
     playerActionSubmitted ? "Locked" : "Planning",
+    `Intent ${formatCombatIntentLabel(draft.intent)}`,
     `Target ${zoneLabels[draft.attackZone]}`,
   ];
+  if (selectedAction.kind === "skill_attack") {
+    const skill = availableSkills.find((entry) => entry.id === selectedAction.skillId) ?? null;
+    return [...baseTags, "Skill", skill?.damageMultiplier ? `Damage x${skill.damageMultiplier.toFixed(2)}` : "Skill"];
+  }
+  if (selectedAction.kind === "consumable") {
+    const consumable = availableConsumables.find((entry) => entry.item.code === selectedAction.consumableCode)?.item ?? null;
+    return [
+      ...baseTags,
+      selectedAction.usageMode === "with_attack" ? "With Attack" : "Separate Action",
+      consumable?.consumableEffect?.heal ? `Heal ${consumable.consumableEffect.heal} HP` : "Consumable",
+    ];
+  }
+  return baseTags;
 }
 
 function getOnlineSelectedActionSummary({
@@ -1935,6 +2458,8 @@ function getOnlineSelectedActionSummary({
   draft,
   playerActionSubmitted,
   showPlanner,
+  availableSkills,
+  availableConsumables,
 }: {
   duelId: string | null;
   currentStepMessage: string;
@@ -1942,13 +2467,34 @@ function getOnlineSelectedActionSummary({
   draft: RoundDraft;
   playerActionSubmitted: boolean;
   showPlanner: boolean;
+  availableSkills: OnlineAvailableSkill[];
+  availableConsumables: OnlineAvailableConsumable[];
 }) {
-  if (!duelId) return ["Create or join a duel.", "Share the room code.", "Wait for both fighters."];
-  if (!showPlanner) return [currentStepMessage, `Opponent ${opponentState}`, "Round planning unlocks after ready."];
+  const selectedAction = draft.selectedAction;
+
+  if (!duelId) return ["Create or join a duel.", "Wait for both fighters.", "Battle planning unlocks in the room."];
+  if (!showPlanner) return [currentStepMessage, `Opponent ${opponentState}`, playerActionSubmitted ? "Action locked." : "Waiting for round planning."];
+  if (selectedAction.kind === "skill_attack") {
+    const skill = availableSkills.find((entry) => entry.id === selectedAction.skillId) ?? null;
+    return [
+      playerActionSubmitted ? "Your action is locked in." : "Skill selected for this round.",
+      ...(formatSkillDetailLines(skill).slice(0, 2)),
+      `Intent: ${formatCombatIntentLabel(draft.intent)}.`,
+    ];
+  }
+  if (selectedAction.kind === "consumable") {
+    const consumable = availableConsumables.find((entry) => entry.item.code === selectedAction.consumableCode)?.item ?? null;
+    return [
+      playerActionSubmitted ? "Your action is locked in." : "Consumable selected for this round.",
+      ...(formatConsumableDetailLines(consumable).slice(0, 2)),
+      `Intent: ${formatCombatIntentLabel(draft.intent)}.`,
+    ];
+  }
   return [
     playerActionSubmitted ? "Your action is locked in." : "Choose attack and block zones.",
     `Attack ${zoneLabels[draft.attackZone]}`,
     `Guard ${draft.defenseZones.map((zone) => zoneLabels[zone]).join(" + ")}`,
+    `Intent: ${formatCombatIntentLabel(draft.intent)}.`,
   ];
 }
 
@@ -2242,6 +2788,13 @@ function createOnlineBuildSelection(
 
   return {
     presetId: preset.id,
+    inventory,
+    equipmentState: presetState.equipment,
+    equippedSkillIds: presetState.equippedSkillIds,
+    equipment: playerEquipmentSlots.map((slot) => ({
+      slot,
+      item: inventory.entries.find((entry) => entry.item.code === presetState.equipment.slots[slot])?.item ?? null,
+    })),
     snapshot: buildCombatSnapshot({
       character,
       flatBonuses: equipmentBonuses.flatBonuses,
@@ -2361,6 +2914,12 @@ function createOnlineSetupFromTransport({
 }
 
 function getOnlineDuelBackendBaseUrl() {
+  const configuredBaseUrl =
+    typeof import.meta !== "undefined" ? import.meta.env.VITE_ONLINE_DUEL_BASE_URL?.trim() : undefined;
+  if (configuredBaseUrl) {
+    return configuredBaseUrl.replace(/\/+$/, "");
+  }
+
   if (typeof window === "undefined") {
     return "http://127.0.0.1:3001";
   }
@@ -2393,8 +2952,22 @@ function describeTransportIssue(issue: string) {
       return "the match service did not answer.";
     case "invalid_status":
       return "the match is not in the right phase for that action yet.";
+    case "combat_not_active":
+      return "the round already moved on. Syncing the room again can get you back in step.";
     case "stale_sync":
       return "your match state is out of date. Refresh the room and try again.";
+    case "invalid_action":
+      return "that action payload was invalid for this round.";
+    case "combatant_not_found":
+      return "the fighter for that action could not be matched in the live combat state.";
+    case "duplicate_defense_zones":
+      return "the same guard zone was selected twice. Pick two different guard zones.";
+    case "dead_combatant_action":
+      return "that fighter is already down, so the round cannot accept another action.";
+    case "insufficient_resources":
+      return "that move needs more combat resources before it can be used.";
+    case "skill_on_cooldown":
+      return "that skill is still on cooldown.";
     case "displaced_session":
       return "this session was replaced by a newer one for the same fighter.";
     case "participant_disconnected":
@@ -2427,8 +3000,23 @@ function shouldRecoverFromSubmitError(messages: OnlineDuelServerMessage[]) {
   return messages.some(
     (message) =>
       message.type === "duel_error" &&
-      (message.reason === "already_submitted" || message.reason === "stale_sync")
+      (
+        message.reason === "already_submitted" ||
+        message.reason === "stale_sync" ||
+        message.reason === "combat_resolution_failed" ||
+        message.reason === "combat_not_active" ||
+        message.reason === "invalid_action" ||
+        message.reason === "combatant_not_found" ||
+        message.reason === "duplicate_defense_zones" ||
+        message.reason === "dead_combatant_action" ||
+        message.reason === "insufficient_resources" ||
+        message.reason === "skill_on_cooldown"
+      )
   );
+}
+
+function shouldRefreshClientsAfterRoundResolution(messages: OnlineDuelServerMessage[]) {
+  return messages.some((message) => message.type === "round_resolved");
 }
 
 const eyebrowStyle: CSSProperties = {

@@ -1,6 +1,6 @@
 # UI Patch Notes
 
-> Last updated: 2026-03-20 01:00 MSK
+> Last updated: 2026-03-21 00:15 MSK
 
 Use this file as the canonical running log only for UI-system changes connected to the UI Systems Agent.
 
@@ -36,6 +36,23 @@ Patch note rule for UI work:
 - Preserved the same metrics, activity log, patch-notes modal, and progression model so both specialist agents behave consistently.
 
 ## 2026-03-18 - UI Agent Data Channels Initialized
+
+## 2026-03-20 - PvP Finish Flow No Longer Stalls On Guest Or Missing Stream
+
+- Fixed the lobby-launched PvP screen so live fight updates can render with only the active player's room token instead of waiting for a second debug-only token.
+- Fixed `Fight Again` so the action now uses the current player-facing room client: `host -> host`, `guest -> guest`.
+- Kept the local debug room controls intact while separating them from the real player-facing PvP recovery path.
+
+## 2026-03-21 - PvP Fight Screen Moved Closer To Bot Combat UI
+
+- Removed more of the room-dashboard framing from the normal PvP fight route, including empty wrapper cards and lobby-style copy inside the active combat surface.
+- Surfaced the live PvP combat log as a first-class panel instead of relying on the old round-summary card alone.
+- Kept `Combat Intent`, skills, and consumables visible in the live PvP fight flow so the screen now reads like the normal combat UI with a human opponent.
+- Matched PvP intent visuals to the main combat screen:
+  - selector tone: neutral/aggressive/guarded/precise now use the same accent families
+  - player-card intent shell now reacts visually when the stance changes
+
+> Last updated: 2026-03-21 00:15 MSK
 
 - Added `ui_agent_journal.md` as the UI specialist memory file.
 - Added `ui_patch_notes.md` as the UI specialist patch-log file.
@@ -118,6 +135,25 @@ Patch note rule for UI work:
 
 - Replaced vague `Power` shorthand with explicit `Block Power` in the compressed intent readouts.
 - This keeps the compact layout but removes ambiguity between raw damage power and block-specific mitigation strength.
+
+## 2026-03-20 - PvP Lobby Became A Separate Pre-Match Screen
+
+- Renamed the main-menu product wording from `Online Duel` to `PvP`.
+- Split the previous direct menu-to-room path into two screens:
+  - `PvP` pre-match lobby
+  - backend-driven PvP room flow
+- Added `PvpLobbyScreen.tsx` as a separate pre-match surface instead of routing `PvP` straight into the room screen.
+- Reused the standard player-side build stack inside that lobby:
+  - silhouette
+  - `Builder`
+  - `Builds`
+  - `Inventory`
+- Moved room-entry actions to the right-side lobby panel:
+  - `Создать игру`
+  - `Войти по номеру`
+  - `Ready`
+  - `Матчмейкинг`
+- Preserved the existing backend-driven room screen as the next step after the lobby instead of mixing those controls back into the bot combat layout.
 
 ## 2026-03-19 - Snapshot Panel Started Reflecting The Active Intent
 

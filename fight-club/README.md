@@ -89,24 +89,28 @@ Current curated presets:
 - combatants now track skill cooldown state
 - penetration has its own `PIERCE` impact feedback lane
 
-## Online Duel
+## PvP
 
-The app now includes a separate `1v1` online duel surface backed by a local authority service.
+The app now includes a backend-driven `PvP` flow backed by the local HTTP/SSE authority service.
 
 Current flow:
 
-- host creates a room and gets a room code
-- guest joins by room code
-- both sides pass a ready check
-- each side locks a round through a small attack/defense planner
-- the normal player flow uses a single active `Your Side` panel
-- duel state prefers the local HTTP/SSE authority service and falls back to the in-memory arena service when the server is unavailable
+- a player enters through the dedicated `PvP` lobby
+- the player can create a room, join by code, or use matchmaking
+- lobby-launched PvP requires the live backend instead of silently falling back to a fake local room
+- once inside the room, the fight screen mirrors the standard combat surface:
+  - local player on the left
+  - live combat controls in the center
+  - second player on the right instead of the bot
+- the live PvP fight now includes combat intent, skills, consumables, and a real combat log
+- duel state uses the HTTP/SSE authority path for room sync, round resolution, reconnect recovery, rematch, and leave-room flow
 
 Current scope:
 
 - no auth
 - no server persistence
-- reconnect / timeout diagnostics still live under `Debug Tools`
+- local-network / prototype deployment stage
+- some diagnostics and local verification controls still live under `Debug Tools`
 - the local backend entrypoint is `npm run online:server`
 
 ## Item And Data Pipeline

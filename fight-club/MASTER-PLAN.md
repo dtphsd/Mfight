@@ -1,6 +1,6 @@
 # MASTER-PLAN - Fight Club
 
-> Last updated: 2026-03-20 18:50 MSK
+> Last updated: 2026-03-21 00:15 MSK
 
 **Project:** Fight Club  
 **Scope:** active product planning, task tracking, and sprint history
@@ -54,7 +54,8 @@
 | BACKEND-004 | Add first local-authority adapter and verification flow | Backend / QA | ???? IN PROGRESS | `features/online-duel-1v1.md` | The transport seam now carries server-owned round summaries into the online screen, and the product flow now covers match-finish UX plus a server-owned `Play Another Match` reset inside the same room instead of a UI-only clear |
 | BACKEND-005 | Stand up first live 1v1 online service slice | Backend / Service | ???? IN PROGRESS | `features/online-duel-1v1.md` | The live HTTP authority slice now includes health checks, room-message handling, server-owned round summaries, revision-tagged sync, stale round-submit rejection, SSE room updates, attach/error resync, resume-token validation, event-cursor replay, explicit displacement of older live sessions after handoff, round lifecycle replay after reconnect, server-owned rematch reset, server-owned leave-room closure, and a dedicated live two-client validation test; the current product target is no longer a separate duel-lab surface but a real `PvP` flow: menu split into `Bot` and `PvP`, a `PvP` pre-match screen with the normal player build stack on the left plus room-entry controls on the right, then the standard combat screen with a real player replacing the bot |
 | BACKEND-006 | Build PvP pre-match lobby on top of the standard player build stack | Backend / UI Integration | ✅ DONE | `features/online-duel-1v1.md` | `PvP` now opens a dedicated pre-match screen with the normal player silhouette plus `Builder / Builds / Inventory` on the left and room-entry controls on the right |
-| BACKEND-007 | Transition PvP lobby into the standard combat screen with a real remote opponent | Backend / UI Integration | 🟡 IN PROGRESS | `features/online-duel-1v1.md` | The lobby now transitions into a combat-like `PvP Fight` screen where the second player replaces the bot-side surface; the remaining work is multi-round hardening, disconnect UX, and full product polish |
+| BACKEND-007 | Transition PvP lobby into the standard combat screen with a real remote opponent | Backend / UI Integration | 🟡 IN PROGRESS | `features/online-duel-1v1.md` | The lobby now transitions into a PvP combat screen that closely mirrors the bot-fight layout: live combat log, intent, skills, consumables, recovery-hardened SSE sync, and a reduced room-dashboard layer are all live; the remaining work is final visual parity, disconnect UX, backend authority hardening for public play, and deployment polish |
+| BACKEND-009 | Harden PvP for public-host deployment and fair authority rules | Backend / Service / Product | 🔴 TODO | `features/online-duel-1v1.md` | Finish the gap between a LAN-playable PvP prototype and an internet-ready product: deployable hosting, authority-side consumable and loadout validation, clearer reconnect states, observability, and operational safety |
 | BACKEND-008 | Add first server-owned matchmaking queue for PvP | Backend / Matchmaking | ✅ DONE | `features/online-duel-1v1.md` | The first server-owned queue is live through `find_matchmaking_duel`; the next work is queue hardening, cancellation, timeout, and reconnect polish rather than first implementation |
 | HUNT-001 | Define hunting domain model and save boundaries | Hunting Architecture | ✅ DONE | `features/hunting-mvp.md` | Hunting model contracts, starter zones, creation helpers, and the `state.hunting.*` save-boundary draft are now established |
 | HUNT-002 | Implement autonomous idle hunt loop and session resolution | Hunting Runtime | ✅ DONE | `features/hunting-mvp.md` | `startHunt` and `resolveHunt` now provide deterministic idle hunt simulation with test coverage |
@@ -138,6 +139,13 @@ Execution rules:
 ---
 
 ## Sprint History
+
+### v1.27 - PvP Combat Parity And Recovery Pass Landed
+
+- hardened the live PvP flow so lobby-launched rooms recover through the active player session instead of requiring debug-only dual-client subscriptions
+- added dedicated realtime and EventSource regression coverage for live create, join, rematch, and multi-round recovery paths
+- brought the PvP fight screen much closer to the bot-fight product surface by surfacing combat log, intent, skills, and consumables directly in the live match flow
+- removed most of the residual room-dashboard wording from the fight screen, collapsed empty wrapper cards, and tied player-card intent coloring to the same visual language as the main combat screen
 
 ### v1.26 - Single Active Match Panel Landed
 
@@ -673,7 +681,7 @@ When work changes state:
 
 ---
 
-> Last updated: 2026-03-20 18:50 MSK
+> Last updated: 2026-03-21 00:15 MSK
 
 
 

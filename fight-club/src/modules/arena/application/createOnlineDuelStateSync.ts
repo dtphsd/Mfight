@@ -70,6 +70,7 @@ export function createOnlineDuelStateSync(
           }
         : {}),
       ...(lastResolvedRound ? { lastResolvedRound } : {}),
+      ...(duel.combatState ? { combatState: duel.combatState } : {}),
     },
   };
 }

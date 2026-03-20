@@ -314,6 +314,13 @@ export function handleOnlineDuelClientMessage(
             duelId: message.duelId,
             reason: resolved.reason,
           });
+          const syncAfterResolveFailure = service.buildStateSync(message.duelId, message.playerId);
+          if (syncAfterResolveFailure.success) {
+            responses.push({
+              type: "duel_state_sync",
+              payload: syncAfterResolveFailure.data,
+            });
+          }
           return responses;
         }
 

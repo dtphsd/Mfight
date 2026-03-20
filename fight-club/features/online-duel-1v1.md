@@ -227,10 +227,16 @@ The first backend-safe runtime slice is now also in place:
   - it hands a prepared fighter into the backend-driven fight flow
 - the player-facing PvP fight screen now mirrors the bot-fight layout much more closely:
   - left side is the local player
-  - center is the combat-like ready / planning / round-result flow
+  - center is the live combat flow with ready / planning / intent / skills / consumables
   - right side is the second player instead of the bot
+- the live PvP combat flow now shows a real combat log instead of relying only on a round-summary card
+- most of the earlier room-dashboard copy has been removed from the normal lobby-launched fight route, so the standard product path reads like combat rather than transport debug
 - lobby-launched PvP now requires the live backend; if `online:server` is unavailable, the screen surfaces an explicit `live_service_required` warning instead of silently creating a fake local room code
 - action submission is now protected by immediate local lock state as well as authority-side submit ownership, which reduces accidental duplicate `already_submitted` errors during live play
+- live room recovery is now single-player-safe:
+  - SSE attach and sync recovery use the active player session instead of assuming both local debug seats exist on one screen
+  - guest rematch now uses the correct active client instead of always routing through the host seam
+  - multi-round regressions now cover repeated round resolution after the second exchange instead of only the first happy-path round
 
 ---
 
@@ -265,16 +271,87 @@ High-priority remaining work:
    - verify several consecutive live rounds, reconnect mid-fight, and stale-action edge cases against the real HTTP/SSE service
 2. Finish the player-facing combat parity pass.
    - remove remaining room-language and any residual lab/debug feel from the normal PvP route
+   - align final spacing, silhouette positioning, and panel rhythm even more closely with the bot-fight screen
+   - keep the normal PvP route free of empty wrapper cards and debug-only framing
 3. Harden live matchmaking.
    - validate queue pairing, cancellation, timeout, and reconnect behavior through the actual backend path
 4. Improve disconnect and rejoin UX.
    - make recovery states, seat ownership, and wait-for-opponent states clearer for real players
 5. Add deployment-ready backend work.
    - the service is still local-only; there is no public host, account identity, or production session boundary yet
+   - the current public-network prototype still needs stronger authority-side validation for consumables, loadouts, and abuse-resistant session behavior
 6. Add fuller regression coverage for real PvP product flows.
    - especially multi-round UI behavior, rematch loops, and live two-client screen parity
 7. Decide the first production boundary.
    - local LAN-style prototype only, or a public hosted PvP slice with real accounts and operational visibility
+
+## PvP Improvement Plan
+
+This is the recommended execution order for the next PvP pass.
+
+### Phase 1 - Final Combat-Screen Parity
+
+Goal: make the normal PvP fight screen feel visually identical to the bot-fight screen unless multiplayer state truly requires a difference.
+
+- finish the remaining layout polish around silhouette placement, stage proportions, and panel density
+- remove any remaining room-code, room-state, or onboarding phrasing from the active fight surface
+- keep debug and transport diagnostics available only behind explicit developer affordances
+- add one visual regression checklist for:
+  - combat log visible
+  - intent visible and color-coded
+  - player card reacts to selected intent
+  - skills and consumables visible in live PvP
+
+### Phase 2 - Reconnect And Match-State UX
+
+Goal: make real-player failures understandable instead of looking like a frozen fight.
+
+- surface clearer `waiting`, `reconnecting`, `opponent left`, and `room closed` states
+- make round-lock and round-resolve transitions feel explicit in the UI
+- improve rematch, leave-room, and return-to-lobby handling after finished or abandoned rooms
+- verify reconnect across:
+  - before ready
+  - mid-planning
+  - after round resolve
+  - after rematch reset
+
+### Phase 3 - Authority And Fairness Hardening
+
+Goal: prevent the public PvP path from trusting too much client-owned state.
+
+- validate consumable ownership, quantity, and usage mode on the backend
+- validate selected skill and loadout legality on the backend
+- reject impossible client actions with explicit recoverable errors plus forced sync
+- document the server-owned truth boundary for:
+  - loadout
+  - room ownership
+  - action legality
+  - rematch reset
+
+### Phase 4 - Public Deployment Slice
+
+Goal: move from local-network prototype to a safe hosted slice.
+
+- define the deploy target:
+  - home-hosted prototype
+  - VPS/reverse-proxy prototype
+  - first managed public environment
+- formalize env config for frontend/backend base URLs and public port exposure
+- add health, startup, and minimal runtime logging guidance for operators
+- decide whether the first public slice stays anonymous or introduces lightweight identity/session controls
+
+### Phase 5 - Regression And Operations Safety
+
+Goal: make PvP changes safe to keep evolving.
+
+- extend server and UI regression coverage for several consecutive rounds, reconnect, rematch, and matchmaking cancellation
+- add smoke-check guidance for live dev verification against the actual HTTP/SSE service
+- add a short operational checklist for:
+  - start server
+  - verify health
+  - verify SSE
+  - verify two-client room creation/join
+  - verify rematch and leave-room
 
 ## Full Online Fight Definition
 

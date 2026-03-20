@@ -220,6 +220,96 @@ describe("online duel live two-client validation", () => {
       10_000
     );
     expect(secondRoundEvents.some((event) => event.message.type === "round_resolved")).toBe(true);
+    for (const event of secondRoundEvents) {
+      hostClient.acceptServerMessage(event.message);
+    }
+
+    const guestSecondRoundEvents = await readUntilMessages(
+      guestStream,
+      (events) => {
+        const latestSync = [...events].reverse().find(isSyncEnvelope);
+
+        return (
+          events.some((event) => event.message.type === "round_resolved") &&
+          Boolean(
+            latestSync &&
+              (latestSync.message.payload.status === "finished" ||
+                (latestSync.message.payload.round === 3 &&
+                  latestSync.message.payload.status === "planning"))
+          )
+        );
+      },
+      10_000
+    );
+    for (const event of guestSecondRoundEvents) {
+      guestClient.acceptServerMessage(event.message);
+    }
+
+    const hostPostSecondSync = hostClient.getLastSync();
+    const guestPostSecondSync = guestClient.getLastSync();
+    if (
+      hostPostSecondSync?.status === "planning" &&
+      hostPostSecondSync.round === 3 &&
+      guestPostSecondSync?.status === "planning" &&
+      guestPostSecondSync.round === 3
+    ) {
+      await hostClient.submitRoundAction(
+        duelCreated.duelId,
+        "playerA",
+        createBasicAttackAction({
+          attackerId: hostSnapshot.characterId,
+          attackZone: "chest",
+          defenseZones: ["head", "waist"],
+        })
+      );
+      await guestClient.submitRoundAction(
+        duelCreated.duelId,
+        "playerB",
+        createBasicAttackAction({
+          attackerId: guestSnapshot.characterId,
+          attackZone: "waist",
+          defenseZones: ["chest", "legs"],
+        })
+      );
+
+      const hostThirdRoundEvents = await readUntilMessages(
+        hostStream,
+        (events) => {
+          const latestSync = [...events].reverse().find(isSyncEnvelope);
+
+          return (
+            events.some((event) => event.message.type === "round_resolved") &&
+            Boolean(
+              latestSync &&
+                (latestSync.message.payload.status === "finished" ||
+                  (latestSync.message.payload.round === 4 &&
+                    latestSync.message.payload.status === "planning"))
+            )
+          );
+        },
+        10_000
+      );
+      expect(hostThirdRoundEvents.some((event) => event.message.type === "round_resolved")).toBe(true);
+
+      const guestThirdRoundEvents = await readUntilMessages(
+        guestStream,
+        (events) => {
+          const latestSync = [...events].reverse().find(isSyncEnvelope);
+
+          return (
+            events.some((event) => event.message.type === "round_resolved") &&
+            Boolean(
+              latestSync &&
+                (latestSync.message.payload.status === "finished" ||
+                  (latestSync.message.payload.round === 4 &&
+                    latestSync.message.payload.status === "planning"))
+            )
+          );
+        },
+        10_000
+      );
+      expect(guestThirdRoundEvents.some((event) => event.message.type === "round_resolved")).toBe(true);
+    }
 
     await guestClient.leaveDuel(duelCreated.duelId);
 

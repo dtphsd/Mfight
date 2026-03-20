@@ -1,6 +1,6 @@
 import type { Random } from "@/core/rng/Random";
 import type { OnlineDuel, OnlineDuelSeat } from "@/modules/arena/model/OnlineDuel";
-import type { CombatSnapshot, CombatZone, RoundAction } from "@/modules/combat";
+import type { CombatSnapshot, CombatState, CombatZone, RoundAction } from "@/modules/combat";
 import type { EquipmentSlot } from "@/modules/equipment";
 import type { Item } from "@/modules/inventory";
 
@@ -21,6 +21,13 @@ export type OnlineDuelFailureReason =
   | "round_not_ready"
   | "already_submitted"
   | "combat_not_started"
+  | "combat_not_active"
+  | "invalid_action"
+  | "combatant_not_found"
+  | "duplicate_defense_zones"
+  | "dead_combatant_action"
+  | "insufficient_resources"
+  | "skill_on_cooldown"
   | "combat_resolution_failed";
 
 export type OnlineDuelResult<TData> =
@@ -149,6 +156,7 @@ export interface OnlineDuelStateSync {
   participants: OnlineDuelParticipantSync[];
   currentRoundState?: OnlineDuelCurrentRoundSync;
   lastResolvedRound?: OnlineDuelRoundSummary;
+  combatState?: CombatState;
 }
 
 export interface OnlineDuelAuthorityService {

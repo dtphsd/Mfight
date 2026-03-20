@@ -639,20 +639,22 @@ export function OnlineDuelScreen({
 
     setHostActionSubmitting(true);
     try {
-      applyInboundMessages(
-        await runClientAction(() =>
-          setupRef.current.hostClient.submitRoundAction(
-            duelId,
-            resolvedHostSeat,
-            buildPlayerRoundAction({
-              attackerId: hostBuild.snapshot.characterId,
-              draft: hostDraft,
-              skill: null,
-              consumable: null,
-            })
-          )
+      const submitMessages = await runClientAction(() =>
+        setupRef.current.hostClient.submitRoundAction(
+          duelId,
+          resolvedHostSeat,
+          buildPlayerRoundAction({
+            attackerId: hostBuild.snapshot.characterId,
+            draft: hostDraft,
+            skill: null,
+            consumable: null,
+          })
         )
       );
+      const recoveredMessages = shouldRecoverFromSubmitError(submitMessages)
+        ? await runClientAction(() => setupRef.current.hostClient.requestSync(duelId))
+        : [];
+      applyInboundMessages([...submitMessages, ...recoveredMessages]);
     } finally {
       setHostActionSubmitting(false);
     }
@@ -665,20 +667,22 @@ export function OnlineDuelScreen({
 
     setGuestActionSubmitting(true);
     try {
-      applyInboundMessages(
-        await runClientAction(() =>
-          setupRef.current.guestClient.submitRoundAction(
-            duelId,
-            resolvedGuestSeat,
-            buildPlayerRoundAction({
-              attackerId: guestBuild.snapshot.characterId,
-              draft: guestDraft,
-              skill: null,
-              consumable: null,
-            })
-          )
+      const submitMessages = await runClientAction(() =>
+        setupRef.current.guestClient.submitRoundAction(
+          duelId,
+          resolvedGuestSeat,
+          buildPlayerRoundAction({
+            attackerId: guestBuild.snapshot.characterId,
+            draft: guestDraft,
+            skill: null,
+            consumable: null,
+          })
         )
       );
+      const recoveredMessages = shouldRecoverFromSubmitError(submitMessages)
+        ? await runClientAction(() => setupRef.current.guestClient.requestSync(duelId))
+        : [];
+      applyInboundMessages([...submitMessages, ...recoveredMessages]);
     } finally {
       setGuestActionSubmitting(false);
     }
@@ -2417,6 +2421,14 @@ function transportBadgeLabel(source: TransportSource) {
     default:
       return "Checking room";
   }
+}
+
+function shouldRecoverFromSubmitError(messages: OnlineDuelServerMessage[]) {
+  return messages.some(
+    (message) =>
+      message.type === "duel_error" &&
+      (message.reason === "already_submitted" || message.reason === "stale_sync")
+  );
 }
 
 const eyebrowStyle: CSSProperties = {

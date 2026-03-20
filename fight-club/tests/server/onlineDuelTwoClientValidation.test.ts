@@ -163,6 +163,64 @@ describe("online duel live two-client validation", () => {
     );
     expect(hostRoundEvents.some((event) => event.message.type === "round_resolved")).toBe(true);
 
+    for (const event of hostRoundEvents) {
+      hostClient.acceptServerMessage(event.message);
+    }
+    const guestRoundEvents = await readUntilMessages(
+      guestStream,
+      (events) => {
+        const latestSync = [...events].reverse().find(isSyncEnvelope);
+
+        return (
+          events.some((event) => event.message.type === "round_resolved") &&
+          latestSync?.message.payload.round === 2 &&
+          latestSync.message.payload.status === "planning"
+        );
+      },
+      10_000
+    );
+    for (const event of guestRoundEvents) {
+      guestClient.acceptServerMessage(event.message);
+    }
+
+    await hostClient.submitRoundAction(
+      duelCreated.duelId,
+      "playerA",
+      createBasicAttackAction({
+        attackerId: hostSnapshot.characterId,
+        attackZone: "waist",
+        defenseZones: ["head", "legs"],
+      })
+    );
+    await guestClient.submitRoundAction(
+      duelCreated.duelId,
+      "playerB",
+      createBasicAttackAction({
+        attackerId: guestSnapshot.characterId,
+        attackZone: "head",
+        defenseZones: ["chest", "belly"],
+      })
+    );
+
+    const secondRoundEvents = await readUntilMessages(
+      hostStream,
+      (events) => {
+        const latestSync = [...events].reverse().find(isSyncEnvelope);
+
+        return (
+          events.some((event) => event.message.type === "round_resolved") &&
+          Boolean(
+            latestSync &&
+              (latestSync.message.payload.status === "finished" ||
+                (latestSync.message.payload.round === 3 &&
+                  latestSync.message.payload.status === "planning"))
+          )
+        );
+      },
+      10_000
+    );
+    expect(secondRoundEvents.some((event) => event.message.type === "round_resolved")).toBe(true);
+
     await guestClient.leaveDuel(duelCreated.duelId);
 
     const hostLeaveEvents = await readUntilMessages(

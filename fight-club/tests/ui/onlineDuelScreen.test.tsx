@@ -93,6 +93,21 @@ describe("OnlineDuelScreen", () => {
       expect(screen.getAllByText(/Host -> Guest|Guest -> Host/i).length).toBeGreaterThan(0);
     });
 
+    fireEvent.click(screen.getByRole("button", { name: "Host Side" }));
+    fireEvent.click(screen.getByRole("button", { name: "Host attack zone head" }));
+    fireEvent.click(screen.getByRole("button", { name: "Host defense zone chest" }));
+    fireEvent.click(screen.getByRole("button", { name: "Lock Selected Attack" }));
+
+    fireEvent.click(screen.getByRole("button", { name: "Guest Side" }));
+    fireEvent.click(screen.getByRole("button", { name: "Guest attack zone waist" }));
+    fireEvent.click(screen.getByRole("button", { name: "Guest defense zone head" }));
+    fireEvent.click(screen.getByRole("button", { name: "Lock Attack" }));
+
+    await waitFor(() => {
+      expect(screen.getAllByText("Round Result").length).toBeGreaterThan(0);
+      expect(screen.getAllByText(/Round 1|Round 2/).length).toBeGreaterThan(0);
+    });
+
     fireEvent.click(screen.getByRole("button", { name: "Force Timeout" }));
     await waitFor(() => {
       expect(screen.getByRole("button", { name: "Create Match" })).toBeTruthy();

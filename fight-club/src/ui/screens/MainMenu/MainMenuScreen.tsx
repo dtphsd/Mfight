@@ -6,6 +6,7 @@ interface MainMenuScreenProps {
   onOpenCombatRules: () => void;
   onOpenHunting: () => void;
   onOpenCombatAgent: () => void;
+  onOpenPvp: () => void;
 }
 
 export function MainMenuScreen({
@@ -14,6 +15,7 @@ export function MainMenuScreen({
   onOpenCombatRules,
   onOpenHunting,
   onOpenCombatAgent,
+  onOpenPvp,
 }: MainMenuScreenProps) {
   const { logger } = useGameApp();
 
@@ -46,6 +48,16 @@ export function MainMenuScreen({
             </button>
             <button type="button" className="main-menu__ghost" onClick={onOpenCombatRules}>
               Read Combat Rules
+            </button>
+            <button
+              type="button"
+              className="main-menu__ghost"
+              onClick={() => {
+                logger.info("PvP opened");
+                onOpenPvp();
+              }}
+            >
+              Open PvP
             </button>
             <button
               type="button"

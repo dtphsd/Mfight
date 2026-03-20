@@ -12,6 +12,8 @@ export function FightControlsPanel({
   selectedActionTags,
   selectedActionSummary,
   onStartFight,
+  primaryActionLabel,
+  primaryActionAriaLabel = "Start fight",
 }: {
   panelStyle: CSSProperties;
   primaryButtonStyle: CSSProperties;
@@ -23,6 +25,8 @@ export function FightControlsPanel({
   selectedActionTags: string[];
   selectedActionSummary: string[];
   onStartFight: () => void;
+  primaryActionLabel?: string;
+  primaryActionAriaLabel?: string;
 }) {
   return (
     <MiniPanel panelStyle={panelStyle} title="Fight Controls">
@@ -30,7 +34,7 @@ export function FightControlsPanel({
         <div style={{ display: "grid", gap: "10px" }}>
           <button
             type="button"
-            aria-label="Start fight"
+            aria-label={primaryActionAriaLabel}
             onClick={onStartFight}
             disabled={!canStartFight}
             style={{
@@ -38,7 +42,7 @@ export function FightControlsPanel({
               ...(canStartFight ? {} : { opacity: 0.48, cursor: "not-allowed" }),
             }}
           >
-            {combatPhase === "finished" ? "Restart Fight" : "Start Fight"}
+            {primaryActionLabel ?? (combatPhase === "finished" ? "Restart Fight" : "Start Fight")}
           </button>
         </div>
         <FightActionSummary

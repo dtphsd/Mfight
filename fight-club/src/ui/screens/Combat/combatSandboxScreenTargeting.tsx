@@ -53,6 +53,7 @@ export function AttackTargetRoundPanel({
   selectedDefenseZones,
   onSelectAttackZone,
   onToggleDefenseZone,
+  interactionLocked = false,
   roundControls,
 }: {
   panelStyle: CSSProperties;
@@ -62,6 +63,7 @@ export function AttackTargetRoundPanel({
   selectedDefenseZones: CombatZone[];
   onSelectAttackZone: (zone: CombatZone) => void;
   onToggleDefenseZone: (zone: CombatZone) => void;
+  interactionLocked?: boolean;
   roundControls: ReactNode;
 }) {
   return (
@@ -75,6 +77,7 @@ export function AttackTargetRoundPanel({
           selectedDefenseZones={selectedDefenseZones}
           onSelectAttackZone={onSelectAttackZone}
           onToggleDefenseZone={onToggleDefenseZone}
+          interactionLocked={interactionLocked}
         />
         {roundControls}
       </div>
@@ -90,6 +93,7 @@ function AttackTargetSelectionPanel({
   selectedDefenseZones,
   onSelectAttackZone,
   onToggleDefenseZone,
+  interactionLocked = false,
 }: {
   panelStyle: CSSProperties;
   resourcePanel: ReactNode;
@@ -98,6 +102,7 @@ function AttackTargetSelectionPanel({
   selectedDefenseZones: CombatZone[];
   onSelectAttackZone: (zone: CombatZone) => void;
   onToggleDefenseZone: (zone: CombatZone) => void;
+  interactionLocked?: boolean;
 }) {
   return (
     <div style={{ display: "grid", gap: "9px" }}>
@@ -117,6 +122,7 @@ function AttackTargetSelectionPanel({
           zones={zones}
           selectedZones={[selectedAttackZone]}
           onSelectZone={onSelectAttackZone}
+          interactionLocked={interactionLocked}
           tone={attackZoneCircleTone}
         />
         <ZoneCircleRow
@@ -124,6 +130,7 @@ function AttackTargetSelectionPanel({
           zones={zones}
           selectedZones={selectedDefenseZones}
           onSelectZone={onToggleDefenseZone}
+          interactionLocked={interactionLocked}
           multiSelect
           tone={defenseZoneCircleTone}
         />
@@ -137,6 +144,7 @@ function ZoneCircleRow({
   zones,
   selectedZones,
   onSelectZone,
+  interactionLocked = false,
   multiSelect = false,
   tone,
 }: {
@@ -144,6 +152,7 @@ function ZoneCircleRow({
   zones: CombatZone[];
   selectedZones: CombatZone[];
   onSelectZone: (zone: CombatZone) => void;
+  interactionLocked?: boolean;
   multiSelect?: boolean;
   tone: ZoneCircleTone;
 }) {
@@ -188,6 +197,7 @@ function ZoneCircleRow({
               type="button"
               aria-label={multiSelect ? `Toggle defense zone ${zone}` : `Select attack zone ${zone}`}
               onClick={() => onSelectZone(zone)}
+              disabled={interactionLocked}
               title={formatMaybeTitle(zone)}
               style={{
                 width: "100%",
@@ -196,7 +206,7 @@ function ZoneCircleRow({
                 border: selected ? `1px solid ${tone.activeBorder}` : "1px solid rgba(255,255,255,0.1)",
                 background: selected ? tone.activeBackground : "rgba(255,255,255,0.03)",
                 color: selected ? tone.activeColor : "#d9ccbc",
-                cursor: "pointer",
+                cursor: interactionLocked ? "not-allowed" : "pointer",
                 fontSize: "9px",
                 fontWeight: 800,
                 textTransform: "uppercase",
@@ -206,6 +216,7 @@ function ZoneCircleRow({
                 transition: "transform 140ms ease, box-shadow 140ms ease, border-color 140ms ease, background 140ms ease",
                 display: "grid",
                 placeItems: "center",
+                opacity: interactionLocked ? 0.58 : 1,
               }}
             >
               {zone.slice(0, 2)}

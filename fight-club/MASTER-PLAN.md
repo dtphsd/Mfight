@@ -1,6 +1,6 @@
 # MASTER-PLAN - Fight Club
 
-> Last updated: 2026-03-20 01:00 MSK
+> Last updated: 2026-03-20 18:50 MSK
 
 **Project:** Fight Club  
 **Scope:** active product planning, task tracking, and sprint history
@@ -52,7 +52,10 @@
 | BACKEND-002 | Build authority-ready duel room domain and state machine | Backend / Runtime | 🟡 IN PROGRESS | `features/online-duel-1v1.md` | Shared duel-room models and pure application functions should own join, action submission, and round resolution before any real transport is added |
 | BACKEND-003 | Define transport contracts for realtime duel sync | Backend / Contracts | ???? IN PROGRESS | `features/online-duel-1v1.md` | The realtime slice now has SSE room updates, client-side stale-push guards, authoritative resync on stream attach or error, server-issued resume tokens, event-cursor replay, explicit session handoff, and replay of core round lifecycle events; the next step is deciding whether reconnect should restore deeper combat/action history beyond the current room-focused stream |
 | BACKEND-004 | Add first local-authority adapter and verification flow | Backend / QA | ???? IN PROGRESS | `features/online-duel-1v1.md` | The transport seam now carries server-owned round summaries into the online screen, and the product flow now covers match-finish UX plus a server-owned `Play Another Match` reset inside the same room instead of a UI-only clear |
-| BACKEND-005 | Stand up first live 1v1 online service slice | Backend / Service | ???? IN PROGRESS | `features/online-duel-1v1.md` | The live HTTP authority slice now includes health checks, room-message handling, server-owned round summaries, revision-tagged sync, stale round-submit rejection, SSE room updates, attach/error resync, resume-token validation, event-cursor replay, explicit displacement of older live sessions after handoff, round lifecycle replay after reconnect, server-owned rematch reset, server-owned leave-room closure, a dedicated live two-client validation test, a player-facing `Your Side` online view, a cleaner `Create Match / Join Match` entry split that only shows one onboarding intent at a time, and a single active-side match panel for normal play; the next step is trimming the remaining in-screen remote-opponent simulation from the non-debug flow |
+| BACKEND-005 | Stand up first live 1v1 online service slice | Backend / Service | ???? IN PROGRESS | `features/online-duel-1v1.md` | The live HTTP authority slice now includes health checks, room-message handling, server-owned round summaries, revision-tagged sync, stale round-submit rejection, SSE room updates, attach/error resync, resume-token validation, event-cursor replay, explicit displacement of older live sessions after handoff, round lifecycle replay after reconnect, server-owned rematch reset, server-owned leave-room closure, and a dedicated live two-client validation test; the current product target is no longer a separate duel-lab surface but a real `PvP` flow: menu split into `Bot` and `PvP`, a `PvP` pre-match screen with the normal player build stack on the left plus room-entry controls on the right, then the standard combat screen with a real player replacing the bot |
+| BACKEND-006 | Build PvP pre-match lobby on top of the standard player build stack | Backend / UI Integration | ✅ DONE | `features/online-duel-1v1.md` | `PvP` now opens a dedicated pre-match screen with the normal player silhouette plus `Builder / Builds / Inventory` on the left and room-entry controls on the right |
+| BACKEND-007 | Transition PvP lobby into the standard combat screen with a real remote opponent | Backend / UI Integration | 🟡 IN PROGRESS | `features/online-duel-1v1.md` | The lobby now transitions into a combat-like `PvP Fight` screen where the second player replaces the bot-side surface; the remaining work is multi-round hardening, disconnect UX, and full product polish |
+| BACKEND-008 | Add first server-owned matchmaking queue for PvP | Backend / Matchmaking | ✅ DONE | `features/online-duel-1v1.md` | The first server-owned queue is live through `find_matchmaking_duel`; the next work is queue hardening, cancellation, timeout, and reconnect polish rather than first implementation |
 | HUNT-001 | Define hunting domain model and save boundaries | Hunting Architecture | ✅ DONE | `features/hunting-mvp.md` | Hunting model contracts, starter zones, creation helpers, and the `state.hunting.*` save-boundary draft are now established |
 | HUNT-002 | Implement autonomous idle hunt loop and session resolution | Hunting Runtime | ✅ DONE | `features/hunting-mvp.md` | `startHunt` and `resolveHunt` now provide deterministic idle hunt simulation with test coverage |
 | HUNT-003 | Add reward bridge from hunting into shared inventory | Hunting Economy | ✅ DONE | `features/hunting-mvp.md` | `claimHuntRewards` now converts pending hunt rewards into shared inventory items through the existing inventory module |
@@ -670,7 +673,7 @@ When work changes state:
 
 ---
 
-> Last updated: 2026-03-20 01:00 MSK
+> Last updated: 2026-03-20 18:50 MSK
 
 
 

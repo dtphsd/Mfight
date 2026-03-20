@@ -1,6 +1,6 @@
 # RULES.md - Documentation And Safe Change Rules
 
-> Last updated: 2026-03-19 17:26 MSK
+> Last updated: 2026-03-20 18:50 MSK
 
 **Project:** Fight Club  
 **Path:** `c:/Users/dtphs/.vscode/Project`
@@ -83,6 +83,7 @@ Update when:
 - If docs are also published as a static site, keep the VitePress entry pages and config under `fight-club/docs/.vitepress/` in sync with the markdown structure.
 - If a change meaningfully affects a specialist domain surface, sync that specialist memory too:
   - combat work -> `fight-club/TAMA_start/combat_patch_notes.md` and, when meaningful, `fight-club/TAMA_start/combat_agent_journal.md`
+  - backend work -> `fight-club/TAMA_start/backend_patch_notes.md` and, when meaningful, `fight-club/TAMA_start/backend_agent_journal.md`
   - UI work -> `fight-club/TAMA_start/ui_patch_notes.md` and, when meaningful, `fight-club/TAMA_start/ui_agent_journal.md`
 - If one task spans multiple specialist domains, every affected specialist must log its own side of the work.
   - Example: a combat mechanic with a new sandbox selector belongs in both combat and UI specialist records.
@@ -157,11 +158,11 @@ And manually verify sandbox flow:
 ## Current Project Facts
 
 - This is a single frontend project on `React + TypeScript + Vite`.
-- Backend is absent.
+- A local online-duel backend slice now exists under `fight-club/server/`.
 - Database is absent.
 - Auth is absent.
 - Persistence is currently `localStorage` only.
-- Main implemented scenario is `Combat Sandbox`.
+- Main implemented user-facing scenarios are `Combat Sandbox`, `PvP`, and `Hunting Lodge`.
 - `Combat Rules` is a real implemented reference screen.
 - `Combat Rules` content must stay synced with live combat runtime, including effects, loadout rules, and consumable behavior.
 - Inventory and equipment use `mainHand / offHand`.
@@ -189,10 +190,14 @@ And manually verify sandbox flow:
   - `Signature Skill`
 - The app now includes an `Ecosystem Agents` hub with at least:
   - `Combat Master`
+  - `Backend Master`
   - `UI Master`
 - `Combat Master` uses:
   - `fight-club/TAMA_start/combat_agent_journal.md`
   - `fight-club/TAMA_start/combat_patch_notes.md`
+- `Backend Master` uses:
+  - `fight-club/TAMA_start/backend_agent_journal.md`
+  - `fight-club/TAMA_start/backend_patch_notes.md`
 - `UI Master` uses:
   - `fight-club/TAMA_start/ui_agent_journal.md`
   - `fight-club/TAMA_start/ui_patch_notes.md`
@@ -211,4 +216,4 @@ Whenever you edit these root docs:
 
 ---
 
-> Last updated: 2026-03-19 17:26 MSK
+> Last updated: 2026-03-20 18:50 MSK

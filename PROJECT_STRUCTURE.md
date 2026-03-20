@@ -1,6 +1,6 @@
 # PROJECT_STRUCTURE - Fight Club
 
-> Last updated: 2026-03-20 01:00 MSK
+> Last updated: 2026-03-20 18:50 MSK
 
 **Project root:** `c:/Users/dtphs/.vscode/Project`
 
@@ -121,7 +121,7 @@ src/
 
 ## `src/app`
 
-- `App.tsx` - screen switcher for menu, rules, combat, hunting, agents, and online duel
+- `App.tsx` - screen switcher for menu, rules, combat, hunting, agents, `PvP` lobby, and the backend-driven PvP room screen
 - `providers/AppProviders.tsx` - React provider shell
 - `config/gameConfig.ts` - gameplay/save config
 - `bootstrap/createGameApp.ts` - logger, RNG, storage, and app services bootstrap
@@ -326,6 +326,7 @@ Backup policy:
 - `CombatRules/CombatRulesScreen.tsx`
 - `Hunting/HuntingScreen.tsx`
 - `CombatAgent/CombatAgentScreen.tsx`
+- `PvpLobby/PvpLobbyScreen.tsx` - separate `PvP` pre-match screen that reuses the player build stack before entering the backend-driven room flow
 - `components/profile/ProfileModal.tsx` - local profile card with mailbox mini modal, reply flow, and direct letters
 - `CombatRules/combatRulesContent.ts` - localized Combat Codex content
 - `CombatRules/combatRulesFacts.ts` - generated item/skill facts from live starter content
@@ -337,11 +338,15 @@ Current UI facts:
 - hunting is now accessible from the main menu through `Hunting Lodge`
 - hunting has its own live UI shell, separate from combat sandbox
 - `Ecosystem Agents` now includes `Combat Master`, `UI Master`, and `Backend Master`
-- `Online Duel` is now accessible from the main menu as a separate host/join prototype over the local online-duel backend seam
-- the screen now uses room code entry, a single active `Your Side` panel in the normal flow, and a live match-status summary
+- `PvP` is now accessible from the main menu through a separate pre-match lobby screen
+- that lobby reuses the normal player-side silhouette, `Builder`, `Builds`, and `Inventory` stack before entering the room flow
+- the backend-driven PvP fight screen now uses the combat-stage shell more directly instead of a separate room-dashboard layout
+- the normal player-facing PvP route now centers on a combat-like `Combat Arena` stage where the second player replaces the bot-side opponent surface
 - round submission now goes through an on-screen planner for attack zone plus two defense zones
 - disconnect/reconnect/session reset controls are now hidden in `Debug Tools` instead of the main player flow
 - the room flow now includes server-owned `Leave Room` and `Play Another Match`
+- lobby-launched PvP now requires the live backend instead of falling back to a local share-code illusion when `online:server` is offline
+- round-submit buttons and zone selectors now lock immediately when the local player submits an action, which reduces duplicate `already_submitted` race errors
 - the screen still includes a safe timeout trigger for stale-room verification against the local authority layer
 - status effects live above HP to avoid spending extra vertical space
 - combat impact text and block/crit/break visuals now use one-shot pulse wiring plus fade-safe CSS so overlays do not reappear after their animation ends
@@ -416,9 +421,9 @@ Current status:
 ## Structural Notes
 
 - this is still one frontend project, not a monorepo
-- the repo now also contains a small local backend tree under `server/` for `Online Duel`
+- the repo now also contains a small local backend tree under `server/` for the backend-driven `PvP` room flow
 - bootstrap is currently minimal and direct through `createGameApp.ts`, not a full dependency-registration graph
 
 ---
 
-> Last updated: 2026-03-20 01:00 MSK
+> Last updated: 2026-03-20 18:50 MSK

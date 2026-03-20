@@ -6,6 +6,7 @@ import type { CombatFigureId } from "@/ui/components/combat/CombatSilhouette";
 import { useCombatSandbox } from "@/ui/hooks/useCombatSandbox";
 import { FightSetupPanel } from "./combatSandboxScreenSetup";
 import { BotCombatPanel, PlayerCombatPanel } from "./combatSandboxScreenPanels";
+import { ArenaStageColumns, ArenaStageShell } from "./combatSandboxScreenLayout";
 
 type CombatSandboxModel = ReturnType<typeof useCombatSandbox>;
 
@@ -71,24 +72,27 @@ export function CombatSandboxStage({
   onOpenSkillLoadout: () => void;
 }) {
   return (
-    <div style={{ ...shellStyle, padding: "16px", display: "grid", gap: "14px", position: "relative", overflow: "hidden" }}>
-      {deathFinisher ? (
-        <div
-          key={deathFinisher.key}
-          className={`combat-death-scene-flash combat-death-scene-flash--${deathFinisher.winner}`}
-          style={{
-            position: "absolute",
-            inset: 0,
-            pointerEvents: "none",
-            zIndex: 0,
-          }}
-        />
-      ) : null}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "14px", alignItems: "start" }}>
+    <ArenaStageShell
+      shellStyle={shellStyle}
+      overlay={
+        deathFinisher ? (
+          <div
+            key={deathFinisher.key}
+            className={`combat-death-scene-flash combat-death-scene-flash--${deathFinisher.winner}`}
+            style={{
+              position: "absolute",
+              inset: 0,
+              pointerEvents: "none",
+              zIndex: 0,
+            }}
+          />
+        ) : null
+      }
+    >
+      <ArenaStageColumns>
         <div
           key={deathFinisher?.winner === "player" ? `${deathFinisher.key}-player-winner` : deathFinisher?.winner === "bot" ? `${deathFinisher.key}-player-loser` : "player-panel"}
           className={resolveDeathFinisherClassName("player", deathFinisher?.winner ?? null)}
-          style={{ position: "relative", zIndex: 1 }}
         >
           <PlayerCombatPanel
             sandbox={sandbox}
@@ -128,7 +132,6 @@ export function CombatSandboxStage({
         <div
           key={deathFinisher?.winner === "bot" ? `${deathFinisher.key}-bot-winner` : deathFinisher?.winner === "player" ? `${deathFinisher.key}-bot-loser` : "bot-panel"}
           className={resolveDeathFinisherClassName("bot", deathFinisher?.winner ?? null)}
-          style={{ position: "relative", zIndex: 1 }}
         >
           <BotCombatPanel
             sandbox={sandbox}
@@ -142,8 +145,8 @@ export function CombatSandboxStage({
             silhouetteState={outcomeWinner === "bot" ? "victory" : outcomeWinner === "player" ? "defeat" : null}
           />
         </div>
-      </div>
-    </div>
+      </ArenaStageColumns>
+    </ArenaStageShell>
   );
 }
 

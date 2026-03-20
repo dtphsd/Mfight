@@ -1,6 +1,6 @@
 # Online Duel 1v1
 
-> Last updated: 2026-03-20 01:00 MSK
+> Last updated: 2026-03-20 18:50 MSK
 
 **Feature:** online-duel-1v1  
 **Status:** IN PROGRESS
@@ -83,9 +83,20 @@ Add the first backend runtime:
 
 Connect the frontend to the backend duel runtime:
 
-- lobby/join flow
-- ready-state UX
-- action submit UX
+- `PvP` menu entry instead of a duel-lab naming surface
+- dedicated `PvP` pre-match screen
+- left side reuses the normal player build stack:
+  - silhouette
+  - `Builder`
+  - `Builds`
+  - `Inventory`
+- right side becomes room-entry and matchmaking:
+  - create game
+  - join by code
+  - ready
+  - matchmaking
+- after room entry, transition into the standard combat screen
+- replace the bot-side runtime with the connected remote player
 - reconnect and timeout feedback
 
 ### Phase 5 - Hardening
@@ -157,14 +168,14 @@ It should not yet include:
 
 Current state:
 
-Phase 1 is now active and Phase 3 has begun. The duel room domain is live, the in-memory authority service now wraps room creation and round resolution, the local transport and client seam are wired, the first pre-fight `lobby -> ready -> planning` gate is active in the `Online Duel` screen, the prototype carries a room code plus first-pass disconnect/reconnect state sync, and the authority layer now has an explicit stale-room timeout sweep.
+Phases 1 through 4 are partially live. The duel room domain is live, the in-memory authority service wraps room creation and round resolution, the local and HTTP transports are wired, the Node authority service exposes HTTP plus SSE, and the product flow now goes through a real `PvP` lobby into a combat-like fight screen instead of staying inside a duel-lab-only surface.
 
 Current frontend-safe state now goes further than the original lab milestone:
 
-- the surface is now `Online Duel`, not `Online Duel Lab`
+- the menu and lobby language is now `PvP`, not `Online Duel Lab`
 - room entry is driven by `roomCode`, not internal duel id
-- the main match surface now centers on one active player-facing panel instead of exposing both room sides in the default flow
-- the screen includes a live `Match Status` summary for room creation, join, ready check, and action phase
+- the main match surface now centers on a combat-like `PvP Fight` stage instead of a room dashboard
+- the screen still includes live match-status summaries for room creation, join, ready check, and action phase
 - round submission now goes through a small attack/defense planner instead of hardcoded submit actions
 - the main room flow now also has explicit match-finish UX with `Leave Room` and `Play Another Match`, so players can exit a closed room or reset into a fresh create/join state without using debug-only controls
 - `Match Status` now surfaces product-facing outcome text too, so the room can clearly report `winner`, `Room closed`, or `In progress`
@@ -210,13 +221,73 @@ The first backend-safe runtime slice is now also in place:
 - the active fight panel is now presented as `Your Side`, while explicit host/guest side switching survives only as a debug affordance for local two-seat verification
 - the room-entry layer now also reflects that product direction: players choose one entry intent first, then see only the create or join flow that matches it
 - the current online setup flow now goes one step further and hides the unselected onboarding path entirely, which keeps room setup focused on one player's immediate action instead of showing both branches at once
+- the dedicated `PvP` lobby is now real too:
+  - it reuses the normal player build stack
+  - it supports create, join by code, and matchmaking
+  - it hands a prepared fighter into the backend-driven fight flow
+- the player-facing PvP fight screen now mirrors the bot-fight layout much more closely:
+  - left side is the local player
+  - center is the combat-like ready / planning / round-result flow
+  - right side is the second player instead of the bot
+- lobby-launched PvP now requires the live backend; if `online:server` is unavailable, the screen surfaces an explicit `live_service_required` warning instead of silently creating a fake local room code
+- action submission is now protected by immediate local lock state as well as authority-side submit ownership, which reduces accidental duplicate `already_submitted` errors during live play
 
 ---
 
-## Next Step
+## Product Target
 
-Now that the frontend can already bind to the HTTP service, render server-owned result summaries, reject stale round submits, receive pushed room sync over SSE, resync state on stream attach or error, validate seat-specific resume tokens, replay missed sync by event cursor, enforce live session handoff ownership, recover core round lifecycle after reconnect, rematch inside the same room through a server-owned reset flow, close the room through a server-owned leave policy, pass a dedicated two-client live validation test, keep most technical controls behind `Debug Tools`, present the active match as one neutral `Your Side` panel, and show only one room-entry branch at a time, the next sprint should focus on the last visible lab residue after room entry: trimming any remaining in-screen remote-opponent simulation from the non-debug player path.
+The intended player-facing flow is now explicit:
+
+1. Main menu offers two separate modes:
+   - bot mode
+   - `PvP`
+2. `PvP` opens a dedicated pre-match screen, not a separate duel-lab combat UI.
+3. That pre-match screen keeps the existing player build experience on the left:
+   - silhouette
+   - `Builder`
+   - `Builds`
+   - `Inventory`
+4. The right side is a room-entry panel:
+   - create game
+   - join by code
+   - ready
+   - matchmaking
+5. Once the player creates, joins, or is matched into a room, the app transitions into the standard combat screen.
+6. In that combat screen, the remote player replaces the bot while the normal combat layout stays intact.
+
+## Remaining Work
+
+The project now has a playable local-network PvP flow, but it is not yet a fully complete online fighting product.
+
+High-priority remaining work:
+
+1. Harden round-to-round live sync beyond the current happy path.
+   - verify several consecutive live rounds, reconnect mid-fight, and stale-action edge cases against the real HTTP/SSE service
+2. Finish the player-facing combat parity pass.
+   - remove remaining room-language and any residual lab/debug feel from the normal PvP route
+3. Harden live matchmaking.
+   - validate queue pairing, cancellation, timeout, and reconnect behavior through the actual backend path
+4. Improve disconnect and rejoin UX.
+   - make recovery states, seat ownership, and wait-for-opponent states clearer for real players
+5. Add deployment-ready backend work.
+   - the service is still local-only; there is no public host, account identity, or production session boundary yet
+6. Add fuller regression coverage for real PvP product flows.
+   - especially multi-round UI behavior, rematch loops, and live two-client screen parity
+7. Decide the first production boundary.
+   - local LAN-style prototype only, or a public hosted PvP slice with real accounts and operational visibility
+
+## Full Online Fight Definition
+
+For this project, `full online fight` should mean all of the following are true at once:
+
+- two real players can create, join, or matchmake into the same fight through the backend path
+- the fight can play through multiple rounds without manual recovery
+- disconnect and rejoin are understandable and recoverable in normal UX
+- the product-facing PvP screen is the standard combat screen with the second player replacing the bot
+- rematch, leave-room, and matchmaking are server-owned and reliable
+- the backend is no longer only a local developer service
+- there is a real identity and trust model instead of anonymous local sessions only
 
 ---
 
-> Last updated: 2026-03-20 01:00 MSK
+> Last updated: 2026-03-20 18:50 MSK

@@ -56,6 +56,47 @@ export function SidePanel({
   );
 }
 
+export function ArenaStageShell({
+  shellStyle,
+  children,
+  overlay = null,
+}: {
+  shellStyle: CSSProperties;
+  children: ReactNode;
+  overlay?: ReactNode;
+}) {
+  return (
+    <div
+      style={{
+        ...shellStyle,
+        padding: "16px",
+        display: "grid",
+        gap: "14px",
+        position: "relative",
+        overflow: "hidden",
+      }}
+    >
+      {overlay}
+      <div style={{ position: "relative", zIndex: 1, display: "grid", gap: "14px" }}>{children}</div>
+    </div>
+  );
+}
+
+export function ArenaStageColumns({ children }: { children: ReactNode }) {
+  return (
+    <div
+      style={{
+        display: "grid",
+        gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
+        gap: "14px",
+        alignItems: "start",
+      }}
+    >
+      {children}
+    </div>
+  );
+}
+
 export function MiniPanel({
   panelStyle,
   title,

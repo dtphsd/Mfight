@@ -1,6 +1,6 @@
 # PROJECT-INFO - Fight Club
 
-> Last updated: 2026-03-20 01:00 MSK
+> Last updated: 2026-03-20 18:50 MSK
 
 **Project:** Fight Club  
 **Type:** browser-first SPA plus local online-duel authority slice  
@@ -72,18 +72,19 @@ The app also exposes a shared specialist console through `Ecosystem Agents`:
 - `UI Master`
 - `Backend Master`
 
-The app also now exposes a separate `Online Duel` screen:
+The app also now exposes a separate `PvP` path:
 
-- backend-first `1v1` host / join surface with local fallback
-- room-code based entry flow
-- single active `Your Side` match panel in the normal player flow
-- pre-fight ready check and live match-status summary
-- in-screen round planner for attack zone and two defense zones before round submit
-- server-owned `Leave Room` and `Play Another Match`
-- SSE-driven sync, reconnect recovery, and room lifecycle ownership in the backend slice
-- reconnect / timeout / session diagnostics hidden behind debug tools
-- powered by the local HTTP authority service first, with in-memory authority fallback
-- intentionally isolated from the main `Combat Sandbox`
+- main menu entry now uses `PvP` wording instead of `Online Duel`
+- `PvP` first opens a separate pre-match lobby screen
+- that lobby reuses the standard player-side silhouette, `Builder`, `Builds`, and `Inventory` flow
+- room entry is launched from the right-side match panel and then continues into the backend-driven fight screen
+- the backend-driven fight screen now mirrors the bot-fight combat layout much more closely:
+  - left side is the active local fighter
+  - right side is the second player instead of the bot
+  - the center flow uses the combat-style ready / planning / round-result surface
+- room-code flow, ready check, live sync, rematch, leave-room, and debug recovery tools are still present
+- lobby-launched `PvP` now requires the live backend and no longer silently falls back to a fake local share-code flow
+- action submission in the PvP fight screen is now locally locked on click, so duplicate `already_submitted` errors are less likely during live play
 
 ---
 
@@ -135,6 +136,7 @@ The app also now exposes a separate `Online Duel` screen:
 - event-cursor replay
 - session handoff ownership
 - server-owned rematch and leave-room flows
+- first server-owned matchmaking queue
 - live two-client validation test coverage
 
 ### Combat Runtime
@@ -312,7 +314,8 @@ There is also a dedicated balance runner:
 ## Constraints
 
 - no auth or account trust boundary yet
-- no real networked multiplayer yet
+- no public deployed multiplayer service yet
+- no account system, ranked identity, or anti-cheat trust boundary
 - bot now uses build-aware skill planning, but still does not use consumables
 - sandbox bot stat allocations are clipped to the current player allocation budget
 - persistence still means browser `localStorage`, not a real save profile system
@@ -384,4 +387,4 @@ From repo root:
 
 ---
 
-> Last updated: 2026-03-20 01:00 MSK
+> Last updated: 2026-03-20 18:50 MSK

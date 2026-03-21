@@ -17,6 +17,7 @@ export function handleOnlineDuelClientMessage(
         displayName: message.displayName,
         snapshot: message.snapshot,
         fighterView: message.fighterView,
+        loadout: message.loadout,
       });
       const sync = service.buildStateSync(duel.id, message.playerId);
 
@@ -40,6 +41,7 @@ export function handleOnlineDuelClientMessage(
         displayName: message.displayName,
         snapshot: message.snapshot,
         fighterView: message.fighterView,
+        loadout: message.loadout,
       });
 
       if (!matched.success) {
@@ -86,6 +88,7 @@ export function handleOnlineDuelClientMessage(
         displayName: message.displayName,
         snapshot: message.snapshot,
         fighterView: message.fighterView,
+        loadout: message.loadout,
         expectedRevision: message.expectedRevision,
       });
 
@@ -123,6 +126,7 @@ export function handleOnlineDuelClientMessage(
         displayName: message.displayName,
         snapshot: message.snapshot,
         fighterView: message.fighterView,
+        loadout: message.loadout,
         expectedRevision: message.expectedRevision,
       });
 
@@ -279,7 +283,7 @@ export function handleOnlineDuelClientMessage(
         seat: message.seat,
         playerId: message.playerId,
         sessionId: message.sessionId,
-        action: message.action,
+        selection: message.selection,
         expectedRound: message.expectedRound,
         expectedRevision: message.expectedRevision,
       });

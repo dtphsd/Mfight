@@ -1,8 +1,8 @@
 import type { Random } from "@/core/rng/Random";
 import type { OnlineDuel, OnlineDuelSeat } from "@/modules/arena/model/OnlineDuel";
-import type { CombatSnapshot, CombatState, CombatZone, RoundAction } from "@/modules/combat";
-import type { EquipmentSlot } from "@/modules/equipment";
-import type { Item } from "@/modules/inventory";
+import type { CombatIntent, CombatSnapshot, CombatState, CombatZone, RoundAction } from "@/modules/combat";
+import type { Equipment, EquipmentSlot } from "@/modules/equipment";
+import type { Inventory, Item } from "@/modules/inventory";
 
 export type OnlineDuelFailureReason =
   | "duel_not_found"
@@ -40,6 +40,7 @@ export interface CreateOnlineDuelRoomInput {
   displayName: string;
   snapshot: CombatSnapshot;
   fighterView?: OnlineDuelFighterView;
+  loadout?: OnlineDuelParticipantLoadout;
   createdAt?: number;
 }
 
@@ -51,6 +52,7 @@ export interface JoinOnlineDuelRoomInput {
   displayName: string;
   snapshot: CombatSnapshot;
   fighterView?: OnlineDuelFighterView;
+  loadout?: OnlineDuelParticipantLoadout;
   expectedRevision?: number;
   joinedAt?: number;
 }
@@ -60,11 +62,29 @@ export interface OnlineDuelFighterView {
   equipment: Array<{ slot: EquipmentSlot; item: Item | null }>;
 }
 
+export interface OnlineDuelParticipantLoadout {
+  equipmentState: Equipment;
+  inventory: Inventory;
+  equippedSkillIds: string[];
+}
+
+export type OnlineDuelSelectedAction =
+  | { kind: "basic_attack" }
+  | { kind: "skill_attack"; skillId: string }
+  | { kind: "consumable"; consumableCode: string; usageMode: "replace_attack" | "with_attack" };
+
+export interface OnlineDuelActionSelection {
+  attackZone: CombatZone;
+  defenseZones: [CombatZone, CombatZone];
+  intent: CombatIntent;
+  selectedAction: OnlineDuelSelectedAction;
+}
+
 export interface SubmitOnlineDuelActionInput {
   seat: OnlineDuelSeat;
   playerId: string;
   sessionId: string;
-  action: RoundAction;
+  selection: OnlineDuelActionSelection;
   expectedRound?: number;
   expectedRevision?: number;
   submittedAt?: number;
@@ -153,6 +173,9 @@ export interface OnlineDuelStateSync {
   winnerSeat: OnlineDuelSeat | null;
   yourSeat: OnlineDuelSeat | null;
   resumeToken?: string;
+  yourLoadout?: OnlineDuelParticipantLoadout;
+  yourSnapshot?: CombatSnapshot;
+  opponentSnapshot?: CombatSnapshot;
   participants: OnlineDuelParticipantSync[];
   currentRoundState?: OnlineDuelCurrentRoundSync;
   lastResolvedRound?: OnlineDuelRoundSummary;
@@ -192,24 +215,28 @@ export interface OnlineDuelClient {
   createDuel(
     snapshot: CombatSnapshot,
     fighterView?: OnlineDuelFighterView,
-    displayNameOverride?: string
+    displayNameOverride?: string,
+    loadout?: OnlineDuelParticipantLoadout
   ): Promise<OnlineDuelServerMessage[]>;
   findMatchmakingDuel(
     snapshot: CombatSnapshot,
     fighterView?: OnlineDuelFighterView,
-    displayNameOverride?: string
+    displayNameOverride?: string,
+    loadout?: OnlineDuelParticipantLoadout
   ): Promise<OnlineDuelServerMessage[]>;
   joinDuel(
     duelId: string,
     snapshot: CombatSnapshot,
     fighterView?: OnlineDuelFighterView,
-    displayNameOverride?: string
+    displayNameOverride?: string,
+    loadout?: OnlineDuelParticipantLoadout
   ): Promise<OnlineDuelServerMessage[]>;
   joinDuelByCode(
     roomCode: string,
     snapshot: CombatSnapshot,
     fighterView?: OnlineDuelFighterView,
-    displayNameOverride?: string
+    displayNameOverride?: string,
+    loadout?: OnlineDuelParticipantLoadout
   ): Promise<OnlineDuelServerMessage[]>;
   setConnection(duelId: string, seat: OnlineDuelSeat, connected: boolean): Promise<OnlineDuelServerMessage[]>;
   setReady(duelId: string, seat: OnlineDuelSeat, ready: boolean): Promise<OnlineDuelServerMessage[]>;
@@ -219,7 +246,7 @@ export interface OnlineDuelClient {
   submitRoundAction(
     duelId: string,
     seat: OnlineDuelSeat,
-    action: RoundAction
+    selection: OnlineDuelActionSelection
   ): Promise<OnlineDuelServerMessage[]>;
   getLastSync(): OnlineDuelStateSync | null;
   acceptServerMessage(message: OnlineDuelServerMessage): boolean;
@@ -233,6 +260,7 @@ export type OnlineDuelClientMessage =
       displayName: string;
       snapshot: CombatSnapshot;
       fighterView?: OnlineDuelFighterView;
+      loadout?: OnlineDuelParticipantLoadout;
     }
   | {
       type: "find_matchmaking_duel";
@@ -241,6 +269,7 @@ export type OnlineDuelClientMessage =
       displayName: string;
       snapshot: CombatSnapshot;
       fighterView?: OnlineDuelFighterView;
+      loadout?: OnlineDuelParticipantLoadout;
     }
   | {
       type: "join_duel";
@@ -250,6 +279,7 @@ export type OnlineDuelClientMessage =
       displayName: string;
       snapshot: CombatSnapshot;
       fighterView?: OnlineDuelFighterView;
+      loadout?: OnlineDuelParticipantLoadout;
       expectedRevision?: number;
     }
   | {
@@ -260,6 +290,7 @@ export type OnlineDuelClientMessage =
       displayName: string;
       snapshot: CombatSnapshot;
       fighterView?: OnlineDuelFighterView;
+      loadout?: OnlineDuelParticipantLoadout;
       expectedRevision?: number;
     }
   | {
@@ -282,7 +313,7 @@ export type OnlineDuelClientMessage =
       seat: OnlineDuelSeat;
       playerId: string;
       sessionId: string;
-      action: RoundAction;
+      selection: OnlineDuelActionSelection;
       expectedRound?: number;
       expectedRevision?: number;
     }

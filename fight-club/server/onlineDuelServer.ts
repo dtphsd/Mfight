@@ -1,16 +1,44 @@
 import { startOnlineDuelHttpServer } from "./onlineDuelHttpServer";
+import { resolveOnlineDuelRuntimeConfig } from "./onlineDuelRuntimeConfig";
 
-const port = parsePort(process.env.PORT);
-const host = process.env.HOST?.trim() || "0.0.0.0";
-const seed = parseOptionalInteger(process.env.ONLINE_DUEL_SEED);
+const runtimeConfig = resolveOnlineDuelRuntimeConfig(process.env);
 
 const handle = await startOnlineDuelHttpServer({
-  port,
-  host,
-  seed,
+  port: runtimeConfig.port,
+  host: runtimeConfig.host,
+  seed: runtimeConfig.seed,
+  staleSweepIntervalMs: runtimeConfig.staleSweepIntervalMs,
+  bodyLimitBytes: runtimeConfig.bodyLimitBytes,
+  corsOrigin: runtimeConfig.corsOrigin,
+  logLevel: runtimeConfig.logLevel,
+  rateLimitWindowMs: runtimeConfig.rateLimitWindowMs,
+  messageRateLimitMax: runtimeConfig.messageRateLimitMax,
+  eventRateLimitMax: runtimeConfig.eventRateLimitMax,
+  trustProxy: runtimeConfig.trustProxy,
+  deployProfile: runtimeConfig.deployProfile,
 });
 
 console.log(`Online Duel HTTP server listening on http://${handle.host}:${handle.port}`);
+console.log(
+  JSON.stringify({
+    service: "online-duel",
+    deployProfile: runtimeConfig.deployProfile,
+    host: handle.host,
+    port: handle.port,
+    corsOrigin: runtimeConfig.corsOrigin,
+    staleSweepIntervalMs: runtimeConfig.staleSweepIntervalMs ?? 15_000,
+    bodyLimitBytes: runtimeConfig.bodyLimitBytes ?? 262144,
+    logLevel: runtimeConfig.logLevel,
+    rateLimitWindowMs: runtimeConfig.rateLimitWindowMs ?? 10_000,
+    messageRateLimitMax: runtimeConfig.messageRateLimitMax ?? 60,
+    eventRateLimitMax: runtimeConfig.eventRateLimitMax ?? 20,
+    trustProxy: runtimeConfig.trustProxy,
+    warnings: runtimeConfig.warnings,
+  })
+);
+runtimeConfig.warnings.forEach((warning) => {
+  console.warn(`[online-duel][warn] ${warning}`);
+});
 
 const shutdown = async () => {
   await handle.close();
@@ -24,26 +52,3 @@ process.on("SIGINT", () => {
 process.on("SIGTERM", () => {
   void shutdown();
 });
-
-function parsePort(rawValue: string | undefined): number {
-  const parsed = parseOptionalInteger(rawValue);
-  if (parsed === undefined) {
-    return 3001;
-  }
-
-  return parsed;
-}
-
-function parseOptionalInteger(rawValue: string | undefined): number | undefined {
-  const value = rawValue?.trim();
-  if (!value) {
-    return undefined;
-  }
-
-  const parsed = Number.parseInt(value, 10);
-  if (Number.isNaN(parsed)) {
-    throw new Error(`Invalid integer value: ${rawValue}`);
-  }
-
-  return parsed;
-}

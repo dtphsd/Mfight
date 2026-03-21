@@ -5,11 +5,13 @@ import { afterEach, describe, expect, it } from "vitest";
 import {
   createHttpOnlineDuelTransport,
   createOnlineDuelClient,
+  type OnlineDuelActionSelection,
   type OnlineDuelServerMessage,
   type OnlineDuelStateSync,
 } from "@/modules/arena";
 import { createCharacter } from "@/modules/character";
-import { createBasicAttackAction } from "@/modules/combat";
+import { createEquipment } from "@/modules/equipment";
+import { createStarterInventory } from "@/modules/inventory";
 import { buildCombatSnapshot } from "@/orchestration/combat/buildCombatSnapshot";
 import {
   startOnlineDuelHttpServer,
@@ -25,6 +27,21 @@ function isSyncEnvelope(
   event: StreamEnvelope
 ): event is StreamEnvelope & { message: { type: "duel_state_sync"; payload: OnlineDuelStateSync } } {
   return event.message.type === "duel_state_sync";
+}
+
+function createBasicSelection(
+  attackZone: "head" | "chest" | "belly" | "legs" | "waist",
+  defenseZones: [
+    "head" | "chest" | "belly" | "legs" | "waist",
+    "head" | "chest" | "belly" | "legs" | "waist",
+  ]
+): OnlineDuelActionSelection {
+  return {
+    attackZone,
+    defenseZones,
+    intent: "neutral",
+    selectedAction: { kind: "basic_attack" },
+  };
 }
 
 describe("online duel live two-client validation", () => {
@@ -52,6 +69,22 @@ describe("online duel live two-client validation", () => {
       flatBonuses: [],
       percentBonuses: [],
     });
+  }
+
+  function createFragileSnapshot(name: string, maxHp: number) {
+    const snapshot = createSnapshot(name);
+    return {
+      ...snapshot,
+      maxHp,
+    };
+  }
+
+  function createLoadout(...equippedSkillIds: string[]) {
+    return {
+      equipmentState: createEquipment(),
+      inventory: createStarterInventory(),
+      equippedSkillIds,
+    };
   }
 
   async function startServer() {
@@ -86,7 +119,7 @@ describe("online duel live two-client validation", () => {
       displayName: "Guest",
     });
 
-    const created = await hostClient.createDuel(hostSnapshot);
+    const created = await hostClient.createDuel(hostSnapshot, undefined, undefined, createLoadout("host-open"));
     const duelCreated =
       created[0]?.type === "duel_created"
         ? created[0]
@@ -97,7 +130,7 @@ describe("online duel live two-client validation", () => {
     expect(hostSync?.yourSeat).toBe("playerA");
     expect(hostSync?.resumeToken).toBeTruthy();
 
-    await guestClient.joinDuelByCode(duelCreated.roomCode, guestSnapshot);
+    await guestClient.joinDuelByCode(duelCreated.roomCode, guestSnapshot, undefined, undefined, createLoadout("guest-open"));
     const guestSync = guestClient.getLastSync();
     expect(guestSync?.yourSeat).toBe("playerB");
     expect(guestSync?.resumeToken).toBeTruthy();
@@ -131,20 +164,12 @@ describe("online duel live two-client validation", () => {
     await hostClient.submitRoundAction(
       duelCreated.duelId,
       "playerA",
-      createBasicAttackAction({
-        attackerId: hostSnapshot.characterId,
-        attackZone: "head",
-        defenseZones: ["chest", "belly"],
-      })
+      createBasicSelection("head", ["chest", "belly"])
     );
     await guestClient.submitRoundAction(
       duelCreated.duelId,
       "playerB",
-      createBasicAttackAction({
-        attackerId: guestSnapshot.characterId,
-        attackZone: "legs",
-        defenseZones: ["head", "waist"],
-      })
+      createBasicSelection("legs", ["head", "waist"])
     );
 
     const hostRoundEvents = await readUntilMessages(
@@ -186,20 +211,12 @@ describe("online duel live two-client validation", () => {
     await hostClient.submitRoundAction(
       duelCreated.duelId,
       "playerA",
-      createBasicAttackAction({
-        attackerId: hostSnapshot.characterId,
-        attackZone: "waist",
-        defenseZones: ["head", "legs"],
-      })
+      createBasicSelection("waist", ["head", "legs"])
     );
     await guestClient.submitRoundAction(
       duelCreated.duelId,
       "playerB",
-      createBasicAttackAction({
-        attackerId: guestSnapshot.characterId,
-        attackZone: "head",
-        defenseZones: ["chest", "belly"],
-      })
+      createBasicSelection("head", ["chest", "belly"])
     );
 
     const secondRoundEvents = await readUntilMessages(
@@ -256,20 +273,12 @@ describe("online duel live two-client validation", () => {
       await hostClient.submitRoundAction(
         duelCreated.duelId,
         "playerA",
-        createBasicAttackAction({
-          attackerId: hostSnapshot.characterId,
-          attackZone: "chest",
-          defenseZones: ["head", "waist"],
-        })
+        createBasicSelection("chest", ["head", "waist"])
       );
       await guestClient.submitRoundAction(
         duelCreated.duelId,
         "playerB",
-        createBasicAttackAction({
-          attackerId: guestSnapshot.characterId,
-          attackZone: "waist",
-          defenseZones: ["chest", "legs"],
-        })
+        createBasicSelection("waist", ["chest", "legs"])
       );
 
       const hostThirdRoundEvents = await readUntilMessages(
@@ -310,6 +319,230 @@ describe("online duel live two-client validation", () => {
       );
       expect(guestThirdRoundEvents.some((event) => event.message.type === "round_resolved")).toBe(true);
     }
+
+    await guestClient.leaveDuel(duelCreated.duelId);
+
+    const hostLeaveEvents = await readUntilMessages(
+      hostStream,
+      (events) =>
+        events.some(
+          (event) =>
+            isSyncEnvelope(event) &&
+            event.message.payload.status === "abandoned" &&
+            event.message.payload.participants.some(
+              (participant) => participant.seat === "playerB" && participant.connected === false
+            )
+        ),
+      10_000
+    );
+    const abandonedSync = [...hostLeaveEvents].reverse().find(isSyncEnvelope);
+    expect(abandonedSync?.message.payload.status).toBe("abandoned");
+
+    hostStream.close();
+    guestStream.close();
+  }, 20_000);
+
+  it("survives finished round, rematch reset, and leave flow across two live clients", async () => {
+    const server = await startServer();
+    const baseUrl = createBaseUrl(server);
+    const hostSnapshot = createFragileSnapshot("Host Rematch", 5);
+    const guestSnapshot = createFragileSnapshot("Guest Rematch", 5);
+    const transport = createHttpOnlineDuelTransport({ baseUrl });
+    const hostClient = createOnlineDuelClient(transport, {
+      playerId: "player-host-rematch",
+      sessionId: "session-host-rematch",
+      displayName: "Host Rematch",
+    });
+    const guestClient = createOnlineDuelClient(transport, {
+      playerId: "player-guest-rematch",
+      sessionId: "session-guest-rematch",
+      displayName: "Guest Rematch",
+    });
+
+    const created = await hostClient.createDuel(hostSnapshot, undefined, undefined, createLoadout("host-open"));
+    const duelCreated =
+      created[0]?.type === "duel_created"
+        ? created[0]
+        : (() => {
+            throw new Error("duel was not created");
+          })();
+    const hostSync = hostClient.getLastSync();
+    expect(hostSync?.yourSeat).toBe("playerA");
+    expect(hostSync?.resumeToken).toBeTruthy();
+
+    await guestClient.joinDuelByCode(duelCreated.roomCode, guestSnapshot, undefined, undefined, createLoadout("guest-open"));
+    const guestSync = guestClient.getLastSync();
+    expect(guestSync?.yourSeat).toBe("playerB");
+    expect(guestSync?.resumeToken).toBeTruthy();
+
+    const hostStream = await openEventStream(
+      `${baseUrl}/api/online-duel/events?duelId=${duelCreated.duelId}&playerId=${hostClient.identity.playerId}&resumeToken=${hostSync?.resumeToken ?? ""}`
+    );
+    const guestStream = await openEventStream(
+      `${baseUrl}/api/online-duel/events?duelId=${duelCreated.duelId}&playerId=${guestClient.identity.playerId}&resumeToken=${guestSync?.resumeToken ?? ""}`
+    );
+
+    await hostStream.readMessage();
+    await guestStream.readMessage();
+
+    await hostClient.setReady(duelCreated.duelId, "playerA", true);
+    await guestClient.setReady(duelCreated.duelId, "playerB", true);
+
+    const hostReadyEvents = await readUntilMessages(
+      hostStream,
+      (events) =>
+        events.some((event) => event.message.type === "duel_ready") &&
+        events.some(
+          (event) => isSyncEnvelope(event) && event.message.payload.status === "planning"
+        ),
+      10_000
+    );
+    for (const event of hostReadyEvents) {
+      hostClient.acceptServerMessage(event.message);
+    }
+
+    const guestReadyEvents = await readUntilMessages(
+      guestStream,
+      (events) =>
+        events.some((event) => event.message.type === "duel_ready") &&
+        events.some(
+          (event) => isSyncEnvelope(event) && event.message.payload.status === "planning"
+        ),
+      10_000
+    );
+    for (const event of guestReadyEvents) {
+      guestClient.acceptServerMessage(event.message);
+    }
+
+    await hostClient.submitRoundAction(
+      duelCreated.duelId,
+      "playerA",
+      createBasicSelection("head", ["chest", "belly"])
+    );
+    await guestClient.submitRoundAction(
+      duelCreated.duelId,
+      "playerB",
+      createBasicSelection("head", ["chest", "belly"])
+    );
+
+    const hostFinishedEvents = await readUntilMessages(
+      hostStream,
+      (events) => {
+        const latestSync = [...events].reverse().find(isSyncEnvelope);
+        return (
+          events.some((event) => event.message.type === "round_resolved") &&
+          latestSync?.message.payload.status === "finished"
+        );
+      },
+      10_000
+    );
+    expect(hostFinishedEvents.some((event) => event.message.type === "round_resolved")).toBe(true);
+    for (const event of hostFinishedEvents) {
+      hostClient.acceptServerMessage(event.message);
+    }
+
+    const guestFinishedEvents = await readUntilMessages(
+      guestStream,
+      (events) => {
+        const latestSync = [...events].reverse().find(isSyncEnvelope);
+        return (
+          events.some((event) => event.message.type === "round_resolved") &&
+          latestSync?.message.payload.status === "finished"
+        );
+      },
+      10_000
+    );
+    expect(guestFinishedEvents.some((event) => event.message.type === "round_resolved")).toBe(true);
+    for (const event of guestFinishedEvents) {
+      guestClient.acceptServerMessage(event.message);
+    }
+
+    await hostClient.requestRematch(duelCreated.duelId);
+
+    const hostRematchEvents = await readUntilMessages(
+      hostStream,
+      (events) => {
+        const latestSync = [...events].reverse().find(isSyncEnvelope);
+        return (
+          events.some((event) => event.message.type === "duel_state_sync") &&
+          latestSync?.message.payload.status === "lobby" &&
+          latestSync.message.payload.round === 1
+        );
+      },
+      10_000
+    );
+    for (const event of hostRematchEvents) {
+      hostClient.acceptServerMessage(event.message);
+    }
+
+    const guestRematchEvents = await readUntilMessages(
+      guestStream,
+      (events) => {
+        const latestSync = [...events].reverse().find(isSyncEnvelope);
+        return (
+          events.some((event) => event.message.type === "duel_state_sync") &&
+          latestSync?.message.payload.status === "lobby" &&
+          latestSync.message.payload.round === 1
+        );
+      },
+      10_000
+    );
+    for (const event of guestRematchEvents) {
+      guestClient.acceptServerMessage(event.message);
+    }
+
+    const hostRematchSync = hostClient.getLastSync();
+    const guestRematchSync = guestClient.getLastSync();
+    expect(hostRematchSync?.status).toBe("lobby");
+    expect(hostRematchSync?.round).toBe(1);
+    expect(guestRematchSync?.status).toBe("lobby");
+    expect(guestRematchSync?.round).toBe(1);
+
+    await hostClient.setReady(duelCreated.duelId, "playerA", true);
+    await guestClient.setReady(duelCreated.duelId, "playerB", true);
+
+    await readUntilMessages(
+      hostStream,
+      (events) =>
+        events.some((event) => event.message.type === "duel_ready") &&
+        events.some(
+          (event) => isSyncEnvelope(event) && event.message.payload.status === "planning"
+        ),
+      10_000
+    );
+    await readUntilMessages(
+      guestStream,
+      (events) =>
+        events.some((event) => event.message.type === "duel_ready") &&
+        events.some(
+          (event) => isSyncEnvelope(event) && event.message.payload.status === "planning"
+        ),
+      10_000
+    );
+
+    await hostClient.submitRoundAction(
+      duelCreated.duelId,
+      "playerA",
+      createBasicSelection("legs", ["head", "waist"])
+    );
+    await guestClient.submitRoundAction(
+      duelCreated.duelId,
+      "playerB",
+      createBasicSelection("legs", ["head", "waist"])
+    );
+
+    const rematchFinishedEvents = await readUntilMessages(
+      hostStream,
+      (events) => {
+        const latestSync = [...events].reverse().find(isSyncEnvelope);
+        return (
+          events.some((event) => event.message.type === "round_resolved") &&
+          latestSync?.message.payload.status === "finished"
+        );
+      },
+      10_000
+    );
+    expect(rematchFinishedEvents.some((event) => event.message.type === "round_resolved")).toBe(true);
 
     await guestClient.leaveDuel(duelCreated.duelId);
 

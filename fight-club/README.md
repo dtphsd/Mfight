@@ -2,7 +2,7 @@
 
 Browser-only combat sandbox built with React, TypeScript, and Vite.
 
-Last updated: 2026-03-20
+Last updated: 2026-03-21
 
 ## Current State
 
@@ -31,6 +31,9 @@ It now includes:
 - `npm run docs:validate`
 - `npm run balance:matrix`
 - `npm run online:server`
+- `npm run online:server:lan`
+- `npm run online:server:public`
+- `npm run online:server:proxy`
 - `npm run baza:parse`
 - `npm run baza:generate-items`
 
@@ -104,6 +107,14 @@ Current flow:
   - second player on the right instead of the bot
 - the live PvP fight now includes combat intent, skills, consumables, and a real combat log
 - duel state uses the HTTP/SSE authority path for room sync, round resolution, reconnect recovery, rematch, and leave-room flow
+- reconnect/disconnect UX now surfaces explicit live states such as reconnecting, opponent offline, session replaced, room closed, and recovery CTAs
+- matchmaking search now supports player-facing pause, resume, and timeout recovery inside the live PvP lobby flow
+- the live backend now exposes operator-oriented `/health` diagnostics, configurable CORS/body limits, minimal request logging, and basic in-memory rate limiting for message and SSE traffic
+- docs now also include an `Online Duel Ops Runbook` for direct-host and reverse-proxy deployment paths
+- reverse-proxy examples now live in `ops/online-duel/` for `nginx` and `Caddy`
+- frontend/backend PvP env examples now also live in `ops/online-duel/`
+- regression coverage now includes longer live authority flows such as stale matchmaking cleanup, rematch plus reconnect recovery, `search -> stop -> resume -> match found -> first round resolve` over HTTP and SSE, and a two-client `finished -> rematch -> leave` lifecycle validation
+- the local player-facing screen is now also covered by a longer lifecycle regression: resolve a round, close the room, rematch back into lobby, and return cleanly to the create flow
 
 Current scope:
 
@@ -112,6 +123,42 @@ Current scope:
 - local-network / prototype deployment stage
 - some diagnostics and local verification controls still live under `Debug Tools`
 - the local backend entrypoint is `npm run online:server`
+
+PvP backend runtime env:
+
+- `HOST`
+  - HTTP bind host, default `0.0.0.0` in `online:server`
+- `PORT`
+  - HTTP port, default `3001`
+- `ONLINE_DUEL_SEED`
+  - optional authority RNG seed for deterministic debugging
+- `ONLINE_DUEL_STALE_SWEEP_MS`
+  - room timeout sweep interval in milliseconds
+- `ONLINE_DUEL_BODY_LIMIT_BYTES`
+  - max request body size for `/api/online-duel/message`
+- `ONLINE_DUEL_CORS_ORIGIN`
+  - CORS origin for HTTP and SSE responses, default `*`
+- `ONLINE_DUEL_LOG_LEVEL`
+  - `info`, `error`, or `silent`
+- `ONLINE_DUEL_RATE_LIMIT_WINDOW_MS`
+  - shared rate-limit window for public HTTP/SSE traffic
+- `ONLINE_DUEL_MESSAGE_RATE_LIMIT_MAX`
+  - max `/api/online-duel/message` requests per client within the window
+- `ONLINE_DUEL_EVENT_RATE_LIMIT_MAX`
+  - max `/api/online-duel/events` attach attempts per client within the window
+- `ONLINE_DUEL_TRUST_PROXY`
+  - set to `true` only when the service is behind a trusted reverse proxy and `X-Forwarded-For` should be used for rate limiting
+  - keep it `false` for direct host exposure or local development
+- `ONLINE_DUEL_DEPLOY_PROFILE`
+  - optional startup profile: `default`, `lan`, `public`, or `proxy`
+  - profile defaults can still be overridden by explicit env values
+
+Operator quick check:
+
+1. start the server with `npm run online:server`, `npm run online:server:lan`, `npm run online:server:public`, or `npm run online:server:proxy`
+2. verify `GET /health`
+3. confirm `/health` reports the expected `deployProfile`, `corsOrigin`, `bodyLimitBytes`, sweep interval, and rate-limit config
+4. open two clients and verify create/join, live SSE updates, rematch, and leave-room
 
 ## Item And Data Pipeline
 

@@ -1,6 +1,6 @@
 # Fight Club Docs
 
-> Last updated: 2026-03-20 01:00 MSK
+> Last updated: 2026-03-21 13:10 MSK
 
 This folder is the GitBook-ready documentation set for the `Fight Club` project.
 
@@ -13,6 +13,7 @@ The current docs baseline now reflects:
 - cooldown-aware combat skills
 - synchronized `Combat Rules` content and verification guidance
 - the current backend-first `Online Duel` host/join flow with room code, SSE sync, and live two-client verification
+- the current `Online Duel` operator runbook for direct-host and reverse-proxy startup paths
 
 ---
 
@@ -22,8 +23,9 @@ The current docs baseline now reflects:
 2. [Systems](./systems/index.md)
 3. [Architecture Overview](./architecture/overview.md)
 4. [Combat Design Reference](./architecture/combat-design-reference.md)
-5. [ADR-001: Modular Headless Core](./decisions/ADR-001-architecture.md)
-6. [GitBook Publish Setup](./gitbook-publish-setup.md)
+5. [Online Duel Ops Runbook](./architecture/online-duel-ops-runbook.md)
+6. [ADR-001: Modular Headless Core](./decisions/ADR-001-architecture.md)
+7. [GitBook Publish Setup](./gitbook-publish-setup.md)
 
 For GitBook navigation, use [SUMMARY.md](./SUMMARY.md).
 
@@ -49,6 +51,7 @@ For GitBook navigation, use [SUMMARY.md](./SUMMARY.md).
 - [Combat Design Reference](./architecture/combat-design-reference.md)
 - [Combat System Roadmap](./architecture/combat-system-roadmap.md)
 - [Hunting Runtime Reference](./architecture/hunting-runtime-reference.md)
+- [Online Duel Ops Runbook](./architecture/online-duel-ops-runbook.md)
 
 ### Decisions
 
@@ -95,4 +98,4 @@ These operational folders are useful for engineering work, but they are not the 
 
 ---
 
-> Last updated: 2026-03-20 01:00 MSK
+> Last updated: 2026-03-21 13:10 MSK

@@ -1,27 +1,16 @@
 import { useEffect, useRef, useState, type CSSProperties } from "react";
-import { SeededRandom } from "@/core/rng/SeededRandom";
-import { createStarterInventory } from "@/modules/inventory";
-import type { Inventory, Item } from "@/modules/inventory";
+import type { Inventory } from "@/modules/inventory";
 import { getEquipmentBonuses } from "@/modules/equipment";
-import type { Equipment, EquipmentSlot } from "@/modules/equipment";
+import type { Equipment } from "@/modules/equipment";
 import {
-  type OnlineDuelFighterView,
-  type OnlineDuelRoundSummary,
-  type OnlineDuelStateSync,
-  createHttpOnlineDuelTransport,
-  createInMemoryOnlineDuelService,
-  createLocalOnlineDuelTransport,
-  createOnlineDuelClient,
   subscribeToOnlineDuelEvents,
   type OnlineDuelClient,
   type OnlineDuelEventSubscription,
   type OnlineDuelServerMessage,
-  type OnlineDuelTransport,
 } from "@/modules/arena";
 import { combatZones, type CombatZone } from "@/modules/combat";
-import { combatBuildPresets, type CombatBuildPreset } from "@/orchestration/combat/combatSandboxConfigs";
+import { combatBuildPresets } from "@/orchestration/combat/combatSandboxConfigs";
 import {
-  buildPlayerRoundAction,
   createRoundDraft,
   getRoundDraftSelectedConsumableCode,
   getRoundDraftSelectedSkillId,
@@ -32,29 +21,70 @@ import {
   toggleRoundDraftDefenseZone,
   type RoundDraft,
 } from "@/orchestration/combat/roundDraft";
-import { buildCombatSnapshot } from "@/orchestration/combat/buildCombatSnapshot";
-import { buildSandboxPresetState, requireSandboxCharacter, applySandboxAllocations } from "@/orchestration/combat/combatSandboxSupport";
 import { createBattleLogEntries } from "@/ui/components/combat/battleLogFormatting";
-import { BattleLogSection, MiniPanel } from "@/ui/screens/Combat/combatSandboxScreenLayout";
-import { CombatSilhouette } from "@/ui/components/combat/CombatSilhouette";
+import { BattleLogSection } from "@/ui/screens/Combat/combatSandboxScreenLayout";
 import { ArenaStageColumns, ArenaStageShell, SidePanel } from "@/ui/screens/Combat/combatSandboxScreenLayout";
 import { buildProfileDerivedStats, resolvePresetFigure } from "@/ui/screens/Combat/combatSandboxScreenDerived";
-import { ActionButton, ActionRail } from "@/ui/screens/Combat/combatSandboxScreenActionRail";
 import { FightControlsPanel } from "@/ui/screens/Combat/combatSandboxScreenControls";
-import {
-  combatIntentDescriptions,
-  combatIntentOptions,
-  formatCombatIntentLabel,
-} from "@/modules/combat";
-import {
-  formatConsumableDetailLines,
-  formatSkillDetailLines,
-  getConsumableIcon,
-  getSkillIcon,
-} from "@/ui/screens/Combat/combatSandboxScreenHelpers";
 import { AttackTargetRoundPanel } from "@/ui/screens/Combat/combatSandboxScreenTargeting";
 import { ResourceGrid } from "@/ui/screens/Combat/combatSandboxScreenResourceGrid";
+import {
+  OnlineCombatActionsPanel,
+  OnlineOpponentCombatPanel,
+  OnlinePlayerCombatPanel,
+} from "@/ui/screens/OnlineDuel/onlineDuelScreenPanels";
+import {
+  MatchFinishCard,
+  RoundPlannerCard,
+  RoundResultCard,
+  SyncView,
+} from "@/ui/screens/OnlineDuel/onlineDuelScreenCards";
+import { PresetChooser } from "@/ui/screens/OnlineDuel/onlineDuelScreenLobby";
 import type { PvpPreparedFighter } from "@/ui/screens/PvpLobby/pvpLobbyTypes";
+import {
+  activeParticipantIsReady,
+  buildClientFighterView,
+  buildOnlineParticipantLoadout,
+  createOnlineBuildSelection,
+  getOnlineSelectedActionLabel,
+  getOnlineSelectedActionSummary,
+  getOnlineSelectedActionTags,
+  getCurrentStepSummary,
+  getMatchStatusSummary,
+  ONLINE_DUEL_MATCHMAKING_TIMEOUT_MS,
+  resolveOnlineDuelRecoveryAction,
+  resolveOnlineDuelLiveStatus,
+  resolveOnlineDuelMatchmakingStatus,
+  pickMostCompleteSync,
+  resolveCombatLoadoutForMode,
+  resolveCombatantSummary,
+  resolveFighterViewFigure,
+  resolveOnlineActionClientMode,
+  resolveOnlineRealtimeClientModes,
+  resolvePresetById,
+  resolveWinnerName,
+  totalArmorProfileValue,
+  totalDamageProfileValue,
+  type OnlineDuelLiveStatus,
+  type ClientMode,
+  type EntryMode,
+  type OnlineAvailableConsumable,
+  type OnlineAvailableSkill,
+  type OnlineBuildSelection,
+  type TransportSource,
+} from "@/ui/screens/OnlineDuel/onlineDuelScreenSupport";
+import {
+  canReachOnlineDuelBackend,
+  createOnlineSetupForScreen,
+  describeTransportIssue,
+  getOnlineDuelBackendBaseUrl,
+  shouldRecoverFromSubmitError,
+  shouldRefreshClientsAfterRoundResolution,
+  transportBadgeLabel,
+  type OnlineDuelSetup,
+} from "@/ui/screens/OnlineDuel/onlineDuelScreenSetup";
+
+export { resolveOnlineActionClientMode, resolveOnlineRealtimeClientModes } from "@/ui/screens/OnlineDuel/onlineDuelScreenSupport";
 
 interface OnlineDuelScreenProps {
   onBack: () => void;
@@ -62,22 +92,6 @@ interface OnlineDuelScreenProps {
   preparedPlayer?: PvpPreparedFighter | null;
   initialJoinCode?: string;
 }
-
-type ClientMode = "host" | "guest";
-type EntryMode = "create" | "join";
-type TransportSource = "checking" | "backend" | "local";
-
-interface OnlineBuildSelection {
-  presetId: string;
-  snapshot: ReturnType<typeof buildCombatSnapshot>;
-  equipmentState: Equipment;
-  inventory: Inventory;
-  equippedSkillIds: string[];
-  equipment: Array<{ slot: EquipmentSlot; item: Item | null }>;
-}
-
-type OnlineAvailableSkill = ReturnType<typeof getEquipmentBonuses>["skills"][number];
-type OnlineAvailableConsumable = Inventory["entries"][number];
 
 const onlineIntentVisuals: Record<
   RoundDraft["intent"],
@@ -149,42 +163,6 @@ const onlinePlayerIntentSilhouetteTone: Record<
   },
 };
 
-const playerEquipmentSlots: EquipmentSlot[] = [
-  "helmet",
-  "earring",
-  "shirt",
-  "armor",
-  "bracers",
-  "gloves",
-  "mainHand",
-  "offHand",
-  "belt",
-  "ring",
-  "ring2",
-  "pants",
-  "boots",
-];
-
-export function resolveOnlineRealtimeClientModes({
-  launchedFromLobby,
-  playerMode,
-  modeOverride,
-}: {
-  launchedFromLobby: boolean;
-  playerMode: ClientMode;
-  modeOverride?: ClientMode;
-}): ClientMode[] {
-  if (launchedFromLobby) {
-    return [modeOverride ?? playerMode];
-  }
-
-  return ["host", "guest"];
-}
-
-export function resolveOnlineActionClientMode(playerMode: ClientMode): ClientMode {
-  return playerMode;
-}
-
 export function OnlineDuelScreen({
   onBack,
   initialEntryMode = "create",
@@ -234,6 +212,8 @@ export function OnlineDuelScreen({
   const [guestActionSubmitting, setGuestActionSubmitting] = useState(false);
   const [transportSource, setTransportSource] = useState<TransportSource>("checking");
   const [transportIssue, setTransportIssue] = useState<string | null>(null);
+  const [matchmakingSearchActive, setMatchmakingSearchActive] = useState(initialEntryMode === "matchmaking");
+  const [matchmakingTimedOut, setMatchmakingTimedOut] = useState(false);
   const [, setClientRefresh] = useState(0);
 
   useEffect(() => {
@@ -346,6 +326,7 @@ export function OnlineDuelScreen({
     if (
       !launchedFromLobby ||
       initialEntryMode !== "matchmaking" ||
+      !matchmakingSearchActive ||
       duelId ||
       transportSource === "checking" ||
       transportSource !== "backend" ||
@@ -356,7 +337,7 @@ export function OnlineDuelScreen({
 
     autoStartedRef.current = true;
     void handleFindMatchmakingDuel();
-  }, [duelId, initialEntryMode, launchedFromLobby, transportSource]);
+  }, [duelId, initialEntryMode, launchedFromLobby, matchmakingSearchActive, transportSource]);
 
   const hostSync = setupRef.current.hostClient.getLastSync();
   const guestSync = setupRef.current.guestClient.getLastSync();
@@ -376,12 +357,16 @@ export function OnlineDuelScreen({
     participants.find((participant) => participant.seat !== (playerSync?.yourSeat ?? playerSeat)) ?? null;
   const debugSync = debugClientMode === "host" ? hostSync : guestSync;
   const debugSeat = debugClientMode === "host" ? resolvedHostSeat : resolvedGuestSeat;
+  const playerSeatOffline = Boolean(duelId) && !(playerParticipant?.connected ?? Boolean(playerSync));
+  const opponentSeatOffline = Boolean(duelId) && joinedCount >= 2 && !(opponentParticipant?.connected ?? false);
   const matchStatusSummary = getMatchStatusSummary({
     duelId,
     status: matchSync?.status,
     joinedCount,
     readyCount,
     winnerName,
+    transportIssue,
+    opponentConnected: !opponentSeatOffline,
   });
   const currentStep = getCurrentStepSummary({
     duelId,
@@ -396,18 +381,59 @@ export function OnlineDuelScreen({
   });
   const matchLocked = matchSync?.status === "finished" || matchSync?.status === "abandoned";
   const playerReady = activeParticipantIsReady(playerSync, playerSeat);
+  const sessionDisplaced = transportIssue === "displaced_session";
+  const roomClosed = transportIssue === "duel_not_found" || matchSync?.status === "abandoned";
+  const liveStatus = resolveOnlineDuelLiveStatus({
+    duelId,
+    transportSource,
+    transportIssue,
+    matchStatus: matchSync?.status,
+    joinedCount,
+    playerConnected: !playerSeatOffline,
+    opponentConnected: !opponentSeatOffline,
+  });
   const showPlanner = matchSync?.status === "planning" || matchSync?.status === "ready_to_resolve";
   const showPlayerFacingArena =
     !launchedFromLobby || initialEntryMode === "join" || Boolean(duelId);
   const liveRoomRequired = launchedFromLobby;
   const liveRoomUnavailable = liveRoomRequired && !duelId && transportSource === "local";
+  const matchmakingStatus = resolveOnlineDuelMatchmakingStatus({
+    matchmakingMode,
+    searchActive: matchmakingSearchActive,
+    duelId,
+    joinedCount,
+    status: matchSync?.status,
+    timedOut: matchmakingTimedOut,
+  });
   const playerCombatLoadout = resolveCombatLoadoutForMode({
     mode: playerMode,
     playerMode,
     preparedPlayer,
+    syncedLoadout: playerSync?.yourLoadout,
     hostBuild,
     guestBuild,
   });
+
+  useEffect(() => {
+    if (
+      !matchmakingMode ||
+      !matchmakingSearchActive ||
+      !duelId ||
+      matchSync?.status !== "waiting_for_players" ||
+      joinedCount >= 2
+    ) {
+      setMatchmakingTimedOut(false);
+      return;
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      setMatchmakingTimedOut(true);
+    }, ONLINE_DUEL_MATCHMAKING_TIMEOUT_MS);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
+  }, [duelId, joinedCount, matchmakingMode, matchmakingSearchActive, matchSync?.status]);
   const playerEquipmentBonuses = getEquipmentBonuses(playerCombatLoadout.equipmentState, playerCombatLoadout.inventory);
   const playerAvailableSkills = playerEquipmentBonuses.skills.filter((skill) =>
     playerCombatLoadout.equippedSkillIds.includes(skill.id)
@@ -457,17 +483,19 @@ export function OnlineDuelScreen({
   const playerActionBusy = playerMode === "host" ? hostActionSubmitting : guestActionSubmitting;
   const playerActionLocked = playerActionSubmitted || playerActionBusy;
   const playerDisplayName = playerParticipant?.displayName ?? preparedPlayer?.playerName ?? playerBuild.snapshot.name;
+  const playerSnapshot = playerSync?.yourSnapshot ?? playerBuild.snapshot;
   const playerFigure = resolveFighterViewFigure(
     playerParticipant?.fighterView?.figure,
     preparedPlayer?.figure ?? resolvePresetFigure(playerBuild.presetId, playerMode === "host" ? "rush-chip" : "kitsune-bit")
   );
   const playerEquipment = playerParticipant?.fighterView?.equipment ?? playerCombatLoadout.equipment;
   const playerCombatantState =
-    matchSync?.combatState?.combatants.find((combatant) => combatant.id === playerBuild.snapshot.characterId) ?? null;
+    matchSync?.combatState?.combatants.find((combatant) => combatant.id === playerSnapshot.characterId) ?? null;
   const playerCombatantSummary = resolveCombatantSummary(lastResolvedRound, playerDisplayName);
   const playerCurrentHp =
-    playerCombatantState?.currentHp ?? playerCombatantSummary?.currentHp ?? playerBuild.snapshot.maxHp;
+    playerCombatantState?.currentHp ?? playerCombatantSummary?.currentHp ?? playerSnapshot.maxHp;
   const opponentBuild = playerMode === "host" ? guestBuild : hostBuild;
+  const opponentSnapshot = playerSync?.opponentSnapshot ?? opponentBuild.snapshot;
   const opponentFallbackName = opponentParticipant?.displayName ?? opponentBuild.snapshot.name ?? "Rival";
   const opponentFigure = resolveFighterViewFigure(
     opponentParticipant?.fighterView?.figure,
@@ -475,37 +503,54 @@ export function OnlineDuelScreen({
   );
   const opponentEquipment = opponentParticipant?.fighterView?.equipment ?? opponentBuild.equipment;
   const opponentCombatantState =
-    matchSync?.combatState?.combatants.find((combatant) => combatant.id === opponentBuild.snapshot.characterId) ?? null;
+    matchSync?.combatState?.combatants.find((combatant) => combatant.id === opponentSnapshot.characterId) ?? null;
   const opponentCombatantSummary = resolveCombatantSummary(lastResolvedRound, opponentFallbackName);
   const opponentCurrentHp =
-    opponentCombatantState?.currentHp ?? opponentCombatantSummary?.currentHp ?? opponentBuild.snapshot.maxHp;
+    opponentCombatantState?.currentHp ?? opponentCombatantSummary?.currentHp ?? opponentSnapshot.maxHp;
   const battleLogEntries = createBattleLogEntries(
     matchSync?.combatState ?? null,
-    playerBuild.snapshot.characterId,
-    opponentBuild.snapshot.characterId
+    playerSnapshot.characterId,
+    opponentSnapshot.characterId
   );
   const playerDerivedStats = buildProfileDerivedStats({
-    totalDamage: totalDamageProfileValue(playerBuild.snapshot.damage),
-    stats: playerBuild.snapshot.stats,
-    totalArmor: totalArmorProfileValue(playerBuild.snapshot.armor),
-    dodgeBonus: playerBuild.snapshot.dodgeChanceBonus,
-    critBonus: playerBuild.snapshot.critChanceBonus,
-    totalCritMultiplier: 1.5 + playerBuild.snapshot.critMultiplierBonus / 100,
-    baseBlockPenetrationValue: playerBuild.snapshot.blockPowerBonus,
-    armorPenetrationPercent: playerBuild.snapshot.armorPenetrationPercent,
+    totalDamage: totalDamageProfileValue(playerSnapshot.damage),
+    stats: playerSnapshot.stats,
+    totalArmor: totalArmorProfileValue(playerSnapshot.armor),
+    dodgeBonus: playerSnapshot.dodgeChanceBonus,
+    critBonus: playerSnapshot.critChanceBonus,
+    totalCritMultiplier: 1.5 + playerSnapshot.critMultiplierBonus / 100,
+    baseBlockPenetrationValue: playerSnapshot.blockPowerBonus,
+    armorPenetrationPercent: playerSnapshot.armorPenetrationPercent,
   }).slice(0, 4);
   const opponentDerivedStats = buildProfileDerivedStats({
-    totalDamage: totalDamageProfileValue(opponentBuild.snapshot.damage),
-    stats: opponentBuild.snapshot.stats,
-    totalArmor: totalArmorProfileValue(opponentBuild.snapshot.armor),
-    dodgeBonus: opponentBuild.snapshot.dodgeChanceBonus,
-    critBonus: opponentBuild.snapshot.critChanceBonus,
-    totalCritMultiplier: 1.5 + opponentBuild.snapshot.critMultiplierBonus / 100,
-    baseBlockPenetrationValue: opponentBuild.snapshot.blockPowerBonus,
-    armorPenetrationPercent: opponentBuild.snapshot.armorPenetrationPercent,
+    totalDamage: totalDamageProfileValue(opponentSnapshot.damage),
+    stats: opponentSnapshot.stats,
+    totalArmor: totalArmorProfileValue(opponentSnapshot.armor),
+    dodgeBonus: opponentSnapshot.dodgeChanceBonus,
+    critBonus: opponentSnapshot.critChanceBonus,
+    totalCritMultiplier: 1.5 + opponentSnapshot.critMultiplierBonus / 100,
+    baseBlockPenetrationValue: opponentSnapshot.blockPowerBonus,
+    armorPenetrationPercent: opponentSnapshot.armorPenetrationPercent,
   }).slice(0, 4);
-  const actionsDisabled = transportSource === "checking" || matchLocked;
+  const combatInteractionBlocked = matchLocked || sessionDisplaced || roomClosed || playerSeatOffline;
+  const actionsDisabled = transportSource === "checking" || combatInteractionBlocked;
   const entryActionsDisabled = actionsDisabled || liveRoomUnavailable;
+  const recoveryActionConfig = resolveOnlineDuelRecoveryAction({
+    transportIssue,
+    matchStatus: matchSync?.status,
+    playerConnected: !playerSeatOffline,
+    opponentConnected: !opponentSeatOffline,
+    joinedCount,
+  });
+  const recoveryAction = recoveryActionConfig
+    ? {
+        label: recoveryActionConfig.label,
+        onClick:
+          recoveryActionConfig.kind === "leave"
+            ? () => void handleLeaveRoom()
+            : () => void (playerMode === "host" ? handleHostSync() : handleGuestSync()),
+      }
+    : null;
 
   function record(nextMessages: OnlineDuelServerMessage[]) {
     setMessages((current) => [...nextMessages, ...current].slice(0, 18));
@@ -661,7 +706,11 @@ export function OnlineDuelScreen({
           fallbackFigure: resolvePresetFigure(hostBuild.presetId, "rush-chip"),
           fallbackEquipment: hostBuild.equipment,
         }),
-        preparedPlayer?.playerName ?? hostBuild.snapshot.name
+        preparedPlayer?.playerName ?? hostBuild.snapshot.name,
+        buildOnlineParticipantLoadout({
+          preparedPlayer,
+          fallbackBuild: hostBuild,
+        })
       )
     );
     const created = nextMessages.find((message) => message.type === "duel_created");
@@ -683,6 +732,7 @@ export function OnlineDuelScreen({
       return;
     }
 
+    setMatchmakingTimedOut(false);
     const nextMessages = await runClientAction(() =>
       setupRef.current.hostClient.findMatchmakingDuel(
         hostBuild.snapshot,
@@ -691,7 +741,11 @@ export function OnlineDuelScreen({
           fallbackFigure: resolvePresetFigure(hostBuild.presetId, "rush-chip"),
           fallbackEquipment: hostBuild.equipment,
         }),
-        preparedPlayer?.playerName ?? hostBuild.snapshot.name
+        preparedPlayer?.playerName ?? hostBuild.snapshot.name,
+        buildOnlineParticipantLoadout({
+          preparedPlayer,
+          fallbackBuild: hostBuild,
+        })
       )
     );
     const created = nextMessages.find((message) => message.type === "duel_created");
@@ -718,6 +772,24 @@ export function OnlineDuelScreen({
     applyInboundMessages(nextMessages);
   }
 
+  async function handleStopMatchmakingSearch() {
+    setMatchmakingSearchActive(false);
+    setMatchmakingTimedOut(false);
+
+    if (duelId) {
+      await handleLeaveRoom();
+      return;
+    }
+
+    resetOnlineFlow();
+  }
+
+  function handleRestartMatchmakingSearch() {
+    autoStartedRef.current = false;
+    setMatchmakingTimedOut(false);
+    setMatchmakingSearchActive(true);
+  }
+
   async function handleJoinDuel() {
     const normalizedCode = joinCode.trim().toUpperCase();
     if (!normalizedCode) {
@@ -738,7 +810,11 @@ export function OnlineDuelScreen({
           fallbackFigure: resolvePresetFigure(guestBuild.presetId, "kitsune-bit"),
           fallbackEquipment: guestBuild.equipment,
         }),
-        preparedPlayer?.playerName ?? guestBuild.snapshot.name
+        preparedPlayer?.playerName ?? guestBuild.snapshot.name,
+        buildOnlineParticipantLoadout({
+          preparedPlayer,
+          fallbackBuild: guestBuild,
+        })
       )
     );
     const joinSync = nextMessages.find((message) => message.type === "duel_state_sync");
@@ -845,18 +921,17 @@ export function OnlineDuelScreen({
         setupRef.current.hostClient.submitRoundAction(
           duelId,
           resolvedHostSeat,
-          buildPlayerRoundAction({
-            attackerId: hostBuild.snapshot.characterId,
-            draft: hostDraft,
-            skill: selectedHostSkill,
-            consumable: selectedHostConsumableItem?.consumableEffect
-              ? {
-                  itemCode: selectedHostConsumableItem.code,
-                  itemName: selectedHostConsumableItem.name,
-                  effect: selectedHostConsumableItem.consumableEffect,
-                }
-              : null,
-          })
+          {
+            attackZone: hostDraft.attackZone,
+            defenseZones: hostDraft.defenseZones,
+            intent: hostDraft.intent,
+            selectedAction:
+              hostDraft.selectedAction.kind === "skill_attack" && !selectedHostSkill
+                ? { kind: "basic_attack" }
+                : hostDraft.selectedAction.kind === "consumable" && !selectedHostConsumableItem?.consumableEffect
+                  ? { kind: "basic_attack" }
+                  : hostDraft.selectedAction,
+          }
         )
       );
       const syncModes: ClientMode[] = shouldRefreshClientsAfterRoundResolution(submitMessages)
@@ -893,18 +968,17 @@ export function OnlineDuelScreen({
         setupRef.current.guestClient.submitRoundAction(
           duelId,
           resolvedGuestSeat,
-          buildPlayerRoundAction({
-            attackerId: guestBuild.snapshot.characterId,
-            draft: guestDraft,
-            skill: selectedGuestSkill,
-            consumable: selectedGuestConsumableItem?.consumableEffect
-              ? {
-                  itemCode: selectedGuestConsumableItem.code,
-                  itemName: selectedGuestConsumableItem.name,
-                  effect: selectedGuestConsumableItem.consumableEffect,
-                }
-              : null,
-          })
+          {
+            attackZone: guestDraft.attackZone,
+            defenseZones: guestDraft.defenseZones,
+            intent: guestDraft.intent,
+            selectedAction:
+              guestDraft.selectedAction.kind === "skill_attack" && !selectedGuestSkill
+                ? { kind: "basic_attack" }
+                : guestDraft.selectedAction.kind === "consumable" && !selectedGuestConsumableItem?.consumableEffect
+                  ? { kind: "basic_attack" }
+                  : guestDraft.selectedAction,
+          }
         )
       );
       const syncModes: ClientMode[] = shouldRefreshClientsAfterRoundResolution(submitMessages)
@@ -1011,7 +1085,9 @@ export function OnlineDuelScreen({
     setGuestDraft(createRoundDraft());
     setHostActionSubmitting(false);
     setGuestActionSubmitting(false);
+    setMatchmakingSearchActive(matchmakingMode ? false : initialEntryMode === "matchmaking");
     setTransportIssue(null);
+    setMatchmakingTimedOut(false);
     setDebugOpen(false);
     autoStartedRef.current = false;
     setClientRefresh((current) => current + 1);
@@ -1100,6 +1176,16 @@ export function OnlineDuelScreen({
                   selectedPresetId={hostBuild.presetId}
                   locked={Boolean(duelId)}
                   onSelect={(presetId) => setHostBuild(createOnlineBuildSelection(presetId, "Host"))}
+                  description={resolvePresetById(hostBuild.presetId)?.description ?? "Choose one of the live curated combat presets."}
+                  presetChooserStyle={presetChooserStyle}
+                  sectionHeadStyle={sectionHeadStyle}
+                  eyebrowStyle={eyebrowStyle}
+                  chipStyle={chipStyle}
+                  presetGridStyle={presetGridStyle}
+                  presetSelectedButtonStyle={presetSelectedButtonStyle}
+                  presetButtonStyle={presetButtonStyle}
+                  presetMetaStyle={presetMetaStyle}
+                  helperTextStyle={helperTextStyle}
                 />
                 <div style={buttonRowStyle}>
                   <button
@@ -1124,6 +1210,16 @@ export function OnlineDuelScreen({
                   selectedPresetId={guestBuild.presetId}
                   locked={Boolean(duelId)}
                   onSelect={(presetId) => setGuestBuild(createOnlineBuildSelection(presetId, "Guest"))}
+                  description={resolvePresetById(guestBuild.presetId)?.description ?? "Choose one of the live curated combat presets."}
+                  presetChooserStyle={presetChooserStyle}
+                  sectionHeadStyle={sectionHeadStyle}
+                  eyebrowStyle={eyebrowStyle}
+                  chipStyle={chipStyle}
+                  presetGridStyle={presetGridStyle}
+                  presetSelectedButtonStyle={presetSelectedButtonStyle}
+                  presetButtonStyle={presetButtonStyle}
+                  presetMetaStyle={presetMetaStyle}
+                  helperTextStyle={helperTextStyle}
                 />
                 <div style={buttonRowStyle}>
                   <label
@@ -1214,31 +1310,148 @@ export function OnlineDuelScreen({
         <article style={panelStyle}>
           <div style={sectionHeadStyle}>
             <span style={eyebrowStyle}>Fight Status</span>
-            <span style={chipStyle}>{matchmakingMode ? "Searching" : initialEntryMode === "join" ? "Joining" : "Opening"}</span>
+            <span style={chipStyle}>
+              {matchmakingStatus?.badge ?? (matchmakingMode ? "Searching" : initialEntryMode === "join" ? "Joining" : "Opening")}
+            </span>
           </div>
           <p style={helperTextStyle}>
-            {matchmakingMode
-              ? "Searching for another prepared fighter and opening the combat screen as soon as a rival is found."
-              : initialEntryMode === "join"
-                ? "Joining the shared match code with your prepared fighter."
-                : "Opening a fresh match for your prepared fighter."}
+            {matchmakingStatus?.message ??
+              (matchmakingMode
+                ? "Searching for another prepared fighter and opening the combat screen as soon as a rival is found."
+                : initialEntryMode === "join"
+                  ? "Joining the shared match code with your prepared fighter."
+                  : "Opening a fresh match for your prepared fighter.")}
           </p>
           <div style={emptyCardStyle}>
-            {matchmakingMode ? "Searching for a rival..." : initialEntryMode === "join" ? "Joining match..." : "Opening match..."}
+            {matchmakingStatus?.badge === "Search paused"
+              ? "Search paused"
+              : matchmakingMode
+                ? "Searching for a rival..."
+                : initialEntryMode === "join"
+                  ? "Joining match..."
+                  : "Opening match..."}
           </div>
           {transportIssue ? <p style={warningTextStyle}>Connection issue: {describeTransportIssue(transportIssue)}</p> : null}
+          {matchmakingMode && !duelId ? (
+            <div style={buttonRowStyle}>
+              {matchmakingSearchActive ? (
+                <button type="button" style={ghostButtonStyle} onClick={() => void handleStopMatchmakingSearch()}>
+                  Stop Searching
+                </button>
+              ) : (
+                <button type="button" style={primaryButtonStyle} onClick={handleRestartMatchmakingSearch}>
+                  Search Again
+                </button>
+              )}
+            </div>
+          ) : null}
         </article>
       )}
 
       {showPlayerFacingArena ? (
         <>
+          {matchmakingStatus && duelId ? (
+            <article
+              style={{
+                ...panelStyle,
+                marginBottom: 14,
+                border:
+                  matchmakingStatus.tone === "warning"
+                    ? "1px solid rgba(255,196,120,0.26)"
+                    : "1px solid rgba(135,217,255,0.24)",
+                background:
+                  matchmakingStatus.tone === "warning"
+                    ? "linear-gradient(180deg, rgba(62,42,18,0.9), rgba(25,17,10,0.96))"
+                    : "linear-gradient(180deg, rgba(20,35,45,0.88), rgba(13,18,24,0.96))",
+              }}
+            >
+              <div style={sectionHeadStyle}>
+                <span style={eyebrowStyle}>Matchmaking</span>
+                <span style={chipStyle}>{matchmakingStatus.badge}</span>
+              </div>
+              <p style={helperTextStyle}>{matchmakingStatus.message}</p>
+              <div style={buttonRowStyle}>
+                <button type="button" style={ghostButtonStyle} onClick={() => void handleStopMatchmakingSearch()}>
+                  Stop Searching
+                </button>
+                {matchmakingTimedOut ? (
+                  <button type="button" style={primaryButtonStyle} onClick={() => setMatchmakingTimedOut(false)}>
+                    Keep Searching
+                  </button>
+                ) : null}
+              </div>
+            </article>
+          ) : null}
+          {liveStatus ? (
+            <article
+              style={{
+                ...panelStyle,
+                marginBottom: 14,
+                border:
+                  liveStatus.tone === "danger"
+                    ? "1px solid rgba(255,127,127,0.3)"
+                    : liveStatus.tone === "warning"
+                      ? "1px solid rgba(255,196,120,0.26)"
+                      : "1px solid rgba(135,217,255,0.24)",
+                background:
+                  liveStatus.tone === "danger"
+                    ? "linear-gradient(180deg, rgba(62,21,21,0.92), rgba(23,12,12,0.96))"
+                    : liveStatus.tone === "warning"
+                      ? "linear-gradient(180deg, rgba(62,42,18,0.9), rgba(25,17,10,0.96))"
+                      : "linear-gradient(180deg, rgba(20,35,45,0.88), rgba(13,18,24,0.96))",
+                boxShadow: "0 18px 36px rgba(0,0,0,0.24)",
+              }}
+            >
+              <div style={sectionHeadStyle}>
+                <span style={eyebrowStyle}>Live Status</span>
+                <span
+                  style={{
+                    ...chipStyle,
+                    border:
+                      liveStatus.tone === "danger"
+                        ? "1px solid rgba(255,127,127,0.34)"
+                        : liveStatus.tone === "warning"
+                          ? "1px solid rgba(255,196,120,0.32)"
+                          : chipStyle.border,
+                    background:
+                      liveStatus.tone === "danger"
+                        ? "rgba(112,31,31,0.28)"
+                        : liveStatus.tone === "warning"
+                          ? "rgba(119,77,18,0.28)"
+                          : chipStyle.background,
+                    color:
+                      liveStatus.tone === "danger"
+                        ? "rgba(255,226,226,0.96)"
+                        : liveStatus.tone === "warning"
+                          ? "rgba(255,236,210,0.96)"
+                          : chipStyle.color,
+                  }}
+                >
+                  {liveStatus.badge}
+                </span>
+              </div>
+              <p
+                style={{
+                  ...helperTextStyle,
+                  color:
+                    liveStatus.tone === "danger"
+                      ? "rgba(255,220,220,0.88)"
+                      : liveStatus.tone === "warning"
+                        ? "rgba(255,232,205,0.88)"
+                        : helperTextStyle.color,
+                }}
+              >
+                {liveStatus.message}
+              </p>
+            </article>
+          ) : null}
           <ArenaStageShell shellStyle={shellStyle}>
             <ArenaStageColumns>
               <OnlinePlayerCombatPanel
                 playerName={playerDisplayName}
                 playerFigure={playerFigure}
                 currentHp={playerCurrentHp}
-                maxHp={playerBuild.snapshot.maxHp}
+                maxHp={playerSnapshot.maxHp}
                 equipment={playerEquipment}
                 selectedIntent={(playerMode === "host" ? hostDraft : guestDraft).intent}
                 shellStyle={shellStyle}
@@ -1248,6 +1461,13 @@ export function OnlineDuelScreen({
                 presetLabel={resolvePresetById(playerBuild.presetId)?.label ?? "Custom"}
                 winner={matchSync?.winnerSeat === (playerSync?.yourSeat ?? playerSeat)}
                 loser={Boolean(matchSync?.winnerSeat) && matchSync?.winnerSeat !== (playerSync?.yourSeat ?? playerSeat)}
+                sidePanelComponent={SidePanel}
+                chipStyle={chipStyle}
+                combatArenaBadgeRowStyle={combatArenaBadgeRowStyle}
+                onlinePlayerIntentSilhouetteTone={onlinePlayerIntentSilhouetteTone}
+                statSummaryRowStyle={statSummaryRowStyle}
+                statSummaryLabelStyle={statSummaryLabelStyle}
+                statSummaryValueStyle={statSummaryValueStyle}
               />
 
               <OnlineFightSetupPanel
@@ -1314,13 +1534,15 @@ export function OnlineDuelScreen({
                 }
                 onLockAttack={() => void (playerMode === "host" ? handleHostAttack() : handleGuestAttack())}
                 actionsDisabled={actionsDisabled}
+                blockedStatus={liveStatus}
+                recoveryAction={recoveryAction}
               />
 
               <OnlineOpponentCombatPanel
                 playerName={opponentParticipant?.displayName ?? "Player 2"}
                 playerFigure={opponentFigure}
                 currentHp={opponentCurrentHp}
-                maxHp={opponentBuild.snapshot.maxHp}
+                maxHp={opponentSnapshot.maxHp}
                 equipment={opponentEquipment}
                 shellStyle={shellStyle}
                 panelStyle={panelStyle}
@@ -1335,6 +1557,12 @@ export function OnlineDuelScreen({
                 readinessLabel={opponentParticipant?.ready ? "Ready" : "Not ready"}
                 winner={matchSync?.winnerSeat !== null && matchSync?.winnerSeat === opponentParticipant?.seat}
                 loser={Boolean(matchSync?.winnerSeat) && matchSync?.winnerSeat !== opponentParticipant?.seat}
+                sidePanelComponent={SidePanel}
+                chipStyle={chipStyle}
+                combatArenaBadgeRowStyle={combatArenaBadgeRowStyle}
+                statSummaryRowStyle={statSummaryRowStyle}
+                statSummaryLabelStyle={statSummaryLabelStyle}
+                statSummaryValueStyle={statSummaryValueStyle}
               />
             </ArenaStageColumns>
           </ArenaStageShell>
@@ -1468,6 +1696,14 @@ export function OnlineDuelScreen({
                       ? setHostDraft((current) => toggleRoundDraftDefenseZone(current, zone))
                       : setGuestDraft((current) => toggleRoundDraftDefenseZone(current, zone))
                   }
+                  plannerCardStyle={plannerCardStyle}
+                  sectionHeadStyle={sectionHeadStyle}
+                  eyebrowStyle={eyebrowStyle}
+                  chipStyle={chipStyle}
+                  plannerLabelStyle={plannerLabelStyle}
+                  plannerZoneRowStyle={plannerZoneRowStyle}
+                  plannerPrimaryButtonStyle={plannerPrimaryButtonStyle}
+                  plannerGhostButtonStyle={plannerGhostButtonStyle}
                 />
                 <div style={buttonRowStyle}>
                   <button
@@ -1495,7 +1731,15 @@ export function OnlineDuelScreen({
                     Lock Selected Attack
                   </button>
                 </div>
-                <SyncView sync={debugSync} emptyLabel="The selected debug client has not synced yet." />
+                <SyncView
+                  sync={debugSync}
+                  emptyLabel="The selected debug client has not synced yet."
+                  emptyCardStyle={emptyCardStyle}
+                  statStripStyle={statStripStyle}
+                  statCardStyle={statCardStyle}
+                  statLabelStyle={statLabelStyle}
+                  statValueStyle={statValueStyle}
+                />
               </div>
 
               <div style={{ ...panelStyle, marginTop: 14, background: "rgba(255,255,255,0.02)", boxShadow: "none" }}>
@@ -1570,330 +1814,40 @@ export function OnlineDuelScreen({
         </article>
       ) : null}
 
-      {!launchedFromLobby ? <RoundResultCard summary={lastResolvedRound} /> : null}
+      {!launchedFromLobby ? (
+        <RoundResultCard
+          summary={lastResolvedRound}
+          panelStyle={panelStyle}
+          sectionHeadStyle={sectionHeadStyle}
+          eyebrowStyle={eyebrowStyle}
+          chipStyle={chipStyle}
+          helperTextStyle={helperTextStyle}
+          statStripStyle={statStripStyle}
+          statCardStyle={statCardStyle}
+          statLabelStyle={statLabelStyle}
+          statValueStyle={statValueStyle}
+          messageCardStyle={messageCardStyle}
+          messageMetaStyle={messageMetaStyle}
+        />
+      ) : null}
       <MatchFinishCard
         status={matchSync?.status ?? null}
         winnerName={winnerName}
         onLeave={() => void handleLeaveRoom()}
         onPlayAgain={() => void handlePlayAnotherMatch()}
+        transportIssue={transportIssue}
+        opponentConnected={!opponentSeatOffline}
+        panelStyle={panelStyle}
+        sectionHeadStyle={sectionHeadStyle}
+        eyebrowStyle={eyebrowStyle}
+        chipStyle={chipStyle}
+        helperTextStyle={helperTextStyle}
+        buttonRowStyle={buttonRowStyle}
+        ghostButtonStyle={ghostButtonStyle}
+        primaryButtonStyle={primaryButtonStyle}
       />
     </section>
   );
-}
-
-function pickMostCompleteSync(
-  first: OnlineDuelStateSync | null,
-  second: OnlineDuelStateSync | null
-): OnlineDuelStateSync | null {
-  if (!first) {
-    return second;
-  }
-
-  if (!second) {
-    return first;
-  }
-
-  const firstScore = scoreSyncCompleteness(first);
-  const secondScore = scoreSyncCompleteness(second);
-  return secondScore > firstScore ? second : first;
-}
-
-function resolveCombatantSummary(summary: OnlineDuelRoundSummary | null, displayName: string) {
-  if (!summary) {
-    return null;
-  }
-
-  return summary.combatants.find((combatant) => combatant.name === displayName) ?? null;
-}
-
-function resolveCombatLoadoutForMode({
-  mode,
-  playerMode,
-  preparedPlayer,
-  hostBuild,
-  guestBuild,
-}: {
-  mode: ClientMode;
-  playerMode: ClientMode;
-  preparedPlayer: PvpPreparedFighter | null;
-  hostBuild: OnlineBuildSelection;
-  guestBuild: OnlineBuildSelection;
-}) {
-  const build = mode === "host" ? hostBuild : guestBuild;
-  const loadout =
-    preparedPlayer && mode === playerMode
-      ? {
-          equipmentState: preparedPlayer.equipmentState,
-          inventory: preparedPlayer.inventory,
-          equippedSkillIds: preparedPlayer.equippedSkillIds,
-          equipment: preparedPlayer.equipment,
-        }
-      : {
-          equipmentState: build.equipmentState,
-          inventory: build.inventory,
-          equippedSkillIds: build.equippedSkillIds,
-          equipment: build.equipment,
-        };
-  const bonuses = getEquipmentBonuses(loadout.equipmentState, loadout.inventory);
-  const availableSkills = bonuses.skills.filter((skill) => loadout.equippedSkillIds.includes(skill.id));
-  const availableConsumables = loadout.inventory.entries.filter(
-    (entry) => entry.item.consumableEffect && entry.quantity > 0
-  );
-
-  return {
-    ...loadout,
-    availableSkills,
-    availableConsumables,
-  };
-}
-
-function buildClientFighterView({
-  preparedPlayer,
-  fallbackFigure,
-  fallbackEquipment = [],
-}: {
-  preparedPlayer: PvpPreparedFighter | null;
-  fallbackFigure: string;
-  fallbackEquipment?: Array<{ slot: EquipmentSlot; item: Item | null }>;
-}): OnlineDuelFighterView {
-  return {
-    figure: preparedPlayer?.figure ?? fallbackFigure,
-    equipment: preparedPlayer?.equipment ?? fallbackEquipment,
-  };
-}
-
-function resolveFighterViewFigure(figure: string | undefined, fallback: string) {
-  return (figure ?? fallback) as Parameters<typeof CombatSilhouette>[0]["figure"];
-}
-
-function totalDamageProfileValue(profile: ReturnType<typeof buildCombatSnapshot>["damage"]) {
-  return profile.slash + profile.pierce + profile.blunt + profile.chop;
-}
-
-function totalArmorProfileValue(profile: ReturnType<typeof buildCombatSnapshot>["armor"]) {
-  return profile.slash + profile.pierce + profile.blunt + profile.chop;
-}
-
-function StatSummaryGrid({
-  stats,
-}: {
-  stats: Array<{ label: string; value: string; helper: string }>;
-}) {
-  return (
-    <div style={{ display: "grid", gap: 8 }}>
-      {stats.map((stat) => (
-        <div key={stat.label} style={statSummaryRowStyle}>
-          <span style={statSummaryLabelStyle}>{stat.label}</span>
-          <span style={statSummaryValueStyle}>{stat.value}</span>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-function scoreSyncCompleteness(sync: OnlineDuelStateSync): number {
-  const joinedCount = sync.participants.filter((participant) => participant.connected).length;
-  const readyCount = sync.participants.filter((participant) => participant.connected && participant.ready).length;
-  const roundScore = sync.round ?? 0;
-  const statusScore =
-    sync.status === "finished"
-      ? 4
-      : sync.status === "ready_to_resolve"
-        ? 3
-        : sync.status === "planning"
-          ? 2
-        : sync.status === "lobby"
-          ? 1
-          : 0;
-
-  return joinedCount * 100 + readyCount * 10 + roundScore + statusScore;
-}
-
-function getMatchStatusSummary({
-  duelId,
-  status,
-  joinedCount,
-  readyCount,
-  winnerName,
-}: {
-  duelId: string | null;
-  status?: string;
-  joinedCount: number;
-  readyCount: number;
-  winnerName: string | null;
-}) {
-  if (!duelId) {
-    return {
-      badge: "Open match",
-      message: "Open a match first, then share the code so the second player can join.",
-    };
-  }
-
-  if (status === "finished") {
-    return {
-      badge: "Match finished",
-      message: winnerName
-        ? `${winnerName} won the fight. Leave this match or start a fresh one from here.`
-        : "The fight is over. Leave this match or start a fresh one from here.",
-    };
-  }
-
-  if (status === "abandoned") {
-    return {
-      badge: "Match closed",
-      message: "This match is no longer active. Leave it or start a fresh one.",
-    };
-  }
-
-  if (joinedCount < 2) {
-    return {
-      badge: "Waiting for rival",
-      message: "The fight is open. Share the duel code and wait for the second fighter to connect.",
-    };
-  }
-
-  if (readyCount < 2) {
-    return {
-      badge: "Ready check",
-      message: "Both fighters are here. Each side needs to ready up before the first exchange can start.",
-    };
-  }
-
-  if (status === "planning") {
-    return {
-      badge: "Choose actions",
-      message: "Ready check passed. Each fighter can now choose zones and lock in an attack for the round.",
-    };
-  }
-
-  if (status === "ready_to_resolve" || status === "finished") {
-    return {
-      badge: "Round resolved",
-      message: "Both actions are in. The exchange is resolved and the result is now shown to both fighters.",
-    };
-  }
-
-    return {
-      badge: status ?? "Match live",
-      message: "The fight is active and both fighters are looking at the same battle state.",
-    };
-  }
-
-function getCurrentStepSummary({
-  duelId,
-  status,
-  joinedCount,
-  readyCount,
-  playerReady,
-  opponentConnected,
-  opponentReady,
-  playerActionSubmitted,
-  opponentActionSubmitted,
-}: {
-  duelId: string | null;
-  status?: string;
-  joinedCount: number;
-  readyCount: number;
-  playerReady: boolean;
-  opponentConnected: boolean;
-  opponentReady: boolean;
-  playerActionSubmitted: boolean;
-  opponentActionSubmitted: boolean;
-}) {
-  if (!duelId) {
-    return {
-      badge: "Open match",
-      message: "Create a match first or switch to Join Match if you already have a match code.",
-    };
-  }
-
-  if (status === "finished") {
-    return {
-      badge: "Match over",
-      message: "This fight is finished. Leave the match or start another one from here.",
-    };
-  }
-
-  if (status === "abandoned") {
-    return {
-      badge: "Match closed",
-      message: "This match is closed. Leave it or start another fight when you are ready.",
-    };
-  }
-
-  if (joinedCount < 2) {
-    if (playerReady) {
-      return {
-        badge: "Hold",
-        message: "You are ready. Waiting for the second fighter.",
-      };
-    }
-
-    return {
-      badge: "Waiting",
-      message: "Waiting for the second fighter.",
-    };
-  }
-
-  if (!opponentConnected) {
-    return {
-      badge: "Waiting",
-      message: "Your opponent is away right now. Stay in the match and wait for them to return.",
-    };
-  }
-
-  if (readyCount < 2) {
-    if (!playerReady) {
-      return {
-        badge: "Ready up",
-        message: "Both fighters are here. Ready up to signal that you want to begin the round setup.",
-      };
-    }
-
-    if (!opponentReady) {
-      return {
-        badge: "Hold",
-        message: "You are ready. Wait for the other fighter so both sides can plan the round.",
-      };
-    }
-  }
-
-  if (status === "planning") {
-    if (playerActionSubmitted && !opponentActionSubmitted) {
-      return {
-        badge: "Waiting",
-        message: "Your action is locked in. Wait for the other fighter to finish their pick.",
-      };
-    }
-
-    return {
-      badge: "Pick zones",
-      message: "Choose your attack zone, set two guard zones, then lock your action for this round.",
-    };
-  }
-
-  if (status === "ready_to_resolve") {
-    return {
-      badge: "Resolving",
-      message: "Both actions are locked in. The round result is being shown below.",
-    };
-  }
-
-  return {
-    badge: status ?? "Live",
-    message: "Stay with the match and follow the next visible battle update from this panel.",
-  };
-}
-
-function activeParticipantIsReady(
-  sync: OnlineDuelStateSync | null,
-  fallbackSeat: string
-) {
-  if (!sync) {
-    return false;
-  }
-
-  return sync.participants.find((participant) => participant.seat === (sync.yourSeat ?? fallbackSeat))?.ready ?? false;
 }
 
 function OnlineFightSetupPanel({
@@ -1926,6 +1880,8 @@ function OnlineFightSetupPanel({
   onSkillChange,
   onConsumableChange,
   onLockAttack,
+  blockedStatus,
+  recoveryAction,
 }: {
   shellStyle: CSSProperties;
   panelStyle: CSSProperties;
@@ -1956,10 +1912,39 @@ function OnlineFightSetupPanel({
   onSkillChange: (skillId: string | null) => void;
   onConsumableChange: (itemCode: string | null) => void;
   onLockAttack: () => void;
+  blockedStatus: OnlineDuelLiveStatus | null;
+  recoveryAction: { label: string; onClick: () => void } | null;
 }) {
   return (
     <div data-testid="fight-setup-panel" style={{ ...shellStyle, padding: 16, display: "grid", gap: 12, alignContent: "start" }}>
       <div style={{ display: "grid", gap: 12 }}>
+        {blockedStatus && recoveryAction ? (
+          <div
+            style={{
+              ...currentStepCardStyle,
+              marginTop: 0,
+              border:
+                blockedStatus.tone === "danger"
+                  ? "1px solid rgba(255,127,127,0.26)"
+                  : "1px solid rgba(255,196,120,0.22)",
+              background:
+                blockedStatus.tone === "danger"
+                  ? "linear-gradient(180deg, rgba(58,22,22,0.86), rgba(23,13,13,0.94))"
+                  : "linear-gradient(180deg, rgba(63,46,20,0.8), rgba(24,17,9,0.94))",
+            }}
+          >
+            <div style={sectionHeadStyle}>
+              <span style={eyebrowStyle}>Recovery</span>
+              <span style={chipStyle}>{blockedStatus.badge}</span>
+            </div>
+            <p style={{ ...helperTextStyle, marginTop: 10 }}>{blockedStatus.message}</p>
+            <div style={{ ...buttonRowStyle, marginTop: 12 }}>
+              <button type="button" style={primaryButtonStyle} onClick={recoveryAction.onClick}>
+                {recoveryAction.label}
+              </button>
+            </div>
+          </div>
+        ) : null}
         <div style={{ display: "grid", gridTemplateColumns: "minmax(0, 0.92fr) minmax(0, 1.08fr)", gap: 12, alignItems: "stretch" }}>
           <FightControlsPanel
             panelStyle={panelStyle}
@@ -2040,983 +2025,12 @@ function OnlineFightSetupPanel({
             onIntentChange={onIntentChange}
             onSkillChange={onSkillChange}
             onConsumableChange={onConsumableChange}
+            onlineIntentVisuals={onlineIntentVisuals}
           />
         </div>
       </div>
     </div>
   );
-}
-
-function OnlineCombatActionsPanel({
-  panelStyle,
-  buttonStyle,
-  selectedIntent,
-  selectedAction,
-  availableSkills,
-  availableConsumables,
-  playerResources,
-  playerSkillCooldowns,
-  onIntentChange,
-  onSkillChange,
-  onConsumableChange,
-}: {
-  panelStyle: CSSProperties;
-  buttonStyle: CSSProperties;
-  selectedIntent: RoundDraft["intent"];
-  selectedAction: RoundDraft["selectedAction"];
-  availableSkills: OnlineAvailableSkill[];
-  availableConsumables: OnlineAvailableConsumable[];
-  playerResources: { rage: number; guard: number; momentum: number; focus: number } | null;
-  playerSkillCooldowns: Record<string, number>;
-  onIntentChange: (intent: RoundDraft["intent"]) => void;
-  onSkillChange: (skillId: string | null) => void;
-  onConsumableChange: (itemCode: string | null) => void;
-}) {
-  const selectedSkillId = selectedAction.kind === "skill_attack" ? selectedAction.skillId : null;
-  const selectedConsumableCode = selectedAction.kind === "consumable" ? selectedAction.consumableCode : null;
-  const selectedTone = onlineIntentVisuals[selectedIntent];
-
-  return (
-    <div style={{ display: "grid", gap: 10 }}>
-      <div
-        style={{
-          display: "grid",
-          gap: 5,
-          padding: 7,
-          borderRadius: 16,
-          border: `1px solid ${selectedTone.border}`,
-          background: `linear-gradient(180deg, ${selectedTone.fill}, rgba(255,255,255,0.02))`,
-          boxShadow: `inset 0 0 0 1px rgba(255,255,255,0.02), 0 0 24px ${selectedTone.glow}`,
-        }}
-      >
-        <div style={{ display: "flex", justifyContent: "space-between", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
-          <div style={{ display: "grid", gap: 2 }}>
-            <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.12em", textTransform: "uppercase", color: "#dbc5ae" }}>
-              Combat Intent
-            </div>
-            <div style={{ fontSize: 8, color: selectedTone.accent, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase" }}>
-              {formatCombatIntentLabel(selectedIntent)}
-            </div>
-          </div>
-          <div style={{ fontSize: 8, color: "#bca896", maxWidth: 190, textAlign: "right", lineHeight: 1.25 }}>
-            {combatIntentDescriptions[selectedIntent]}
-          </div>
-        </div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, minmax(0, 1fr))", gap: 5 }}>
-          {combatIntentOptions.map((intent) => {
-            const selected = selectedIntent === intent;
-            const tone = onlineIntentVisuals[intent];
-
-            return (
-              <button
-                key={intent}
-                type="button"
-                onClick={() => onIntentChange(intent)}
-                style={{
-                  ...buttonStyle,
-                  padding: "6px 8px",
-                  fontSize: 9,
-                  minHeight: 34,
-                  position: "relative",
-                  overflow: "hidden",
-                  transition: "border-color 140ms ease, box-shadow 140ms ease, background 140ms ease, color 140ms ease",
-                  ...(selected
-                    ? {
-                        border: `1px solid ${tone.border}`,
-                        background: `linear-gradient(180deg, ${tone.fill}, rgba(255,255,255,0.04))`,
-                        color: tone.accent,
-                        boxShadow: `inset 0 0 0 1px ${tone.border}, 0 0 18px ${tone.glow}`,
-                      }
-                    : {
-                        background: "linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.03))",
-                      }),
-                }}
-              >
-                {formatCombatIntentLabel(intent)}
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
-        <ActionRail
-          panelStyle={panelStyle}
-          title="Skills"
-          emptyLabel=""
-          countLabel={String(availableSkills.length)}
-          headerAction={
-            <button
-              type="button"
-              onClick={() => onSkillChange(null)}
-              style={{
-                ...buttonStyle,
-                padding: "5px 8px",
-                fontSize: 9,
-                ...(selectedAction.kind === "basic_attack"
-                  ? {
-                      border: "1px solid rgba(255,171,97,0.4)",
-                      background: "linear-gradient(180deg, rgba(221,122,68,0.24), rgba(207,106,50,0.12))",
-                      color: "#ffe2c2",
-                    }
-                  : {}),
-              }}
-            >
-              Basic
-            </button>
-          }
-          entries={availableSkills.map((skill) => {
-            const currentValue = (playerResources ?? { rage: 0, guard: 0, momentum: 0, focus: 0 })[skill.resourceType];
-            const cooldownTurns = playerSkillCooldowns[skill.id] ?? 0;
-            const skillReady = currentValue >= skill.cost && cooldownTurns <= 0;
-
-            return (
-              <ActionButton
-                key={skill.id}
-                selected={selectedSkillId === skill.id}
-                muted={currentValue < skill.cost || cooldownTurns > 0}
-                ready={skillReady}
-                resourceProgress={skill.cost > 0 ? Math.min(1, currentValue / skill.cost) : 1}
-                onClick={() =>
-                  cooldownTurns <= 0
-                    ? onSkillChange(selectedSkillId === skill.id ? null : skill.id)
-                    : undefined
-                }
-                label={skill.name}
-                note={cooldownTurns > 0 ? `Cooldown ${cooldownTurns}T` : `${currentValue}/${skill.cost} ${skill.resourceType}`}
-                description={skill.description}
-                detailLines={formatSkillDetailLines(skill)}
-                icon={getSkillIcon(skill.name, skill.sourceItemCode)}
-                iconHint={skill.sourceItemCode}
-                badge={cooldownTurns > 0 ? `${cooldownTurns}` : `${skill.cost}`}
-              />
-            );
-          })}
-        />
-
-        <ActionRail
-          panelStyle={panelStyle}
-          title="Consumables"
-          emptyLabel="No consumables."
-          countLabel={String(availableConsumables.length)}
-          entries={availableConsumables.map((entry) => (
-            <ActionButton
-              key={entry.item.code}
-              selected={selectedConsumableCode === entry.item.code}
-              onClick={() =>
-                onConsumableChange(
-                  selectedConsumableCode === entry.item.code ? null : entry.item.code
-                )
-              }
-              label={entry.item.name}
-              note={`x${entry.quantity}`}
-              description={entry.item.description}
-              detailLines={formatConsumableDetailLines(entry.item)}
-              icon={getConsumableIcon(entry.item.name)}
-            />
-          ))}
-        />
-      </div>
-    </div>
-  );
-}
-
-function OnlinePlayerCombatPanel({
-  playerName,
-  playerFigure,
-  currentHp,
-  maxHp,
-  equipment,
-  selectedIntent,
-  shellStyle,
-  panelStyle,
-  derivedStats,
-  roleLabel,
-  presetLabel,
-  winner,
-  loser,
-}: {
-  playerName: string;
-  playerFigure: string;
-  currentHp: number;
-  maxHp: number;
-  equipment: Array<{ slot: string; item: unknown }>;
-  selectedIntent: RoundDraft["intent"];
-  shellStyle: CSSProperties;
-  panelStyle: CSSProperties;
-  derivedStats: Array<{ label: string; value: string; helper: string }>;
-  roleLabel: string;
-  presetLabel: string;
-  winner: boolean;
-  loser: boolean;
-}) {
-  const selectedTone = onlinePlayerIntentSilhouetteTone[selectedIntent];
-
-  return (
-    <SidePanel
-      shellStyle={{
-        ...shellStyle,
-        border: `1px solid ${selectedTone.edge}`,
-        background: `linear-gradient(180deg, ${selectedTone.fill}, rgba(255,255,255,0.02))`,
-        boxShadow: `0 30px 74px rgba(0,0,0,0.34), 0 0 24px ${selectedTone.glow}`,
-      }}
-      panelStyle={panelStyle}
-      silhouette={
-        <div className={winner ? "combat-postfight-silhouette combat-postfight-silhouette--victory-left" : loser ? "combat-postfight-silhouette combat-postfight-silhouette--defeat-left" : undefined}>
-          <div
-            style={{
-              borderRadius: 30,
-              padding: 8,
-              background: `linear-gradient(180deg, ${selectedTone.fill}, rgba(255,255,255,0.02))`,
-              border: `1px solid ${selectedTone.edge}`,
-              boxShadow: `0 0 24px ${selectedTone.glow}, inset 2px 0 0 ${selectedTone.edge}, inset -2px 0 0 ${selectedTone.edge}`,
-              transition: "border-color 160ms ease, box-shadow 160ms ease, background 160ms ease",
-            }}
-          >
-            <CombatSilhouette
-              title={playerName}
-              currentHp={currentHp}
-              maxHp={maxHp}
-              activeEffects={[]}
-              equipmentSlots={equipment as Array<{ slot: EquipmentSlot; item: Item | null }>}
-              figure={playerFigure as never}
-              mirrored
-            />
-          </div>
-        </div>
-      }
-      sidebar={
-        <div style={{ display: "grid", gap: 8, alignContent: "start", height: "100%" }}>
-          <MiniPanel panelStyle={panelStyle} title="Utility">
-            <div style={{ display: "grid", gap: 6 }}>
-              <div style={combatArenaBadgeRowStyle}>
-                <span style={chipStyle}>{roleLabel}</span>
-                <span style={chipStyle}>{presetLabel}</span>
-              </div>
-            </div>
-          </MiniPanel>
-          <MiniPanel panelStyle={panelStyle} title="Build">
-            <StatSummaryGrid stats={derivedStats} />
-          </MiniPanel>
-        </div>
-      }
-      blocks={[]}
-    />
-  );
-}
-
-function OnlineOpponentCombatPanel({
-  playerName,
-  playerFigure,
-  currentHp,
-  maxHp,
-  equipment,
-  shellStyle,
-  panelStyle,
-  derivedStats,
-  connectionLabel,
-  readinessLabel,
-  winner,
-  loser,
-}: {
-  playerName: string;
-  playerFigure: string;
-  currentHp: number;
-  maxHp: number;
-  equipment: Array<{ slot: string; item: unknown }>;
-  shellStyle: CSSProperties;
-  panelStyle: CSSProperties;
-  derivedStats: Array<{ label: string; value: string; helper: string }>;
-  connectionLabel: string;
-  readinessLabel: string;
-  winner: boolean;
-  loser: boolean;
-}) {
-  return (
-    <SidePanel
-      shellStyle={shellStyle}
-      panelStyle={panelStyle}
-      silhouette={
-        <div style={{ display: "grid", gap: 8 }}>
-          <div className={winner ? "combat-postfight-silhouette combat-postfight-silhouette--victory-right" : loser ? "combat-postfight-silhouette combat-postfight-silhouette--defeat-right" : undefined}>
-            <CombatSilhouette
-              title={playerName}
-              currentHp={currentHp}
-              maxHp={maxHp}
-              activeEffects={[]}
-              equipmentSlots={equipment as Array<{ slot: EquipmentSlot; item: Item | null }>}
-              figure={playerFigure as never}
-            />
-          </div>
-          <ResourceGrid panelStyle={panelStyle} resources={null} layout="row" showHeader={false} />
-        </div>
-      }
-      sidebar={
-        <div style={{ display: "grid", gap: 8, alignContent: "start", height: "100%" }}>
-          <MiniPanel panelStyle={panelStyle} title="Utility">
-            <div style={{ display: "grid", gap: 6 }}>
-              <div style={combatArenaBadgeRowStyle}>
-                <span style={chipStyle}>{connectionLabel}</span>
-                <span style={chipStyle}>{readinessLabel}</span>
-              </div>
-            </div>
-          </MiniPanel>
-          <MiniPanel panelStyle={panelStyle} title="Snapshot">
-            <StatSummaryGrid stats={derivedStats} />
-          </MiniPanel>
-        </div>
-      }
-      blocks={[]}
-    />
-  );
-}
-
-function getOnlineSelectedActionLabel({
-  duelId,
-  playerReady,
-  showPlanner,
-  matchLocked,
-  draft,
-  playerActionSubmitted,
-  availableSkills,
-  availableConsumables,
-}: {
-  duelId: string | null;
-  playerReady: boolean;
-  showPlanner: boolean;
-  matchLocked: boolean;
-  draft: RoundDraft;
-  playerActionSubmitted: boolean;
-  availableSkills: OnlineAvailableSkill[];
-  availableConsumables: OnlineAvailableConsumable[];
-}) {
-  const selectedAction = draft.selectedAction;
-
-  if (!duelId) return "Open Match";
-  if (matchLocked) return "Fight Complete";
-  if (!playerReady) return "Ready Check";
-  if (!showPlanner) return "Waiting for Rival";
-  if (playerActionSubmitted) return "Action Locked";
-  if (selectedAction.kind === "skill_attack") {
-    return availableSkills.find((skill) => skill.id === selectedAction.skillId)?.name ?? "Skill";
-  }
-  if (selectedAction.kind === "consumable") {
-    return availableConsumables.find((entry) => entry.item.code === selectedAction.consumableCode)?.item.name ?? "Consumable";
-  }
-  return `${zoneLabels[draft.attackZone]} Strike`;
-}
-
-function getOnlineSelectedActionTags({
-  duelId,
-  playerReady,
-  showPlanner,
-  currentStepBadge,
-  draft,
-  playerActionSubmitted,
-  availableSkills,
-  availableConsumables,
-}: {
-  duelId: string | null;
-  playerReady: boolean;
-  showPlanner: boolean;
-  currentStepBadge: string;
-  draft: RoundDraft;
-  playerActionSubmitted: boolean;
-  availableSkills: OnlineAvailableSkill[];
-  availableConsumables: OnlineAvailableConsumable[];
-}) {
-  const selectedAction = draft.selectedAction;
-
-  if (!duelId) return ["Open"];
-  if (!playerReady) return [currentStepBadge, "Ready Check"];
-  if (!showPlanner) return [currentStepBadge, "Waiting"];
-  const baseTags = [
-    currentStepBadge,
-    playerActionSubmitted ? "Locked" : "Planning",
-    `Intent ${formatCombatIntentLabel(draft.intent)}`,
-    `Target ${zoneLabels[draft.attackZone]}`,
-  ];
-  if (selectedAction.kind === "skill_attack") {
-    const skill = availableSkills.find((entry) => entry.id === selectedAction.skillId) ?? null;
-    return [...baseTags, "Skill", skill?.damageMultiplier ? `Damage x${skill.damageMultiplier.toFixed(2)}` : "Skill"];
-  }
-  if (selectedAction.kind === "consumable") {
-    const consumable = availableConsumables.find((entry) => entry.item.code === selectedAction.consumableCode)?.item ?? null;
-    return [
-      ...baseTags,
-      selectedAction.usageMode === "with_attack" ? "With Attack" : "Separate Action",
-      consumable?.consumableEffect?.heal ? `Heal ${consumable.consumableEffect.heal} HP` : "Consumable",
-    ];
-  }
-  return baseTags;
-}
-
-function getOnlineSelectedActionSummary({
-  duelId,
-  currentStepMessage,
-  opponentState,
-  draft,
-  playerActionSubmitted,
-  showPlanner,
-  availableSkills,
-  availableConsumables,
-}: {
-  duelId: string | null;
-  currentStepMessage: string;
-  opponentState: string;
-  draft: RoundDraft;
-  playerActionSubmitted: boolean;
-  showPlanner: boolean;
-  availableSkills: OnlineAvailableSkill[];
-  availableConsumables: OnlineAvailableConsumable[];
-}) {
-  const selectedAction = draft.selectedAction;
-
-  if (!duelId) return ["Create or join a duel.", "Wait for both fighters.", "Battle planning unlocks in the room."];
-  if (!showPlanner) return [currentStepMessage, `Opponent ${opponentState}`, playerActionSubmitted ? "Action locked." : "Waiting for round planning."];
-  if (selectedAction.kind === "skill_attack") {
-    const skill = availableSkills.find((entry) => entry.id === selectedAction.skillId) ?? null;
-    return [
-      playerActionSubmitted ? "Your action is locked in." : "Skill selected for this round.",
-      ...(formatSkillDetailLines(skill).slice(0, 2)),
-      `Intent: ${formatCombatIntentLabel(draft.intent)}.`,
-    ];
-  }
-  if (selectedAction.kind === "consumable") {
-    const consumable = availableConsumables.find((entry) => entry.item.code === selectedAction.consumableCode)?.item ?? null;
-    return [
-      playerActionSubmitted ? "Your action is locked in." : "Consumable selected for this round.",
-      ...(formatConsumableDetailLines(consumable).slice(0, 2)),
-      `Intent: ${formatCombatIntentLabel(draft.intent)}.`,
-    ];
-  }
-  return [
-    playerActionSubmitted ? "Your action is locked in." : "Choose attack and block zones.",
-    `Attack ${zoneLabels[draft.attackZone]}`,
-    `Guard ${draft.defenseZones.map((zone) => zoneLabels[zone]).join(" + ")}`,
-    `Intent: ${formatCombatIntentLabel(draft.intent)}.`,
-  ];
-}
-
-function resolveWinnerName(sync: OnlineDuelStateSync | null) {
-  if (!sync?.winnerSeat) {
-    return null;
-  }
-
-  return sync.participants.find((participant) => participant.seat === sync.winnerSeat)?.displayName ?? sync.winnerSeat;
-}
-
-function RoundPlannerCard({
-  draft,
-  mode,
-  onAttackZoneChange,
-  onDefenseZoneToggle,
-}: {
-  draft: RoundDraft;
-  mode: ClientMode;
-  onAttackZoneChange: (zone: CombatZone) => void;
-  onDefenseZoneToggle: (zone: CombatZone) => void;
-}) {
-  return (
-    <div style={plannerCardStyle}>
-      <div style={sectionHeadStyle}>
-        <span style={eyebrowStyle}>Round Plan</span>
-        <span style={chipStyle}>
-          {zoneLabels[draft.attackZone]} / Guard {draft.defenseZones.map((zone) => zoneLabels[zone]).join(" + ")}
-        </span>
-      </div>
-      <div style={{ marginTop: 14, display: "grid", gap: 12 }}>
-        <div>
-          <div style={plannerLabelStyle}>Attack Zone</div>
-          <div style={plannerZoneRowStyle}>
-            {combatZones.map((zone) => {
-              const selected = draft.attackZone === zone;
-              return (
-                <button
-                  key={`${mode}-attack-${zone}`}
-                  type="button"
-                  onClick={() => onAttackZoneChange(zone)}
-                  aria-label={`${capitalizeLabel(mode)} attack zone ${zone}`}
-                  style={selected ? plannerPrimaryButtonStyle : plannerGhostButtonStyle}
-                >
-                  {zoneLabels[zone]}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-        <div>
-          <div style={plannerLabelStyle}>Defense Zones</div>
-          <div style={plannerZoneRowStyle}>
-            {combatZones.map((zone) => {
-              const selected = draft.defenseZones.includes(zone);
-              return (
-                <button
-                  key={`${mode}-defense-${zone}`}
-                  type="button"
-                  onClick={() => onDefenseZoneToggle(zone)}
-                  aria-label={`${capitalizeLabel(mode)} defense zone ${zone}`}
-                  style={selected ? plannerPrimaryButtonStyle : plannerGhostButtonStyle}
-                >
-                  {zoneLabels[zone]}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function RoundResultCard({
-  summary,
-}: {
-  summary: OnlineDuelRoundSummary | null;
-}) {
-  if (!summary) {
-    return (
-      <article style={panelStyle}>
-        <div style={sectionHeadStyle}>
-          <span style={eyebrowStyle}>Round Result</span>
-          <span style={chipStyle}>Waiting</span>
-        </div>
-        <p style={helperTextStyle}>Resolve a round to see the exchange summary here.</p>
-      </article>
-    );
-  }
-
-  return (
-    <article style={panelStyle}>
-      <div style={sectionHeadStyle}>
-        <span style={eyebrowStyle}>Round Result</span>
-        <span style={chipStyle}>Round {summary.round}</span>
-      </div>
-      <div style={statStripStyle}>
-        {summary.combatants.map((combatant) => (
-          <div key={combatant.id} style={statCardStyle}>
-            <div style={statLabelStyle}>{combatant.name}</div>
-            <div style={statValueStyle}>
-              {combatant.currentHp} / {combatant.maxHp} HP
-            </div>
-          </div>
-        ))}
-      </div>
-      <div style={{ marginTop: 14, display: "grid", gap: 10 }}>
-        {summary.entries.map((entry, index) => (
-          <div key={`${summary.round}-${entry.attackerName}-${index}`} style={messageCardStyle}>
-            <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
-              <strong style={{ fontSize: 14 }}>
-                {entry.attackerName} {"->"} {entry.defenderName}
-              </strong>
-              <span style={messageMetaStyle}>
-                {zoneLabels[entry.attackZone]} | {entry.dodged ? "dodged" : entry.blocked ? "blocked" : "landed"}
-                {entry.crit ? " | crit" : ""} | {entry.finalDamage} dmg
-              </span>
-            </div>
-            <p style={{ margin: "10px 0 0", color: "rgba(255,244,231,0.82)", lineHeight: 1.55 }}>
-              {entry.commentary}
-            </p>
-            {entry.knockoutCommentary ? (
-              <p style={{ margin: "8px 0 0", color: "rgba(255,210,168,0.92)", lineHeight: 1.5 }}>
-                KO: {entry.knockoutCommentary}
-              </p>
-            ) : null}
-          </div>
-        ))}
-      </div>
-    </article>
-  );
-}
-
-function MatchFinishCard({
-  status,
-  winnerName,
-  onLeave,
-  onPlayAgain,
-}: {
-  status: string | null;
-  winnerName: string | null;
-  onLeave: () => void | Promise<void>;
-  onPlayAgain: () => void | Promise<void>;
-}) {
-  if (status !== "finished" && status !== "abandoned") {
-    return null;
-  }
-
-  return (
-    <article style={panelStyle}>
-      <div style={sectionHeadStyle}>
-        <span style={eyebrowStyle}>Fight Finish</span>
-        <span style={chipStyle}>{status === "finished" ? "Complete" : "Closed"}</span>
-      </div>
-      <p style={helperTextStyle}>
-        {status === "finished"
-          ? winnerName
-            ? `${winnerName} wins the duel.`
-            : "The duel has finished."
-          : "This match has been closed."}
-      </p>
-      <div style={buttonRowStyle}>
-        <button type="button" style={ghostButtonStyle} onClick={onLeave}>
-          Leave Fight
-        </button>
-        <button type="button" style={primaryButtonStyle} onClick={onPlayAgain}>
-          Fight Again
-        </button>
-      </div>
-    </article>
-  );
-}
-
-function SyncView({
-  sync,
-  emptyLabel,
-}: {
-  sync: ReturnType<OnlineDuelClient["getLastSync"]>;
-  emptyLabel: string;
-}) {
-  if (!sync) {
-    return <div style={emptyCardStyle}>{emptyLabel}</div>;
-  }
-
-  return (
-    <>
-      <div style={statStripStyle}>
-        <div style={statCardStyle}>
-          <div style={statLabelStyle}>Status</div>
-          <div style={statValueStyle}>{sync.status}</div>
-        </div>
-        <div style={statCardStyle}>
-          <div style={statLabelStyle}>Round</div>
-          <div style={statValueStyle}>{sync.round ?? "-"}</div>
-        </div>
-        <div style={statCardStyle}>
-          <div style={statLabelStyle}>Winner</div>
-          <div style={statValueStyle}>{sync.winnerSeat ?? "-"}</div>
-        </div>
-        <div style={statCardStyle}>
-          <div style={statLabelStyle}>Seat</div>
-          <div style={statValueStyle}>{sync.yourSeat ?? "-"}</div>
-        </div>
-      </div>
-      <div style={statStripStyle}>
-        {sync.participants.map((participant) => (
-          <div key={participant.seat} style={statCardStyle}>
-            <div style={statLabelStyle}>{participant.displayName}</div>
-            <div style={statValueStyle}>{participant.connected ? (participant.ready ? "Ready" : "Waiting") : "Offline"}</div>
-            <div style={{ marginTop: 6, color: "rgba(255,244,231,0.58)", fontSize: 12 }}>
-              {participant.connected ? "connected" : "disconnected"}
-            </div>
-          </div>
-        ))}
-      </div>
-    </>
-  );
-}
-
-function capitalizeLabel(value: string) {
-  return value.charAt(0).toUpperCase() + value.slice(1);
-}
-
-function PresetChooser({
-  title,
-  selectedPresetId,
-  locked,
-  onSelect,
-}: {
-  title: string;
-  selectedPresetId: string;
-  locked: boolean;
-  onSelect: (presetId: string) => void;
-}) {
-  return (
-    <div style={presetChooserStyle}>
-      <div style={sectionHeadStyle}>
-        <span style={eyebrowStyle}>{title}</span>
-        <span style={chipStyle}>{locked ? "Locked for this room" : "Pick before match"}</span>
-      </div>
-      <div style={presetGridStyle}>
-        {combatBuildPresets.map((preset) => {
-          const selected = preset.id === selectedPresetId;
-          return (
-            <button
-              key={preset.id}
-              type="button"
-              style={selected ? presetSelectedButtonStyle : presetButtonStyle}
-              onClick={() => onSelect(preset.id)}
-              disabled={locked}
-            >
-              <strong style={{ fontSize: 13 }}>{preset.label}</strong>
-              <span style={presetMetaStyle}>{preset.archetype}</span>
-            </button>
-          );
-        })}
-      </div>
-      <p style={{ ...helperTextStyle, marginTop: 10 }}>
-        {resolvePresetById(selectedPresetId)?.description ?? "Choose one of the live curated combat presets."}
-      </p>
-    </div>
-  );
-}
-
-function resolvePresetById(presetId: string): CombatBuildPreset | null {
-  return combatBuildPresets.find((preset) => preset.id === presetId) ?? null;
-}
-
-function createOnlineBuildSelection(
-  presetId: string,
-  fighterName: string
-): OnlineBuildSelection {
-  const preset = resolvePresetById(presetId) ?? combatBuildPresets[0];
-  if (!preset) {
-    throw new Error("missing_online_preset");
-  }
-
-  const inventory = createStarterInventory();
-  const presetState = buildSandboxPresetState({
-    inventory,
-    preset: {
-      loadout: preset.loadout,
-      allocations: preset.allocations,
-      skillLoadout: preset.skillLoadout,
-    },
-  });
-  const equipmentBonuses = getEquipmentBonuses(presetState.equipment, inventory);
-  const baseCharacter = requireSandboxCharacter(fighterName);
-  const character = applySandboxAllocations(baseCharacter, preset.allocations);
-
-  return {
-    presetId: preset.id,
-    inventory,
-    equipmentState: presetState.equipment,
-    equippedSkillIds: presetState.equippedSkillIds,
-    equipment: playerEquipmentSlots.map((slot) => ({
-      slot,
-      item: inventory.entries.find((entry) => entry.item.code === presetState.equipment.slots[slot])?.item ?? null,
-    })),
-    snapshot: buildCombatSnapshot({
-      character,
-      flatBonuses: equipmentBonuses.flatBonuses,
-      percentBonuses: equipmentBonuses.percentBonuses,
-      baseDamage: equipmentBonuses.baseDamage,
-      baseArmor: equipmentBonuses.baseArmor,
-      baseZoneArmor: equipmentBonuses.baseZoneArmor,
-      armorBySlot: equipmentBonuses.armorBySlot,
-      zoneArmorBySlot: equipmentBonuses.zoneArmorBySlot,
-      combatBonuses: equipmentBonuses.combatBonuses,
-      preferredDamageType: equipmentBonuses.preferredDamageType,
-      weaponClass: equipmentBonuses.mainHandWeaponClass,
-    }),
-  };
-}
-
-interface OnlineDuelSetup {
-  transportLabel: "backend" | "local";
-  hostClient: OnlineDuelClient;
-  guestClient: OnlineDuelClient;
-  resetHostClient(): void;
-  resetGuestClient(): void;
-  expireRooms?: (now?: number) => void;
-}
-
-interface OnlineSetupClientIdentityOverride {
-  playerId: string;
-  sessionId: string;
-  displayName: string;
-}
-
-function createOnlineSetupForScreen({
-  mode,
-  baseUrl,
-  matchmakingIdentity,
-}: {
-  mode: "backend" | "local";
-  baseUrl: string;
-  matchmakingIdentity?: OnlineSetupClientIdentityOverride;
-}) {
-  return mode === "backend"
-    ? createHttpOnlineSetup(baseUrl, matchmakingIdentity)
-    : createLocalOnlineSetup(matchmakingIdentity);
-}
-
-function createLocalOnlineSetup(matchmakingIdentity?: OnlineSetupClientIdentityOverride): OnlineDuelSetup {
-  const service = createInMemoryOnlineDuelService(new SeededRandom(21));
-  const transport = createLocalOnlineDuelTransport(service);
-  return createOnlineSetupFromTransport({
-    transportLabel: "local",
-    transport,
-    hostIdentityOverride: matchmakingIdentity,
-    expireRooms(now) {
-      service.expireStaleRooms(now);
-    },
-  });
-}
-
-function createHttpOnlineSetup(
-  baseUrl: string,
-  matchmakingIdentity?: OnlineSetupClientIdentityOverride
-): OnlineDuelSetup {
-  const transport = createHttpOnlineDuelTransport({ baseUrl });
-  return createOnlineSetupFromTransport({
-    transportLabel: "backend",
-    transport,
-    hostIdentityOverride: matchmakingIdentity,
-  });
-}
-
-function createOnlineSetupFromTransport({
-  transportLabel,
-  transport,
-  hostIdentityOverride,
-  expireRooms,
-}: {
-  transportLabel: "backend" | "local";
-  transport: OnlineDuelTransport;
-  hostIdentityOverride?: OnlineSetupClientIdentityOverride;
-  expireRooms?: (now?: number) => void;
-}): OnlineDuelSetup {
-  let hostSessionVersion = 1;
-  let guestSessionVersion = 1;
-
-  const createHostClient = () =>
-    createOnlineDuelClient(transport, {
-      playerId: hostIdentityOverride?.playerId ?? "player-host",
-      sessionId: hostIdentityOverride?.sessionId ?? `session-host-${hostSessionVersion}`,
-      displayName: hostIdentityOverride?.displayName ?? "Host",
-    });
-  const createGuestClient = () =>
-    createOnlineDuelClient(transport, {
-      playerId: "player-guest",
-      sessionId: `session-guest-${guestSessionVersion}`,
-      displayName: "Guest",
-    });
-
-  const setup: OnlineDuelSetup = {
-    transportLabel,
-    hostClient: createHostClient(),
-    guestClient: createGuestClient(),
-    resetHostClient() {
-      hostSessionVersion += 1;
-      setup.hostClient = createHostClient();
-    },
-    resetGuestClient() {
-      guestSessionVersion += 1;
-      setup.guestClient = createGuestClient();
-    },
-  };
-
-  if (expireRooms) {
-    setup.expireRooms = expireRooms;
-  }
-
-  return setup;
-}
-
-function getOnlineDuelBackendBaseUrl() {
-  const configuredBaseUrl =
-    typeof import.meta !== "undefined" ? import.meta.env.VITE_ONLINE_DUEL_BASE_URL?.trim() : undefined;
-  if (configuredBaseUrl) {
-    return configuredBaseUrl.replace(/\/+$/, "");
-  }
-
-  if (typeof window === "undefined") {
-    return "http://127.0.0.1:3001";
-  }
-
-  const protocol = window.location.protocol === "https:" ? "https:" : "http:";
-  const hostname = window.location.hostname || "127.0.0.1";
-  return `${protocol}//${hostname}:3001`;
-}
-
-async function canReachOnlineDuelBackend(baseUrl: string) {
-  if (typeof navigator !== "undefined" && /jsdom/i.test(navigator.userAgent)) {
-    return false;
-  }
-
-  try {
-    const response = await fetch(`${baseUrl}/health`);
-    return response.ok;
-  } catch {
-    return false;
-  }
-}
-
-function describeTransportIssue(issue: string) {
-  switch (issue) {
-    case "missing_resume_token":
-      return "the match link needs to refresh before updates can continue.";
-    case "event_stream_error":
-      return "live updates dropped for a moment. Trying to reconnect now.";
-    case "online_duel_transport_error":
-      return "the match service did not answer.";
-    case "invalid_status":
-      return "the match is not in the right phase for that action yet.";
-    case "combat_not_active":
-      return "the round already moved on. Syncing the room again can get you back in step.";
-    case "stale_sync":
-      return "your match state is out of date. Refresh the room and try again.";
-    case "invalid_action":
-      return "that action payload was invalid for this round.";
-    case "combatant_not_found":
-      return "the fighter for that action could not be matched in the live combat state.";
-    case "duplicate_defense_zones":
-      return "the same guard zone was selected twice. Pick two different guard zones.";
-    case "dead_combatant_action":
-      return "that fighter is already down, so the round cannot accept another action.";
-    case "insufficient_resources":
-      return "that move needs more combat resources before it can be used.";
-    case "skill_on_cooldown":
-      return "that skill is still on cooldown.";
-    case "displaced_session":
-      return "this session was replaced by a newer one for the same fighter.";
-    case "participant_disconnected":
-      return "that fighter is disconnected right now.";
-    case "seat_mismatch":
-      return "that action was sent for the wrong side.";
-    case "duel_not_found":
-      return "that match could not be found.";
-    case "live_service_required":
-      return "the live match service is offline. Start online:server before creating or joining a PvP fight.";
-    case "room_full":
-      return "that match already has two fighters.";
-    default:
-      return issue.replaceAll("_", " ");
-  }
-}
-
-function transportBadgeLabel(source: TransportSource) {
-  switch (source) {
-    case "backend":
-      return "Live room";
-    case "local":
-      return "Local room";
-    default:
-      return "Checking room";
-  }
-}
-
-function shouldRecoverFromSubmitError(messages: OnlineDuelServerMessage[]) {
-  return messages.some(
-    (message) =>
-      message.type === "duel_error" &&
-      (
-        message.reason === "already_submitted" ||
-        message.reason === "stale_sync" ||
-        message.reason === "combat_resolution_failed" ||
-        message.reason === "combat_not_active" ||
-        message.reason === "invalid_action" ||
-        message.reason === "combatant_not_found" ||
-        message.reason === "duplicate_defense_zones" ||
-        message.reason === "dead_combatant_action" ||
-        message.reason === "insufficient_resources" ||
-        message.reason === "skill_on_cooldown"
-      )
-  );
-}
-
-function shouldRefreshClientsAfterRoundResolution(messages: OnlineDuelServerMessage[]) {
-  return messages.some((message) => message.type === "round_resolved");
 }
 
 const eyebrowStyle: CSSProperties = {

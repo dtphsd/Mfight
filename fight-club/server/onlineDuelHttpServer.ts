@@ -12,6 +12,7 @@ import {
   type OnlineDuelClientMessage,
   type OnlineDuelServerMessage,
 } from "@/modules/arena";
+import type { OnlineDuelDeployProfile, OnlineDuelLogLevel } from "./onlineDuelRuntimeConfig";
 
 const JSON_CONTENT_TYPE = "application/json; charset=utf-8";
 const EVENT_STREAM_CONTENT_TYPE = "text/event-stream; charset=utf-8";
@@ -19,12 +20,33 @@ const DEFAULT_HOST = "127.0.0.1";
 const DEFAULT_SWEEP_INTERVAL_MS = 15_000;
 const DEFAULT_BODY_LIMIT_BYTES = 256 * 1024;
 const MAX_ROOM_EVENT_HISTORY = 24;
+const DEFAULT_CORS_ORIGIN = "*";
+const DEFAULT_RATE_LIMIT_WINDOW_MS = 10_000;
+const DEFAULT_MESSAGE_RATE_LIMIT_MAX = 60;
+const DEFAULT_EVENT_RATE_LIMIT_MAX = 20;
 
 type KnownOnlineDuelMessageType = OnlineDuelClientMessage["type"];
+interface OnlineDuelHttpLogger {
+  info(message: string, meta?: Record<string, unknown>): void;
+  error(message: string, meta?: Record<string, unknown>): void;
+}
+
+interface OnlineDuelRateLimitBucket {
+  count: number;
+  resetAt: number;
+}
 
 export interface CreateOnlineDuelHttpHandlerOptions {
   seed?: number;
   staleSweepIntervalMs?: number;
+  bodyLimitBytes?: number;
+  corsOrigin?: string;
+  logLevel?: OnlineDuelLogLevel;
+  rateLimitWindowMs?: number;
+  messageRateLimitMax?: number;
+  eventRateLimitMax?: number;
+  trustProxy?: boolean;
+  deployProfile?: OnlineDuelDeployProfile;
 }
 
 export interface StartOnlineDuelHttpServerOptions extends CreateOnlineDuelHttpHandlerOptions {
@@ -51,16 +73,26 @@ export function createOnlineDuelHttpHandler(
 ): OnlineDuelHttpHandlerBundle {
   const authorityService = createInMemoryOnlineDuelService(new SeededRandom(options.seed ?? 9));
   const staleSweepIntervalMs = options.staleSweepIntervalMs ?? DEFAULT_SWEEP_INTERVAL_MS;
+  const bodyLimitBytes = options.bodyLimitBytes ?? DEFAULT_BODY_LIMIT_BYTES;
+  const corsOrigin = options.corsOrigin?.trim() || DEFAULT_CORS_ORIGIN;
+  const logger = createOnlineDuelLogger(options.logLevel ?? "info");
+  const rateLimitWindowMs = options.rateLimitWindowMs ?? DEFAULT_RATE_LIMIT_WINDOW_MS;
+  const messageRateLimitMax = options.messageRateLimitMax ?? DEFAULT_MESSAGE_RATE_LIMIT_MAX;
+  const eventRateLimitMax = options.eventRateLimitMax ?? DEFAULT_EVENT_RATE_LIMIT_MAX;
+  const trustProxy = options.trustProxy ?? false;
+  const deployProfile = options.deployProfile ?? "default";
   const roomSubscribers = new Map<
     string,
     Map<string, { response: ServerResponse; resumeToken: string; lastEventId: string | null }>
   >();
   const roomEventHistory = new Map<string, Map<string, Array<{ id: string; message: OnlineDuelServerMessage }>>>();
   const roomEventCounters = new Map<string, number>();
+  const requestRateLimits = new Map<string, OnlineDuelRateLimitBucket>();
   let lastSweepAt = 0;
+  const startedAt = Date.now();
 
   async function handleRequest(request: IncomingMessage, response: ServerResponse) {
-    applyJsonHeaders(response);
+    applyJsonHeaders(response, corsOrigin);
 
     if (request.method === "OPTIONS") {
       response.writeHead(204);
@@ -74,6 +106,22 @@ export function createOnlineDuelHttpHandler(
       writeJson(response, 200, {
         status: "ok",
         transport: "http",
+        uptimeMs: Date.now() - startedAt,
+        rooms: {
+          subscribed: roomSubscribers.size,
+          trackedEventStreams: Array.from(roomSubscribers.values()).reduce((total, subscribers) => total + subscribers.size, 0),
+          replayBuffers: roomEventHistory.size,
+        },
+        config: {
+          deployProfile,
+          staleSweepIntervalMs,
+          bodyLimitBytes,
+          corsOrigin,
+          rateLimitWindowMs,
+          messageRateLimitMax,
+          eventRateLimitMax,
+          trustProxy,
+        },
       });
       return;
     }
@@ -81,6 +129,23 @@ export function createOnlineDuelHttpHandler(
     if (request.method === "GET" && request.url) {
       const streamRequest = tryParseEventStreamRequest(request.url);
       if (streamRequest) {
+        const eventRateLimit = enforceRateLimit({
+          request,
+          rateLimits: requestRateLimits,
+          scope: "events",
+          limit: eventRateLimitMax,
+          windowMs: rateLimitWindowMs,
+          trustProxy,
+        });
+        if (eventRateLimit.limited) {
+          response.setHeader("Retry-After", String(eventRateLimit.retryAfterSeconds));
+          writeJson(response, 429, {
+            error: "rate_limited",
+            scope: "events",
+          });
+          return;
+        }
+
         attachEventStreamSubscriber(
           streamRequest.duelId,
           streamRequest.playerId,
@@ -93,8 +158,25 @@ export function createOnlineDuelHttpHandler(
     }
 
     if (request.method === "POST" && request.url === "/api/online-duel/message") {
+      const messageRateLimit = enforceRateLimit({
+        request,
+        rateLimits: requestRateLimits,
+        scope: "message",
+        limit: messageRateLimitMax,
+        windowMs: rateLimitWindowMs,
+        trustProxy,
+      });
+      if (messageRateLimit.limited) {
+        response.setHeader("Retry-After", String(messageRateLimit.retryAfterSeconds));
+        writeJson(response, 429, {
+          error: "rate_limited",
+          scope: "message",
+        });
+        return;
+      }
+
       try {
-        const body = await readJsonBody(request);
+        const body = await readJsonBody(request, bodyLimitBytes);
         if (!isOnlineDuelClientMessage(body)) {
           writeJson(response, 400, {
             error: "invalid_online_duel_message",
@@ -104,16 +186,28 @@ export function createOnlineDuelHttpHandler(
 
         const messages = handleOnlineDuelClientMessage(authorityService, body);
         publishRoomUpdates(resolveMessageDuelId(body, messages), messages);
+        logger.info("online_duel_message_processed", {
+          type: body.type,
+          duelId: resolveMessageDuelId(body, messages),
+          messageCount: messages.length,
+        });
         writeJson(response, 200, { messages });
         return;
       } catch (error) {
         if (error instanceof InvalidRequestBodyError) {
+          logger.error("online_duel_request_rejected", {
+            reason: error.message,
+            statusCode: error.statusCode,
+          });
           writeJson(response, error.statusCode, {
             error: error.message,
           });
           return;
         }
 
+        logger.error("online_duel_server_error", {
+          error: error instanceof Error ? error.message : "unknown_error",
+        });
         writeJson(response, 500, {
           error: "online_duel_server_error",
         });
@@ -145,7 +239,7 @@ export function createOnlineDuelHttpHandler(
     response.setHeader("Content-Type", EVENT_STREAM_CONTENT_TYPE);
     response.setHeader("Cache-Control", "no-cache, no-transform");
     response.setHeader("Connection", "keep-alive");
-    response.setHeader("Access-Control-Allow-Origin", "*");
+    response.setHeader("Access-Control-Allow-Origin", corsOrigin);
     response.setHeader("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
     response.setHeader("Access-Control-Allow-Headers", "Content-Type");
     response.writeHead(200);
@@ -375,6 +469,7 @@ export function createOnlineDuelHttpHandler(
       roomSubscribers.clear();
       roomEventHistory.clear();
       roomEventCounters.clear();
+      requestRateLimits.clear();
     },
   };
 }
@@ -423,9 +518,9 @@ export async function startOnlineDuelHttpServer(
   };
 }
 
-function applyJsonHeaders(response: ServerResponse) {
+function applyJsonHeaders(response: ServerResponse, corsOrigin: string) {
   response.setHeader("Content-Type", JSON_CONTENT_TYPE);
-  response.setHeader("Access-Control-Allow-Origin", "*");
+  response.setHeader("Access-Control-Allow-Origin", corsOrigin);
   response.setHeader("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
   response.setHeader("Access-Control-Allow-Headers", "Content-Type");
 }
@@ -442,14 +537,14 @@ function writeJson(response: ServerResponse, statusCode: number, payload: unknow
   response.end(JSON.stringify(payload));
 }
 
-async function readJsonBody(request: IncomingMessage): Promise<unknown> {
+async function readJsonBody(request: IncomingMessage, bodyLimitBytes: number): Promise<unknown> {
   const chunks: Buffer[] = [];
   let totalLength = 0;
 
   for await (const chunk of request) {
     const bufferChunk = typeof chunk === "string" ? Buffer.from(chunk) : chunk;
     totalLength += bufferChunk.length;
-    if (totalLength > DEFAULT_BODY_LIMIT_BYTES) {
+    if (totalLength > bodyLimitBytes) {
       throw new InvalidRequestBodyError("request_body_too_large", 413);
     }
 
@@ -466,6 +561,83 @@ async function readJsonBody(request: IncomingMessage): Promise<unknown> {
   } catch {
     throw new InvalidRequestBodyError("invalid_json", 400);
   }
+}
+
+function createOnlineDuelLogger(level: OnlineDuelLogLevel): OnlineDuelHttpLogger {
+  return {
+    info(message, meta) {
+      if (level === "silent" || level === "error") {
+        return;
+      }
+
+      console.log(formatLogLine("info", message, meta));
+    },
+    error(message, meta) {
+      if (level === "silent") {
+        return;
+      }
+
+      console.error(formatLogLine("error", message, meta));
+    },
+  };
+}
+
+function formatLogLine(level: "info" | "error", message: string, meta?: Record<string, unknown>) {
+  const payload = meta ? ` ${JSON.stringify(meta)}` : "";
+  return `[online-duel][${level}] ${message}${payload}`;
+}
+
+function enforceRateLimit({
+  request,
+  rateLimits,
+  scope,
+  limit,
+  windowMs,
+  trustProxy,
+}: {
+  request: IncomingMessage;
+  rateLimits: Map<string, OnlineDuelRateLimitBucket>;
+  scope: "message" | "events";
+  limit: number;
+  windowMs: number;
+  trustProxy: boolean;
+}) {
+  const clientKey = `${scope}:${resolveClientAddress(request, trustProxy)}`;
+  const now = Date.now();
+  const existing = rateLimits.get(clientKey);
+
+  if (!existing || existing.resetAt <= now) {
+    rateLimits.set(clientKey, {
+      count: 1,
+      resetAt: now + windowMs,
+    });
+    return {
+      limited: false,
+      retryAfterSeconds: 0,
+    };
+  }
+
+  if (existing.count >= limit) {
+    return {
+      limited: true,
+      retryAfterSeconds: Math.max(1, Math.ceil((existing.resetAt - now) / 1000)),
+    };
+  }
+
+  existing.count += 1;
+  return {
+    limited: false,
+    retryAfterSeconds: 0,
+  };
+}
+
+function resolveClientAddress(request: IncomingMessage, trustProxy: boolean) {
+  const forwarded = request.headers["x-forwarded-for"];
+  if (trustProxy && typeof forwarded === "string" && forwarded.trim().length > 0) {
+    return forwarded.split(",")[0]?.trim() || request.socket.remoteAddress || "unknown";
+  }
+
+  return request.socket.remoteAddress || "unknown";
 }
 
 function isOnlineDuelClientMessage(value: unknown): value is OnlineDuelClientMessage {
@@ -534,7 +706,7 @@ function isOnlineDuelClientMessage(value: unknown): value is OnlineDuelClientMes
         hasString(value, "seat") &&
         hasString(value, "playerId") &&
         hasString(value, "sessionId") &&
-        isRecord(value.action)
+        isRecord(value.selection)
       );
     default:
       return false;

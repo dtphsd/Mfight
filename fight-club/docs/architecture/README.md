@@ -1,6 +1,6 @@
 # Architecture Docs
 
-> Last updated: 2026-03-14 18:08 MSK
+> Last updated: 2026-03-21 13:10 MSK
 
 This section explains how `Fight Club` is structured and where the most important runtime decisions live.
 
@@ -11,7 +11,8 @@ This section explains how `Fight Club` is structured and where the most importan
 1. [Architecture Overview](./overview.md)
 2. [Combat Design Reference](./combat-design-reference.md)
 3. [Hunting Runtime Reference](./hunting-runtime-reference.md)
-4. [Combat System Roadmap](./combat-system-roadmap.md)
+4. [Online Duel Ops Runbook](./online-duel-ops-runbook.md)
+5. [Combat System Roadmap](./combat-system-roadmap.md)
 
 ---
 
@@ -23,6 +24,8 @@ This section explains how `Fight Club` is structured and where the most importan
   - source-of-truth combat runtime reference, sequencing, formulas, and verification rules
 - [Hunting Runtime Reference](./hunting-runtime-reference.md)
   - source-of-truth hunting runtime reference, reward bridge, and verification checklist
+- [Online Duel Ops Runbook](./online-duel-ops-runbook.md)
+  - operator guide for HTTP/SSE PvP startup, health checks, direct-host exposure, and reverse-proxy deployment
 - [Hunting MVP Blueprint](./hunting-mvp-blueprint.md)
   - original scope and bounded-context plan for the hunting module
 - [Combat System Roadmap](./combat-system-roadmap.md)
@@ -37,4 +40,4 @@ This section explains how `Fight Club` is structured and where the most importan
 
 ---
 
-> Last updated: 2026-03-14 18:08 MSK
+> Last updated: 2026-03-21 13:10 MSK

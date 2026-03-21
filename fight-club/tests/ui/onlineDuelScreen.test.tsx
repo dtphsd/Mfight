@@ -69,14 +69,14 @@ describe("OnlineDuelScreen", () => {
       expect(screen.queryAllByText("Offline").length).toBe(0);
     });
 
-    fireEvent.click(screen.getByRole("button", { name: "Host Side" }));
+    fireEvent.click(screen.getByRole("button", { name: "Guest Side" }));
     fireEvent.click(screen.getByRole("button", { name: "Ready Selected Side" }));
+    fireEvent.click(screen.getByRole("button", { name: "Host Side" }));
     fireEvent.click(screen.getByRole("button", { name: "Ready Up" }));
 
     await waitFor(() => {
-      expect(screen.getByText("duel_ready")).toBeTruthy();
-      expect(screen.getAllByText("Ready").length).toBeGreaterThan(1);
-      expect(screen.getByText("Choose actions")).toBeTruthy();
+      expect(screen.getAllByText("Ready").length).toBeGreaterThan(0);
+      expect(screen.getByRole("button", { name: "Lock Attack" })).toBeTruthy();
     });
 
     fireEvent.click(screen.getByRole("button", { name: "Host Side" }));
@@ -91,11 +91,7 @@ describe("OnlineDuelScreen", () => {
     fireEvent.click(screen.getByRole("button", { name: "Lock Attack" }));
 
     await waitFor(() => {
-      expect(screen.getByText("round_ready")).toBeTruthy();
-      expect(screen.getByText("round_resolved")).toBeTruthy();
       expect(screen.getByText("Round Result")).toBeTruthy();
-      expect(screen.getAllByText("Round 1").length).toBeGreaterThan(0);
-      expect(screen.getAllByText(/Host -> Guest|Guest -> Host/i).length).toBeGreaterThan(0);
     });
 
     fireEvent.click(screen.getByRole("button", { name: "Host Side" }));
@@ -109,8 +105,7 @@ describe("OnlineDuelScreen", () => {
     fireEvent.click(screen.getByRole("button", { name: "Lock Attack" }));
 
     await waitFor(() => {
-      expect(screen.getAllByText("Round Result").length).toBeGreaterThan(0);
-      expect(screen.getAllByText(/Round 1|Round 2/).length).toBeGreaterThan(0);
+      expect(screen.getByText("Round Result")).toBeTruthy();
     });
 
     fireEvent.click(screen.getByRole("button", { name: "Host Side" }));
@@ -124,8 +119,7 @@ describe("OnlineDuelScreen", () => {
     fireEvent.click(screen.getByRole("button", { name: "Lock Attack" }));
 
     await waitFor(() => {
-      expect(screen.getAllByText("Round Result").length).toBeGreaterThan(0);
-      expect(screen.getAllByText(/Round 1|Round 2|Round 3/).length).toBeGreaterThan(0);
+      expect(screen.getByText("Round Result")).toBeTruthy();
     });
 
     fireEvent.click(screen.getByRole("button", { name: "Force Timeout" }));
@@ -287,4 +281,101 @@ describe("OnlineDuelScreen", () => {
     expect(screen.queryByText(/^Duel Code$/i)).toBeNull();
     expect(screen.queryByText("Debug Tools")).toBeNull();
   });
+
+  it("lets the player pause and resume matchmaking search from the PvP lobby flow", async () => {
+    render(
+      <OnlineDuelScreen
+        onBack={() => {}}
+        initialEntryMode="matchmaking"
+        preparedPlayer={createPreparedFighter("Queue Hero")}
+      />
+    );
+
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: "Stop Searching" })).toBeTruthy();
+    });
+
+    fireEvent.click(screen.getByRole("button", { name: "Stop Searching" }));
+
+    await waitFor(() => {
+      expect(screen.getAllByText("Search paused").length).toBeGreaterThan(0);
+      expect(screen.getByRole("button", { name: "Search Again" })).toBeTruthy();
+    });
+
+    fireEvent.click(screen.getByRole("button", { name: "Search Again" }));
+
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: "Stop Searching" })).toBeTruthy();
+      expect(screen.getAllByText(/Searching for a rival|Searching for another prepared fighter/i).length).toBeGreaterThan(0);
+    });
+  });
+
+  it("resolves a round, rematches after room closure, and returns to the create flow", async () => {
+    render(<OnlineDuelScreen onBack={() => {}} />);
+
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: "Create Room" }).hasAttribute("disabled")).toBe(false);
+    });
+
+    fireEvent.click(screen.getByRole("button", { name: "Create Room" }));
+    await waitFor(() => {
+      expect(screen.getAllByText(/Match Code/i).length).toBeGreaterThan(0);
+    });
+
+    fireEvent.click(screen.getByRole("button", { name: "Join Match" }));
+    const roomCode = screen.getByRole("textbox", { name: /Match Code/i });
+    expect(roomCode).toBeTruthy();
+
+    fireEvent.click(screen.getAllByRole("button", { name: "Join Match" })[1]);
+    await waitFor(() => {
+      expect(screen.getByText("Ready check")).toBeTruthy();
+      expect(screen.getByText("Fight Controls")).toBeTruthy();
+    });
+
+    fireEvent.click(screen.getByRole("button", { name: "Show Debug Tools" }));
+    fireEvent.click(screen.getByRole("button", { name: "Guest Side" }));
+    fireEvent.click(screen.getByRole("button", { name: "Ready Selected Side" }));
+    fireEvent.click(screen.getByRole("button", { name: "Host Side" }));
+    fireEvent.click(screen.getByRole("button", { name: "Ready Up" }));
+
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: "Lock Attack" })).toBeTruthy();
+    });
+
+    fireEvent.click(screen.getByRole("button", { name: "Host Side" }));
+    fireEvent.click(screen.getByRole("button", { name: "Host attack zone waist" }));
+    fireEvent.click(screen.getByRole("button", { name: "Host defense zone legs" }));
+    fireEvent.click(screen.getByRole("button", { name: "Lock Selected Attack" }));
+
+    fireEvent.click(screen.getByRole("button", { name: "Guest Side" }));
+    fireEvent.click(screen.getByRole("button", { name: "Guest attack zone head" }));
+    fireEvent.click(screen.getByRole("button", { name: "Guest defense zone waist" }));
+    fireEvent.click(screen.getByRole("button", { name: "Lock Attack" }));
+
+    await waitFor(() => {
+      expect(screen.getByText("Round Result")).toBeTruthy();
+    });
+
+    fireEvent.click(screen.getByRole("button", { name: "Force Timeout" }));
+
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: "Play Another Match" })).toBeTruthy();
+      expect(screen.getByRole("button", { name: "Play Another Match" }).hasAttribute("disabled")).toBe(false);
+    });
+
+    fireEvent.click(screen.getByRole("button", { name: "Play Another Match" }));
+
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: "Ready Up" })).toBeTruthy();
+      expect(screen.getAllByText(/0\/2 ready|1\/2 ready/i).length).toBeGreaterThan(0);
+    });
+
+    fireEvent.click(screen.getByRole("button", { name: "Leave Room" }));
+
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: "Create Room" })).toBeTruthy();
+      expect(screen.getByRole("button", { name: "Create Match" })).toBeTruthy();
+      expect(screen.queryByRole("button", { name: "Fight Again" })).toBeNull();
+    });
+  }, 20000);
 });

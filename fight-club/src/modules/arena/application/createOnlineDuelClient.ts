@@ -2,12 +2,16 @@ import type {
   OnlineDuelFighterView,
   OnlineDuelClient,
   OnlineDuelClientIdentity,
+  OnlineDuelActionSelection,
+  OnlineDuelParticipantLoadout,
   OnlineDuelServerMessage,
   OnlineDuelStateSync,
   OnlineDuelTransport,
 } from "@/modules/arena/contracts/arenaPublicApi";
 import type { OnlineDuelSeat } from "@/modules/arena/model/OnlineDuel";
-import type { CombatSnapshot, RoundAction } from "@/modules/combat";
+import type { CombatSnapshot } from "@/modules/combat";
+import { createEquipment } from "@/modules/equipment";
+import { createStarterInventory } from "@/modules/inventory";
 
 export function createOnlineDuelClient(
   transport: OnlineDuelTransport,
@@ -17,7 +21,7 @@ export function createOnlineDuelClient(
 
   return {
     identity,
-    createDuel(snapshot, fighterView, displayNameOverride) {
+    createDuel(snapshot, fighterView, displayNameOverride, loadout) {
       return dispatch({
         type: "create_duel",
         playerId: identity.playerId,
@@ -25,9 +29,10 @@ export function createOnlineDuelClient(
         displayName: displayNameOverride ?? identity.displayName,
         snapshot,
         fighterView,
+        loadout: resolveClientLoadout(loadout),
       });
     },
-    findMatchmakingDuel(snapshot, fighterView, displayNameOverride) {
+    findMatchmakingDuel(snapshot, fighterView, displayNameOverride, loadout) {
       return dispatch({
         type: "find_matchmaking_duel",
         playerId: identity.playerId,
@@ -35,9 +40,10 @@ export function createOnlineDuelClient(
         displayName: displayNameOverride ?? identity.displayName,
         snapshot,
         fighterView,
+        loadout: resolveClientLoadout(loadout),
       });
     },
-    joinDuel(duelId, snapshot, fighterView, displayNameOverride) {
+    joinDuel(duelId, snapshot, fighterView, displayNameOverride, loadout) {
       return dispatch({
         type: "join_duel",
         duelId,
@@ -46,10 +52,11 @@ export function createOnlineDuelClient(
         displayName: displayNameOverride ?? identity.displayName,
         snapshot,
         fighterView,
+        loadout: resolveClientLoadout(loadout),
         expectedRevision: lastSync?.revision,
       });
     },
-    joinDuelByCode(roomCode, snapshot, fighterView, displayNameOverride) {
+    joinDuelByCode(roomCode, snapshot, fighterView, displayNameOverride, loadout) {
       return dispatch({
         type: "join_duel_by_code",
         roomCode,
@@ -58,6 +65,7 @@ export function createOnlineDuelClient(
         displayName: displayNameOverride ?? identity.displayName,
         snapshot,
         fighterView,
+        loadout: resolveClientLoadout(loadout),
         expectedRevision: lastSync?.revision,
       });
     },
@@ -109,14 +117,14 @@ export function createOnlineDuelClient(
         expectedRevision: lastSync?.revision,
       });
     },
-    submitRoundAction(duelId, seat, action) {
+    submitRoundAction(duelId, seat, selection) {
       return dispatch({
         type: "submit_round_action",
         duelId,
         seat,
         playerId: identity.playerId,
         sessionId: identity.sessionId,
-        action,
+        selection,
         expectedRound: lastSync?.round ?? undefined,
       });
     },
@@ -145,6 +153,7 @@ export function createOnlineDuelClient(
           displayName: string;
           snapshot: CombatSnapshot;
           fighterView?: OnlineDuelFighterView;
+          loadout: OnlineDuelParticipantLoadout;
           expectedRevision?: number;
         }
       | {
@@ -154,6 +163,7 @@ export function createOnlineDuelClient(
           displayName: string;
           snapshot: CombatSnapshot;
           fighterView?: OnlineDuelFighterView;
+          loadout: OnlineDuelParticipantLoadout;
           expectedRevision?: number;
         }
       | {
@@ -182,6 +192,7 @@ export function createOnlineDuelClient(
           displayName: string;
           snapshot: CombatSnapshot;
           fighterView?: OnlineDuelFighterView;
+          loadout: OnlineDuelParticipantLoadout;
           expectedRevision?: number;
         }
       | {
@@ -192,6 +203,7 @@ export function createOnlineDuelClient(
           displayName: string;
           snapshot: CombatSnapshot;
           fighterView?: OnlineDuelFighterView;
+          loadout: OnlineDuelParticipantLoadout;
           expectedRevision?: number;
         }
       | { type: "request_duel_sync"; duelId: string; playerId?: string; resumeToken?: string }
@@ -215,7 +227,7 @@ export function createOnlineDuelClient(
           seat: OnlineDuelSeat;
           playerId: string;
           sessionId: string;
-          action: RoundAction;
+          selection: OnlineDuelActionSelection;
           expectedRound?: number;
           expectedRevision?: number;
         }
@@ -228,4 +240,16 @@ export function createOnlineDuelClient(
 
     return responses;
   }
+}
+
+function resolveClientLoadout(
+  loadout?: OnlineDuelParticipantLoadout
+): OnlineDuelParticipantLoadout {
+  return (
+    loadout ?? {
+      equipmentState: createEquipment(),
+      inventory: createStarterInventory(),
+      equippedSkillIds: [],
+    }
+  );
 }

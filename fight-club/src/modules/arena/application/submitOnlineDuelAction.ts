@@ -2,6 +2,7 @@ import type {
   OnlineDuelResult,
   SubmitOnlineDuelActionInput,
 } from "@/modules/arena/contracts/arenaPublicApi";
+import { buildOnlineDuelRoundAction } from "@/modules/arena/application/buildOnlineDuelRoundAction";
 import type { OnlineDuel, OnlineDuelParticipant, OnlineDuelSeat } from "@/modules/arena/model/OnlineDuel";
 
 export function submitOnlineDuelAction(
@@ -65,18 +66,16 @@ export function submitOnlineDuelAction(
     };
   }
 
-  if (input.action.attackerId !== participant.snapshot.characterId) {
-    return {
-      success: false,
-      reason: "attacker_mismatch",
-    };
-  }
-
   if (duel.currentRound.submissions[input.seat]) {
     return {
       success: false,
       reason: "already_submitted",
     };
+  }
+
+  const builtAction = buildOnlineDuelRoundAction(participant, duel.combatState, input.selection);
+  if (!builtAction.success) {
+    return builtAction;
   }
 
   const submittedAt = input.submittedAt ?? Date.now();
@@ -85,7 +84,7 @@ export function submitOnlineDuelAction(
     [input.seat]: {
       seat: input.seat,
       playerId: input.playerId,
-      action: input.action,
+      action: builtAction.data,
       submittedAt,
     },
   };

@@ -71,6 +71,7 @@ export function createInMemoryOnlineDuelService(
         displayName: input.displayName,
         snapshot: input.snapshot,
         fighterView: input.fighterView,
+        loadout: input.loadout,
         joinedAt: input.createdAt,
       });
 

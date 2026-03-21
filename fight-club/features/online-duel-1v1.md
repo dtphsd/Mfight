@@ -1,6 +1,6 @@
 # Online Duel 1v1
 
-> Last updated: 2026-03-20 18:50 MSK
+> Last updated: 2026-03-21 17:40 MSK
 
 **Feature:** online-duel-1v1  
 **Status:** IN PROGRESS
@@ -237,6 +237,29 @@ The first backend-safe runtime slice is now also in place:
   - SSE attach and sync recovery use the active player session instead of assuming both local debug seats exist on one screen
   - guest rematch now uses the correct active client instead of always routing through the host seam
   - multi-round regressions now cover repeated round resolution after the second exchange instead of only the first happy-path round
+- authority ownership is now much stronger than the original prototype:
+  - room participants now keep server-owned baseline snapshot and loadout data
+  - reconnect no longer mutates those baselines silently
+  - rematch now restores the original baseline build instead of reusing runtime-spent consumables
+  - clients submit only combat selections, while the server rebuilds the real `RoundAction`
+  - consumables are now decremented from server-owned runtime loadout after successful round resolution
+- opponent-facing combat presentation is now closer to full server truth:
+  - synced room state now carries player and opponent snapshots for the active seat
+  - PvP stat cards and combat summaries no longer rely as heavily on local fallback data
+- the PvP screen itself is now partially decomposed:
+  - transport/setup helpers live in sibling modules
+  - major panels, cards, and lobby UI moved out of `OnlineDuelScreen`
+  - the remaining screen is much closer to an orchestration shell than the earlier monolith
+- matchmaking UX is now more player-facing:
+  - queued search can be paused or resumed from the live lobby
+  - stale search can surface an explicit timeout state instead of looking frozen
+  - recovery CTA now guides the player back into search instead of leaving the room in an unclear queue state
+- regression coverage now goes beyond the original happy path:
+  - stale queued matchmaking rooms are covered
+  - `abandoned -> rematch -> reconnect SSE` is covered
+  - `search -> stop -> resume -> match found -> first round resolve` is covered through the live HTTP plus SSE path
+  - a longer live two-client lifecycle now covers `finished -> rematch -> leave`
+  - the local player-facing screen now also covers `resolve round -> room closed -> rematch -> leave`
 
 ---
 
@@ -275,13 +298,17 @@ High-priority remaining work:
    - keep the normal PvP route free of empty wrapper cards and debug-only framing
 3. Harden live matchmaking.
    - validate queue pairing, cancellation, timeout, and reconnect behavior through the actual backend path
+   - continue from the new pause/resume and timeout baseline toward a fuller player-facing search lifecycle
 4. Improve disconnect and rejoin UX.
    - make recovery states, seat ownership, and wait-for-opponent states clearer for real players
+   - keep polishing finish-state and opponent-offline paths so they read like product UX instead of transport recovery
 5. Add deployment-ready backend work.
-   - the service is still local-only; there is no public host, account identity, or production session boundary yet
-   - the current public-network prototype still needs stronger authority-side validation for consumables, loadouts, and abuse-resistant session behavior
+   - the service now has deploy profiles, health diagnostics, proxy guidance, env examples, and basic rate limiting, but it is still pre-production
+   - there is still no auth, persistence, or full production session boundary
+   - the current public-network prototype still needs stronger abuse resistance and real operational rollout validation
 6. Add fuller regression coverage for real PvP product flows.
-   - especially multi-round UI behavior, rematch loops, and live two-client screen parity
+   - especially longer two-client UI behavior, matchmaking timeout loops, and more end-to-end parity checks
+   - the newest UI lifecycle coverage now protects post-round rematch and return-to-create behavior, but more real backend-backed screen parity is still desirable
 7. Decide the first production boundary.
    - local LAN-style prototype only, or a public hosted PvP slice with real accounts and operational visibility
 
@@ -315,6 +342,16 @@ Goal: make real-player failures understandable instead of looking like a frozen 
   - after round resolve
   - after rematch reset
 
+Current progress in this phase:
+
+- the PvP screen now shows explicit live-state banners for reconnect, stale room sync, opponent disconnect, displaced session, and closed room cases
+- battle actions are now suppressed when the session is displaced, the room is closed, or the seat is temporarily offline, and the screen shows explicit recovery CTAs instead
+- matchmaking search now also has explicit player-facing `paused` and `timeout` states instead of silently staying queued forever
+- recovery CTAs are wired into the combat surface:
+  - `Refresh Room` for recoverable sync/reconnect states
+  - `Leave Fight` for displaced or closed-room states
+- battle status and finish-state text now reflect opponent disconnect and session replacement instead of using one generic transport warning
+
 ### Phase 3 - Authority And Fairness Hardening
 
 Goal: prevent the public PvP path from trusting too much client-owned state.
@@ -340,6 +377,20 @@ Goal: move from local-network prototype to a safe hosted slice.
 - add health, startup, and minimal runtime logging guidance for operators
 - decide whether the first public slice stays anonymous or introduces lightweight identity/session controls
 
+Current progress in this phase:
+
+- the live backend now supports explicit runtime env config for:
+  - host / port
+  - stale sweep interval
+  - body size limit
+  - CORS origin
+  - log level
+  - message and SSE rate limits
+- `/health` now reports runtime config plus lightweight room diagnostics for operators
+- the HTTP/SSE service now has basic in-memory abuse protection through per-client rate limiting
+- the backend now supports optional trusted reverse-proxy mode for `X-Forwarded-For`, so rate limiting can follow the real client IP only when the host is explicitly deployed behind a trusted proxy
+- the next ops hardening step is deployment-path documentation and a concrete operator runbook for direct-host vs reverse-proxy setups
+
 ### Phase 5 - Regression And Operations Safety
 
 Goal: make PvP changes safe to keep evolving.
@@ -352,6 +403,104 @@ Goal: make PvP changes safe to keep evolving.
   - verify SSE
   - verify two-client room creation/join
   - verify rematch and leave-room
+
+## PvP Debt Backlog
+
+Ниже зафиксирован рабочий backlog следующего PvP-прохода.
+
+### PVP-010 - Перенести truth по loadout на сервер
+
+- сервер должен хранить разрешенные скиллы, расходку, экипировку и боевой snapshot участника
+- клиентский UI больше не должен быть источником истины для легальности действия
+
+### PVP-011 - Перестроить submit action в server-authoritative flow
+
+- клиент отправляет только намерение и выбор:
+  - `intent`
+  - атакующая зона
+  - защитные зоны
+  - `skillId`
+  - `consumableCode`
+- сервер сам собирает итоговый `RoundAction` и валидирует его
+
+### PVP-012 - Ввести server-side расход расходки и валидацию скиллов
+
+- проверять количество расходки
+- проверять наличие скилла в loadout
+- проверять кулдаун
+- проверять ресурсы
+- списывать расходку только на стороне authority
+
+### PVP-013 - Зафиксировать правила snapshot/reconnect/rematch
+
+- reconnect не должен незаметно подменять build
+- rematch должен стартовать из явно определенного server-owned состояния
+- нужно четко определить, когда build можно менять, а когда матч уже зафиксирован
+
+### PVP-014 - Перевести PvP UI на полный server truth для соперника
+
+- экран должен отображать соперника из синхронизированного server state
+- локальные fallback/build данные должны остаться только резервом для dev/debug-сценариев
+
+### PVP-015 - Разбить `OnlineDuelScreen` на transport / state / ui слои
+
+- выделить transport/recovery слой
+- выделить state/view-model слой
+- выделить чистые UI-компоненты
+- убрать из одного файла смесь orchestration, debug, rendering и networking
+
+### PVP-016 - Доделать reconnect/disconnect UX для реальных игроков
+
+- отдельные состояния:
+  - переподключение
+  - соперник вышел
+  - сессия вытеснена
+  - матч закрыт
+  - ожидание следующего шага
+
+### PVP-017 - Подготовить PvP backend к публичному хостингу
+
+- env-конфиги
+- health/ops checklist
+- логирование
+- reverse proxy / VPS path
+- базовая защита от abuse
+
+### PVP-018 - Расширить регрессионное покрытие реального PvP flow
+
+- reconnect
+- rematch loops
+- matchmaking cancel / timeout
+- authority validation
+- несколько раундов подряд в live HTTP/SSE flow
+
+## PvP Debt Execution Order
+
+## Progress Update - 2026-03-21
+
+Свежий PvP-прогресс поверх исходного backlog-снимка:
+
+- `PVP-015` уже идет в реальном коде, а не только в плане:
+  - `OnlineDuelScreen` уже разрезан на `onlineDuelScreenSetup`, `onlineDuelScreenSupport`, `onlineDuelScreenPanels`, `onlineDuelScreenCards` и `onlineDuelScreenLobby`
+  - следующий шаг: еще сильнее ужать orchestration-shell и дочистить границы view-model
+- `PVP-016` тоже уже в активной работе:
+  - live PvP уже показывает явные live-state статусы `Reconnecting`, `Opponent offline`, `Session replaced`, `Match closed`, `Live service offline` и `Syncing room`
+  - экран уже показывает recovery CTA вроде `Refresh Room` и `Leave Fight`
+  - небезопасные боевые действия уже блокируются, когда текущее состояние матча больше не должно принимать ход
+- `PVP-017` тоже уже в активной работе:
+  - runtime env-конфиги backend уже live для host, port, CORS, body limits, логирования, rate limiting и trusted-proxy режима
+  - `/health` уже отдает runtime config и lightweight room diagnostics
+  - следующий шаг: операторская документация по deployment-path и reverse-proxy runbook
+
+1. `PVP-010`
+2. `PVP-011`
+3. `PVP-012`
+4. `PVP-013`
+5. `PVP-014`
+6. `PVP-015`
+7. `PVP-016`
+8. `PVP-018`
+9. `PVP-017`
 
 ## Full Online Fight Definition
 

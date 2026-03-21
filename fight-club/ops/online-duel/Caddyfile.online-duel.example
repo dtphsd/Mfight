@@ -1,0 +1,20 @@
+duel.example.com {
+    # Serve the built frontend separately or add a file_server block here.
+    # This example focuses on the PvP backend HTTP/SSE transport only.
+
+    reverse_proxy /api/online-duel/message 127.0.0.1:3001 {
+        header_up X-Forwarded-For {remote_host}
+        header_up X-Forwarded-Proto {scheme}
+    }
+
+    reverse_proxy /api/online-duel/events 127.0.0.1:3001 {
+        header_up X-Forwarded-For {remote_host}
+        header_up X-Forwarded-Proto {scheme}
+        flush_interval -1
+    }
+
+    reverse_proxy /health 127.0.0.1:3001 {
+        header_up X-Forwarded-For {remote_host}
+        header_up X-Forwarded-Proto {scheme}
+    }
+}

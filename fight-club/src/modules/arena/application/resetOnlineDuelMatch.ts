@@ -58,8 +58,10 @@ export function resetOnlineDuelMatch(
     };
   }
 
-  const combatState = startCombat(duel.participants.playerA.snapshot, playerB.snapshot);
+  const combatState = startCombat(duel.participants.playerA.baselineSnapshot, playerB.baselineSnapshot);
   const updatedAt = input.updatedAt ?? Date.now();
+  const resetPlayerA = resetParticipantForRematch(duel.participants.playerA);
+  const resetPlayerB = resetParticipantForRematch(playerB);
 
   return {
     success: true,
@@ -71,14 +73,8 @@ export function resetOnlineDuelMatch(
       combatState,
       winnerSeat: null,
       participants: {
-        playerA: {
-          ...duel.participants.playerA,
-          readyAt: null,
-        },
-        playerB: {
-          ...playerB,
-          readyAt: null,
-        },
+        playerA: resetPlayerA,
+        playerB: resetPlayerB,
       },
       currentRound: {
         round: combatState.round,
@@ -87,5 +83,24 @@ export function resetOnlineDuelMatch(
         resolvedAt: null,
       },
     },
+  };
+}
+
+function resetParticipantForRematch<TParticipant extends OnlineDuel["participants"]["playerA"] | NonNullable<OnlineDuel["participants"]["playerB"]>>(
+  participant: TParticipant
+): TParticipant {
+  return {
+    ...participant,
+    snapshot: participant.baselineSnapshot,
+    fighterView: participant.baselineFighterView,
+    loadout: {
+      equipmentState: participant.baselineLoadout.equipmentState,
+      inventory: {
+        ...participant.baselineLoadout.inventory,
+        entries: participant.baselineLoadout.inventory.entries.map((entry) => ({ ...entry })),
+      },
+      equippedSkillIds: [...participant.baselineLoadout.equippedSkillIds],
+    },
+    readyAt: null,
   };
 }

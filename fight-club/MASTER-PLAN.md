@@ -1,6 +1,6 @@
 # MASTER-PLAN - Fight Club
 
-> Last updated: 2026-03-21 00:15 MSK
+> Last updated: 2026-03-21 17:40 MSK
 
 **Project:** Fight Club  
 **Scope:** active product planning, task tracking, and sprint history
@@ -78,6 +78,73 @@
 
 ---
 
+## PvP Debt Backlog
+
+| ID | Задача | Область | Статус | Feature Doc | Notes |
+|----|--------|---------|--------|-------------|-------|
+| PVP-010 | Перенести truth по loadout на сервер | Backend / PvP Authority | 🔴 TODO | `features/online-duel-1v1.md` | Сервер должен хранить разрешенные скиллы, расходку, экипировку и боевой snapshot участника, а не доверять клиентскому состоянию |
+| PVP-011 | Перестроить submit action в server-authoritative flow | Backend / Combat Authority | 🔴 TODO | `features/online-duel-1v1.md` | Клиент должен отправлять только намерение и выбор (`intent`, зоны, `skillId`, `consumableCode`), а сервер сам валидирует и собирает итоговый `RoundAction` |
+| PVP-012 | Ввести server-side расход расходки и валидацию скиллов | Backend / Economy / Fairness | 🔴 TODO | `features/online-duel-1v1.md` | Нужны проверка количества расходки, доступности скилла, кулдауна и ресурсов на стороне authority |
+| PVP-013 | Зафиксировать правила snapshot/reconnect/rematch | Backend / PvP Runtime | 🔴 TODO | `features/online-duel-1v1.md` | Reconnect не должен незаметно подменять build, а rematch должен стартовать из явно определенного server-owned состояния |
+| PVP-014 | Перевести PvP UI на полный server truth для соперника | UI / PvP Sync | 🟡 IN PROGRESS | `features/online-duel-1v1.md` | Экран уже использует live sync, но часть отображения соперника все еще опирается на локальные fallback/build данные |
+| PVP-015 | Разбить `OnlineDuelScreen` на transport / state / ui слои | UI Architecture | 🔴 TODO | `features/online-duel-1v1.md` | Текущий экран слишком большой и смешивает transport, recovery, orchestration, debug и rendering |
+| PVP-016 | Доделать reconnect/disconnect UX для реальных игроков | UX / PvP Recovery | 🔴 TODO | `features/online-duel-1v1.md` | Нужны явные состояния: переподключение, соперник вышел, сессия вытеснена, матч закрыт, ожидание следующего шага |
+| PVP-017 | Подготовить PvP backend к публичному хостингу | Backend / Ops / Deployment | 🔴 TODO | `features/online-duel-1v1.md` | Нужны env-конфиги, health/ops checklist, логирование, reverse proxy/VPS path и базовая защита от abuse |
+| PVP-018 | Расширить регрессионное покрытие реального PvP flow | QA / PvP | 🟡 IN PROGRESS | `features/online-duel-1v1.md` | Уже есть базовый набор, но нужно расширение на reconnect, rematch loops, matchmaking cancel/timeout и authority validation |
+
+Порядок выполнения:
+
+1. `PVP-010`
+2. `PVP-011`
+3. `PVP-012`
+4. `PVP-013`
+5. `PVP-014`
+6. `PVP-015`
+7. `PVP-016`
+8. `PVP-018`
+9. `PVP-017`
+
+---
+
+## PvP Progress Update - 2026-03-21
+
+- `PVP-015` уже реально в работе:
+  - `OnlineDuelScreen` уже разрезан на соседние модули `setup`, `support`, `panels`, `cards` и `lobby`
+  - следующий шаг по этому треку: еще сильнее ужать orchestration-shell и дочистить границу view-model
+- `PVP-016` уже реально в работе:
+  - live PvP экран уже показывает явные состояния `Reconnecting`, `Opponent offline`, `Session replaced`, `Match closed`, `Live service offline` и `Syncing room`
+  - экран уже умеет показывать recovery CTA и блокирует небезопасные боевые действия, когда матч больше не находится в валидном live-состоянии
+- `PVP-017` уже реально в работе:
+  - runtime env-конфиги backend, `/health`, логирование, proxy-aware client IP и базовый rate limiting уже live
+  - следующий шаг по этому треку: закрепить deployment-path и операторский runbook для прямого хоста и reverse proxy
+
+## PvP Progress Update - 2026-03-21 (Refresh)
+
+- `PVP-010` through `PVP-013` are effectively landed in code:
+  - room participants now keep server-owned baseline snapshot and loadout truth
+  - reconnect does not silently mutate that baseline
+  - rematch restores the original baseline build
+  - clients submit selections while the server rebuilds and validates the real `RoundAction`
+  - consumables are decremented from server-owned runtime state after round resolution
+- `PVP-014` is materially advanced:
+  - synced state now carries active-seat `yourSnapshot` and `opponentSnapshot`
+  - PvP stat cards and opponent presentation rely much more on server truth and less on local fallback data
+- `PVP-015` is materially advanced:
+  - `OnlineDuelScreen` is now split across `setup`, `support`, `panels`, `cards`, and `lobby` siblings
+  - the remaining screen is much closer to an orchestration shell than the old monolith
+- `PVP-016` is materially advanced:
+  - live PvP now surfaces explicit reconnect, displaced-session, opponent-offline, room-closed, and syncing states
+  - unsafe combat actions are blocked in invalid live states
+  - matchmaking search now has player-facing `pause`, `resume`, and `timeout` behavior
+- `PVP-017` is materially advanced:
+  - backend runtime env config, deploy profiles, `/health`, request logging, rate limiting, reverse-proxy examples, env examples, and an ops runbook are now live
+- `PVP-018` is materially advanced:
+  - regression coverage now includes stale matchmaking cleanup
+  - `abandoned -> rematch -> reconnect SSE`
+  - `search -> stop -> resume -> match found -> first round resolve` over live HTTP and SSE
+  - a longer live two-client lifecycle now covers `finished -> rematch -> leave`
+  - the local player-facing screen now also covers `resolve round -> room closed -> rematch -> return to create flow`
+
 ## Status Legend
 
 - `🔴 TODO` - not started yet
@@ -139,6 +206,12 @@ Execution rules:
 ---
 
 ## Sprint History
+
+### v1.28 - PvP Lifecycle Regression Net Expanded
+
+- added a longer live two-client PvP validation that now covers `finished -> rematch -> leave` across two independent clients and two SSE streams
+- added a stable player-facing UI lifecycle regression that covers `resolve round -> room closed -> Play Another Match -> return to create flow`
+- revalidated the PvP screen and build after the new regression pass so the project keeps moving toward a first playable deploy with better safety nets
 
 ### v1.27 - PvP Combat Parity And Recovery Pass Landed
 
@@ -681,7 +754,7 @@ When work changes state:
 
 ---
 
-> Last updated: 2026-03-21 00:15 MSK
+> Last updated: 2026-03-21 13:10 MSK
 
 
 

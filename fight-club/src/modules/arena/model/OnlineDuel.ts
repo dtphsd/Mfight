@@ -1,4 +1,4 @@
-import type { OnlineDuelFighterView } from "@/modules/arena/contracts/arenaPublicApi";
+import type { OnlineDuelFighterView, OnlineDuelParticipantLoadout } from "@/modules/arena/contracts/arenaPublicApi";
 import type { CombatSnapshot, CombatState, RoundAction } from "@/modules/combat";
 
 export type OnlineDuelSeat = "playerA" | "playerB";
@@ -17,8 +17,12 @@ export interface OnlineDuelParticipant {
   sessionId: string;
   resumeToken: string;
   displayName: string;
+  baselineSnapshot: CombatSnapshot;
   snapshot: CombatSnapshot;
+  baselineFighterView?: OnlineDuelFighterView;
   fighterView?: OnlineDuelFighterView;
+  baselineLoadout: OnlineDuelParticipantLoadout;
+  loadout: OnlineDuelParticipantLoadout;
   connected: boolean;
   joinedAt: number;
   readyAt: number | null;

@@ -1,10 +1,13 @@
 import { createId } from "@/core/ids/createId";
 import type {
   JoinOnlineDuelRoomInput,
+  OnlineDuelParticipantLoadout,
   OnlineDuelResult,
 } from "@/modules/arena/contracts/arenaPublicApi";
 import type { OnlineDuel } from "@/modules/arena/model/OnlineDuel";
 import { startCombat } from "@/modules/combat";
+import { createEquipment } from "@/modules/equipment";
+import { createStarterInventory } from "@/modules/inventory";
 
 export function joinOnlineDuelRoom(
   duel: OnlineDuel,
@@ -37,8 +40,6 @@ export function joinOnlineDuelRoom(
               sessionId: input.sessionId,
               resumeToken: createId("resume"),
               displayName: input.displayName,
-              snapshot: input.snapshot,
-              ...(input.fighterView ? { fighterView: input.fighterView } : {}),
               connected: true,
               joinedAt,
             }
@@ -50,8 +51,6 @@ export function joinOnlineDuelRoom(
               sessionId: input.sessionId,
               resumeToken: createId("resume"),
               displayName: input.displayName,
-              snapshot: input.snapshot,
-              ...(input.fighterView ? { fighterView: input.fighterView } : {}),
               connected: true,
               joinedAt,
             }
@@ -89,6 +88,7 @@ export function joinOnlineDuelRoom(
     };
   }
 
+  const participantLoadout = cloneParticipantLoadout(input.loadout ?? createFallbackParticipantLoadout());
   const combatState = startCombat(duel.participants.playerA.snapshot, input.snapshot);
 
   return {
@@ -108,8 +108,12 @@ export function joinOnlineDuelRoom(
           sessionId: input.sessionId,
           resumeToken: createId("resume"),
           displayName: input.displayName,
+          baselineSnapshot: input.snapshot,
           snapshot: input.snapshot,
+          ...(input.fighterView ? { baselineFighterView: input.fighterView } : {}),
           ...(input.fighterView ? { fighterView: input.fighterView } : {}),
+          baselineLoadout: participantLoadout,
+          loadout: cloneParticipantLoadout(participantLoadout),
           connected: true,
           joinedAt,
           readyAt: null,
@@ -122,6 +126,25 @@ export function joinOnlineDuelRoom(
         resolvedAt: null,
       },
     },
+  };
+}
+
+function createFallbackParticipantLoadout() {
+  return {
+    equipmentState: createEquipment(),
+    inventory: createStarterInventory(),
+    equippedSkillIds: [],
+  };
+}
+
+function cloneParticipantLoadout(loadout: OnlineDuelParticipantLoadout): OnlineDuelParticipantLoadout {
+  return {
+    equipmentState: loadout.equipmentState,
+    inventory: {
+      ...loadout.inventory,
+      entries: loadout.inventory.entries.map((entry) => ({ ...entry })),
+    },
+    equippedSkillIds: [...loadout.equippedSkillIds],
   };
 }
 

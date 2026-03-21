@@ -23,6 +23,9 @@ export function createOnlineDuelStateSync(
   }
 
   const lastResolvedRound = createOnlineDuelRoundSummary(duel);
+  const yourSeat = resolveSeat(duel, playerId);
+  const opponentSeat = resolveOpponentSeat(duel, yourSeat);
+  const opponentParticipant = resolveParticipantBySeat(duel, opponentSeat);
 
   return {
     success: true,
@@ -33,8 +36,11 @@ export function createOnlineDuelStateSync(
       status: duel.status,
       round: duel.currentRound?.round ?? duel.combatState?.round ?? null,
       winnerSeat: duel.winnerSeat,
-      yourSeat: resolveSeat(duel, playerId),
+      yourSeat,
       ...(participant ? { resumeToken: participant.resumeToken } : {}),
+      ...(participant ? { yourLoadout: participant.loadout } : {}),
+      ...(participant ? { yourSnapshot: participant.snapshot } : {}),
+      ...(opponentParticipant ? { opponentSnapshot: opponentParticipant.snapshot } : {}),
       participants: [
         {
           seat: duel.participants.playerA.seat,
@@ -129,4 +135,12 @@ function resolveOpponentSeat(
   }
 
   return opponentSeat;
+}
+
+function resolveParticipantBySeat(duel: OnlineDuel, seat: OnlineDuelSeat | null) {
+  if (!seat) {
+    return null;
+  }
+
+  return seat === "playerA" ? duel.participants.playerA : duel.participants.playerB;
 }

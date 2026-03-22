@@ -1,6 +1,6 @@
 # MASTER-PLAN - Fight Club
 
-> Last updated: 2026-03-21 17:40 MSK
+> Last updated: 2026-03-22 14:52 MSK
 
 **Project:** Fight Club  
 **Scope:** active product planning, task tracking, and sprint history
@@ -78,16 +78,27 @@
 
 ---
 
+| TECH-001 | Stabilize PvP truth and revision-first sync selection | PvP / Sync | ✅ DONE | `MASTER-PLAN.md` | Online PvP now prefers freshest room state by `revision`; completeness fallback remains only for equal-revision ties |
+| TECH-002 | Finish PvP UI parity with combat sandbox and reduce ambiguity | PvP / UX / UI | ✅ DONE | `MASTER-PLAN.md` | Online fight now shows real opponent resources and clearer primary control states instead of misleading ready-only wording |
+| TECH-003 | Expand online PvP UI regression coverage | QA / PvP UI | ✅ DONE | `MASTER-PLAN.md` | Online UI regressions now cover stale-state recovery, synced opponent resources, and finished/profile parity on the live PvP screen |
+| TECH-004 | Harden server authority and stale-action validation | Backend / PvP Authority | ✅ DONE | `MASTER-PLAN.md` | `submit_round_action` now validates stale sync by `expectedRevision` as well as round, and the client seam sends revision tags on submit |
+| TECH-005 | Consolidate remote-play deployment and ops path | Ops / Deployment | рџ”ґ TODO | `MASTER-PLAN.md` | Turn the current quick-tunnel success into a repeatable operator path with safer env defaults, clearer launcher/runtime ownership, and a cleaner public-host checklist |
+| TECH-006 | Decompose remaining heavyweight PvP and combat files | Architecture / Refactor | рџ”ґ TODO | `MASTER-PLAN.md` | Continue shrinking `OnlineDuelScreen`, related support modules, and high-risk combat surfaces so future fixes land in smaller, testable units |
+| TECH-007 | Reduce combat-core risk behind stronger regression nets | Combat / Safety | рџ”ґ TODO | `MASTER-PLAN.md` | Move toward safer decomposition of `resolveRound.ts` and adjacent combat logic only after coverage and invariants are strong enough |
+| TECH-008 | Harden persistence and compatibility boundaries | Persistence / Safety | рџ”ґ TODO | `MASTER-PLAN.md` | Validate save payloads on read, define migration rules, and keep future PvP/profile/hunting additions from silently breaking older local saves |
+
+---
+
 ## PvP Debt Backlog
 
 | ID | Задача | Область | Статус | Feature Doc | Notes |
 |----|--------|---------|--------|-------------|-------|
-| PVP-010 | Перенести truth по loadout на сервер | Backend / PvP Authority | 🔴 TODO | `features/online-duel-1v1.md` | Сервер должен хранить разрешенные скиллы, расходку, экипировку и боевой snapshot участника, а не доверять клиентскому состоянию |
-| PVP-011 | Перестроить submit action в server-authoritative flow | Backend / Combat Authority | 🔴 TODO | `features/online-duel-1v1.md` | Клиент должен отправлять только намерение и выбор (`intent`, зоны, `skillId`, `consumableCode`), а сервер сам валидирует и собирает итоговый `RoundAction` |
-| PVP-012 | Ввести server-side расход расходки и валидацию скиллов | Backend / Economy / Fairness | 🔴 TODO | `features/online-duel-1v1.md` | Нужны проверка количества расходки, доступности скилла, кулдауна и ресурсов на стороне authority |
-| PVP-013 | Зафиксировать правила snapshot/reconnect/rematch | Backend / PvP Runtime | 🔴 TODO | `features/online-duel-1v1.md` | Reconnect не должен незаметно подменять build, а rematch должен стартовать из явно определенного server-owned состояния |
-| PVP-014 | Перевести PvP UI на полный server truth для соперника | UI / PvP Sync | 🟡 IN PROGRESS | `features/online-duel-1v1.md` | Экран уже использует live sync, но часть отображения соперника все еще опирается на локальные fallback/build данные |
-| PVP-015 | Разбить `OnlineDuelScreen` на transport / state / ui слои | UI Architecture | 🔴 TODO | `features/online-duel-1v1.md` | Текущий экран слишком большой и смешивает transport, recovery, orchestration, debug и rendering |
+| PVP-010 | Перенести truth по loadout на сервер | Backend / PvP Authority | ✅ DONE | `features/online-duel-1v1.md` | Сервер теперь нормализует и хранит server-owned loadout truth для комнаты, а не полагается на сырой клиентский loadout |
+| PVP-011 | Перестроить submit action в server-authoritative flow | Backend / Combat Authority | ✅ DONE | `features/online-duel-1v1.md` | Клиент отправляет только выбор раунда, submission хранит selection, а authority пересобирает и валидирует итоговый `RoundAction` уже на серверной стороне |
+| PVP-012 | Ввести server-side расход расходки и валидацию скиллов | Backend / Economy / Fairness | ✅ DONE | `features/online-duel-1v1.md` | Authority now enforces skill availability, cooldown, resources, consumable quantity, and resolve-time depleted-inventory validation through arena regressions |
+| PVP-013 | Зафиксировать правила snapshot/reconnect/rematch | Backend / PvP Runtime | ✅ DONE | `features/online-duel-1v1.md` | Reconnect now preserves server-owned baseline truth, rematch rebuilds detached runtime state from baseline, and regression tests cover baseline immutability across rejoin/rematch |
+| PVP-014 | Перевести PvP UI на полный server truth для соперника | UI / PvP Sync | 🟢 DONE | `features/online-duel-1v1.md` | `duel_state_sync` теперь отдаёт `opponentLoadout`, opponent profile/skills больше не зависят от локального build fallback, UI truth закреплён arena + EventSource tests |
+| PVP-015 | Разбить `OnlineDuelScreen` на transport / state / ui слои | UI Architecture | 🟡 IN PROGRESS | `features/online-duel-1v1.md` | Arena/presenter, session/controller и debug/operator layout уже вынесены, но state aggregation и часть entry/status presentation всё ещё живут в основном экране |
 | PVP-016 | Доделать reconnect/disconnect UX для реальных игроков | UX / PvP Recovery | 🔴 TODO | `features/online-duel-1v1.md` | Нужны явные состояния: переподключение, соперник вышел, сессия вытеснена, матч закрыт, ожидание следующего шага |
 | PVP-017 | Подготовить PvP backend к публичному хостингу | Backend / Ops / Deployment | 🔴 TODO | `features/online-duel-1v1.md` | Нужны env-конфиги, health/ops checklist, логирование, reverse proxy/VPS path и базовая защита от abuse |
 | PVP-018 | Расширить регрессионное покрытие реального PvP flow | QA / PvP | 🟡 IN PROGRESS | `features/online-duel-1v1.md` | Уже есть базовый набор, но нужно расширение на reconnect, rematch loops, matchmaking cancel/timeout и authority validation |
@@ -132,6 +143,9 @@
 - `PVP-015` is materially advanced:
   - `OnlineDuelScreen` is now split across `setup`, `support`, `panels`, `cards`, and `lobby` siblings
   - the remaining screen is much closer to an orchestration shell than the old monolith
+  - fight-stage rendering now lives in `onlineDuelScreenArena.tsx`
+  - session and transport orchestration now lives in `onlineDuelScreenSession.ts`
+  - debug and operator tooling now lives in `onlineDuelScreenDebug.tsx`
 - `PVP-016` is materially advanced:
   - live PvP now surfaces explicit reconnect, displaced-session, opponent-offline, room-closed, and syncing states
   - unsafe combat actions are blocked in invalid live states
@@ -144,6 +158,33 @@
   - `search -> stop -> resume -> match found -> first round resolve` over live HTTP and SSE
   - a longer live two-client lifecycle now covers `finished -> rematch -> leave`
   - the local player-facing screen now also covers `resolve round -> room closed -> rematch -> return to create flow`
+
+## PvP Progress Update - 2026-03-22
+
+- The first real remote PvP milestone is now achieved:
+  - a launcher-assisted `trycloudflare` flow can bring up backend, frontend, both tunnels, and a runtime manifest for the browser-side operator flow
+  - the `Admin Dashboard` now reads that manifest, shows readiness state, and can apply the backend tunnel override before opening PvP
+  - one real remote match was played successfully through the public quick-tunnel path
+- The player-facing PvP screen advanced materially:
+  - match code is surfaced directly inside `Fight Controls`
+  - round progress and wait status now explain whether the room is waiting for `Ready` or for both locked actions
+  - the `Ready Up` control now toggles into `Cancel Ready` instead of living as a second detached button
+  - online combat now restores hit / crit / block / dodge effect wiring and supports opening the fighter profile modal from the PvP screen
+- Several live-sync and authority bugs were closed:
+  - remote matches no longer hang when both seats start from the same fighter template because combatants now get unique online ids
+  - winner/result presentation now resolves against the real online combatant identity instead of loose name fallback
+  - online skill submission now validates against the active synced loadout instead of an outdated local fallback
+- PvP verification moved from a thin smoke layer to a real online test program:
+  - `npm run test:pvp`
+  - `npm run test:pvp:matrix`
+  - `npm run test:pvp:soak`
+  - `npm run test:pvp:fuzz`
+  - the live suite now covers scenario matrix flow, preset-vs-preset smoke, longer soak rounds, and seeded fuzz over real `HTTP + SSE`
+- Tomorrow's highest-value follow-up remains clear:
+  - prefer freshest synced room state by `revision`
+  - surface real opponent resources instead of the current zero-strip fallback
+  - finish the remaining PvP UI parity and reconnect clarity pass
+  - add stronger online UI tests for animation/result/profile parity
 
 ## Status Legend
 
@@ -169,6 +210,163 @@
 - `UI-013` - reduce combat-screen noise and separate play-now information from analysis and log-heavy information
 - `UI-014` - make `Exposed`, `Staggered`, and payoff windows self-explanatory directly in the combat UI
 - `UI-015` - reduce build-editing friction by moving presets, inventory, equipment, and skills toward one clearer build center
+
+---
+
+## Technical Debt And Optimization Program
+
+This is the main stabilization plan after the first real remote PvP milestone.
+
+The goal of this track is to make the current game slice:
+
+- more truthful
+- more predictable
+- easier to change safely
+- easier to test
+- easier to operate remotely
+
+### Phase A - PvP Truth First
+
+Primary tasks:
+
+1. `TECH-001`
+2. `TECH-002`
+3. `TECH-003`
+
+Focus:
+
+- prefer freshest online room state by `revision`
+- remove stale-state heuristics from player-facing PvP flow
+- surface real opponent-facing truth instead of local or zero-value fallback data
+- make phase, wait, lock, and result states obvious to both players
+- cover the main online UI truth states with regression tests
+
+Definition of done:
+
+- no known stale-sync chooser remains on the main PvP screen path
+- opponent resources and result state match live synced truth
+- the common "it looks frozen" and "both clients think they won" class of issues are either fixed or directly tested
+- online UI tests cover the main truth-heavy player states
+
+### Phase B - Authority And Fairness
+
+Primary tasks:
+
+1. `TECH-004`
+2. `PVP-010`
+3. `PVP-011`
+4. `PVP-012`
+5. `PVP-013`
+
+Focus:
+
+- keep moving fairness-critical truth to the server
+- accept intent and choice from the client, not trusted combat truth
+- make reconnect, rematch, stale submit, displaced session, and resource validation explicit
+- ensure weird client UI states do not create unfair combat outcomes
+
+Definition of done:
+
+- server-owned validation covers loadout, skills, consumables, resources, and session ownership cleanly
+- reconnect/rematch lifecycle is reproducible and explicit
+- live PvP tests catch stale or invalid mutation paths before UI polish can hide them
+
+### Phase C - Deployment And Operator Reliability
+
+Primary tasks:
+
+1. `TECH-005`
+2. `BACKEND-009`
+3. `PVP-017`
+
+Focus:
+
+- keep one clean path for quick remote prototypes and one clean path for public-host or VPS prototypes
+- keep launcher, runtime manifest, dashboard, and runbook aligned
+- improve env defaults, startup clarity, and operator visibility
+
+Definition of done:
+
+- remote bootstrap is repeatable without tribal memory
+- dashboard and runbook reflect the real launcher flow
+- public-host checklist, proxy path, and runtime config are clear enough for the next deployment pass
+
+### Phase D - Structural Debt
+
+Primary tasks:
+
+1. `TECH-006`
+2. `TECH-007`
+3. `TECH-008`
+4. `CLEAN-006`
+5. `CLEAN-007`
+6. `CLEAN-008`
+
+Focus:
+
+- continue shrinking risky files
+- reduce combat-core change risk only behind tests
+- make save loading and compatibility an explicit boundary, not a best-effort guess
+
+Definition of done:
+
+- major PvP and combat fixes land in smaller modules
+- save loading is validated and compatibility-aware
+- the next refactor cycle is cheaper than the current one
+
+### Recommended Working Order For Today
+
+1. `TECH-001` - freshest sync by `revision`
+2. `TECH-002` - real opponent resources plus remaining PvP UI ambiguity cleanup
+3. `TECH-003` - online UI regression tests for truth, result, animation, and profile states
+4. `TECH-004` - next authority hardening pass only after UI truth is stable
+
+### Technical Debt Progress Update - 2026-03-22
+
+- `TECH-001` is complete:
+  - the main online PvP chooser now prefers freshest synced room state by `revision`
+  - older-but-more-complete payloads no longer override newer room truth on the player-facing screen path
+- `TECH-002` is complete:
+  - opponent resource strips now render real synced values instead of a zeroed fallback
+  - the primary fight-control button now reflects live phase truth like `Ready Up`, `Cancel Ready`, `Planning`, `Action Locked`, and `Match Closed`
+- `TECH-003` is complete:
+  - online UI regression tests now cover stale-state recovery, synced opponent resources, and finished/profile modal parity
+  - this closes the main gap between server-heavy PvP tests and player-facing truth checks
+- `TECH-004` is complete:
+  - server authority now rejects stale round submissions by `expectedRevision`, not just `expectedRound`
+  - the client seam sends `expectedRevision` on `submit_round_action`
+  - arena seam tests now explicitly resync clients before submit, matching the hardened authority contract
+- `PVP-010` is complete:
+  - room creation and join now normalize incoming loadout truth on the authority side
+  - participants keep detached baseline and runtime loadout state instead of trusting live client references
+- `PVP-011` is complete:
+  - round submit now stores only player selection inside the room state, not a prebuilt combat action
+  - the authority rebuilds and revalidates `RoundAction` from current server combat state right before resolution
+  - arena regressions now cover resolve-time rebuild against changed server state
+- `PVP-012` is complete:
+  - arena regressions now cover authority-side skill availability, active cooldown, and resolve-time depleted consumable validation
+  - the fairness-critical economy checks are now locked to server-owned loadout and combat state instead of UI assumptions
+- `PVP-013` is complete:
+  - reconnect keeps server-owned baseline snapshot/loadout truth instead of accepting silent client-side replacement on rejoin
+  - rematch now rebuilds detached runtime snapshot, fighter view, and loadout state from baseline-safe clones
+  - arena regressions cover baseline immutability after rejoin and after rematch reset
+- Next recommended order:
+  1. `PVP-014`
+  2. `PVP-015`
+  3. `PVP-016`
+  4. `PVP-018`
+
+### Rules For This Program
+
+- prefer truth bugs over content tweaks
+- prefer reproducible tests over speculative fixes
+- do not rebalance combat while PvP sync truth is still suspect
+- any PvP behavior change should be checked against:
+  - `npm run test:pvp`
+  - `npm run test:pvp:matrix`
+  - `npm run test:pvp:soak`
+  - `npm run test:pvp:fuzz`
+- any combat-core refactor should follow regression coverage, not precede it
 
 ---
 
@@ -754,7 +952,7 @@ When work changes state:
 
 ---
 
-> Last updated: 2026-03-21 13:10 MSK
+> Last updated: 2026-03-22 00:35 MSK
 
 
 

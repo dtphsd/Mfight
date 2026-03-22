@@ -1,6 +1,6 @@
 # Online Duel 1v1
 
-> Last updated: 2026-03-21 17:40 MSK
+> Last updated: 2026-03-22 17:40 MSK
 
 **Feature:** online-duel-1v1  
 **Status:** IN PROGRESS
@@ -258,6 +258,45 @@ The first backend-safe runtime slice is now also in place:
   - stale queued matchmaking rooms are covered
   - `abandoned -> rematch -> reconnect SSE` is covered
   - `search -> stop -> resume -> match found -> first round resolve` is covered through the live HTTP plus SSE path
+
+Today's milestone moves the feature from "LAN-playable prototype" into "first remote-playable prototype":
+
+- the repo root now has launcher scripts for quick remote bootstrap:
+  - `start-online-pvp-quicktunnel.ps1`
+  - `start-online-pvp-quicktunnel.bat`
+  - `stop-online-pvp-quicktunnel.ps1`
+  - `stop-online-pvp-quicktunnel.bat`
+- the launcher now writes `public/online-duel-runtime.json`, and the `Admin Dashboard` reads it to prefill tunnel URLs and operator readiness state
+- the `Admin Dashboard` can also apply the backend tunnel as the browser runtime PvP URL before opening the fight screen
+- one real remote quick-tunnel match is now confirmed playable end to end
+- the player-facing fight screen now exposes:
+  - compact `Match Code` inside `Fight Controls`
+  - `Round Progress`
+  - `Wait Status`
+  - a single toggle-style `Ready Up / Cancel Ready` control
+- online combat presentation now also restores:
+  - impact effects for hit / crit / block / dodge / penetration-style outcomes
+  - profile-modal access from the PvP screen
+- the live authority and UI bugs closed in this pass include:
+  - unique online combatant ids when both seats use the same fighter template
+  - correct winner/result lookup for same-name fighters
+  - skill submission validation against the active synced loadout instead of stale local fallback
+- regression coverage now includes a dedicated live PvP program:
+  - `npm run test:pvp`
+  - `npm run test:pvp:matrix`
+  - `npm run test:pvp:soak`
+  - `npm run test:pvp:fuzz`
+
+Remaining highest-value gap after today's work:
+
+- public-host hardening is still incomplete:
+  - stronger authority validation
+  - clearer reconnect and stale-sync semantics
+  - safer ops/deployment defaults
+- PvP UI parity is still incomplete:
+  - freshest-state selection should prefer `revision`
+  - opponent resource presentation should come from live truth instead of fallback
+  - online-specific UI tests should cover animation/result/profile parity more directly
   - a longer live two-client lifecycle now covers `finished -> rematch -> leave`
   - the local player-facing screen now also covers `resolve round -> room closed -> rematch -> leave`
 
@@ -482,7 +521,10 @@ Goal: make PvP changes safe to keep evolving.
 
 - `PVP-015` уже идет в реальном коде, а не только в плане:
   - `OnlineDuelScreen` уже разрезан на `onlineDuelScreenSetup`, `onlineDuelScreenSupport`, `onlineDuelScreenPanels`, `onlineDuelScreenCards` и `onlineDuelScreenLobby`
-  - следующий шаг: еще сильнее ужать orchestration-shell и дочистить границы view-model
+  - fight-stage rendering вынесен в `onlineDuelScreenArena.tsx`
+  - session / transport orchestration вынесены в `onlineDuelScreenSession.ts`
+  - debug / operator tooling вынесены в `onlineDuelScreenDebug.tsx`
+  - следующий шаг: дочистить state aggregation и entry/status view-model внутри `OnlineDuelScreen.tsx`
 - `PVP-016` тоже уже в активной работе:
   - live PvP уже показывает явные live-state статусы `Reconnecting`, `Opponent offline`, `Session replaced`, `Match closed`, `Live service offline` и `Syncing room`
   - экран уже показывает recovery CTA вроде `Refresh Room` и `Leave Fight`

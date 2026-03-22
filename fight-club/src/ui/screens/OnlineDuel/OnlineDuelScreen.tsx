@@ -1,19 +1,14 @@
 import { useEffect, useRef, useState, type CSSProperties } from "react";
-import type { Inventory } from "@/modules/inventory";
 import { getEquipmentBonuses } from "@/modules/equipment";
-import type { Equipment } from "@/modules/equipment";
 import {
-  subscribeToOnlineDuelEvents,
-  type OnlineDuelClient,
-  type OnlineDuelEventSubscription,
-  type OnlineDuelServerMessage,
-} from "@/modules/arena";
-import { combatZones, type CombatZone } from "@/modules/combat";
+  createProfileMailboxes,
+  createProfileMeta,
+} from "@/modules/profile";
+import { type OnlineDuelEventSubscription, type OnlineDuelServerMessage } from "@/modules/arena";
+import type { CombatZone } from "@/modules/combat";
 import { combatBuildPresets } from "@/orchestration/combat/combatSandboxConfigs";
 import {
   createRoundDraft,
-  getRoundDraftSelectedConsumableCode,
-  getRoundDraftSelectedSkillId,
   setRoundDraftAttackZone,
   setRoundDraftConsumable,
   setRoundDraftIntent,
@@ -22,29 +17,19 @@ import {
   type RoundDraft,
 } from "@/orchestration/combat/roundDraft";
 import { createBattleLogEntries } from "@/ui/components/combat/battleLogFormatting";
-import { BattleLogSection } from "@/ui/screens/Combat/combatSandboxScreenLayout";
-import { ArenaStageColumns, ArenaStageShell, SidePanel } from "@/ui/screens/Combat/combatSandboxScreenLayout";
 import { buildProfileDerivedStats, resolvePresetFigure } from "@/ui/screens/Combat/combatSandboxScreenDerived";
-import { FightControlsPanel } from "@/ui/screens/Combat/combatSandboxScreenControls";
-import { AttackTargetRoundPanel } from "@/ui/screens/Combat/combatSandboxScreenTargeting";
-import { ResourceGrid } from "@/ui/screens/Combat/combatSandboxScreenResourceGrid";
-import {
-  OnlineCombatActionsPanel,
-  OnlineOpponentCombatPanel,
-  OnlinePlayerCombatPanel,
-} from "@/ui/screens/OnlineDuel/onlineDuelScreenPanels";
 import {
   MatchFinishCard,
   RoundPlannerCard,
   RoundResultCard,
   SyncView,
 } from "@/ui/screens/OnlineDuel/onlineDuelScreenCards";
+import { OnlineDuelArena } from "@/ui/screens/OnlineDuel/onlineDuelScreenArena";
+import { OnlineDuelDebugPanel } from "@/ui/screens/OnlineDuel/onlineDuelScreenDebug";
 import { PresetChooser } from "@/ui/screens/OnlineDuel/onlineDuelScreenLobby";
 import type { PvpPreparedFighter } from "@/ui/screens/PvpLobby/pvpLobbyTypes";
 import {
   activeParticipantIsReady,
-  buildClientFighterView,
-  buildOnlineParticipantLoadout,
   createOnlineBuildSelection,
   getOnlineSelectedActionLabel,
   getOnlineSelectedActionSummary,
@@ -59,17 +44,12 @@ import {
   resolveCombatLoadoutForMode,
   resolveCombatantSummary,
   resolveFighterViewFigure,
-  resolveOnlineActionClientMode,
-  resolveOnlineRealtimeClientModes,
   resolvePresetById,
   resolveWinnerName,
   totalArmorProfileValue,
   totalDamageProfileValue,
-  type OnlineDuelLiveStatus,
   type ClientMode,
   type EntryMode,
-  type OnlineAvailableConsumable,
-  type OnlineAvailableSkill,
   type OnlineBuildSelection,
   type TransportSource,
 } from "@/ui/screens/OnlineDuel/onlineDuelScreenSupport";
@@ -78,11 +58,10 @@ import {
   createOnlineSetupForScreen,
   describeTransportIssue,
   getOnlineDuelBackendBaseUrl,
-  shouldRecoverFromSubmitError,
-  shouldRefreshClientsAfterRoundResolution,
   transportBadgeLabel,
   type OnlineDuelSetup,
 } from "@/ui/screens/OnlineDuel/onlineDuelScreenSetup";
+import { createOnlineDuelSessionController } from "@/ui/screens/OnlineDuel/onlineDuelScreenSession";
 
 export { resolveOnlineActionClientMode, resolveOnlineRealtimeClientModes } from "@/ui/screens/OnlineDuel/onlineDuelScreenSupport";
 
@@ -93,75 +72,6 @@ interface OnlineDuelScreenProps {
   initialJoinCode?: string;
 }
 
-const onlineIntentVisuals: Record<
-  RoundDraft["intent"],
-  {
-    accent: string;
-    border: string;
-    fill: string;
-    glow: string;
-  }
-> = {
-  neutral: {
-    accent: "#f0a286",
-    border: "rgba(240,162,134,0.34)",
-    fill: "rgba(240,162,134,0.12)",
-    glow: "rgba(240,162,134,0.22)",
-  },
-  aggressive: {
-    accent: "#ee9abb",
-    border: "rgba(238,154,187,0.36)",
-    fill: "rgba(238,154,187,0.14)",
-    glow: "rgba(238,154,187,0.24)",
-  },
-  guarded: {
-    accent: "#b7d5ff",
-    border: "rgba(183,213,255,0.36)",
-    fill: "rgba(183,213,255,0.14)",
-    glow: "rgba(183,213,255,0.24)",
-  },
-  precise: {
-    accent: "#87e2cf",
-    border: "rgba(135,226,207,0.36)",
-    fill: "rgba(135,226,207,0.14)",
-    glow: "rgba(135,226,207,0.24)",
-  },
-};
-
-const onlinePlayerIntentSilhouetteTone: Record<
-  RoundDraft["intent"],
-  {
-    accent: string;
-    fill: string;
-    edge: string;
-    glow: string;
-  }
-> = {
-  neutral: {
-    accent: "#f0a286",
-    fill: "rgba(240,162,134,0.11)",
-    edge: "rgba(240,162,134,0.28)",
-    glow: "rgba(240,162,134,0.18)",
-  },
-  aggressive: {
-    accent: "#ee9abb",
-    fill: "rgba(238,154,187,0.12)",
-    edge: "rgba(238,154,187,0.3)",
-    glow: "rgba(238,154,187,0.2)",
-  },
-  guarded: {
-    accent: "#b7d5ff",
-    fill: "rgba(183,213,255,0.12)",
-    edge: "rgba(183,213,255,0.3)",
-    glow: "rgba(183,213,255,0.2)",
-  },
-  precise: {
-    accent: "#87e2cf",
-    fill: "rgba(135,226,207,0.12)",
-    edge: "rgba(135,226,207,0.3)",
-    glow: "rgba(135,226,207,0.2)",
-  },
-};
 
 export function OnlineDuelScreen({
   onBack,
@@ -215,6 +125,17 @@ export function OnlineDuelScreen({
   const [matchmakingSearchActive, setMatchmakingSearchActive] = useState(initialEntryMode === "matchmaking");
   const [matchmakingTimedOut, setMatchmakingTimedOut] = useState(false);
   const [, setClientRefresh] = useState(0);
+  const [codeCopied, setCodeCopied] = useState(false);
+  const [profileTarget, setProfileTarget] = useState<"player" | "opponent" | null>(null);
+  const [playerProfileName, setPlayerProfileName] = useState(preparedPlayer?.playerName ?? "Player");
+  const [playerProfile, setPlayerProfile] = useState(() => createProfileMeta());
+  const [opponentProfile] = useState(() => createProfileMeta());
+  const [mailboxes, setMailboxes] = useState(() =>
+    createProfileMailboxes({
+      playerName: preparedPlayer?.playerName ?? "Player",
+      botName: "Rival",
+    })
+  );
 
   useEffect(() => {
     let disposed = false;
@@ -319,7 +240,7 @@ export function OnlineDuelScreen({
     }
 
     autoStartedRef.current = true;
-    void handleJoinDuel();
+    void handleJoinDuel(joinCode);
   }, [duelId, initialEntryMode, joinCode, launchedFromLobby, transportSource]);
 
   useEffect(() => {
@@ -413,6 +334,15 @@ export function OnlineDuelScreen({
     hostBuild,
     guestBuild,
   });
+  const opponentMode = playerMode === "host" ? "guest" : "host";
+  const opponentCombatLoadout = resolveCombatLoadoutForMode({
+    mode: opponentMode,
+    playerMode,
+    syncedLoadout: playerSync?.opponentLoadout,
+    preparedPlayer,
+    hostBuild,
+    guestBuild,
+  });
 
   useEffect(() => {
     if (
@@ -441,6 +371,7 @@ export function OnlineDuelScreen({
   const playerAvailableConsumables = playerCombatLoadout.inventory.entries.filter(
     (entry) => entry.item.consumableEffect && entry.quantity > 0
   );
+  const opponentAvailableSkills = opponentCombatLoadout.availableSkills;
   const selectedActionLabel = getOnlineSelectedActionLabel({
     duelId,
     playerReady,
@@ -491,12 +422,16 @@ export function OnlineDuelScreen({
   const playerEquipment = playerParticipant?.fighterView?.equipment ?? playerCombatLoadout.equipment;
   const playerCombatantState =
     matchSync?.combatState?.combatants.find((combatant) => combatant.id === playerSnapshot.characterId) ?? null;
-  const playerCombatantSummary = resolveCombatantSummary(lastResolvedRound, playerDisplayName);
+  const playerCombatantSummary = resolveCombatantSummary(
+    lastResolvedRound,
+    playerSnapshot.characterId,
+    playerDisplayName
+  );
   const playerCurrentHp =
     playerCombatantState?.currentHp ?? playerCombatantSummary?.currentHp ?? playerSnapshot.maxHp;
   const opponentBuild = playerMode === "host" ? guestBuild : hostBuild;
   const opponentSnapshot = playerSync?.opponentSnapshot ?? opponentBuild.snapshot;
-  const opponentFallbackName = opponentParticipant?.displayName ?? opponentBuild.snapshot.name ?? "Rival";
+  const opponentDisplayName = opponentParticipant?.displayName ?? opponentBuild.snapshot.name ?? "Rival";
   const opponentFigure = resolveFighterViewFigure(
     opponentParticipant?.fighterView?.figure,
     resolvePresetFigure(opponentBuild.presetId, "vermin-tek")
@@ -504,15 +439,74 @@ export function OnlineDuelScreen({
   const opponentEquipment = opponentParticipant?.fighterView?.equipment ?? opponentBuild.equipment;
   const opponentCombatantState =
     matchSync?.combatState?.combatants.find((combatant) => combatant.id === opponentSnapshot.characterId) ?? null;
-  const opponentCombatantSummary = resolveCombatantSummary(lastResolvedRound, opponentFallbackName);
+  const opponentCombatantSummary = resolveCombatantSummary(
+    lastResolvedRound,
+    opponentSnapshot.characterId,
+    opponentDisplayName
+  );
   const opponentCurrentHp =
     opponentCombatantState?.currentHp ?? opponentCombatantSummary?.currentHp ?? opponentSnapshot.maxHp;
+  const playerResources = playerCombatantState?.resources ?? null;
+  const opponentResources = opponentCombatantState?.resources ?? null;
   const battleLogEntries = createBattleLogEntries(
     matchSync?.combatState ?? null,
     playerSnapshot.characterId,
     opponentSnapshot.characterId
   );
-  const playerDerivedStats = buildProfileDerivedStats({
+  const combatLog = matchSync?.combatState?.log ?? [];
+  const activeRoomCode = hostSync?.roomCode ?? guestSync?.roomCode ?? "";
+  const primaryFightControlLabel = matchLocked
+    ? "Match Closed"
+    : showPlanner
+      ? playerActionSubmitted
+        ? "Action Locked"
+        : "Planning"
+      : playerReady
+        ? "Cancel Ready"
+        : "Ready Up";
+  const primaryFightControlAriaLabel = matchLocked
+    ? "Match Closed"
+    : showPlanner
+      ? playerActionSubmitted
+        ? "Action Locked"
+        : "Planning phase"
+      : playerReady
+        ? "Cancel Ready"
+        : "Ready Up";
+
+  useEffect(() => {
+    setPlayerProfileName((current) => (current === playerDisplayName ? current : playerDisplayName));
+  }, [playerDisplayName]);
+
+  useEffect(() => {
+    setMailboxes((current) => ({
+      player: {
+        entries: current.player.entries.map((entry) => ({
+          ...entry,
+          fromName: entry.fromActorId === "player" ? playerDisplayName : entry.fromName,
+          toName: entry.toActorId === "player" ? playerDisplayName : entry.toName,
+        })),
+      },
+      bot: {
+        entries: current.bot.entries.map((entry) => ({
+          ...entry,
+          fromName: entry.fromActorId === "bot" ? opponentDisplayName : entry.fromName,
+          toName: entry.toActorId === "bot" ? opponentDisplayName : entry.toName,
+        })),
+      },
+    }));
+  }, [opponentDisplayName, playerDisplayName]);
+
+  async function handleCopyRoomCode() {
+    if (!activeRoomCode || typeof navigator === "undefined" || !navigator.clipboard) {
+      return;
+    }
+
+    await navigator.clipboard.writeText(activeRoomCode);
+    setCodeCopied(true);
+    window.setTimeout(() => setCodeCopied(false), 1400);
+  }
+  const playerProfileDerivedStats = buildProfileDerivedStats({
     totalDamage: totalDamageProfileValue(playerSnapshot.damage),
     stats: playerSnapshot.stats,
     totalArmor: totalArmorProfileValue(playerSnapshot.armor),
@@ -521,8 +515,8 @@ export function OnlineDuelScreen({
     totalCritMultiplier: 1.5 + playerSnapshot.critMultiplierBonus / 100,
     baseBlockPenetrationValue: playerSnapshot.blockPowerBonus,
     armorPenetrationPercent: playerSnapshot.armorPenetrationPercent,
-  }).slice(0, 4);
-  const opponentDerivedStats = buildProfileDerivedStats({
+  });
+  const opponentProfileDerivedStats = buildProfileDerivedStats({
     totalDamage: totalDamageProfileValue(opponentSnapshot.damage),
     stats: opponentSnapshot.stats,
     totalArmor: totalArmorProfileValue(opponentSnapshot.armor),
@@ -531,7 +525,9 @@ export function OnlineDuelScreen({
     totalCritMultiplier: 1.5 + opponentSnapshot.critMultiplierBonus / 100,
     baseBlockPenetrationValue: opponentSnapshot.blockPowerBonus,
     armorPenetrationPercent: opponentSnapshot.armorPenetrationPercent,
-  }).slice(0, 4);
+  });
+  const playerDerivedStats = playerProfileDerivedStats.slice(0, 4);
+  const opponentDerivedStats = opponentProfileDerivedStats.slice(0, 4);
   const combatInteractionBlocked = matchLocked || sessionDisplaced || roomClosed || playerSeatOffline;
   const actionsDisabled = transportSource === "checking" || combatInteractionBlocked;
   const entryActionsDisabled = actionsDisabled || liveRoomUnavailable;
@@ -603,495 +599,72 @@ export function OnlineDuelScreen({
     }
   }
 
-  function getRealtimeClientModes(modeOverride?: ClientMode): ClientMode[] {
-    return resolveOnlineRealtimeClientModes({
-      launchedFromLobby,
-      playerMode,
-      modeOverride,
-    });
-  }
-
-  function getClientForMode(mode: ClientMode) {
-    return mode === "host" ? setupRef.current.hostClient : setupRef.current.guestClient;
-  }
-
-  function getCombatLoadoutForMode(mode: ClientMode) {
-    return resolveCombatLoadoutForMode({
-      mode,
-      playerMode,
-      preparedPlayer,
-      hostBuild,
-      guestBuild,
-    });
-  }
-
-  async function recoverRealtimeState(nextDuelId: string, modeOverride?: ClientMode) {
-    const nextMessages = await Promise.all(
-      getRealtimeClientModes(modeOverride).map((mode) =>
-        runClientAction(() => getClientForMode(mode).requestSync(nextDuelId))
-      )
-    );
-    applyInboundMessages(nextMessages.flat());
-  }
-
-  function refreshRealtimeSubscriptions(nextDuelId: string | null, modeOverride?: ClientMode) {
-    hostSubscriptionRef.current?.close();
-    guestSubscriptionRef.current?.close();
-    hostSubscriptionRef.current = null;
-    guestSubscriptionRef.current = null;
-
-    if (
-      !nextDuelId ||
-      setupRef.current.transportLabel !== "backend" ||
-      typeof window === "undefined"
-    ) {
-      return;
-    }
-
-    const baseUrl = getOnlineDuelBackendBaseUrl();
-    for (const mode of getRealtimeClientModes(modeOverride)) {
-      const client = getClientForMode(mode);
-      const resumeToken = client.getLastSync()?.resumeToken;
-      if (!resumeToken) {
-        setTransportIssue("missing_resume_token");
-        return;
-      }
-
-      const subscription = subscribeToOnlineDuelEvents({
-        baseUrl,
-        duelId: nextDuelId,
-        playerId: client.identity.playerId,
-        resumeToken,
-        afterEventId: mode === "host" ? hostLastEventIdRef.current ?? undefined : guestLastEventIdRef.current ?? undefined,
-        onMessage: (message, eventId) =>
-          applyInboundMessages([message], eventId ? { [mode]: eventId } : undefined),
-        onOpen: () => void recoverRealtimeState(nextDuelId, mode),
-        onError: () => {
-          setTransportIssue("event_stream_error");
-          void recoverRealtimeState(nextDuelId, mode);
-        },
-      });
-
-      if (mode === "host") {
-        hostSubscriptionRef.current = subscription;
-      } else {
-        guestSubscriptionRef.current = subscription;
-      }
-    }
-  }
-
-  async function runClientAction(action: () => Promise<OnlineDuelServerMessage[]>) {
-    try {
-      const nextMessages = await action();
-      setTransportIssue(null);
-      return nextMessages;
-    } catch (error) {
-      const message = error instanceof Error ? error.message : "online_duel_transport_error";
-      setTransportIssue(message);
-      return [];
-    }
-  }
-
-  async function handleCreateDuel() {
-    if (liveRoomRequired && setupRef.current.transportLabel !== "backend") {
-      setTransportIssue("live_service_required");
-      return;
-    }
-
-    const nextMessages = await runClientAction(() =>
-      setupRef.current.hostClient.createDuel(
-        hostBuild.snapshot,
-        buildClientFighterView({
-          preparedPlayer,
-          fallbackFigure: resolvePresetFigure(hostBuild.presetId, "rush-chip"),
-          fallbackEquipment: hostBuild.equipment,
-        }),
-        preparedPlayer?.playerName ?? hostBuild.snapshot.name,
-        buildOnlineParticipantLoadout({
-          preparedPlayer,
-          fallbackBuild: hostBuild,
-        })
-      )
-    );
-    const created = nextMessages.find((message) => message.type === "duel_created");
-    if (created?.type === "duel_created") {
-      setDuelId(created.duelId);
-      setHostSeat(created.yourSeat);
-      setJoinCode(created.roomCode);
-      setPlayerMode("host");
-      setDebugClientMode("host");
-      setEntryMode("create");
-      refreshRealtimeSubscriptions(created.duelId, "host");
-    }
-    applyInboundMessages(nextMessages);
-  }
-
-  async function handleFindMatchmakingDuel() {
-    if (liveRoomRequired && setupRef.current.transportLabel !== "backend") {
-      setTransportIssue("live_service_required");
-      return;
-    }
-
-    setMatchmakingTimedOut(false);
-    const nextMessages = await runClientAction(() =>
-      setupRef.current.hostClient.findMatchmakingDuel(
-        hostBuild.snapshot,
-        buildClientFighterView({
-          preparedPlayer,
-          fallbackFigure: resolvePresetFigure(hostBuild.presetId, "rush-chip"),
-          fallbackEquipment: hostBuild.equipment,
-        }),
-        preparedPlayer?.playerName ?? hostBuild.snapshot.name,
-        buildOnlineParticipantLoadout({
-          preparedPlayer,
-          fallbackBuild: hostBuild,
-        })
-      )
-    );
-    const created = nextMessages.find((message) => message.type === "duel_created");
-    const matchSync = nextMessages.find((message) => message.type === "duel_state_sync");
-
-    if (created?.type === "duel_created") {
-      setDuelId(created.duelId);
-      setHostSeat(created.yourSeat);
-      setJoinCode(created.roomCode);
-      setPlayerMode("host");
-      setDebugClientMode("host");
-      setEntryMode("create");
-      refreshRealtimeSubscriptions(created.duelId, "host");
-    } else if (matchSync?.type === "duel_state_sync" && matchSync.payload.yourSeat) {
-      setDuelId(matchSync.payload.duelId);
-      setHostSeat(matchSync.payload.yourSeat);
-      setJoinCode(matchSync.payload.roomCode);
-      setPlayerMode("host");
-      setDebugClientMode("host");
-      setEntryMode("create");
-      refreshRealtimeSubscriptions(matchSync.payload.duelId, "host");
-    }
-
-    applyInboundMessages(nextMessages);
-  }
-
-  async function handleStopMatchmakingSearch() {
-    setMatchmakingSearchActive(false);
-    setMatchmakingTimedOut(false);
-
-    if (duelId) {
-      await handleLeaveRoom();
-      return;
-    }
-
-    resetOnlineFlow();
-  }
-
-  function handleRestartMatchmakingSearch() {
-    autoStartedRef.current = false;
-    setMatchmakingTimedOut(false);
-    setMatchmakingSearchActive(true);
-  }
-
-  async function handleJoinDuel() {
-    const normalizedCode = joinCode.trim().toUpperCase();
-    if (!normalizedCode) {
-      return;
-    }
-
-    if (liveRoomRequired && setupRef.current.transportLabel !== "backend") {
-      setTransportIssue("live_service_required");
-      return;
-    }
-
-    const nextMessages = await runClientAction(() =>
-      setupRef.current.guestClient.joinDuelByCode(
-        normalizedCode,
-        guestBuild.snapshot,
-        buildClientFighterView({
-          preparedPlayer,
-          fallbackFigure: resolvePresetFigure(guestBuild.presetId, "kitsune-bit"),
-          fallbackEquipment: guestBuild.equipment,
-        }),
-        preparedPlayer?.playerName ?? guestBuild.snapshot.name,
-        buildOnlineParticipantLoadout({
-          preparedPlayer,
-          fallbackBuild: guestBuild,
-        })
-      )
-    );
-    const joinSync = nextMessages.find((message) => message.type === "duel_state_sync");
-    if (joinSync?.type === "duel_state_sync" && joinSync.payload.yourSeat) {
-      setDuelId(joinSync.payload.duelId);
-      setGuestSeat(joinSync.payload.yourSeat);
-      setPlayerMode("guest");
-      setDebugClientMode("guest");
-      setEntryMode("join");
-      refreshRealtimeSubscriptions(joinSync.payload.duelId, "guest");
-    }
-    applyInboundMessages(nextMessages);
-  }
-
-  async function handleHostSync() {
-    if (!duelId) {
-      return;
-    }
-    applyInboundMessages(await runClientAction(() => setupRef.current.hostClient.requestSync(duelId)));
-  }
-
-  async function handleGuestSync() {
-    if (!duelId) {
-      return;
-    }
-    applyInboundMessages(await runClientAction(() => setupRef.current.guestClient.requestSync(duelId)));
-  }
-
-  async function handleHostReady(ready: boolean) {
-    if (!duelId) {
-      return;
-    }
-    applyInboundMessages(
-      await runClientAction(() =>
-        setupRef.current.hostClient.setReady(
-          duelId,
-          resolvedHostSeat,
-          ready
-        )
-      )
-    );
-  }
-
-  async function handleHostConnection(connected: boolean) {
-    if (!duelId) {
-      return;
-    }
-    applyInboundMessages(
-      await runClientAction(() =>
-        setupRef.current.hostClient.setConnection(
-          duelId,
-          resolvedHostSeat,
-          connected
-        )
-      )
-    );
-  }
-
-  async function handleGuestReady(ready: boolean) {
-    if (!duelId) {
-      return;
-    }
-    applyInboundMessages(
-      await runClientAction(() =>
-        setupRef.current.guestClient.setReady(
-          duelId,
-          resolvedGuestSeat,
-          ready
-        )
-      )
-    );
-  }
-
-  async function handleGuestConnection(connected: boolean) {
-    if (!duelId) {
-      return;
-    }
-    applyInboundMessages(
-      await runClientAction(() =>
-        setupRef.current.guestClient.setConnection(
-          duelId,
-          resolvedGuestSeat,
-          connected
-        )
-      )
-    );
-  }
-
-  async function handleHostAttack() {
-    if (!duelId || hostActionSubmitting || hostSync?.currentRoundState?.yourActionSubmitted) {
-      return;
-    }
-
-    const hostLoadout = getCombatLoadoutForMode("host");
-    const selectedHostSkill =
-      hostLoadout.availableSkills.find((skill) => skill.id === getRoundDraftSelectedSkillId(hostDraft)) ?? null;
-    const selectedHostConsumableItem =
-      hostLoadout.availableConsumables.find((entry) => entry.item.code === getRoundDraftSelectedConsumableCode(hostDraft))
-        ?.item ?? null;
-
-    setHostActionSubmitting(true);
-    try {
-      const submitMessages = await runClientAction(() =>
-        setupRef.current.hostClient.submitRoundAction(
-          duelId,
-          resolvedHostSeat,
-          {
-            attackZone: hostDraft.attackZone,
-            defenseZones: hostDraft.defenseZones,
-            intent: hostDraft.intent,
-            selectedAction:
-              hostDraft.selectedAction.kind === "skill_attack" && !selectedHostSkill
-                ? { kind: "basic_attack" }
-                : hostDraft.selectedAction.kind === "consumable" && !selectedHostConsumableItem?.consumableEffect
-                  ? { kind: "basic_attack" }
-                  : hostDraft.selectedAction,
-          }
-        )
-      );
-      const syncModes: ClientMode[] = shouldRefreshClientsAfterRoundResolution(submitMessages)
-        ? getRealtimeClientModes()
-        : shouldRecoverFromSubmitError(submitMessages)
-          ? ["host" satisfies ClientMode]
-          : [];
-      const recoveredMessages = (
-        await Promise.all(
-          syncModes.map((mode) => runClientAction(() => getClientForMode(mode).requestSync(duelId)))
-        )
-      ).flat();
-      applyInboundMessages([...submitMessages, ...recoveredMessages]);
-    } finally {
-      setHostActionSubmitting(false);
-    }
-  }
-
-  async function handleGuestAttack() {
-    if (!duelId || guestActionSubmitting || guestSync?.currentRoundState?.yourActionSubmitted) {
-      return;
-    }
-
-    const guestLoadout = getCombatLoadoutForMode("guest");
-    const selectedGuestSkill =
-      guestLoadout.availableSkills.find((skill) => skill.id === getRoundDraftSelectedSkillId(guestDraft)) ?? null;
-    const selectedGuestConsumableItem =
-      guestLoadout.availableConsumables.find((entry) => entry.item.code === getRoundDraftSelectedConsumableCode(guestDraft))
-        ?.item ?? null;
-
-    setGuestActionSubmitting(true);
-    try {
-      const submitMessages = await runClientAction(() =>
-        setupRef.current.guestClient.submitRoundAction(
-          duelId,
-          resolvedGuestSeat,
-          {
-            attackZone: guestDraft.attackZone,
-            defenseZones: guestDraft.defenseZones,
-            intent: guestDraft.intent,
-            selectedAction:
-              guestDraft.selectedAction.kind === "skill_attack" && !selectedGuestSkill
-                ? { kind: "basic_attack" }
-                : guestDraft.selectedAction.kind === "consumable" && !selectedGuestConsumableItem?.consumableEffect
-                  ? { kind: "basic_attack" }
-                  : guestDraft.selectedAction,
-          }
-        )
-      );
-      const syncModes: ClientMode[] = shouldRefreshClientsAfterRoundResolution(submitMessages)
-        ? getRealtimeClientModes()
-        : shouldRecoverFromSubmitError(submitMessages)
-          ? ["guest" satisfies ClientMode]
-          : [];
-      const recoveredMessages = (
-        await Promise.all(
-          syncModes.map((mode) => runClientAction(() => getClientForMode(mode).requestSync(duelId)))
-        )
-      ).flat();
-      applyInboundMessages([...submitMessages, ...recoveredMessages]);
-    } finally {
-      setGuestActionSubmitting(false);
-    }
-  }
-
-  async function handleForceTimeout() {
-    if (!duelId || !setupRef.current.expireRooms) {
-      return;
-    }
-
-    setupRef.current.expireRooms(Date.now() + 10 * 60 * 1000);
-    record([
-      ...(await runClientAction(() => setupRef.current.hostClient.requestSync(duelId))),
-      ...(await runClientAction(() => setupRef.current.guestClient.requestSync(duelId))),
-    ]);
-  }
-
-  async function handlePlayAnotherMatch() {
-    if (!duelId || !matchLocked) {
-      resetOnlineFlow();
-      return;
-    }
-
-    const activeClient = getClientForMode(resolveOnlineActionClientMode(playerMode));
-    const nextMessages = await runClientAction(() =>
-      activeClient.requestRematch(duelId)
-    );
-    const recoveredMessages = await Promise.all(
-      getRealtimeClientModes().map((mode) =>
-        runClientAction(() => getClientForMode(mode).requestSync(duelId))
-      )
-    );
-    applyInboundMessages([...nextMessages, ...recoveredMessages.flat()]);
-    setDebugClientMode(playerMode);
-    setHostDraft(createRoundDraft());
-    setGuestDraft(createRoundDraft());
-  }
-
-  async function handleLeaveRoom() {
-    if (!duelId) {
-      resetOnlineFlow();
-      return;
-    }
-
-    const activeClient =
-      playerMode === "host" ? setupRef.current.hostClient : setupRef.current.guestClient;
-    await runClientAction(() => activeClient.leaveDuel(duelId));
-    resetOnlineFlow();
-  }
-
-  function handleNewHostSession() {
-    setupRef.current.resetHostClient();
-    setHostSeat("playerA");
-    setClientRefresh((current) => current + 1);
-  }
-
-  function handleNewGuestSession() {
-    setupRef.current.resetGuestClient();
-    setGuestSeat("playerB");
-    setClientRefresh((current) => current + 1);
-  }
-
-  function resetOnlineFlow() {
-    hostSubscriptionRef.current?.close();
-    guestSubscriptionRef.current?.close();
-    hostSubscriptionRef.current = null;
-    guestSubscriptionRef.current = null;
-    hostLastEventIdRef.current = null;
-    guestLastEventIdRef.current = null;
-    setupRef.current = createOnlineSetupForScreen({
-      mode: setupRef.current.transportLabel,
-      baseUrl: getOnlineDuelBackendBaseUrl(),
-      matchmakingIdentity:
-        matchmakingMode && preparedPlayer
-          ? {
-              playerId: `match-${screenInstanceIdRef.current}`,
-              sessionId: `match-session-${screenInstanceIdRef.current}`,
-              displayName: preparedPlayer.playerName,
-            }
-          : undefined,
-    });
-    setDuelId(null);
-    setMessages([]);
-    setHostSeat("playerA");
-    setGuestSeat("playerB");
-    setJoinCode("");
-    setPlayerMode("host");
-    setDebugClientMode("host");
-    setEntryMode("create");
-    setHostDraft(createRoundDraft());
-    setGuestDraft(createRoundDraft());
-    setHostActionSubmitting(false);
-    setGuestActionSubmitting(false);
-    setMatchmakingSearchActive(matchmakingMode ? false : initialEntryMode === "matchmaking");
-    setTransportIssue(null);
-    setMatchmakingTimedOut(false);
-    setDebugOpen(false);
-    autoStartedRef.current = false;
-    setClientRefresh((current) => current + 1);
-  }
+  const {
+    handleCreateDuel,
+    handleFindMatchmakingDuel,
+    handleStopMatchmakingSearch,
+    handleRestartMatchmakingSearch,
+    handleJoinDuel,
+    handleHostSync,
+    handleGuestSync,
+    handleHostReady,
+    handleHostConnection,
+    handleGuestReady,
+    handleGuestConnection,
+    handleHostAttack,
+    handleGuestAttack,
+    handleForceTimeout,
+    handlePlayAnotherMatch,
+    handleLeaveRoom,
+    handleNewHostSession,
+    handleNewGuestSession,
+    refreshRealtimeSubscriptions,
+  } = createOnlineDuelSessionController({
+    launchedFromLobby,
+    playerMode,
+    preparedPlayer,
+    hostBuild,
+    guestBuild,
+    hostSync,
+    guestSync,
+    hostDraft,
+    guestDraft,
+    resolvedHostSeat,
+    resolvedGuestSeat,
+    duelId,
+    liveRoomRequired,
+    matchmakingMode,
+    initialEntryMode,
+    matchLocked,
+    hostActionSubmitting,
+    guestActionSubmitting,
+    autoStartedRef,
+    screenInstanceIdRef,
+    setupRef,
+    hostSubscriptionRef,
+    guestSubscriptionRef,
+    hostLastEventIdRef,
+    guestLastEventIdRef,
+    applyInboundMessages,
+    record,
+    setTransportIssue,
+    setClientRefresh,
+    setDuelId,
+    setMessages,
+    setHostSeat,
+    setGuestSeat,
+    setJoinCode,
+    setPlayerMode,
+    setDebugClientMode,
+    setEntryMode,
+    setHostDraft,
+    setGuestDraft,
+    setHostActionSubmitting,
+    setGuestActionSubmitting,
+    setMatchmakingSearchActive,
+    setMatchmakingTimedOut,
+    setDebugOpen,
+  });
 
   return (
     <section
@@ -1242,7 +815,7 @@ export function OnlineDuelScreen({
                   <button
                     type="button"
                     style={primaryButtonStyle}
-                    onClick={() => void handleJoinDuel()}
+                    onClick={() => void handleJoinDuel(joinCode)}
                     disabled={!joinCode.trim() || entryActionsDisabled}
                   >
                     Join Match
@@ -1258,6 +831,49 @@ export function OnlineDuelScreen({
               <span style={chipStyle}>{matchStatusSummary.badge}</span>
             </div>
             <p style={helperTextStyle}>{matchStatusSummary.message}</p>
+            {activeRoomCode ? (
+              <div
+                style={{
+                  marginTop: 2,
+                  borderRadius: 18,
+                  border: "1px solid rgba(255,184,107,0.2)",
+                  background: "linear-gradient(180deg, rgba(177,84,43,0.16), rgba(255,255,255,0.03))",
+                  padding: "14px 16px",
+                  display: "grid",
+                  gap: 10,
+                }}
+              >
+                <div style={sectionHeadStyle}>
+                  <span style={eyebrowStyle}>Share Code</span>
+                  <button
+                    type="button"
+                    style={{
+                      ...ghostButtonStyle,
+                      padding: "8px 12px",
+                      fontSize: 12,
+                    }}
+                    onClick={() => void handleCopyRoomCode()}
+                  >
+                    {codeCopied ? "Copied" : "Copy Code"}
+                  </button>
+                </div>
+                <div
+                  style={{
+                    fontSize: 32,
+                    lineHeight: 1,
+                    fontWeight: 800,
+                    letterSpacing: "0.24em",
+                    fontFamily: "Consolas, monospace",
+                    color: "#fff4eb",
+                  }}
+                >
+                  {activeRoomCode}
+                </div>
+                <p style={{ ...helperTextStyle, marginTop: 0 }}>
+                  Send this code to the second player. They can paste it into `Join Match` to enter your room.
+                </p>
+              </div>
+            ) : null}
             <div style={statStripStyle}>
               <div style={statCardStyle}>
                 <div style={statLabelStyle}>Match</div>
@@ -1266,7 +882,7 @@ export function OnlineDuelScreen({
               <div style={statCardStyle}>
                 <div style={statLabelStyle}>Match Code</div>
                 <div style={{ ...statValueStyle, letterSpacing: "0.16em", fontFamily: "Consolas, monospace" }}>
-                  {hostSync?.roomCode ?? guestSync?.roomCode ?? "------"}
+                  {activeRoomCode || "------"}
                 </div>
               </div>
               <div style={statCardStyle}>
@@ -1348,471 +964,181 @@ export function OnlineDuelScreen({
         </article>
       )}
 
-      {showPlayerFacingArena ? (
-        <>
-          {matchmakingStatus && duelId ? (
-            <article
-              style={{
-                ...panelStyle,
-                marginBottom: 14,
-                border:
-                  matchmakingStatus.tone === "warning"
-                    ? "1px solid rgba(255,196,120,0.26)"
-                    : "1px solid rgba(135,217,255,0.24)",
-                background:
-                  matchmakingStatus.tone === "warning"
-                    ? "linear-gradient(180deg, rgba(62,42,18,0.9), rgba(25,17,10,0.96))"
-                    : "linear-gradient(180deg, rgba(20,35,45,0.88), rgba(13,18,24,0.96))",
-              }}
-            >
-              <div style={sectionHeadStyle}>
-                <span style={eyebrowStyle}>Matchmaking</span>
-                <span style={chipStyle}>{matchmakingStatus.badge}</span>
-              </div>
-              <p style={helperTextStyle}>{matchmakingStatus.message}</p>
-              <div style={buttonRowStyle}>
-                <button type="button" style={ghostButtonStyle} onClick={() => void handleStopMatchmakingSearch()}>
-                  Stop Searching
-                </button>
-                {matchmakingTimedOut ? (
-                  <button type="button" style={primaryButtonStyle} onClick={() => setMatchmakingTimedOut(false)}>
-                    Keep Searching
-                  </button>
-                ) : null}
-              </div>
-            </article>
-          ) : null}
-          {liveStatus ? (
-            <article
-              style={{
-                ...panelStyle,
-                marginBottom: 14,
-                border:
-                  liveStatus.tone === "danger"
-                    ? "1px solid rgba(255,127,127,0.3)"
-                    : liveStatus.tone === "warning"
-                      ? "1px solid rgba(255,196,120,0.26)"
-                      : "1px solid rgba(135,217,255,0.24)",
-                background:
-                  liveStatus.tone === "danger"
-                    ? "linear-gradient(180deg, rgba(62,21,21,0.92), rgba(23,12,12,0.96))"
-                    : liveStatus.tone === "warning"
-                      ? "linear-gradient(180deg, rgba(62,42,18,0.9), rgba(25,17,10,0.96))"
-                      : "linear-gradient(180deg, rgba(20,35,45,0.88), rgba(13,18,24,0.96))",
-                boxShadow: "0 18px 36px rgba(0,0,0,0.24)",
-              }}
-            >
-              <div style={sectionHeadStyle}>
-                <span style={eyebrowStyle}>Live Status</span>
-                <span
-                  style={{
-                    ...chipStyle,
-                    border:
-                      liveStatus.tone === "danger"
-                        ? "1px solid rgba(255,127,127,0.34)"
-                        : liveStatus.tone === "warning"
-                          ? "1px solid rgba(255,196,120,0.32)"
-                          : chipStyle.border,
-                    background:
-                      liveStatus.tone === "danger"
-                        ? "rgba(112,31,31,0.28)"
-                        : liveStatus.tone === "warning"
-                          ? "rgba(119,77,18,0.28)"
-                          : chipStyle.background,
-                    color:
-                      liveStatus.tone === "danger"
-                        ? "rgba(255,226,226,0.96)"
-                        : liveStatus.tone === "warning"
-                          ? "rgba(255,236,210,0.96)"
-                          : chipStyle.color,
-                  }}
-                >
-                  {liveStatus.badge}
-                </span>
-              </div>
-              <p
-                style={{
-                  ...helperTextStyle,
-                  color:
-                    liveStatus.tone === "danger"
-                      ? "rgba(255,220,220,0.88)"
-                      : liveStatus.tone === "warning"
-                        ? "rgba(255,232,205,0.88)"
-                        : helperTextStyle.color,
-                }}
-              >
-                {liveStatus.message}
-              </p>
-            </article>
-          ) : null}
-          <ArenaStageShell shellStyle={shellStyle}>
-            <ArenaStageColumns>
-              <OnlinePlayerCombatPanel
-                playerName={playerDisplayName}
-                playerFigure={playerFigure}
-                currentHp={playerCurrentHp}
-                maxHp={playerSnapshot.maxHp}
-                equipment={playerEquipment}
-                selectedIntent={(playerMode === "host" ? hostDraft : guestDraft).intent}
-                shellStyle={shellStyle}
-                panelStyle={panelStyle}
-                derivedStats={playerDerivedStats}
-                roleLabel={playerMode === "host" ? "Host" : "Guest"}
-                presetLabel={resolvePresetById(playerBuild.presetId)?.label ?? "Custom"}
-                winner={matchSync?.winnerSeat === (playerSync?.yourSeat ?? playerSeat)}
-                loser={Boolean(matchSync?.winnerSeat) && matchSync?.winnerSeat !== (playerSync?.yourSeat ?? playerSeat)}
-                sidePanelComponent={SidePanel}
-                chipStyle={chipStyle}
-                combatArenaBadgeRowStyle={combatArenaBadgeRowStyle}
-                onlinePlayerIntentSilhouetteTone={onlinePlayerIntentSilhouetteTone}
-                statSummaryRowStyle={statSummaryRowStyle}
-                statSummaryLabelStyle={statSummaryLabelStyle}
-                statSummaryValueStyle={statSummaryValueStyle}
-              />
+      <OnlineDuelArena
+        showPlayerFacingArena={showPlayerFacingArena}
+        matchmakingStatus={matchmakingStatus && duelId ? matchmakingStatus : null}
+        duelId={duelId}
+        liveStatus={liveStatus}
+        panelStyle={panelStyle}
+        shellStyle={shellStyle}
+        sectionHeadStyle={sectionHeadStyle}
+        eyebrowStyle={eyebrowStyle}
+        chipStyle={chipStyle}
+        helperTextStyle={helperTextStyle}
+        ghostButtonStyle={ghostButtonStyle}
+        primaryButtonStyle={primaryButtonStyle}
+        combatArenaBadgeRowStyle={combatArenaBadgeRowStyle}
+        statSummaryRowStyle={statSummaryRowStyle}
+        statSummaryLabelStyle={statSummaryLabelStyle}
+        statSummaryValueStyle={statSummaryValueStyle}
+        deferredOverlayFallbackStyle={deferredOverlayFallbackStyle}
+        buttonRowStyle={buttonRowStyle}
+        currentStepCardStyle={currentStepCardStyle}
+        playerMode={playerMode}
+        playerBuildPresetLabel={resolvePresetById(playerBuild.presetId)?.label ?? "Custom"}
+        playerDisplayName={playerDisplayName}
+        playerFigure={playerFigure}
+        playerCurrentHp={playerCurrentHp}
+        playerSnapshot={playerSnapshot}
+        playerCombatantState={playerCombatantState}
+        playerEquipment={playerEquipment}
+        playerDerivedStats={playerDerivedStats}
+        playerProfileName={playerProfileName}
+        playerProfile={playerProfile}
+        playerProfileDerivedStats={playerProfileDerivedStats}
+        playerAvailableSkills={playerAvailableSkills}
+        playerResources={playerResources}
+        playerSkillCooldowns={playerCombatantState?.skillCooldowns ?? {}}
+        opponentDisplayName={opponentDisplayName}
+        opponentFigure={opponentFigure}
+        opponentCurrentHp={opponentCurrentHp}
+        opponentSnapshot={opponentSnapshot}
+        opponentCombatantState={opponentCombatantState}
+        opponentEquipment={opponentEquipment}
+        opponentDerivedStats={opponentDerivedStats}
+        opponentProfile={opponentProfile}
+        opponentProfileDerivedStats={opponentProfileDerivedStats}
+        opponentAvailableSkills={opponentAvailableSkills}
+        opponentResources={opponentResources}
+        opponentParticipant={opponentParticipant}
+        matchSyncWinnerSeat={matchSync?.winnerSeat ?? null}
+        playerSeat={playerSeat}
+        playerSyncSeat={playerSync?.yourSeat ?? null}
+        combatLog={combatLog}
+        battleLogEntries={battleLogEntries}
+        profileTarget={profileTarget}
+        mailboxes={mailboxes}
+        setProfileTarget={setProfileTarget}
+        setPlayerProfileName={setPlayerProfileName}
+        setPlayerProfile={setPlayerProfile}
+        setMailboxes={setMailboxes}
+        currentStep={currentStep}
+        matchLocked={matchLocked}
+        readyCount={readyCount}
+        playerReady={playerReady}
+        showPlanner={showPlanner}
+        opponentActionSubmitted={playerSync?.currentRoundState?.opponentActionSubmitted ?? false}
+        selectedActionLabel={selectedActionLabel}
+        selectedActionTags={selectedActionTags}
+        selectedActionSummary={selectedActionSummary}
+        draft={playerMode === "host" ? hostDraft : guestDraft}
+        playerActionSubmitted={playerActionLocked}
+        actionsDisabled={actionsDisabled}
+        latestRoundSummary={lastResolvedRound ? `Round ${lastResolvedRound.round}` : "No round resolved yet."}
+        selectedIntent={(playerMode === "host" ? hostDraft : guestDraft).intent}
+        availableConsumables={playerAvailableConsumables}
+        roomCode={activeRoomCode}
+        codeCopied={codeCopied}
+        primaryActionLabel={primaryFightControlLabel}
+        primaryActionAriaLabel={primaryFightControlAriaLabel}
+        onPrimaryAction={() => void (playerMode === "host" ? handleHostReady(true) : handleGuestReady(true))}
+        onCopyRoomCode={() => void handleCopyRoomCode()}
+        onCancelReady={() => void (playerMode === "host" ? handleHostReady(false) : handleGuestReady(false))}
+        onAttackZoneChange={(zone) =>
+          playerMode === "host"
+            ? setHostDraft((current) => setRoundDraftAttackZone(current, zone))
+            : setGuestDraft((current) => setRoundDraftAttackZone(current, zone))
+        }
+        onDefenseZoneToggle={(zone) =>
+          playerMode === "host"
+            ? setHostDraft((current) => toggleRoundDraftDefenseZone(current, zone))
+            : setGuestDraft((current) => toggleRoundDraftDefenseZone(current, zone))
+        }
+        onIntentChange={(intent) =>
+          playerMode === "host"
+            ? setHostDraft((current) => setRoundDraftIntent(current, intent))
+            : setGuestDraft((current) => setRoundDraftIntent(current, intent))
+        }
+        onSkillChange={(skillId) =>
+          playerMode === "host"
+            ? setHostDraft((current) => setRoundDraftSkill(current, skillId))
+            : setGuestDraft((current) => setRoundDraftSkill(current, skillId))
+        }
+        onConsumableChange={(itemCode) =>
+          playerMode === "host"
+            ? setHostDraft((current) =>
+                setRoundDraftConsumable(
+                  current,
+                  itemCode,
+                  playerAvailableConsumables.find((entry) => entry.item.code === itemCode)?.item.consumableEffect
+                    ?.usageMode ?? null
+                )
+              )
+            : setGuestDraft((current) =>
+                setRoundDraftConsumable(
+                  current,
+                  itemCode,
+                  playerAvailableConsumables.find((entry) => entry.item.code === itemCode)?.item.consumableEffect
+                    ?.usageMode ?? null
+                )
+              )
+        }
+        onLockAttack={() => void (playerMode === "host" ? handleHostAttack() : handleGuestAttack())}
+        recoveryAction={recoveryAction}
+        onStopMatchmakingSearch={() => void handleStopMatchmakingSearch()}
+      />
 
-              <OnlineFightSetupPanel
-                panelStyle={panelStyle}
-                shellStyle={shellStyle}
-                primaryButtonStyle={primaryButtonStyle}
-                buttonStyle={ghostButtonStyle}
-                currentStep={currentStep}
-                duelId={duelId}
-                matchLocked={matchLocked}
-                playerReady={playerReady}
-                showPlanner={showPlanner}
-                selectedActionLabel={selectedActionLabel}
-                selectedActionTags={selectedActionTags}
-                selectedActionSummary={selectedActionSummary}
-                draft={playerMode === "host" ? hostDraft : guestDraft}
-                playerActionSubmitted={playerActionLocked}
-                latestRoundSummary={lastResolvedRound ? `Round ${lastResolvedRound.round}` : "No round resolved yet."}
-                selectedIntent={(playerMode === "host" ? hostDraft : guestDraft).intent}
-                availableSkills={playerAvailableSkills}
-                availableConsumables={playerAvailableConsumables}
-                playerResources={playerCombatantState?.resources ?? null}
-                playerSkillCooldowns={playerCombatantState?.skillCooldowns ?? {}}
-                onPrimaryAction={() => void (playerMode === "host" ? handleHostReady(true) : handleGuestReady(true))}
-                onCancelReady={() => void (playerMode === "host" ? handleHostReady(false) : handleGuestReady(false))}
-                onAttackZoneChange={(zone) =>
-                  playerMode === "host"
-                    ? setHostDraft((current) => setRoundDraftAttackZone(current, zone))
-                    : setGuestDraft((current) => setRoundDraftAttackZone(current, zone))
-                }
-                onDefenseZoneToggle={(zone) =>
-                  playerMode === "host"
-                    ? setHostDraft((current) => toggleRoundDraftDefenseZone(current, zone))
-                    : setGuestDraft((current) => toggleRoundDraftDefenseZone(current, zone))
-                }
-                onIntentChange={(intent) =>
-                  playerMode === "host"
-                    ? setHostDraft((current) => setRoundDraftIntent(current, intent))
-                    : setGuestDraft((current) => setRoundDraftIntent(current, intent))
-                }
-                onSkillChange={(skillId) =>
-                  playerMode === "host"
-                    ? setHostDraft((current) => setRoundDraftSkill(current, skillId))
-                    : setGuestDraft((current) => setRoundDraftSkill(current, skillId))
-                }
-                onConsumableChange={(itemCode) =>
-                  playerMode === "host"
-                    ? setHostDraft((current) =>
-                        setRoundDraftConsumable(
-                          current,
-                          itemCode,
-                          playerAvailableConsumables.find((entry) => entry.item.code === itemCode)?.item.consumableEffect
-                            ?.usageMode ?? null
-                        )
-                      )
-                    : setGuestDraft((current) =>
-                        setRoundDraftConsumable(
-                          current,
-                          itemCode,
-                          playerAvailableConsumables.find((entry) => entry.item.code === itemCode)?.item.consumableEffect
-                            ?.usageMode ?? null
-                        )
-                      )
-                }
-                onLockAttack={() => void (playerMode === "host" ? handleHostAttack() : handleGuestAttack())}
-                actionsDisabled={actionsDisabled}
-                blockedStatus={liveStatus}
-                recoveryAction={recoveryAction}
-              />
-
-              <OnlineOpponentCombatPanel
-                playerName={opponentParticipant?.displayName ?? "Player 2"}
-                playerFigure={opponentFigure}
-                currentHp={opponentCurrentHp}
-                maxHp={opponentSnapshot.maxHp}
-                equipment={opponentEquipment}
-                shellStyle={shellStyle}
-                panelStyle={panelStyle}
-                derivedStats={opponentDerivedStats}
-                connectionLabel={
-                  opponentParticipant
-                    ? opponentParticipant.connected
-                      ? "Connected"
-                      : "Offline"
-                    : "Pending"
-                }
-                readinessLabel={opponentParticipant?.ready ? "Ready" : "Not ready"}
-                winner={matchSync?.winnerSeat !== null && matchSync?.winnerSeat === opponentParticipant?.seat}
-                loser={Boolean(matchSync?.winnerSeat) && matchSync?.winnerSeat !== opponentParticipant?.seat}
-                sidePanelComponent={SidePanel}
-                chipStyle={chipStyle}
-                combatArenaBadgeRowStyle={combatArenaBadgeRowStyle}
-                statSummaryRowStyle={statSummaryRowStyle}
-                statSummaryLabelStyle={statSummaryLabelStyle}
-                statSummaryValueStyle={statSummaryValueStyle}
-              />
-            </ArenaStageColumns>
-          </ArenaStageShell>
-        </>
-      ) : null}
-      {showPlayerFacingArena ? (
-        <BattleLogSection
-          entries={battleLogEntries}
-          playerId={playerBuild.snapshot.characterId}
-          botId={opponentBuild.snapshot.characterId}
-          shellStyle={shellStyle}
-        />
-      ) : null}
-
-      {!launchedFromLobby ? (
-        <article style={panelStyle}>
-          <div style={sectionHeadStyle}>
-            <span style={eyebrowStyle}>Debug Tools</span>
-            <button
-              type="button"
-              style={ghostButtonStyle}
-              onClick={() => setDebugOpen((current) => !current)}
-            >
-              {debugOpen ? "Hide Debug Tools" : "Show Debug Tools"}
-            </button>
-          </div>
-          {debugOpen ? (
-            <>
-              <p style={helperTextStyle}>
-                These controls exercise session lifecycle behavior. Timeout forcing only works on the local fallback
-                authority until the backend exposes the same debug hooks.
-              </p>
-              <div style={buttonRowStyle}>
-                <button
-                  type="button"
-                  style={debugClientMode === "host" ? primaryButtonStyle : ghostButtonStyle}
-                  onClick={() => setDebugClientMode("host")}
-                >
-                  Host Side
-                </button>
-                <button
-                  type="button"
-                  style={debugClientMode === "guest" ? primaryButtonStyle : ghostButtonStyle}
-                  onClick={() => setDebugClientMode("guest")}
-                >
-                  Guest Side
-                </button>
-                <button
-                  type="button"
-                  style={ghostButtonStyle}
-                  onClick={() => void handleHostSync()}
-                  disabled={!duelId || actionsDisabled}
-                >
-                  Refresh Host
-                </button>
-                <button
-                  type="button"
-                  style={ghostButtonStyle}
-                  onClick={() => void handleGuestSync()}
-                  disabled={!duelId || actionsDisabled}
-                >
-                  Refresh Guest
-                </button>
-                <button type="button" style={ghostButtonStyle} onClick={handleNewHostSession}>
-                  New Host Session
-                </button>
-                <button type="button" style={ghostButtonStyle} onClick={handleNewGuestSession}>
-                  New Guest Session
-                </button>
-                <button
-                  type="button"
-                  style={ghostButtonStyle}
-                  onClick={() => void handleHostConnection(false)}
-                  disabled={!duelId || actionsDisabled}
-                >
-                  Host Disconnect
-                </button>
-                <button
-                  type="button"
-                  style={ghostButtonStyle}
-                  onClick={() => void handleHostConnection(true)}
-                  disabled={!duelId || actionsDisabled}
-                >
-                  Host Reconnect
-                </button>
-                <button
-                  type="button"
-                  style={ghostButtonStyle}
-                  onClick={() => void handleGuestConnection(false)}
-                  disabled={!duelId || actionsDisabled}
-                >
-                  Guest Disconnect
-                </button>
-                <button
-                  type="button"
-                  style={ghostButtonStyle}
-                  onClick={() => void handleGuestConnection(true)}
-                  disabled={!duelId || actionsDisabled}
-                >
-                  Guest Reconnect
-                </button>
-                <button
-                  type="button"
-                  style={ghostButtonStyle}
-                  onClick={() => void handleForceTimeout()}
-                  disabled={!duelId || actionsDisabled || !setupRef.current.expireRooms}
-                >
-                  Force Timeout
-                </button>
-              </div>
-
-              <div style={{ ...panelStyle, marginTop: 14, background: "rgba(255,255,255,0.02)", boxShadow: "none" }}>
-                <div style={sectionHeadStyle}>
-                  <span style={eyebrowStyle}>Selected Debug Side</span>
-                  <span style={chipStyle}>{debugSync?.yourSeat ?? debugSeat}</span>
-                </div>
-                <p style={helperTextStyle}>
-                  Use this operator view for local two-seat verification. It does not change the normal `Your Side`
-                  player surface above.
-                </p>
-                <RoundPlannerCard
-                  draft={debugClientMode === "host" ? hostDraft : guestDraft}
-                  mode={debugClientMode}
-                  onAttackZoneChange={(zone) =>
-                    debugClientMode === "host"
-                      ? setHostDraft((current) => setRoundDraftAttackZone(current, zone))
-                      : setGuestDraft((current) => setRoundDraftAttackZone(current, zone))
-                  }
-                  onDefenseZoneToggle={(zone) =>
-                    debugClientMode === "host"
-                      ? setHostDraft((current) => toggleRoundDraftDefenseZone(current, zone))
-                      : setGuestDraft((current) => toggleRoundDraftDefenseZone(current, zone))
-                  }
-                  plannerCardStyle={plannerCardStyle}
-                  sectionHeadStyle={sectionHeadStyle}
-                  eyebrowStyle={eyebrowStyle}
-                  chipStyle={chipStyle}
-                  plannerLabelStyle={plannerLabelStyle}
-                  plannerZoneRowStyle={plannerZoneRowStyle}
-                  plannerPrimaryButtonStyle={plannerPrimaryButtonStyle}
-                  plannerGhostButtonStyle={plannerGhostButtonStyle}
-                />
-                <div style={buttonRowStyle}>
-                  <button
-                    type="button"
-                    style={primaryButtonStyle}
-                    onClick={() => void (debugClientMode === "host" ? handleHostReady(true) : handleGuestReady(true))}
-                    disabled={!duelId || actionsDisabled}
-                  >
-                    Ready Selected Side
-                  </button>
-                  <button
-                    type="button"
-                    style={ghostButtonStyle}
-                    onClick={() => void (debugClientMode === "host" ? handleHostReady(false) : handleGuestReady(false))}
-                    disabled={!duelId || actionsDisabled}
-                  >
-                    Cancel Selected Ready
-                  </button>
-                  <button
-                    type="button"
-                    style={primaryButtonStyle}
-                    onClick={() => void (debugClientMode === "host" ? handleHostAttack() : handleGuestAttack())}
-                    disabled={!duelId || actionsDisabled}
-                  >
-                    Lock Selected Attack
-                  </button>
-                </div>
-                <SyncView
-                  sync={debugSync}
-                  emptyLabel="The selected debug client has not synced yet."
-                  emptyCardStyle={emptyCardStyle}
-                  statStripStyle={statStripStyle}
-                  statCardStyle={statCardStyle}
-                  statLabelStyle={statLabelStyle}
-                  statValueStyle={statValueStyle}
-                />
-              </div>
-
-              <div style={{ ...panelStyle, marginTop: 14, background: "rgba(255,255,255,0.02)", boxShadow: "none" }}>
-                <div style={sectionHeadStyle}>
-                  <span style={eyebrowStyle}>Session Details</span>
-                  <span style={chipStyle}>Developer</span>
-                </div>
-                <div style={{ ...clientMetaStyle, marginBottom: 0 }}>
-                  <span>Duel</span>
-                  <span>{duelId ?? "not-created"}</span>
-                </div>
-                <div style={{ ...clientMetaStyle, marginBottom: 0 }}>
-                  <span>{setupRef.current.hostClient.identity.playerId}</span>
-                  <span>{setupRef.current.hostClient.identity.sessionId}</span>
-                </div>
-                <div style={{ ...clientMetaStyle, marginBottom: 0, marginTop: 10 }}>
-                  <span>{setupRef.current.guestClient.identity.playerId}</span>
-                  <span>{setupRef.current.guestClient.identity.sessionId}</span>
-                </div>
-              </div>
-
-              <div style={{ ...panelStyle, minHeight: 280, padding: 0, marginTop: 14, background: "transparent", boxShadow: "none" }}>
-                <div style={sectionHeadStyle}>
-                  <span style={eyebrowStyle}>Server Messages</span>
-                  <span style={chipStyle}>{messages.length} entries</span>
-                </div>
-                <div
-                  style={{
-                    marginTop: 14,
-                    display: "grid",
-                    gap: 10,
-                    maxHeight: 320,
-                    overflowY: "auto",
-                    paddingRight: 6,
-                  }}
-                >
-                  {messages.length === 0 ? (
-                    <div style={emptyCardStyle}>No online messages yet.</div>
-                  ) : (
-                    messages.map((message, index) => (
-                      <div key={`${message.type}-${index}`} style={messageCardStyle}>
-                        <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
-                          <strong style={{ fontSize: 14 }}>{message.type}</strong>
-                          {"duelId" in message ? (
-                            <span style={messageMetaStyle}>{message.duelId}</span>
-                          ) : (
-                            <span style={messageMetaStyle}>payload</span>
-                          )}
-                        </div>
-                        <pre
-                          style={{
-                            margin: "10px 0 0",
-                            whiteSpace: "pre-wrap",
-                            wordBreak: "break-word",
-                            color: "rgba(234, 229, 223, 0.78)",
-                            fontSize: 12,
-                            lineHeight: 1.5,
-                            fontFamily: "Consolas, monospace",
-                          }}
-                        >
-                          {JSON.stringify(message, null, 2)}
-                        </pre>
-                      </div>
-                    ))
-                  )}
-                </div>
-              </div>
-            </>
-          ) : (
-            <p style={helperTextStyle}>Debug controls are hidden during normal play.</p>
-          )}
-        </article>
-      ) : null}
+      <OnlineDuelDebugPanel
+        launchedFromLobby={launchedFromLobby}
+        panelStyle={panelStyle}
+        sectionHeadStyle={sectionHeadStyle}
+        eyebrowStyle={eyebrowStyle}
+        chipStyle={chipStyle}
+        ghostButtonStyle={ghostButtonStyle}
+        primaryButtonStyle={primaryButtonStyle}
+        helperTextStyle={helperTextStyle}
+        buttonRowStyle={buttonRowStyle}
+        plannerCardStyle={plannerCardStyle}
+        plannerLabelStyle={plannerLabelStyle}
+        plannerZoneRowStyle={plannerZoneRowStyle}
+        plannerPrimaryButtonStyle={plannerPrimaryButtonStyle}
+        plannerGhostButtonStyle={plannerGhostButtonStyle}
+        emptyCardStyle={emptyCardStyle}
+        statStripStyle={statStripStyle}
+        statCardStyle={statCardStyle}
+        statLabelStyle={statLabelStyle}
+        statValueStyle={statValueStyle}
+        clientMetaStyle={clientMetaStyle}
+        messageCardStyle={messageCardStyle}
+        messageMetaStyle={messageMetaStyle}
+        debugOpen={debugOpen}
+        setDebugOpen={setDebugOpen}
+        debugClientMode={debugClientMode}
+        setDebugClientMode={setDebugClientMode}
+        debugSync={debugSync}
+        debugSeat={debugSeat}
+        hostDraft={hostDraft}
+        guestDraft={guestDraft}
+        duelId={duelId}
+        actionsDisabled={actionsDisabled}
+        messages={messages}
+        setup={setupRef.current}
+        onHostSync={handleHostSync}
+        onGuestSync={handleGuestSync}
+        onHostReady={handleHostReady}
+        onGuestReady={handleGuestReady}
+        onHostConnection={handleHostConnection}
+        onGuestConnection={handleGuestConnection}
+        onHostAttack={handleHostAttack}
+        onGuestAttack={handleGuestAttack}
+        onForceTimeout={handleForceTimeout}
+        onNewHostSession={handleNewHostSession}
+        onNewGuestSession={handleNewGuestSession}
+        onHostAttackZoneChange={(zone) => setHostDraft((current) => setRoundDraftAttackZone(current, zone))}
+        onGuestAttackZoneChange={(zone) => setGuestDraft((current) => setRoundDraftAttackZone(current, zone))}
+        onHostDefenseZoneToggle={(zone) => setHostDraft((current) => toggleRoundDraftDefenseZone(current, zone))}
+        onGuestDefenseZoneToggle={(zone) => setGuestDraft((current) => toggleRoundDraftDefenseZone(current, zone))}
+      />
 
       {!launchedFromLobby ? (
         <RoundResultCard
@@ -1847,189 +1173,6 @@ export function OnlineDuelScreen({
         primaryButtonStyle={primaryButtonStyle}
       />
     </section>
-  );
-}
-
-function OnlineFightSetupPanel({
-  shellStyle,
-  panelStyle,
-  primaryButtonStyle,
-  buttonStyle,
-  currentStep,
-  duelId,
-  matchLocked,
-  playerReady,
-  showPlanner,
-  selectedActionLabel,
-  selectedActionTags,
-  selectedActionSummary,
-  draft,
-  playerActionSubmitted,
-  actionsDisabled,
-  latestRoundSummary,
-  selectedIntent,
-  availableSkills,
-  availableConsumables,
-  playerResources,
-  playerSkillCooldowns,
-  onPrimaryAction,
-  onCancelReady,
-  onAttackZoneChange,
-  onDefenseZoneToggle,
-  onIntentChange,
-  onSkillChange,
-  onConsumableChange,
-  onLockAttack,
-  blockedStatus,
-  recoveryAction,
-}: {
-  shellStyle: CSSProperties;
-  panelStyle: CSSProperties;
-  primaryButtonStyle: CSSProperties;
-  buttonStyle: CSSProperties;
-  currentStep: { badge: string; message: string };
-  duelId: string | null;
-  matchLocked: boolean;
-  playerReady: boolean;
-  showPlanner: boolean;
-  selectedActionLabel: string;
-  selectedActionTags: string[];
-  selectedActionSummary: string[];
-  draft: RoundDraft;
-  playerActionSubmitted: boolean;
-  actionsDisabled: boolean;
-  latestRoundSummary: string;
-  selectedIntent: RoundDraft["intent"];
-  availableSkills: OnlineAvailableSkill[];
-  availableConsumables: OnlineAvailableConsumable[];
-  playerResources: { rage: number; guard: number; momentum: number; focus: number } | null;
-  playerSkillCooldowns: Record<string, number>;
-  onPrimaryAction: () => void;
-  onCancelReady: () => void;
-  onAttackZoneChange: (zone: CombatZone) => void;
-  onDefenseZoneToggle: (zone: CombatZone) => void;
-  onIntentChange: (intent: RoundDraft["intent"]) => void;
-  onSkillChange: (skillId: string | null) => void;
-  onConsumableChange: (itemCode: string | null) => void;
-  onLockAttack: () => void;
-  blockedStatus: OnlineDuelLiveStatus | null;
-  recoveryAction: { label: string; onClick: () => void } | null;
-}) {
-  return (
-    <div data-testid="fight-setup-panel" style={{ ...shellStyle, padding: 16, display: "grid", gap: 12, alignContent: "start" }}>
-      <div style={{ display: "grid", gap: 12 }}>
-        {blockedStatus && recoveryAction ? (
-          <div
-            style={{
-              ...currentStepCardStyle,
-              marginTop: 0,
-              border:
-                blockedStatus.tone === "danger"
-                  ? "1px solid rgba(255,127,127,0.26)"
-                  : "1px solid rgba(255,196,120,0.22)",
-              background:
-                blockedStatus.tone === "danger"
-                  ? "linear-gradient(180deg, rgba(58,22,22,0.86), rgba(23,13,13,0.94))"
-                  : "linear-gradient(180deg, rgba(63,46,20,0.8), rgba(24,17,9,0.94))",
-            }}
-          >
-            <div style={sectionHeadStyle}>
-              <span style={eyebrowStyle}>Recovery</span>
-              <span style={chipStyle}>{blockedStatus.badge}</span>
-            </div>
-            <p style={{ ...helperTextStyle, marginTop: 10 }}>{blockedStatus.message}</p>
-            <div style={{ ...buttonRowStyle, marginTop: 12 }}>
-              <button type="button" style={primaryButtonStyle} onClick={recoveryAction.onClick}>
-                {recoveryAction.label}
-              </button>
-            </div>
-          </div>
-        ) : null}
-        <div style={{ display: "grid", gridTemplateColumns: "minmax(0, 0.92fr) minmax(0, 1.08fr)", gap: 12, alignItems: "stretch" }}>
-          <FightControlsPanel
-            panelStyle={panelStyle}
-            primaryButtonStyle={primaryButtonStyle}
-            canStartFight={Boolean(duelId) && !actionsDisabled && !playerReady && !showPlanner && !matchLocked}
-            combatPhase={matchLocked ? "finished" : showPlanner ? "planning" : "lobby"}
-            combatRound={null}
-            combatPhaseLabel={currentStep.badge}
-            selectedActionLabel={selectedActionLabel}
-            selectedActionTags={selectedActionTags}
-            selectedActionSummary={selectedActionSummary}
-            onStartFight={onPrimaryAction}
-            primaryActionLabel="Ready Up"
-            primaryActionAriaLabel="Ready Up"
-          />
-
-          <AttackTargetRoundPanel
-            panelStyle={panelStyle}
-            resourcePanel={<ResourceGrid panelStyle={panelStyle} resources={playerResources} />}
-            zones={combatZones}
-            selectedAttackZone={draft.attackZone}
-            selectedDefenseZones={draft.defenseZones}
-            onSelectAttackZone={onAttackZoneChange}
-            onToggleDefenseZone={onDefenseZoneToggle}
-            interactionLocked={playerActionSubmitted}
-            roundControls={
-              <div style={{ display: "grid", gap: 7 }}>
-                <button
-                  type="button"
-                  aria-label="Lock Attack"
-                  onClick={onLockAttack}
-                  disabled={!duelId || actionsDisabled || !showPlanner || playerActionSubmitted}
-                  style={{
-                    ...primaryButtonStyle,
-                    ...(!duelId || actionsDisabled || !showPlanner || playerActionSubmitted
-                      ? { opacity: 0.48, cursor: "not-allowed" }
-                      : {}),
-                  }}
-                >
-                  {playerActionSubmitted ? "Action Locked" : "Lock Attack"}
-                </button>
-                <div data-testid="latest-round-summary" style={{ display: "none" }}>
-                  {latestRoundSummary}
-                </div>
-              </div>
-            }
-          />
-        </div>
-
-        <div style={{ display: "grid", gap: 10 }}>
-          {!showPlanner && playerReady ? (
-            <div style={{ display: "flex", justifyContent: "flex-end" }}>
-              <button
-                type="button"
-                aria-label="Cancel Ready"
-                onClick={onCancelReady}
-                disabled={!duelId || actionsDisabled || showPlanner || !playerReady}
-                style={{
-                  ...buttonStyle,
-                  padding: "8px 12px",
-                  ...(!duelId || actionsDisabled || showPlanner || !playerReady ? { opacity: 0.48, cursor: "not-allowed" } : {}),
-                }}
-              >
-                Cancel Ready
-              </button>
-            </div>
-          ) : null}
-
-          <OnlineCombatActionsPanel
-            panelStyle={panelStyle}
-            buttonStyle={buttonStyle}
-            selectedIntent={selectedIntent}
-            selectedAction={draft.selectedAction}
-            availableSkills={availableSkills}
-            availableConsumables={availableConsumables}
-            playerResources={playerResources}
-            playerSkillCooldowns={playerSkillCooldowns}
-            onIntentChange={onIntentChange}
-            onSkillChange={onSkillChange}
-            onConsumableChange={onConsumableChange}
-            onlineIntentVisuals={onlineIntentVisuals}
-          />
-        </div>
-      </div>
-    </div>
   );
 }
 
@@ -2143,6 +1286,21 @@ const primaryButtonStyle: CSSProperties = {
   fontWeight: 800,
   padding: "12px 16px",
   cursor: "pointer",
+};
+
+const deferredOverlayFallbackStyle: CSSProperties = {
+  position: "fixed",
+  inset: "24px 24px auto auto",
+  zIndex: 90,
+  padding: "8px 12px",
+  borderRadius: "999px",
+  border: "1px solid rgba(255,255,255,0.1)",
+  background: "rgba(18,16,14,0.9)",
+  color: "#efe6da",
+  fontSize: "11px",
+  letterSpacing: "0.08em",
+  textTransform: "uppercase",
+  boxShadow: "0 18px 40px rgba(0,0,0,0.35)",
 };
 
 const ghostButtonStyle: CSSProperties = {

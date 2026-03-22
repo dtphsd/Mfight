@@ -40,6 +40,7 @@ export function createOnlineDuelStateSync(
       ...(participant ? { resumeToken: participant.resumeToken } : {}),
       ...(participant ? { yourLoadout: participant.loadout } : {}),
       ...(participant ? { yourSnapshot: participant.snapshot } : {}),
+      ...(opponentParticipant ? { opponentLoadout: opponentParticipant.loadout } : {}),
       ...(opponentParticipant ? { opponentSnapshot: opponentParticipant.snapshot } : {}),
       participants: [
         {

@@ -1,6 +1,6 @@
 import { SeededRandom } from "@/core/rng/SeededRandom";
 import { createCharacter } from "@/modules/character";
-import { createEquipment } from "@/modules/equipment";
+import { createEquipment, getEquipmentSlotForItem } from "@/modules/equipment";
 import { createStarterInventory, getItemQuantity } from "@/modules/inventory";
 import {
   createLocalOnlineDuelTransport,
@@ -28,6 +28,7 @@ describe("online duel arena domain", () => {
         if (
           key === "combatState" ||
           key === "yourLoadout" ||
+          key === "opponentLoadout" ||
           key === "yourSnapshot" ||
           key === "opponentSnapshot"
         ) {
@@ -71,6 +72,29 @@ describe("online duel arena domain", () => {
     };
   }
 
+  function createEquippedSkillCarrierLoadout(index = 0) {
+    const inventory = createStarterInventory();
+    const skillCarrierEntries = inventory.entries.filter((entry) => entry.item.skills?.length && entry.item.equip);
+    const skillCarrierEntry = skillCarrierEntries[index] ?? skillCarrierEntries[0] ?? null;
+    if (!skillCarrierEntry?.item.skills?.length) {
+      throw new Error("expected starter inventory to expose a skill carrier");
+    }
+
+    const equipmentState = createEquipment();
+    const slot = getEquipmentSlotForItem(skillCarrierEntry.item);
+    if (!slot) {
+      throw new Error("expected skill carrier to be equippable");
+    }
+
+    equipmentState.slots[slot] = skillCarrierEntry.item.code;
+
+    return {
+      equipmentState,
+      inventory,
+      equippedSkillIds: [skillCarrierEntry.item.skills[0].id],
+    };
+  }
+
   function createBasicSelection(
     attackZone: "head" | "chest" | "belly" | "legs" | "waist",
     defenseZones: [
@@ -101,6 +125,25 @@ describe("online duel arena domain", () => {
         kind: "consumable",
         consumableCode: consumableEntry.item.code,
         usageMode: consumableEntry.item.consumableEffect.usageMode,
+      },
+    };
+  }
+
+  function createSkillSelection(
+    skillId: string,
+    attackZone: "head" | "chest" | "belly" | "legs" | "waist" = "head",
+    defenseZones: [
+      "head" | "chest" | "belly" | "legs" | "waist",
+      "head" | "chest" | "belly" | "legs" | "waist",
+    ] = ["chest", "belly"]
+  ): OnlineDuelActionSelection {
+    return {
+      attackZone,
+      defenseZones,
+      intent: "neutral",
+      selectedAction: {
+        kind: "skill_attack",
+        skillId,
       },
     };
   }
@@ -137,6 +180,105 @@ describe("online duel arena domain", () => {
     expect(joined.data.participants.playerB?.displayName).toBe("Beta");
     expect(joined.data.participants.playerA.readyAt).toBeNull();
     expect(joined.data.participants.playerB?.readyAt).toBeNull();
+  });
+
+  it("normalizes incoming loadout truth on room creation and keeps it detached from client references", () => {
+    const { alpha } = createSnapshots();
+    const inventory = createStarterInventory();
+    const skillCarrierEntry =
+      inventory.entries.find((entry) => entry.item.skills?.length && entry.item.equip) ?? null;
+    if (!skillCarrierEntry?.item.skills?.length) {
+      throw new Error("expected starter inventory to expose a skill carrier");
+    }
+
+    const equipmentState = createEquipment();
+    const skillSlot = getEquipmentSlotForItem(skillCarrierEntry.item);
+    if (!skillSlot) {
+      throw new Error("expected skill carrier to be equippable");
+    }
+
+    equipmentState.slots[skillSlot] = skillCarrierEntry.item.code;
+    equipmentState.slots.mainHand =
+      inventory.entries.find((entry) => entry.item.type === "consumable")?.item.code ?? null;
+
+    const incomingLoadout = {
+      equipmentState,
+      inventory: {
+        ...inventory,
+        entries: [...inventory.entries, { ...inventory.entries[0], quantity: 0 }],
+      },
+      equippedSkillIds: ["fake-skill", skillCarrierEntry.item.skills[0].id, skillCarrierEntry.item.skills[0].id],
+    };
+
+    const room = createOnlineDuelRoom({
+      playerId: "player-alpha",
+      sessionId: "session-alpha",
+      displayName: "Alpha",
+      snapshot: alpha,
+      loadout: incomingLoadout,
+      createdAt: 1000,
+    });
+
+    expect(room.participants.playerA.baselineLoadout.equipmentState.slots[skillSlot]).toBe(
+      skillCarrierEntry.item.code
+    );
+    expect(room.participants.playerA.baselineLoadout.equipmentState.slots.mainHand).toBeNull();
+    expect(room.participants.playerA.baselineLoadout.equippedSkillIds).toEqual([
+      skillCarrierEntry.item.skills[0].id,
+    ]);
+    expect(
+      room.participants.playerA.baselineLoadout.inventory.entries.some((entry) => entry.quantity <= 0)
+    ).toBe(false);
+
+    incomingLoadout.equipmentState.slots[skillSlot] = null;
+    incomingLoadout.equippedSkillIds.length = 0;
+
+    expect(room.participants.playerA.baselineLoadout.equipmentState.slots[skillSlot]).toBe(
+      skillCarrierEntry.item.code
+    );
+    expect(room.participants.playerA.baselineLoadout.equippedSkillIds).toEqual([
+      skillCarrierEntry.item.skills[0].id,
+    ]);
+  });
+
+  it("normalizes guest loadout truth on join before the room enters lobby", () => {
+    const { alpha, beta } = createSnapshots();
+    const inventory = createStarterInventory();
+    const invalidGuestLoadout = {
+      equipmentState: {
+        ...createEquipment(),
+        slots: {
+          ...createEquipment().slots,
+          mainHand: inventory.entries.find((entry) => entry.item.type === "consumable")?.item.code ?? null,
+        },
+      },
+      inventory,
+      equippedSkillIds: ["fake-skill"],
+    };
+    const room = createOnlineDuelRoom({
+      playerId: "player-alpha",
+      sessionId: "session-alpha",
+      displayName: "Alpha",
+      snapshot: alpha,
+      createdAt: 1000,
+    });
+
+    const joined = joinOnlineDuelRoom(room, {
+      playerId: "player-beta",
+      sessionId: "session-beta",
+      displayName: "Beta",
+      snapshot: beta,
+      loadout: invalidGuestLoadout,
+      joinedAt: 2000,
+    });
+
+    expect(joined.success).toBe(true);
+    if (!joined.success || !joined.data.participants.playerB) {
+      return;
+    }
+
+    expect(joined.data.participants.playerB.baselineLoadout.equipmentState.slots.mainHand).toBeNull();
+    expect(joined.data.participants.playerB.baselineLoadout.equippedSkillIds).toEqual([]);
   });
 
   it("lets the host ready up before the second player joins and keeps that ready state after join", () => {
@@ -199,8 +341,8 @@ describe("online duel arena domain", () => {
 
     const alphaEquipment = [{ slot: "mainHand" as const, item: null }];
     const betaEquipment = [{ slot: "offHand" as const, item: null }];
-    const alphaLoadout = createLoadout("alpha-skill");
-    const betaLoadout = createLoadout("beta-skill");
+    const alphaLoadout = createEquippedSkillCarrierLoadout(0);
+    const betaLoadout = createEquippedSkillCarrierLoadout(1);
     const created = await alphaClient.createDuel(alpha, {
       figure: "rush-chip",
       equipment: alphaEquipment,
@@ -223,8 +365,12 @@ describe("online duel arena domain", () => {
       return;
     }
 
-    expect(storedRoom.data.participants.playerA.loadout.equippedSkillIds).toEqual(["alpha-skill"]);
-    expect(storedRoom.data.participants.playerB?.loadout.equippedSkillIds).toEqual(["beta-skill"]);
+    expect(storedRoom.data.participants.playerA.loadout.equippedSkillIds).toEqual(
+      alphaLoadout.equippedSkillIds
+    );
+    expect(storedRoom.data.participants.playerB?.loadout.equippedSkillIds).toEqual(
+      betaLoadout.equippedSkillIds
+    );
 
     expect(betaClient.getLastSync()?.participants).toEqual([
       {
@@ -466,8 +612,72 @@ describe("online duel arena domain", () => {
     }
 
     expect(afterSecondSubmit.data.status).toBe("ready_to_resolve");
-    expect(afterSecondSubmit.data.currentRound?.submissions.playerA?.action.attackerId).toBe(alpha.characterId);
-    expect(afterSecondSubmit.data.currentRound?.submissions.playerB?.action.attackerId).toBe(beta.characterId);
+    expect(afterSecondSubmit.data.currentRound?.submissions.playerA?.selection).toEqual(
+      createBasicSelection("head", ["chest", "belly"])
+    );
+    expect(afterSecondSubmit.data.currentRound?.submissions.playerB?.selection).toEqual(
+      createBasicSelection("legs", ["head", "waist"])
+    );
+  });
+
+  it("rejects stale revisions when a round action comes from an outdated sync", () => {
+    const { alpha, beta } = createSnapshots();
+    const service = createInMemoryOnlineDuelService(new SeededRandom(9));
+    const room = service.createRoom({
+      playerId: "player-alpha",
+      sessionId: "session-alpha",
+      displayName: "Alpha",
+      snapshot: alpha,
+      createdAt: 1000,
+    });
+
+    const joined = service.joinRoom(room.id, {
+      playerId: "player-beta",
+      sessionId: "session-beta",
+      displayName: "Beta",
+      snapshot: beta,
+      joinedAt: 2000,
+    });
+    expect(joined.success).toBe(true);
+    if (!joined.success) {
+      return;
+    }
+
+    const readyA = service.setReadyState(room.id, {
+      seat: "playerA",
+      playerId: "player-alpha",
+      sessionId: "session-alpha",
+      ready: true,
+      updatedAt: 2500,
+    });
+    expect(readyA.success).toBe(true);
+
+    const readyB = service.setReadyState(room.id, {
+      seat: "playerB",
+      playerId: "player-beta",
+      sessionId: "session-beta",
+      ready: true,
+      updatedAt: 2600,
+    });
+    expect(readyB.success).toBe(true);
+    if (!readyB.success) {
+      return;
+    }
+
+    const staleSubmit = service.submitAction(room.id, {
+      seat: "playerA",
+      playerId: "player-alpha",
+      sessionId: "session-alpha",
+      selection: createBasicSelection("head", ["chest", "belly"]),
+      expectedRound: readyB.data.currentRound?.round,
+      expectedRevision: readyB.data.revision - 1,
+      submittedAt: 3000,
+    });
+
+    expect(staleSubmit).toEqual({
+      success: false,
+      reason: "stale_sync",
+    });
   });
 
   it("resolves an authority-side duel round and advances back to planning", () => {
@@ -543,6 +753,174 @@ describe("online duel arena domain", () => {
     expect(resolved.data.currentRound?.round).toBe(2);
     expect(resolved.data.currentRound?.submissions.playerA).toBeUndefined();
     expect(resolved.data.currentRound?.submissions.playerB).toBeUndefined();
+  });
+
+  it("rebuilds submitted actions from current server combat state during resolution", () => {
+    const { alpha, beta } = createSnapshots();
+    const service = createInMemoryOnlineDuelService(new SeededRandom(9));
+    const room = service.createRoom({
+      playerId: "player-alpha",
+      sessionId: "session-alpha",
+      displayName: "Alpha",
+      snapshot: alpha,
+      createdAt: 1000,
+    });
+    service.joinRoom(room.id, {
+      playerId: "player-beta",
+      sessionId: "session-beta",
+      displayName: "Beta",
+      snapshot: beta,
+      joinedAt: 2000,
+    });
+    service.setReadyState(room.id, {
+      seat: "playerA",
+      playerId: "player-alpha",
+      sessionId: "session-alpha",
+      ready: true,
+      updatedAt: 2500,
+    });
+    const readyRoom = service.setReadyState(room.id, {
+      seat: "playerB",
+      playerId: "player-beta",
+      sessionId: "session-beta",
+      ready: true,
+      updatedAt: 2600,
+    });
+    expect(readyRoom.success).toBe(true);
+    if (!readyRoom.success) {
+      return;
+    }
+
+    const withAlphaAction = submitOnlineDuelAction(readyRoom.data, {
+      seat: "playerA",
+      playerId: "player-alpha",
+      sessionId: "session-alpha",
+      selection: createBasicSelection("head", ["chest", "belly"]),
+      submittedAt: 3000,
+    });
+    expect(withAlphaAction.success).toBe(true);
+    if (!withAlphaAction.success) {
+      return;
+    }
+
+    const withSecondSubmit = submitOnlineDuelAction(withAlphaAction.data, {
+      seat: "playerB",
+      playerId: "player-beta",
+      sessionId: "session-beta",
+      selection: createBasicSelection("legs", ["head", "waist"]),
+      submittedAt: 4000,
+    });
+    expect(withSecondSubmit.success).toBe(true);
+    if (!withSecondSubmit.success || !withSecondSubmit.data.combatState) {
+      return;
+    }
+
+    const alphaCombatantId = withSecondSubmit.data.participants.playerA.snapshot.characterId;
+    const combatants = withSecondSubmit.data.combatState.combatants;
+    const invalidatedCombatState = {
+      ...withSecondSubmit.data,
+      combatState: {
+        ...withSecondSubmit.data.combatState,
+        combatants: [
+          combatants[0].id === alphaCombatantId
+            ? {
+                ...combatants[0],
+                currentHp: 0,
+              }
+            : combatants[0],
+          combatants[1].id === alphaCombatantId
+            ? {
+                ...combatants[1],
+                currentHp: 0,
+              }
+            : combatants[1],
+        ] as typeof withSecondSubmit.data.combatState.combatants,
+      },
+    };
+
+    const resolved = resolveOnlineDuelRound(invalidatedCombatState, new SeededRandom(9));
+    expect(resolved).toEqual({
+      success: false,
+      reason: "dead_combatant_action",
+    });
+  });
+
+  it("assigns unique combatant ids per seat so identical fighters can still resolve a live round", () => {
+    const { alpha } = createSnapshots();
+    const room = createOnlineDuelRoom({
+      playerId: "player-alpha",
+      sessionId: "session-alpha",
+      displayName: "Alpha",
+      snapshot: alpha,
+      createdAt: 1000,
+    });
+
+    const joined = joinOnlineDuelRoom(room, {
+      playerId: "player-beta",
+      sessionId: "session-beta",
+      displayName: "Beta",
+      snapshot: alpha,
+      joinedAt: 2000,
+    });
+    expect(joined.success).toBe(true);
+    if (!joined.success) {
+      return;
+    }
+
+    expect(joined.data.participants.playerA.snapshot.characterId).not.toBe(
+      joined.data.participants.playerB?.snapshot.characterId
+    );
+
+    const readyA = {
+      ...joined.data,
+      participants: {
+        ...joined.data.participants,
+        playerA: {
+          ...joined.data.participants.playerA,
+          readyAt: 2500,
+        },
+        playerB: joined.data.participants.playerB
+          ? {
+              ...joined.data.participants.playerB,
+              readyAt: 2600,
+            }
+          : null,
+      },
+      status: "planning" as const,
+    };
+
+    const withFirstSubmit = submitOnlineDuelAction(readyA, {
+      seat: "playerA",
+      playerId: "player-alpha",
+      sessionId: "session-alpha",
+      selection: createBasicSelection("head", ["chest", "belly"]),
+      submittedAt: 3000,
+    });
+    expect(withFirstSubmit.success).toBe(true);
+    if (!withFirstSubmit.success) {
+      return;
+    }
+
+    const withSecondSubmit = submitOnlineDuelAction(withFirstSubmit.data, {
+      seat: "playerB",
+      playerId: "player-beta",
+      sessionId: "session-beta",
+      selection: createBasicSelection("legs", ["head", "waist"]),
+      submittedAt: 4000,
+    });
+    expect(withSecondSubmit.success).toBe(true);
+    if (!withSecondSubmit.success) {
+      return;
+    }
+
+    const resolved = resolveOnlineDuelRound(withSecondSubmit.data, new SeededRandom(9));
+    expect(resolved.success).toBe(true);
+    if (!resolved.success) {
+      return;
+    }
+
+    expect(resolved.data.status).toBe("planning");
+    expect(resolved.data.combatState?.round).toBe(2);
   });
 
   it("rejects actions that do not belong to the declared seat", () => {
@@ -917,8 +1295,8 @@ describe("online duel arena domain", () => {
           winnerSeat: null,
           entries: expect.any(Array),
           combatants: [
-            { id: alpha.characterId, name: "Alpha", currentHp: expect.any(Number), maxHp: expect.any(Number) },
-            { id: beta.characterId, name: "Beta", currentHp: expect.any(Number), maxHp: expect.any(Number) },
+            { id: expect.stringContaining(alpha.characterId), name: "Alpha", currentHp: expect.any(Number), maxHp: expect.any(Number) },
+            { id: expect.stringContaining(beta.characterId), name: "Beta", currentHp: expect.any(Number), maxHp: expect.any(Number) },
           ],
         },
       },
@@ -1036,12 +1414,16 @@ describe("online duel arena domain", () => {
 
     await alphaClient.setReady(duelId, "playerA", true);
     await betaClient.setReady(duelId, "playerB", true);
+    await alphaClient.requestSync(duelId);
+    await betaClient.requestSync(duelId);
 
     await alphaClient.submitRoundAction(
       duelId,
       "playerA",
       createBasicSelection("head", ["chest", "belly"])
     );
+    await betaClient.requestSync(duelId);
+
     const betaMessages = await betaClient.submitRoundAction(
       duelId,
       "playerB",
@@ -1075,11 +1457,45 @@ describe("online duel arena domain", () => {
         winnerSeat: null,
         entries: expect.any(Array),
         combatants: [
-          { id: alpha.characterId, name: "Alpha", currentHp: expect.any(Number), maxHp: expect.any(Number) },
-          { id: beta.characterId, name: "Beta", currentHp: expect.any(Number), maxHp: expect.any(Number) },
+          { id: expect.stringContaining(alpha.characterId), name: "Alpha", currentHp: expect.any(Number), maxHp: expect.any(Number) },
+          { id: expect.stringContaining(beta.characterId), name: "Beta", currentHp: expect.any(Number), maxHp: expect.any(Number) },
         ],
       },
     });
+  });
+
+  it("includes expected revision when the client submits a round action", async () => {
+    const transport = {
+      send: vi.fn().mockResolvedValue([]),
+    };
+    const client = createOnlineDuelClient(transport, {
+      playerId: "player-alpha",
+      sessionId: "session-alpha",
+      displayName: "Alpha",
+    });
+
+    client.acceptServerMessage({
+      type: "duel_state_sync",
+      payload: {
+        revision: 11,
+        round: 3,
+      } as never,
+    });
+
+    await client.submitRoundAction(
+      "duel-tech-004",
+      "playerA",
+      createBasicSelection("head", ["chest", "belly"])
+    );
+
+    expect(transport.send).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: "submit_round_action",
+        duelId: "duel-tech-004",
+        expectedRound: 3,
+        expectedRevision: 11,
+      })
+    );
   });
 
   it("spends consumables on the authority side and returns the updated loadout in sync", () => {
@@ -1186,6 +1602,263 @@ describe("online duel arena domain", () => {
         alphaConsumableSelection.selectedAction.consumableCode
       )
     ).toBe(beforeQuantity - 1);
+    expect(sync.data.opponentLoadout).toBeTruthy();
+  });
+
+  it("rejects a skill attack when the skill is not equipped in the server-owned loadout", () => {
+    const { alpha, beta } = createSnapshots();
+    const service = createInMemoryOnlineDuelService(new SeededRandom(9));
+    const alphaSkillLoadout = createEquippedSkillCarrierLoadout(0);
+    const room = service.createRoom({
+      playerId: "player-alpha",
+      sessionId: "session-alpha",
+      displayName: "Alpha",
+      snapshot: alpha,
+      loadout: createLoadout(),
+      createdAt: 1000,
+    });
+
+    const joined = service.joinRoom(room.id, {
+      playerId: "player-beta",
+      sessionId: "session-beta",
+      displayName: "Beta",
+      snapshot: beta,
+      loadout: createLoadout(),
+      joinedAt: 2000,
+    });
+    expect(joined.success).toBe(true);
+    if (!joined.success) {
+      return;
+    }
+
+    service.setReadyState(room.id, {
+      seat: "playerA",
+      playerId: "player-alpha",
+      sessionId: "session-alpha",
+      ready: true,
+      updatedAt: 2500,
+    });
+    service.setReadyState(room.id, {
+      seat: "playerB",
+      playerId: "player-beta",
+      sessionId: "session-beta",
+      ready: true,
+      updatedAt: 2600,
+    });
+
+    const skillSubmit = service.submitAction(room.id, {
+      seat: "playerA",
+      playerId: "player-alpha",
+      sessionId: "session-alpha",
+      selection: createSkillSelection(alphaSkillLoadout.equippedSkillIds[0]),
+      submittedAt: 3000,
+    });
+
+    expect(skillSubmit).toEqual({
+      success: false,
+      reason: "invalid_action",
+    });
+  });
+
+  it("rejects a skill attack when the authority combat state reports active cooldown", () => {
+    const { alpha, beta } = createSnapshots();
+    const service = createInMemoryOnlineDuelService(new SeededRandom(9));
+    const alphaLoadout = createEquippedSkillCarrierLoadout(0);
+    const skillId = alphaLoadout.equippedSkillIds[0];
+    const room = service.createRoom({
+      playerId: "player-alpha",
+      sessionId: "session-alpha",
+      displayName: "Alpha",
+      snapshot: alpha,
+      loadout: alphaLoadout,
+      createdAt: 1000,
+    });
+
+    const joined = service.joinRoom(room.id, {
+      playerId: "player-beta",
+      sessionId: "session-beta",
+      displayName: "Beta",
+      snapshot: beta,
+      loadout: createLoadout(),
+      joinedAt: 2000,
+    });
+    expect(joined.success).toBe(true);
+    if (!joined.success || !joined.data.combatState) {
+      return;
+    }
+
+    service.setReadyState(room.id, {
+      seat: "playerA",
+      playerId: "player-alpha",
+      sessionId: "session-alpha",
+      ready: true,
+      updatedAt: 2500,
+    });
+    const readyRoom = service.setReadyState(room.id, {
+      seat: "playerB",
+      playerId: "player-beta",
+      sessionId: "session-beta",
+      ready: true,
+      updatedAt: 2600,
+    });
+    expect(readyRoom.success).toBe(true);
+    if (!readyRoom.success || !readyRoom.data.combatState) {
+      return;
+    }
+
+    const alphaCombatantId = readyRoom.data.participants.playerA.snapshot.characterId;
+    const combatants = readyRoom.data.combatState.combatants;
+    const roomOnCooldown = {
+      ...readyRoom.data,
+      combatState: {
+        ...readyRoom.data.combatState,
+          combatants: [
+          combatants[0].id === alphaCombatantId
+            ? {
+                ...combatants[0],
+                resources: {
+                  rage: 100,
+                  guard: 100,
+                  momentum: 100,
+                  focus: 100,
+                },
+                skillCooldowns: {
+                  ...(combatants[0].skillCooldowns ?? {}),
+                  [skillId]: 2,
+                },
+              }
+            : combatants[0],
+          combatants[1].id === alphaCombatantId
+            ? {
+                ...combatants[1],
+                resources: {
+                  rage: 100,
+                  guard: 100,
+                  momentum: 100,
+                  focus: 100,
+                },
+                skillCooldowns: {
+                  ...(combatants[1].skillCooldowns ?? {}),
+                  [skillId]: 2,
+                },
+              }
+            : combatants[1],
+        ] as typeof readyRoom.data.combatState.combatants,
+      },
+    };
+
+    const skillSubmit = submitOnlineDuelAction(roomOnCooldown, {
+      seat: "playerA",
+      playerId: "player-alpha",
+      sessionId: "session-alpha",
+      selection: createSkillSelection(skillId),
+      submittedAt: 3000,
+    });
+
+    expect(skillSubmit).toEqual({
+      success: false,
+      reason: "skill_on_cooldown",
+    });
+  });
+
+  it("rejects a consumable when authority inventory no longer has quantity during resolve", () => {
+    const { alpha, beta } = createSnapshots();
+    const service = createInMemoryOnlineDuelService(new SeededRandom(9));
+    const alphaLoadout = createLoadout();
+    const betaLoadout = createLoadout();
+    const alphaConsumableSelection = createConsumableSelection(alphaLoadout.inventory);
+    if (alphaConsumableSelection.selectedAction.kind !== "consumable") {
+      throw new Error("expected consumable selection");
+    }
+    const alphaConsumableCode = alphaConsumableSelection.selectedAction.consumableCode;
+
+    const room = service.createRoom({
+      playerId: "player-alpha",
+      sessionId: "session-alpha",
+      displayName: "Alpha",
+      snapshot: alpha,
+      loadout: alphaLoadout,
+      createdAt: 1000,
+    });
+
+    const joined = service.joinRoom(room.id, {
+      playerId: "player-beta",
+      sessionId: "session-beta",
+      displayName: "Beta",
+      snapshot: beta,
+      loadout: betaLoadout,
+      joinedAt: 2000,
+    });
+    expect(joined.success).toBe(true);
+    if (!joined.success) {
+      return;
+    }
+
+    service.setReadyState(room.id, {
+      seat: "playerA",
+      playerId: "player-alpha",
+      sessionId: "session-alpha",
+      ready: true,
+      updatedAt: 2500,
+    });
+    service.setReadyState(room.id, {
+      seat: "playerB",
+      playerId: "player-beta",
+      sessionId: "session-beta",
+      ready: true,
+      updatedAt: 2600,
+    });
+
+    const submittedA = service.submitAction(room.id, {
+      seat: "playerA",
+      playerId: "player-alpha",
+      sessionId: "session-alpha",
+      selection: alphaConsumableSelection,
+      submittedAt: 3000,
+    });
+    expect(submittedA.success).toBe(true);
+    if (!submittedA.success) {
+      return;
+    }
+
+    const submittedB = service.submitAction(room.id, {
+      seat: "playerB",
+      playerId: "player-beta",
+      sessionId: "session-beta",
+      selection: createBasicSelection("legs", ["head", "waist"]),
+      submittedAt: 3100,
+    });
+    expect(submittedB.success).toBe(true);
+    if (!submittedB.success || !submittedB.data.participants.playerA.loadout.inventory.entries.length) {
+      return;
+    }
+
+    const depletedRoom = {
+      ...submittedB.data,
+      participants: {
+        ...submittedB.data.participants,
+        playerA: {
+          ...submittedB.data.participants.playerA,
+          loadout: {
+            ...submittedB.data.participants.playerA.loadout,
+            inventory: {
+              ...submittedB.data.participants.playerA.loadout.inventory,
+              entries: submittedB.data.participants.playerA.loadout.inventory.entries.map((entry) =>
+                entry.item.code === alphaConsumableCode
+                  ? { ...entry, quantity: 0 }
+                  : entry
+              ),
+            },
+          },
+        },
+      },
+    };
+
+    const resolved = resolveOnlineDuelRound(depletedRoom, new SeededRandom(9));
+    expect(resolved).toEqual({
+      success: false,
+      reason: "invalid_action",
+    });
   });
 
   it("restores the baseline loadout on rematch instead of reusing spent runtime inventory", () => {
@@ -1311,6 +1984,9 @@ describe("online duel arena domain", () => {
         alphaConsumableSelection.selectedAction.consumableCode
       )
     ).toBe(originalQuantity);
+
+    rematched.data.participants.playerA.loadout.equipmentState.slots.mainHand = "mutated-after-rematch";
+    expect(rematched.data.participants.playerA.baselineLoadout.equipmentState.slots.mainHand).toBeNull();
   });
 
   it("ignores stale pushed sync messages and keeps the newest revision in the client", async () => {
@@ -1674,8 +2350,8 @@ describe("online duel arena domain", () => {
   it("rejects stale resume tokens after a player rejoins with a fresh session", () => {
     const { alpha, beta } = createSnapshots();
     const service = createInMemoryOnlineDuelService(new SeededRandom(9));
-    const alphaLoadout = createLoadout("alpha-open");
-    const betaInitialLoadout = createLoadout("beta-open");
+    const alphaLoadout = createEquippedSkillCarrierLoadout(0);
+    const betaInitialLoadout = createEquippedSkillCarrierLoadout(1);
     const betaReconnectLoadout = createLoadout("beta-reconnect-should-not-replace");
     const created = handleOnlineDuelClientMessage(service, {
       type: "create_duel",
@@ -1784,7 +2460,12 @@ describe("online duel arena domain", () => {
       return;
     }
 
-    expect(storedRoom.data.participants.playerB?.loadout.equippedSkillIds).toEqual(["beta-open"]);
+    expect(storedRoom.data.participants.playerB?.loadout.equippedSkillIds).toEqual(
+      betaInitialLoadout.equippedSkillIds
+    );
+    expect(storedRoom.data.participants.playerB?.baselineLoadout.equippedSkillIds).toEqual(
+      betaInitialLoadout.equippedSkillIds
+    );
   });
 
   it("hands seat ownership to a newer live session and displaces the old one", () => {

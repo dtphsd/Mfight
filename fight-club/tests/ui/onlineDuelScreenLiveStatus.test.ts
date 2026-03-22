@@ -1,12 +1,77 @@
 import { describe, expect, it } from "vitest";
 import {
   getMatchStatusSummary,
+  pickMostCompleteSync,
   resolveOnlineDuelLiveStatus,
   resolveOnlineDuelMatchmakingStatus,
   resolveOnlineDuelRecoveryAction,
 } from "@/ui/screens/OnlineDuel/onlineDuelScreenSupport";
+import type { OnlineDuelStateSync } from "@/modules/arena";
 
 describe("OnlineDuel live status", () => {
+  function createSync({
+    revision,
+    status,
+    connectedSeats,
+    readySeats = [],
+  }: {
+    revision: number;
+    status: OnlineDuelStateSync["status"];
+    connectedSeats: Array<"playerA" | "playerB">;
+    readySeats?: Array<"playerA" | "playerB">;
+  }): OnlineDuelStateSync {
+    return {
+      duelId: "DUEL123",
+      roomCode: "DUEL123",
+      revision,
+      status,
+      round: revision,
+      winnerSeat: null,
+      yourSeat: "playerA",
+      resumeToken: `resume-${revision}`,
+      participants: (["playerA", "playerB"] as const).map((seat) => ({
+        seat,
+        displayName: seat === "playerA" ? "Host" : "Guest",
+        connected: connectedSeats.includes(seat),
+        ready: readySeats.includes(seat),
+      })),
+    };
+  }
+
+  it("prefers the freshest sync by revision over a more complete older state", () => {
+    const olderButMoreComplete = createSync({
+      revision: 4,
+      status: "planning",
+      connectedSeats: ["playerA", "playerB"],
+      readySeats: ["playerA", "playerB"],
+    });
+    const newerButLessComplete = createSync({
+      revision: 5,
+      status: "waiting_for_players",
+      connectedSeats: ["playerA"],
+      readySeats: [],
+    });
+
+    expect(pickMostCompleteSync(olderButMoreComplete, newerButLessComplete)).toBe(newerButLessComplete);
+  });
+
+  it("falls back to completeness when revisions are equal", () => {
+    const lessComplete = createSync({
+      revision: 5,
+      status: "waiting_for_players",
+      connectedSeats: ["playerA"],
+      readySeats: [],
+    });
+    const moreComplete = createSync({
+      revision: 5,
+      status: "planning",
+      connectedSeats: ["playerA", "playerB"],
+      readySeats: ["playerA", "playerB"],
+    });
+
+    expect(pickMostCompleteSync(lessComplete, moreComplete)).toBe(moreComplete);
+  });
+
   it("surfaces reconnecting state when live updates drop", () => {
     expect(
       resolveOnlineDuelLiveStatus({

@@ -1,6 +1,6 @@
 export type CombatImpactVariant = "hit" | "crit" | "block" | "block_break" | "penetration" | "dodge";
 
-export const COMBAT_IMPACT_LINGER_DURATION_MS = 6000;
+export const COMBAT_IMPACT_LINGER_DURATION_MS = 3200;
 
 export function getCombatImpactMotionDurationMs(impactVariant: CombatImpactVariant) {
   switch (impactVariant) {

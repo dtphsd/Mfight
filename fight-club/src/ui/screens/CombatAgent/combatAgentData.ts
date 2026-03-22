@@ -161,3 +161,66 @@ export const uiAgentProfile: CombatAgentProfile = {
     "Verify with build, visual review and docs sync before closing the pass",
   ],
 };
+
+export const backendAgentProfile: CombatAgentProfile = {
+  name: "Backend Systems Specialist",
+  role: "Backend Systems Agent",
+  domain: "Fight Club backend architecture, online duel runtime, sync and service safety",
+  level: 9,
+  rank: "Planner",
+  xpCurrent: 22,
+  xpNext: 50,
+  summary:
+    "A dedicated in-project agent for backend architecture, authoritative combat state, realtime sync, service contracts and deployment-safe evolution.",
+  tags: [
+    "API Design",
+    "State Authority",
+    "Realtime Sync",
+    "Service Safety",
+    "Deployment Readiness",
+  ],
+  battleWins: 2,
+  safeFixes: 1,
+  bugsKilled: 0,
+  achievementsUnlocked: 1,
+  tracks: [
+    { label: "API Design", value: 42, note: "Contracts, DTOs, room flows and service boundaries" },
+    { label: "State Authority", value: 48, note: "Authoritative match state and backend truth ownership" },
+    { label: "Realtime Sync", value: 36, note: "Turn sync, rooms, reconnect and event timing" },
+    { label: "Service Safety", value: 41, note: "Validation, safe persistence, server guards" },
+    { label: "Deployment Readiness", value: 33, note: "Envs, rollout checks and infra-safe planning" },
+  ],
+  tools: [
+    {
+      label: "Contract Pass",
+      command: "Define DTOs and authority boundaries before transport code",
+      purpose: "Keep backend design explicit before implementation starts",
+    },
+    {
+      label: "State Review",
+      command: "Trace room -> action -> resolve -> sync -> reconnect",
+      purpose: "Catch hidden state drift in online duel planning",
+    },
+    {
+      label: "Build",
+      command: "npm run build",
+      purpose: "Baseline project safety after shared UI or architecture changes",
+    },
+    {
+      label: "Patch Sync",
+      command: "Update backend_patch_notes.md and backend_agent_journal.md",
+      purpose: "Keep backend memory and visible backend history aligned",
+    },
+  ],
+  achievements: [
+    { name: "Server Seed", note: "Established the backend specialist surface before the server exists" },
+    { name: "Authority Keeper", note: "Protects server-truth design from client-side drift" },
+  ],
+  operatingLoop: [
+    "Read backend canon notes and current online-combat assumptions first",
+    "Find direct consumers through imports, flows and persistence touchpoints",
+    "Design server-authoritative state before transport or UI polish",
+    "Apply one narrow backend architecture hypothesis at a time",
+    "Verify docs, build safety and specialist sync before closing the pass",
+  ],
+};

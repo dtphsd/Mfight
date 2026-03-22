@@ -25,6 +25,8 @@ interface OnlineSetupClientIdentityOverride {
   displayName: string;
 }
 
+export const ONLINE_DUEL_BACKEND_OVERRIDE_STORAGE_KEY = "fight-club-online-duel-backend-override";
+
 export function createOnlineSetupForScreen({
   mode,
   baseUrl,
@@ -40,6 +42,11 @@ export function createOnlineSetupForScreen({
 }
 
 export function getOnlineDuelBackendBaseUrl() {
+  const runtimeOverride = readOnlineDuelBackendBaseUrlOverride();
+  if (runtimeOverride) {
+    return runtimeOverride;
+  }
+
   const configuredBaseUrl =
     typeof import.meta !== "undefined" ? import.meta.env.VITE_ONLINE_DUEL_BASE_URL?.trim() : undefined;
   if (configuredBaseUrl) {
@@ -53,6 +60,46 @@ export function getOnlineDuelBackendBaseUrl() {
   const protocol = window.location.protocol === "https:" ? "https:" : "http:";
   const hostname = window.location.hostname || "127.0.0.1";
   return `${protocol}//${hostname}:3001`;
+}
+
+export function readOnlineDuelBackendBaseUrlOverride() {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
+  const value = window.localStorage.getItem(ONLINE_DUEL_BACKEND_OVERRIDE_STORAGE_KEY)?.trim();
+  return value ? value.replace(/\/+$/, "") : null;
+}
+
+export function setOnlineDuelBackendBaseUrlOverride(baseUrl: string) {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  const trimmed = baseUrl.trim().replace(/\/+$/, "");
+  if (!trimmed) {
+    window.localStorage.removeItem(ONLINE_DUEL_BACKEND_OVERRIDE_STORAGE_KEY);
+    return;
+  }
+
+  window.localStorage.setItem(ONLINE_DUEL_BACKEND_OVERRIDE_STORAGE_KEY, trimmed);
+}
+
+export function clearOnlineDuelBackendBaseUrlOverride() {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  window.localStorage.removeItem(ONLINE_DUEL_BACKEND_OVERRIDE_STORAGE_KEY);
+}
+
+export function isLoopbackOnlineDuelBackendBaseUrl(baseUrl: string) {
+  try {
+    const parsedUrl = new URL(baseUrl);
+    return ["127.0.0.1", "localhost", "::1"].includes(parsedUrl.hostname);
+  } catch {
+    return false;
+  }
 }
 
 export async function canReachOnlineDuelBackend(baseUrl: string) {

@@ -1,4 +1,9 @@
 import { assertOnlineDuelRevision } from "@/modules/arena/application/assertOnlineDuelRevision";
+import {
+  cloneOnlineDuelFighterView,
+  cloneOnlineDuelParticipantLoadout,
+} from "@/modules/arena/application/normalizeOnlineDuelLoadout";
+import { cloneCombatSnapshot } from "@/modules/arena/application/normalizeOnlineDuelSnapshot";
 import type {
   OnlineDuelResult,
   ResetOnlineDuelMatchInput,
@@ -91,16 +96,9 @@ function resetParticipantForRematch<TParticipant extends OnlineDuel["participant
 ): TParticipant {
   return {
     ...participant,
-    snapshot: participant.baselineSnapshot,
-    fighterView: participant.baselineFighterView,
-    loadout: {
-      equipmentState: participant.baselineLoadout.equipmentState,
-      inventory: {
-        ...participant.baselineLoadout.inventory,
-        entries: participant.baselineLoadout.inventory.entries.map((entry) => ({ ...entry })),
-      },
-      equippedSkillIds: [...participant.baselineLoadout.equippedSkillIds],
-    },
+    snapshot: cloneCombatSnapshot(participant.baselineSnapshot),
+    fighterView: cloneOnlineDuelFighterView(participant.baselineFighterView),
+    loadout: cloneOnlineDuelParticipantLoadout(participant.baselineLoadout),
     readyAt: null,
   };
 }

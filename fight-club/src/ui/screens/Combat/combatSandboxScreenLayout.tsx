@@ -50,8 +50,19 @@ export function SidePanel({
         </div>
         {overlay}
       </div>
-      {blocks.length > 0 ? <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>{blocks.slice(0, 2)}</div> : null}
-      {blocks.length > 2 ? blocks[2] : null}
+      {blocks.length > 1 ? (
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr",
+            gap: "10px",
+            alignItems: "start",
+          }}
+        >
+          {blocks.slice(0, 2)}
+        </div>
+      ) : null}
+      {blocks.length === 1 ? blocks[0] : blocks.length > 2 ? blocks[2] : null}
     </div>
   );
 }

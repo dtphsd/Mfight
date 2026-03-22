@@ -56,7 +56,7 @@ describe("CombatSandboxScreen", () => {
     fireEvent.click(screen.getByRole("button", { name: "Set combat intent aggressive" }));
 
     expect(screen.getByTestId("selected-action-tags").textContent).toContain("Intent Aggressive");
-    expect(screen.getAllByText(/Push harder this turn/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/DMG \+8%/i).length).toBeGreaterThan(0);
   });
 
   it("shows attack zone damage multipliers in fight controls", () => {
@@ -98,7 +98,7 @@ describe("CombatSandboxScreen", () => {
     fireEvent.click(screen.getByRole("button", { name: /MC Mace \/ Control/i }));
 
     expect(screen.getAllByText("Mace / Control").length).toBeGreaterThan(0);
-    expect(screen.getAllByText("Blunt").length).toBeGreaterThan(0);
+    expect(screen.getByText(/Control vs 13-16 rounds/i)).toBeTruthy();
   });
 
   it("supports local profile mail from inbox replies and direct messages", async () => {

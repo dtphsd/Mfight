@@ -1,6 +1,6 @@
 # Online Duel Ops Runbook
 
-> Last updated: 2026-03-21 13:10 MSK
+> Last updated: 2026-03-22 00:35 MSK
 
 This runbook describes how to start, expose, and sanity-check the current `Online Duel` HTTP/SSE service.
 
@@ -9,6 +9,13 @@ Use it for:
 - local network testing
 - direct public host prototypes
 - reverse-proxy or VPS prototypes
+- quick remote-play prototypes through the repo launcher scripts
+
+Quick launcher note:
+
+- app root now ships `start-online-pvp-quicktunnel.ps1/.bat`
+- the launcher bootstraps backend, frontend, both `trycloudflare` tunnels, and writes `public/online-duel-runtime.json`
+- `Admin Dashboard` can read that manifest and guide the final browser-side PvP launch flow
 
 ---
 

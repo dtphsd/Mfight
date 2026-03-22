@@ -8,20 +8,20 @@ param(
 
 $ErrorActionPreference = "Stop"
 
-$projectRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
-$appRoot = Join-Path $projectRoot "fight-club"
+$appRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
+$runtimeLogsRoot = Join-Path $appRoot "runtime-logs"
 $nodeModulesPath = Join-Path $appRoot "node_modules"
 $npmCommand = Join-Path ${env:ProgramFiles} "nodejs\npm.cmd"
-$outLog = Join-Path $projectRoot "fight-club-dev.out.log"
-$errLog = Join-Path $projectRoot "fight-club-dev.err.log"
+$outLog = Join-Path $runtimeLogsRoot "fight-club-dev.out.log"
+$errLog = Join-Path $runtimeLogsRoot "fight-club-dev.err.log"
 $devUrl = "http://${BindAddress}:$Port/"
-
-if (-not (Test-Path $appRoot)) {
-  throw "fight-club directory not found: $appRoot"
-}
 
 if (-not (Test-Path $npmCommand)) {
   throw "npm.cmd not found at $npmCommand"
+}
+
+if (-not (Test-Path $runtimeLogsRoot)) {
+  New-Item -ItemType Directory -Path $runtimeLogsRoot | Out-Null
 }
 
 function Get-ListeningProcessId {

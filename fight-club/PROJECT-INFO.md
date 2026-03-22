@@ -1,6 +1,6 @@
 # PROJECT-INFO - Fight Club
 
-> Last updated: 2026-03-22 22:05 MSK
+> Last updated: 2026-03-23 02:35 MSK
 
 **Project:** Fight Club  
 **Type:** browser-first SPA plus local online-duel authority slice  
@@ -103,6 +103,7 @@ The app also now exposes a separate `PvP` path:
 - room-code flow, ready check, live sync, rematch, leave-room, and debug recovery tools are still present
 - lobby-launched `PvP` now requires the live backend and no longer silently falls back to a fake local share-code flow
 - action submission in the PvP fight screen is now locally locked on click, so duplicate `already_submitted` errors are less likely during live play
+- the player-facing fight surface now shares more of the same presentation layer between sandbox and PvP, especially around result reveal, round reveal, and center-stage combat readability
 
 ---
 
@@ -239,6 +240,7 @@ Effects are visible:
   - healing ticks
   - expired effects
   - full-block zero-damage outcomes
+- shared `Round Reveal` now exists across sandbox and PvP with grouped per-fighter recap rows, color-coded skills/consumables/healing, clearer crit/block emphasis, and slower, more readable payoff timing
 
 ### Curated Build Presets
 

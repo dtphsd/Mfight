@@ -2,6 +2,7 @@ import type {
   OnlineDuelResult,
   SubmitOnlineDuelActionInput,
 } from "@/modules/arena/contracts/arenaPublicApi";
+import { assertOnlineDuelRevision } from "@/modules/arena/application/assertOnlineDuelRevision";
 import { buildOnlineDuelRoundAction } from "@/modules/arena/application/buildOnlineDuelRoundAction";
 import type { OnlineDuel, OnlineDuelParticipant, OnlineDuelSeat } from "@/modules/arena/model/OnlineDuel";
 
@@ -28,6 +29,11 @@ export function submitOnlineDuelAction(
       success: false,
       reason: "combat_not_started",
     };
+  }
+
+  const revisionCheck = assertOnlineDuelRevision(duel, input.expectedRevision);
+  if (!revisionCheck.success) {
+    return revisionCheck;
   }
 
   if (input.expectedRound !== undefined && input.expectedRound !== duel.currentRound.round) {
@@ -73,9 +79,9 @@ export function submitOnlineDuelAction(
     };
   }
 
-  const builtAction = buildOnlineDuelRoundAction(participant, duel.combatState, input.selection);
-  if (!builtAction.success) {
-    return builtAction;
+  const validationResult = buildOnlineDuelRoundAction(participant, duel.combatState, input.selection);
+  if (!validationResult.success) {
+    return validationResult;
   }
 
   const submittedAt = input.submittedAt ?? Date.now();
@@ -84,7 +90,7 @@ export function submitOnlineDuelAction(
     [input.seat]: {
       seat: input.seat,
       playerId: input.playerId,
-      action: builtAction.data,
+      selection: input.selection,
       submittedAt,
     },
   };

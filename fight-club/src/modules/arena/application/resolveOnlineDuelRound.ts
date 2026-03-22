@@ -1,6 +1,12 @@
 import type { Random } from "@/core/rng/Random";
+import { buildOnlineDuelRoundAction } from "@/modules/arena/application/buildOnlineDuelRoundAction";
 import type { OnlineDuelResult } from "@/modules/arena/contracts/arenaPublicApi";
-import type { OnlineDuel, OnlineDuelSeat } from "@/modules/arena/model/OnlineDuel";
+import type {
+  OnlineDuel,
+  OnlineDuelParticipant,
+  OnlineDuelRoundSubmission,
+  OnlineDuelSeat,
+} from "@/modules/arena/model/OnlineDuel";
 import { resolveRound, type RoundAction } from "@/modules/combat";
 import { getRoundActionConsumable } from "@/modules/combat/model/RoundAction";
 import { removeItem } from "@/modules/inventory";
@@ -23,9 +29,12 @@ export function resolveOnlineDuelRound(
     };
   }
 
-  const playerAAction = duel.currentRound.submissions.playerA?.action;
-  const playerBAction = duel.currentRound.submissions.playerB?.action;
+  const builtActions = buildResolvedActions(duel);
+  if (!builtActions.success) {
+    return builtActions;
+  }
 
+  const { playerAAction, playerBAction } = builtActions.data;
   if (!playerAAction || !playerBAction) {
     return {
       success: false,
@@ -155,6 +164,46 @@ function resolveWinnerSeat(duel: OnlineDuel, winnerId: string | null): OnlineDue
   }
 
   return null;
+}
+
+function buildResolvedActions(
+  duel: OnlineDuel
+): OnlineDuelResult<{ playerAAction: RoundAction; playerBAction: RoundAction }> {
+  const playerASubmission = duel.currentRound?.submissions.playerA;
+  const playerBSubmission = duel.currentRound?.submissions.playerB;
+  const playerBParticipant = duel.participants.playerB;
+  if (!playerASubmission || !playerBSubmission || !playerBParticipant || !duel.combatState) {
+    return {
+      success: false,
+      reason: "round_not_ready",
+    };
+  }
+
+  const playerAAction = buildSubmissionAction(duel.participants.playerA, duel.combatState, playerASubmission);
+  if (!playerAAction.success) {
+    return playerAAction;
+  }
+
+  const playerBAction = buildSubmissionAction(playerBParticipant, duel.combatState, playerBSubmission);
+  if (!playerBAction.success) {
+    return playerBAction;
+  }
+
+  return {
+    success: true,
+    data: {
+      playerAAction: playerAAction.data,
+      playerBAction: playerBAction.data,
+    },
+  };
+}
+
+function buildSubmissionAction(
+  participant: OnlineDuelParticipant,
+  combatState: NonNullable<OnlineDuel["combatState"]>,
+  submission: OnlineDuelRoundSubmission
+): OnlineDuelResult<RoundAction> {
+  return buildOnlineDuelRoundAction(participant, combatState, submission.selection);
 }
 
 function resolveSeatByCombatantId(duel: OnlineDuel, combatantId: string): OnlineDuelSeat | null {

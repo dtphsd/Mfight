@@ -6,6 +6,7 @@ interface MainMenuScreenProps {
   onOpenCombatRules: () => void;
   onOpenHunting: () => void;
   onOpenCombatAgent: () => void;
+  onOpenAdminDashboard: () => void;
   onOpenPvp: () => void;
 }
 
@@ -15,6 +16,7 @@ export function MainMenuScreen({
   onOpenCombatRules,
   onOpenHunting,
   onOpenCombatAgent,
+  onOpenAdminDashboard,
   onOpenPvp,
 }: MainMenuScreenProps) {
   const { logger } = useGameApp();
@@ -58,6 +60,16 @@ export function MainMenuScreen({
               }}
             >
               Open PvP
+            </button>
+            <button
+              type="button"
+              className="main-menu__ghost"
+              onClick={() => {
+                logger.info("Admin dashboard opened");
+                onOpenAdminDashboard();
+              }}
+            >
+              Open Admin Dashboard
             </button>
             <button
               type="button"

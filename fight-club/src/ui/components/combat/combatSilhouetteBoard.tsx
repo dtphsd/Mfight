@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import type { CombatZone } from "@/modules/combat";
 import { CombatImpactOverlay } from "@/ui/components/combat/CombatImpactOverlay";
 import type { CombatImpactVariant } from "@/ui/components/combat/combatImpactMotion";
 
@@ -8,6 +9,7 @@ export function SilhouetteBoard({
   lingerToken = 0,
   impactVariant = "hit",
   impactValue = null,
+  impactZone = null,
   onProfileClick,
   children,
 }: {
@@ -16,6 +18,7 @@ export function SilhouetteBoard({
   lingerToken?: number;
   impactVariant?: CombatImpactVariant;
   impactValue?: number | null;
+  impactZone?: CombatZone | null;
   onProfileClick?: () => void;
   children: ReactNode;
 }) {
@@ -72,6 +75,7 @@ export function SilhouetteBoard({
         lingerActive={lingerActive}
         impactVariant={impactVariant}
         impactValue={impactValue}
+        impactZone={impactZone}
       />
       {children}
     </div>

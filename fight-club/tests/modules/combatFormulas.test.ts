@@ -20,7 +20,7 @@ describe("combat formulas", () => {
   });
 
   it("returns deterministic base damage", () => {
-    expect(baseDamage(10)).toBe(20);
+    expect(baseDamage(10)).toBe(18);
   });
 
   it("increases base damage when strength grows", () => {

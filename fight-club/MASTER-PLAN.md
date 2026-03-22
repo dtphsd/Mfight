@@ -1,6 +1,6 @@
 # MASTER-PLAN - Fight Club
 
-> Last updated: 2026-03-22 22:05 MSK
+> Last updated: 2026-03-23 02:35 MSK
 
 **Project:** Fight Club  
 **Scope:** active product planning, task tracking, and sprint history
@@ -186,6 +186,284 @@
   - surface real opponent resources instead of the current zero-strip fallback
   - finish the remaining PvP UI parity and reconnect clarity pass
   - add stronger online UI tests for animation/result/profile parity
+
+---
+
+## Unified Combat Presentation Program
+
+Tracked product tasks:
+
+- `PROD-001` - `🟡 IN PROGRESS` - unify player-facing combat presentation across sandbox and PvP
+- `PROD-002` - `🔴 TODO` - remove tech-noise from the normal fight flow
+- `PROD-003` - `🔴 TODO` - ship the first unified combat feel pass
+
+Goal:
+
+- stop maintaining separate player-facing combat presentation for sandbox/bot and online PvP
+- move toward one shared combat screen shell, one visual language, and one combat feel layer
+- make future visual upgrades land once instead of being repeated across two different fight screens
+
+Scope:
+
+- shared left / center / right combat stage presentation
+- shared fight controls layout and round-state messaging
+- shared impact, crit, block, dodge, penetration, and finish presentation
+- shared battle log and round recap presentation
+- separate adapters for sandbox/bot controller state and online PvP session state
+
+Non-goals for the first slice:
+
+- do not merge sandbox and PvP transport, matchmaking, or lobby logic
+- do not rewrite combat rules or authority logic
+- do not force debug/operator surfaces into the shared player shell
+
+Execution phases:
+
+### Phase U1 - Shared Presentation Contract
+
+- define one combat screen view-model contract for local player, rival, center controls, round summary, battle log, and result state
+- build adapter `fromCombatSandbox`
+- build adapter `fromOnlineDuel`
+- progress:
+  - shared presentation contract added in `src/ui/screens/Combat/combatPresentationModel.ts`
+  - sandbox adapter added in `src/ui/screens/Combat/combatPresentationAdapters.ts`
+  - online duel adapter added in `src/ui/screens/Combat/combatPresentationAdapters.ts`
+  - sandbox stage now renders its fighter/control data through the shared contract
+  - online duel arena now renders its fighter/control data through the shared contract
+
+### Phase U2 - Shared Combat Shell
+
+- extract one shared player-facing combat shell
+- make both sandbox and PvP render through it
+- keep only source-specific orchestration outside the shell
+- progress:
+  - shared shell added in `src/ui/screens/Combat/combatPresentationShell.tsx`
+  - sandbox stage now renders through the shared shell
+  - online duel arena now renders through the shared shell
+  - source-specific orchestration still stays outside the shell, as planned
+
+### Phase U3 - Shared Feel Layer
+
+- unify impact overlays, shake, zone hit markers, round reveal, result reveal, and future VFX hooks
+- ensure visual additions hit both modes automatically
+- progress:
+  - shared result reveal now lives in `src/ui/screens/Combat/combatPresentationShell.tsx`
+  - sandbox and online PvP both use the same end-of-match reveal surface
+  - final victory / defeat / closed-match messaging is now handled at the shared shell layer
+  - shared round reveal now lives in `src/ui/screens/Combat/combatRoundReveal.tsx`
+  - sandbox and online PvP both use the same round-resolution reveal treatment
+  - shared current-turn focus now lives in `src/ui/screens/Combat/combatSandboxScreenControls.tsx`
+  - both modes now explain the current phase, next step, and locked/ready state through the same focus block
+  - shared `Last Exchange` recap now lives in `src/ui/screens/Combat/combatSandboxScreenControls.tsx`
+  - both modes now surface the previous resolved exchange directly in fight controls instead of relying only on the combat log
+  - shared payoff tags for `Critical`, `Dodge`, `Block`, `Pierce`, `Finisher`, and `Impact` now live in `src/ui/screens/Combat/combatSandboxScreenControls.tsx`
+  - both modes now highlight the tone of the previous exchange through the same visual badges
+
+### Phase U4 - Product Cleanup
+
+- remove duplicate tech-facing controls from the normal player path
+- keep debug/operator surfaces isolated behind dev or admin entry points
+- simplify fight-state wording so both modes read the same way
+- progress:
+  - normal online arena now hides routine live-status noise during healthy fights
+  - top-of-screen banners are reserved for player-facing alerts instead of constant transport chatter
+  - recovery actions still stay visible inside fight controls when the player actually needs to act
+
+Acceptance criteria:
+
+- one visual change to the combat stage should apply to both bot/sandbox and online PvP
+- one round-state UX improvement should apply to both modes without duplicated implementation
+- the shared shell must remain testable through both sandbox UI tests and PvP UI tests
+
+Recommended execution order:
+
+1. `PROD-001`
+2. `PROD-002`
+3. `PROD-003`
+4. continue `PVP-016`
+5. continue `PVP-018`
+
+## Combat Presentation And Visual Polish Program
+
+This is the product-facing polish track that sits on top of the shared combat shell.
+
+The goal of this track is to make combat feel:
+
+- more readable at a glance
+- more tactile and satisfying
+- less like a debug tool
+- closer to a product-grade player experience
+
+This track does not change combat rules or class identity directly.
+It improves how combat is presented, understood, and emotionally felt.
+
+Tracked visual tasks:
+
+- `VIS-001` - define the product-grade combat readability baseline
+- `VIS-002` - reduce normal-flow interface noise and clarify combat priorities
+- `VIS-003` - strengthen impact, payoff, and round-resolution feedback
+- `VIS-004` - improve result, victory, defeat, and post-round reveal quality
+- `VIS-005` - unify combat visual language across sandbox and online PvP
+- `VIS-006` - prepare a premium-feel pass for motion, layering, and finish polish
+
+### Product pillars
+
+1. Readability first
+
+- the player should understand the current phase, the required next step, and the last meaningful outcome in under one second
+- the center of the screen must answer: what is happening, what I should do, and what just happened
+
+2. Combat feel
+
+- hits should feel like hits
+- crits, blocks, dodges, and finishers must read as distinct events, not just different log rows
+- the player should feel momentum, contact, and payoff even before reading the combat log
+
+3. Product-grade focus
+
+- normal fights should feel like a game screen, not an operator console
+- debug and recovery surfaces should stay available, but they must not dominate healthy player flow
+- the most important actions should visually outweigh all secondary information
+
+4. One visual truth across modes
+
+- sandbox and online PvP should share the same player-facing presentation language
+- visual improvements should land once through the shared shell and controls, not as two separate implementations
+
+### Phase V1 - Readability And Information Hierarchy
+
+Primary intent:
+
+- make the screen easy to parse before adding more visual intensity
+
+Focus:
+
+- demote or remove technical labels from the normal fight path
+- keep one strong primary status, one strong primary action, and one clear recap area
+- tighten vertical rhythm and reduce card clutter in `Fight Controls`
+- make `Current Turn Focus`, `Last Exchange`, and round-state messaging the center of player comprehension
+
+Definition of done:
+
+- a new player can identify current phase and next action without reading the full log
+- the normal fight screen no longer feels like a debug-first layout
+- sandbox and PvP share the same information hierarchy
+- progress:
+  - shared `Fight Controls` now groups match code, wait state, and round progress into one compact combat-status rail instead of three separate tech-style cards
+  - the action summary now reads as a tighter player-facing HUD block with clearer phase and round emphasis
+  - the central combat column now has less vertical clutter while preserving the same sandbox and PvP contract
+  - center-stage wording now leans more into player-facing language (`Your Move`, cleaner recap phrasing) instead of panel-heavy technical labels
+  - `Last Exchange` presentation is now a dedicated shared recap card, keeping the central flow easier to scan in both modes
+
+### Phase V2 - Impact And Payoff Feel
+
+Primary intent:
+
+- make every resolved exchange feel more physical and more rewarding to read
+
+Focus:
+
+- improve hit flash, crit flash, block pulse, dodge read, and finisher emphasis
+- strengthen screen-space shake, panel reaction, and zone-hit overlays without becoming noisy
+- improve flying numbers and payoff tags so they read clearly under real match pacing
+- make the difference between normal impact and high-value impact immediately visible
+
+Definition of done:
+
+- players can tell the difference between hit, crit, block, dodge, and finisher without reading detailed text
+- combat outcomes feel more tactile during live play
+- both sandbox and PvP receive the same impact language automatically
+- progress:
+  - shared silhouette impact treatment is now materially stronger through clearer hit, crit, block, dodge, penetration, and block-break overlays
+  - round feedback now uses color-coded payoff language for skills, consumables, healing, blocks, and crits instead of a mostly neutral recap style
+  - block outcomes now surface `% blocked` directly inside shared round recap badges
+
+### Phase V3 - Round Reveal And Result Presentation
+
+Primary intent:
+
+- turn round resolution and fight finish into satisfying presentation beats
+
+Focus:
+
+- improve round reveal timing and payoff cadence
+- make victory, defeat, and match-closed states feel deliberate and final
+- add a cleaner post-round recap language around who won the exchange and why
+- reduce the feeling that numbers changed "silently" between two states
+
+Definition of done:
+
+- a resolved round feels like a revealed outcome, not a silent state jump
+- end-of-match states feel conclusive and emotionally readable
+- result presentation is consistent across both modes
+- progress:
+  - sandbox and online PvP now share one `Round Reveal` component and one result-reveal language
+  - round reveal timing was retuned to a fast entrance, long readable hold, and clean fade-out instead of the older lag-like dissolve
+  - reveal rows now group by fighter, keep skill / consumable / heal chips on one horizontal action line, and avoid duplicate per-fighter rows for the same exchange
+  - the reveal damage pill now carries stronger contrast and clearer color separation for normal hits, blocked hits, and crits
+
+### Phase V4 - Premium Motion And Layering Pass
+
+Primary intent:
+
+- add polish that makes the combat screen feel richer without changing the architecture
+
+Focus:
+
+- improve animation timing and easing across shared combat presentation pieces
+- add stronger silhouette focus, dimming, reveal staging, and payoff layering
+- make resource and readiness states feel more alive
+- make transitions between planning, locking, resolving, and finished states feel smoother
+
+Definition of done:
+
+- the screen feels intentional in motion, not only in static layout
+- state changes feel staged and premium instead of abrupt
+- additional polish still flows through shared presentation primitives
+- progress:
+  - round reveal cards now use heavier glow, deeper contrast, and stronger payoff emphasis without splitting sandbox and PvP into separate visual branches
+  - the premium-motion pass is still incomplete, but the first shared timing/glow layer is already live in the shared combat presentation path
+
+### Phase V5 - Product Validation And Feel QA
+
+Primary intent:
+
+- protect presentation quality from regression once polish starts landing faster
+
+Focus:
+
+- expand UI regression coverage for key player-facing combat states
+- keep visual-critical shared layers under lightweight tests where possible
+- record subjective playtest notes against concrete product criteria instead of vague taste
+- use live PvP smoke sessions to verify that clarity improvements survive real latency and remote play
+
+Definition of done:
+
+- major combat presentation regressions are caught before shipping
+- player-facing feel work is evaluated against shared criteria, not memory alone
+- both automated tests and live smoke checks are part of the finish bar
+
+### Acceptance criteria for the whole program
+
+- a healthy PvP fight can be played without debug/operator knowledge
+- sandbox and PvP look like the same game, not two related tools
+- the center of combat explains phase, action, and last outcome clearly
+- impact events are visually distinct and satisfying in live play
+- victory and defeat feel readable, deliberate, and product-grade
+
+### Recommended execution order
+
+1. finish `PROD-001`
+2. continue `PROD-002`
+3. continue `PROD-003`
+4. execute `VIS-001`
+5. execute `VIS-002`
+6. execute `VIS-003`
+7. execute `VIS-004`
+8. execute `VIS-005`
+9. execute `VIS-006`
+10. continue `PVP-016`
+11. continue `PVP-018`
 
 ## Status Legend
 
@@ -405,6 +683,12 @@ Execution rules:
 ---
 
 ## Sprint History
+
+### v1.29 - Shared Combat Feel And Round Reveal Polish Landed
+
+- continued the shared combat-presentation track so sandbox and online PvP now inherit the same `Round Reveal`, result reveal, and central readability improvements instead of drifting into separate fight UIs
+- pushed `Round Reveal` much closer to a product-facing payoff layer with grouped per-fighter recap rows, stronger color coding for crit/block/heal events, readable action chips, longer stable timing, and sharper fade staging
+- strengthened the first visual-polish pass across the shared combat shell, including heavier reveal glow/contrast and more readable impact language without breaking the common sandbox/PvP presentation contract
 
 ### v1.28 - PvP Lifecycle Regression Net Expanded
 
@@ -953,7 +1237,7 @@ When work changes state:
 
 ---
 
-> Last updated: 2026-03-22 00:35 MSK
+> Last updated: 2026-03-22 22:40 MSK
 
 
 

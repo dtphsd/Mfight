@@ -114,17 +114,32 @@ export function pickMostCompleteSync(
     return first;
   }
 
+  const firstRevision = typeof first.revision === "number" ? first.revision : -1;
+  const secondRevision = typeof second.revision === "number" ? second.revision : -1;
+
+  if (firstRevision !== secondRevision) {
+    return secondRevision > firstRevision ? second : first;
+  }
+
   const firstScore = scoreSyncCompleteness(first);
   const secondScore = scoreSyncCompleteness(second);
   return secondScore > firstScore ? second : first;
 }
 
-export function resolveCombatantSummary(summary: OnlineDuelRoundSummary | null, displayName: string) {
+export function resolveCombatantSummary(
+  summary: OnlineDuelRoundSummary | null,
+  combatantId: string,
+  displayName: string
+) {
   if (!summary) {
     return null;
   }
 
-  return summary.combatants.find((combatant) => combatant.name === displayName) ?? null;
+  return (
+    summary.combatants.find((combatant) => combatant.id === combatantId) ??
+    summary.combatants.find((combatant) => combatant.name === displayName) ??
+    null
+  );
 }
 
 export function resolveCombatLoadoutForMode({
@@ -144,12 +159,12 @@ export function resolveCombatLoadoutForMode({
 }) {
   const build = mode === "host" ? hostBuild : guestBuild;
   const loadout =
-    syncedLoadout && mode === playerMode
+    syncedLoadout
       ? {
           equipmentState: syncedLoadout.equipmentState,
           inventory: syncedLoadout.inventory,
           equippedSkillIds: syncedLoadout.equippedSkillIds,
-          equipment: preparedPlayer?.equipment ?? build.equipment,
+          equipment: mode === playerMode ? preparedPlayer?.equipment ?? build.equipment : build.equipment,
         }
       : preparedPlayer && mode === playerMode
         ? {

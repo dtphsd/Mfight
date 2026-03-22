@@ -1,4 +1,6 @@
-import type { CSSProperties, ComponentType, ReactNode } from "react";
+import { useEffect, useRef, useState, type CSSProperties, type ComponentType, type ReactNode } from "react";
+import type { ActiveCombatEffect } from "@/modules/combat/model/CombatEffect";
+import type { RoundResult } from "@/modules/combat/model/RoundResult";
 import type { Item } from "@/modules/inventory";
 import type { EquipmentSlot } from "@/modules/equipment";
 import {
@@ -21,6 +23,15 @@ import type {
   OnlineAvailableConsumable,
   OnlineAvailableSkill,
 } from "@/ui/screens/OnlineDuel/onlineDuelScreenSupport";
+
+type OnlineImpactVariant = "hit" | "crit" | "block" | "block_break" | "penetration" | "dodge";
+
+interface OnlineImpactEvent {
+  key: string;
+  variant: OnlineImpactVariant;
+  value: number | null;
+  zone: RoundResult["attackZone"];
+}
 
 export function StatSummaryGrid({
   stats,
@@ -228,6 +239,9 @@ export function OnlinePlayerCombatPanel({
   playerFigure,
   currentHp,
   maxHp,
+  combatantId,
+  combatLog,
+  activeEffects,
   equipment,
   selectedIntent,
   shellStyle,
@@ -237,6 +251,7 @@ export function OnlinePlayerCombatPanel({
   presetLabel,
   winner,
   loser,
+  onOpenProfile,
   sidePanelComponent: SidePanelComponent,
   chipStyle,
   combatArenaBadgeRowStyle,
@@ -249,6 +264,9 @@ export function OnlinePlayerCombatPanel({
   playerFigure: string;
   currentHp: number;
   maxHp: number;
+  combatantId: string;
+  combatLog: RoundResult[];
+  activeEffects: ActiveCombatEffect[];
   equipment: Array<{ slot: string; item: unknown }>;
   selectedIntent: RoundDraft["intent"];
   shellStyle: CSSProperties;
@@ -258,6 +276,7 @@ export function OnlinePlayerCombatPanel({
   presetLabel: string;
   winner: boolean;
   loser: boolean;
+  onOpenProfile: () => void;
   sidePanelComponent: ComponentType<{
     shellStyle: CSSProperties;
     panelStyle: CSSProperties;
@@ -282,6 +301,7 @@ export function OnlinePlayerCombatPanel({
   statSummaryValueStyle: CSSProperties;
 }) {
   const selectedTone = onlinePlayerIntentSilhouetteTone[selectedIntent];
+  const impactEvent = useOnlineCombatImpactPulse(combatLog, combatantId);
 
   return (
     <SidePanelComponent
@@ -293,7 +313,16 @@ export function OnlinePlayerCombatPanel({
       }}
       panelStyle={panelStyle}
       silhouette={
-        <div className={winner ? "combat-postfight-silhouette combat-postfight-silhouette--victory-left" : loser ? "combat-postfight-silhouette combat-postfight-silhouette--defeat-left" : undefined}>
+        <div
+          key={impactEvent?.key ?? "player-idle"}
+          className={[
+            winner ? "combat-postfight-silhouette combat-postfight-silhouette--victory-left" : "",
+            loser ? "combat-postfight-silhouette combat-postfight-silhouette--defeat-left" : "",
+            impactEvent ? `combat-panel-shake combat-panel-shake--${impactEvent.variant}` : "",
+          ]
+            .filter(Boolean)
+            .join(" ")}
+        >
           <div
             style={{
               borderRadius: 30,
@@ -308,10 +337,15 @@ export function OnlinePlayerCombatPanel({
               title={playerName}
               currentHp={currentHp}
               maxHp={maxHp}
-              activeEffects={[]}
+              activeEffects={activeEffects}
               equipmentSlots={equipment as Array<{ slot: EquipmentSlot; item: Item | null }>}
               figure={playerFigure as never}
               mirrored
+              onProfileClick={onOpenProfile}
+              impactKey={impactEvent?.key ?? null}
+              impactVariant={impactEvent?.variant ?? "hit"}
+              impactValue={impactEvent?.value ?? null}
+              impactZone={impactEvent?.zone ?? null}
             />
           </div>
         </div>
@@ -346,14 +380,19 @@ export function OnlineOpponentCombatPanel({
   playerFigure,
   currentHp,
   maxHp,
+  combatantId,
+  combatLog,
+  activeEffects,
   equipment,
   shellStyle,
   panelStyle,
   derivedStats,
+  resources,
   connectionLabel,
   readinessLabel,
   winner,
   loser,
+  onOpenProfile,
   sidePanelComponent: SidePanelComponent,
   chipStyle,
   combatArenaBadgeRowStyle,
@@ -365,14 +404,19 @@ export function OnlineOpponentCombatPanel({
   playerFigure: string;
   currentHp: number;
   maxHp: number;
+  combatantId: string;
+  combatLog: RoundResult[];
+  activeEffects: ActiveCombatEffect[];
   equipment: Array<{ slot: string; item: unknown }>;
   shellStyle: CSSProperties;
   panelStyle: CSSProperties;
   derivedStats: Array<{ label: string; value: string; helper: string }>;
+  resources: { rage: number; guard: number; momentum: number; focus: number } | null;
   connectionLabel: string;
   readinessLabel: string;
   winner: boolean;
   loser: boolean;
+  onOpenProfile: () => void;
   sidePanelComponent: ComponentType<{
     shellStyle: CSSProperties;
     panelStyle: CSSProperties;
@@ -387,23 +431,39 @@ export function OnlineOpponentCombatPanel({
   statSummaryLabelStyle: CSSProperties;
   statSummaryValueStyle: CSSProperties;
 }) {
+  const impactEvent = useOnlineCombatImpactPulse(combatLog, combatantId);
+
   return (
     <SidePanelComponent
       shellStyle={shellStyle}
       panelStyle={panelStyle}
       silhouette={
         <div style={{ display: "grid", gap: 8 }}>
-          <div className={winner ? "combat-postfight-silhouette combat-postfight-silhouette--victory-right" : loser ? "combat-postfight-silhouette combat-postfight-silhouette--defeat-right" : undefined}>
+          <div
+            key={impactEvent?.key ?? "opponent-idle"}
+            className={[
+              winner ? "combat-postfight-silhouette combat-postfight-silhouette--victory-right" : "",
+              loser ? "combat-postfight-silhouette combat-postfight-silhouette--defeat-right" : "",
+              impactEvent ? `combat-panel-shake combat-panel-shake--${impactEvent.variant}` : "",
+            ]
+              .filter(Boolean)
+              .join(" ")}
+          >
             <CombatSilhouette
               title={playerName}
               currentHp={currentHp}
               maxHp={maxHp}
-              activeEffects={[]}
+              activeEffects={activeEffects}
               equipmentSlots={equipment as Array<{ slot: EquipmentSlot; item: Item | null }>}
               figure={playerFigure as never}
+              onProfileClick={onOpenProfile}
+              impactKey={impactEvent?.key ?? null}
+              impactVariant={impactEvent?.variant ?? "hit"}
+              impactValue={impactEvent?.value ?? null}
+              impactZone={impactEvent?.zone ?? null}
             />
           </div>
-          <ResourceGrid panelStyle={panelStyle} resources={null} layout="row" showHeader={false} />
+          <ResourceGrid panelStyle={panelStyle} resources={resources} layout="row" showHeader={false} />
         </div>
       }
       sidebar={
@@ -429,4 +489,86 @@ export function OnlineOpponentCombatPanel({
       blocks={[]}
     />
   );
+}
+
+function resolveOnlineImpactVariant(result: RoundResult): OnlineImpactVariant {
+  if (result.dodged) {
+    return "dodge";
+  }
+
+  if (result.blocked && result.finalDamage > 0) {
+    return "block_break";
+  }
+
+  if (result.penetrated) {
+    return "penetration";
+  }
+
+  if (result.blocked && result.finalDamage <= 0) {
+    return "block";
+  }
+
+  if (result.crit) {
+    return "crit";
+  }
+
+  if (result.blocked) {
+    return "block";
+  }
+
+  return "hit";
+}
+
+function resolveOnlineImpactValue(result: RoundResult) {
+  return result.finalDamage > 0 ? result.finalDamage : null;
+}
+
+function useOnlineCombatImpactPulse(combatLog: RoundResult[], defenderId: string) {
+  const [event, setEvent] = useState<OnlineImpactEvent | null>(null);
+  const lastImpactKeyRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    const latestRound = combatLog.reduce((highestRound, entry) => {
+      return entry.round > highestRound ? entry.round : highestRound;
+    }, 0);
+
+    if (!latestRound) {
+      return;
+    }
+
+    const latestIncomingResult =
+      [...combatLog]
+        .reverse()
+        .find(
+          (entry) =>
+            entry.round === latestRound &&
+            entry.defenderId === defenderId &&
+            (entry.finalDamage > 0 || entry.blocked || entry.dodged)
+        ) ?? null;
+
+    if (!latestIncomingResult) {
+      return;
+    }
+
+    const nextKey = `${latestIncomingResult.round}-${latestIncomingResult.timestamp}-${latestIncomingResult.attackerId}-${latestIncomingResult.defenderId}-${latestIncomingResult.type}-${latestIncomingResult.finalDamage}-${latestIncomingResult.crit ? "crit" : "normal"}-${latestIncomingResult.blocked ? "block" : "open"}-${latestIncomingResult.dodged ? "dodge" : "land"}`;
+    if (lastImpactKeyRef.current === nextKey) {
+      return;
+    }
+
+    lastImpactKeyRef.current = nextKey;
+    setEvent({
+      key: nextKey,
+      variant: resolveOnlineImpactVariant(latestIncomingResult),
+      value: resolveOnlineImpactValue(latestIncomingResult),
+      zone: latestIncomingResult.attackZone,
+    });
+
+    const clearTimeoutId = window.setTimeout(() => {
+      setEvent((current) => (current?.key === nextKey ? null : current));
+    }, 0);
+
+    return () => window.clearTimeout(clearTimeoutId);
+  }, [combatLog, defenderId]);
+
+  return event;
 }

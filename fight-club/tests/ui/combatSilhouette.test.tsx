@@ -89,4 +89,29 @@ describe("CombatSilhouette", () => {
     expect(screen.getByText("CRIT")).toBeTruthy();
     expect(screen.getByText("-12")).toBeTruthy();
   });
+
+  it("shows a zone overlay label for the active impact", () => {
+    vi.spyOn(window, "requestAnimationFrame").mockImplementation((callback: FrameRequestCallback) => {
+      callback(0);
+      return 1;
+    });
+    vi.spyOn(window, "cancelAnimationFrame").mockImplementation(() => {});
+    vi.spyOn(window, "setTimeout");
+    vi.spyOn(window, "clearTimeout");
+
+    render(
+      <CombatSilhouette
+        title="Player"
+        currentHp={100}
+        maxHp={100}
+        figure="rush-chip"
+        impactKey="impact-zone"
+        impactVariant="hit"
+        impactValue={9}
+        impactZone="head"
+      />
+    );
+
+    expect(screen.getByText("HEAD")).toBeTruthy();
+  });
 });

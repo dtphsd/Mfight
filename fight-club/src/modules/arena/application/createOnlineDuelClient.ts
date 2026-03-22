@@ -126,6 +126,7 @@ export function createOnlineDuelClient(
         sessionId: identity.sessionId,
         selection,
         expectedRound: lastSync?.round ?? undefined,
+        expectedRevision: lastSync?.revision,
       });
     },
     getLastSync() {

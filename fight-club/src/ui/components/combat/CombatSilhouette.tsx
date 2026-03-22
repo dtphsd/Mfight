@@ -1,4 +1,5 @@
 import { useState } from "react";
+import type { CombatZone } from "@/modules/combat";
 import type { ActiveCombatEffect } from "@/modules/combat";
 import type { EquipmentSlot } from "@/modules/equipment";
 import type { Item } from "@/modules/inventory";
@@ -30,6 +31,7 @@ interface CombatSilhouetteProps {
   impactKey?: string | number | null;
   impactVariant?: CombatImpactVariant;
   impactValue?: number | null;
+  impactZone?: CombatZone | null;
   onEquipmentSlotClick?: (slot: EquipmentSlot) => void;
   onProfileClick?: () => void;
 }
@@ -45,6 +47,7 @@ export function CombatSilhouette({
   impactKey = null,
   impactVariant = "hit",
   impactValue = null,
+  impactZone = null,
   onEquipmentSlotClick,
   onProfileClick,
 }: CombatSilhouetteProps) {
@@ -70,6 +73,7 @@ export function CombatSilhouette({
         lingerToken={lingerToken}
         impactVariant={activeImpact.variant}
         impactValue={activeImpact.value}
+        impactZone={impactZone}
         onProfileClick={onProfileClick}
       >
         <SilhouetteFigure figure={figure} mirrored={mirrored} />

@@ -23,6 +23,11 @@ const CombatAgentScreen = lazy(() =>
     default: module.CombatAgentScreen,
   }))
 );
+const AdminDashboardScreen = lazy(() =>
+  import("@/ui/screens/AdminDashboard/AdminDashboardScreen").then((module) => ({
+    default: module.AdminDashboardScreen,
+  }))
+);
 const OnlineDuelScreen = lazy(() =>
   import("@/ui/screens/OnlineDuel/OnlineDuelScreen").then((module) => ({
     default: module.OnlineDuelScreen,
@@ -53,7 +58,7 @@ const screenLoadingFallback = (
 
 export function App() {
   const [screen, setScreen] = useState<
-    "menu" | "combat" | "rules" | "hunting" | "combat-agent" | "pvp" | "pvp-room"
+    "menu" | "combat" | "rules" | "hunting" | "combat-agent" | "admin-dashboard" | "pvp" | "pvp-room"
   >("menu");
   const [playerName, setPlayerName] = useState("Player");
   const [pvpPreparedFighter, setPvpPreparedFighter] = useState<PvpPreparedFighter | null>(null);
@@ -69,6 +74,7 @@ export function App() {
           onOpenCombatRules={() => setScreen("rules")}
           onOpenHunting={() => setScreen("hunting")}
           onOpenCombatAgent={() => setScreen("combat-agent")}
+          onOpenAdminDashboard={() => setScreen("admin-dashboard")}
           onOpenPvp={() => setScreen("pvp")}
         />
       ) : (
@@ -82,6 +88,11 @@ export function App() {
             <CombatAgentScreen
               onBack={() => setScreen("menu")}
               onOpenCombatSandbox={() => setScreen("combat")}
+            />
+          ) : screen === "admin-dashboard" ? (
+            <AdminDashboardScreen
+              onBack={() => setScreen("menu")}
+              onOpenPvp={() => setScreen("pvp")}
             />
           ) : screen === "pvp" ? (
             <PvpLobbyScreen

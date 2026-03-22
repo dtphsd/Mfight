@@ -1,2 +1,2 @@
 @echo off
-powershell -ExecutionPolicy Bypass -File "%~dp0..\run-project-analysis.ps1"
+powershell -ExecutionPolicy Bypass -File "%~dp0project-analysis\run-project-analysis.ps1"

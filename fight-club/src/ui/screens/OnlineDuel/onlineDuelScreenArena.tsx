@@ -11,8 +11,11 @@ import type { ActiveCombatEffect } from "@/modules/combat/model/CombatEffect";
 import type { RoundDraft } from "@/orchestration/combat/roundDraft";
 import { createBattleLogEntries } from "@/ui/components/combat/battleLogFormatting";
 import { BattleLogSection } from "@/ui/screens/Combat/combatSandboxScreenLayout";
-import { ArenaStageColumns, ArenaStageShell, SidePanel } from "@/ui/screens/Combat/combatSandboxScreenLayout";
+import { SidePanel } from "@/ui/screens/Combat/combatSandboxScreenLayout";
+import { createOnlineDuelCombatPresentationModel } from "@/ui/screens/Combat/combatPresentationAdapters";
+import { CombatPresentationShell } from "@/ui/screens/Combat/combatPresentationShell";
 import { FightControlsPanel } from "@/ui/screens/Combat/combatSandboxScreenControls";
+import { CombatRoundReveal } from "@/ui/screens/Combat/combatRoundReveal";
 import { AttackTargetRoundPanel } from "@/ui/screens/Combat/combatSandboxScreenTargeting";
 import { ResourceGrid } from "@/ui/screens/Combat/combatSandboxScreenResourceGrid";
 import {
@@ -29,6 +32,21 @@ import type {
 const ProfileModal = lazy(() =>
   import("@/ui/components/profile/ProfileModal").then((module) => ({ default: module.ProfileModal }))
 );
+
+type OnlineRoundRevealEntry = {
+  attackerName: string;
+  defenderName?: string | null;
+  skillName?: string | null;
+  consumableName?: string | null;
+  finalDamage?: number | null;
+  healedHp?: number | null;
+  blocked?: boolean;
+  blockedPercent?: number | null;
+  dodged?: boolean;
+  crit?: boolean;
+  knockoutCommentary?: string | null;
+  commentary?: string | null;
+};
 
 export function OnlineDuelArena({
   showPlayerFacingArena,
@@ -123,33 +141,130 @@ export function OnlineDuelArena({
     return null;
   }
 
+  const playerWinner = matchSyncWinnerSeat === (playerSyncSeat ?? playerSeat);
+  const opponentWinner = matchSyncWinnerSeat !== null && matchSyncWinnerSeat === opponentParticipant?.seat;
+  const waitingHint =
+    currentStep.badge === "Hold" || currentStep.badge === "Waiting"
+      ? currentStep.message
+      : currentStep.badge === "Pick zones" && playerActionSubmitted
+        ? "Your action is locked. Waiting for the rival to lock theirs."
+        : null;
+  const roundProgressLabel =
+    !duelId
+      ? null
+      : !showPlanner
+        ? `Ready ${readyCount}/2`
+        : `Locked ${Number(playerActionSubmitted) + Number(opponentActionSubmitted)}/2`;
+  const presentation = createOnlineDuelCombatPresentationModel({
+    player: {
+      name: playerDisplayName,
+      figure: playerFigure,
+      currentHp: playerCurrentHp,
+      maxHp: playerSnapshot.maxHp,
+      equipment: playerEquipment,
+      activeEffects: playerCombatantState?.activeEffects ?? [],
+      derivedStats: playerDerivedStats,
+      badges: [playerMode === "host" ? "Host" : "Guest", playerBuildPresetLabel].filter(Boolean),
+      resources: playerResources,
+      winner: playerWinner,
+      loser: Boolean(matchSyncWinnerSeat) && !playerWinner,
+    },
+    rival: {
+      name: opponentDisplayName,
+      figure: opponentFigure,
+      currentHp: opponentCurrentHp,
+      maxHp: opponentSnapshot.maxHp,
+      equipment: opponentEquipment,
+      activeEffects: opponentCombatantState?.activeEffects ?? [],
+      derivedStats: opponentDerivedStats,
+      badges: [
+        opponentParticipant ? (opponentParticipant.connected ? "Connected" : "Offline") : "Pending",
+        opponentParticipant?.ready ? "Ready" : "Not ready",
+      ],
+      resources: opponentResources,
+      winner: opponentWinner,
+      loser: Boolean(matchSyncWinnerSeat) && !opponentWinner,
+    },
+    controls: {
+      currentActionLabel: selectedActionLabel,
+      currentActionTags: selectedActionTags,
+      currentActionSummary: selectedActionSummary,
+      phaseLabel: currentStep.badge,
+      round: null,
+      roomCode: roomCode || null,
+      roundProgressLabel,
+      waitStatus: waitingHint,
+      latestRoundSummary,
+      primaryActionLabel,
+      primaryActionAriaLabel,
+      primaryActionTone: playerReady && !showPlanner ? "ready" : "warm",
+      canPrimaryAction: Boolean(duelId) && !actionsDisabled && !showPlanner && !matchLocked,
+    },
+  });
+  const showMatchFlowBanner = Boolean(
+    matchmakingStatus &&
+      duelId &&
+      (matchmakingStatus.tone === "warning" || matchmakingStatus.badge === "Search paused")
+  );
+  const showLiveAlertBanner = Boolean(liveStatus && liveStatus.tone === "danger" && !recoveryAction);
+  const playerFacingMatchFlowMessage =
+    matchmakingStatus?.badge === "Search paused"
+      ? "Search is paused. Resume it when you are ready to keep looking for a rival."
+      : matchmakingStatus?.message ?? "";
+  const playerFacingLiveMessage =
+    liveStatus?.badge === "Backend offline"
+      ? "The live match service is not responding right now. Use the recovery action below to get back into the fight."
+      : liveStatus?.message ?? "";
+  const activeMatchmakingStatus = showMatchFlowBanner ? matchmakingStatus : null;
+  const activeLiveStatus = showLiveAlertBanner ? liveStatus : null;
+  const latestResolvedRoundNumber = combatLog.length > 0 ? combatLog[combatLog.length - 1]?.round ?? null : null;
+  const roundRevealEntries: OnlineRoundRevealEntry[] = latestResolvedRoundNumber
+    ? combatLog
+        .filter((entry) => entry.round === latestResolvedRoundNumber)
+        .slice(-2)
+        .map((entry) => ({
+    attackerName: entry.attackerName,
+    defenderName: entry.defenderName,
+    skillName: entry.skillName,
+    consumableName: entry.consumableName,
+    finalDamage: entry.finalDamage,
+    healedHp: entry.healedHp,
+    blocked: entry.blocked,
+    blockedPercent: entry.blockedPercent,
+    dodged: entry.dodged,
+    crit: entry.crit,
+    knockoutCommentary: entry.knockoutCommentary,
+    commentary: entry.commentary,
+        }))
+    : [];
+
   return (
     <>
-      {matchmakingStatus && duelId ? (
+      {activeMatchmakingStatus ? (
         <article
           style={{
             ...panelStyle,
             marginBottom: 14,
             border:
-              matchmakingStatus.tone === "warning"
+              activeMatchmakingStatus.tone === "warning"
                 ? "1px solid rgba(255,196,120,0.26)"
                 : "1px solid rgba(135,217,255,0.24)",
             background:
-              matchmakingStatus.tone === "warning"
+              activeMatchmakingStatus.tone === "warning"
                 ? "linear-gradient(180deg, rgba(62,42,18,0.9), rgba(25,17,10,0.96))"
                 : "linear-gradient(180deg, rgba(20,35,45,0.88), rgba(13,18,24,0.96))",
           }}
         >
           <div style={sectionHeadStyle}>
-            <span style={eyebrowStyle}>Matchmaking</span>
-            <span style={chipStyle}>{matchmakingStatus.badge}</span>
+            <span style={eyebrowStyle}>Room Status</span>
+            <span style={chipStyle}>{activeMatchmakingStatus.badge}</span>
           </div>
-          <p style={helperTextStyle}>{matchmakingStatus.message}</p>
+          <p style={helperTextStyle}>{playerFacingMatchFlowMessage}</p>
           <div style={buttonRowStyle}>
             <button type="button" style={ghostButtonStyle} onClick={onStopMatchmakingSearch}>
               Stop Searching
             </button>
-            {matchmakingStatus.badge === "Search paused" ? (
+            {activeMatchmakingStatus.badge === "Search paused" ? (
               <button type="button" style={primaryButtonStyle} onClick={() => undefined}>
                 Keep Searching
               </button>
@@ -157,88 +272,113 @@ export function OnlineDuelArena({
           </div>
         </article>
       ) : null}
-      {liveStatus ? (
+      {activeLiveStatus ? (
         <article
           style={{
             ...panelStyle,
             marginBottom: 14,
             border:
-              liveStatus.tone === "danger"
+              activeLiveStatus.tone === "danger"
                 ? "1px solid rgba(255,127,127,0.3)"
-                : liveStatus.tone === "warning"
+                : activeLiveStatus.tone === "warning"
                   ? "1px solid rgba(255,196,120,0.26)"
                   : "1px solid rgba(135,217,255,0.24)",
             background:
-              liveStatus.tone === "danger"
+              activeLiveStatus.tone === "danger"
                 ? "linear-gradient(180deg, rgba(62,21,21,0.92), rgba(23,12,12,0.96))"
-                : liveStatus.tone === "warning"
+                : activeLiveStatus.tone === "warning"
                   ? "linear-gradient(180deg, rgba(62,42,18,0.9), rgba(25,17,10,0.96))"
                   : "linear-gradient(180deg, rgba(20,35,45,0.88), rgba(13,18,24,0.96))",
             boxShadow: "0 18px 36px rgba(0,0,0,0.24)",
           }}
         >
           <div style={sectionHeadStyle}>
-            <span style={eyebrowStyle}>Live Status</span>
+            <span style={eyebrowStyle}>Match Alert</span>
             <span
               style={{
                 ...chipStyle,
                 border:
-                  liveStatus.tone === "danger"
+                  activeLiveStatus.tone === "danger"
                     ? "1px solid rgba(255,127,127,0.34)"
-                    : liveStatus.tone === "warning"
+                    : activeLiveStatus.tone === "warning"
                       ? "1px solid rgba(255,196,120,0.32)"
                       : chipStyle.border,
                 background:
-                  liveStatus.tone === "danger"
+                  activeLiveStatus.tone === "danger"
                     ? "rgba(112,31,31,0.28)"
-                    : liveStatus.tone === "warning"
+                    : activeLiveStatus.tone === "warning"
                       ? "rgba(119,77,18,0.28)"
                       : chipStyle.background,
                 color:
-                  liveStatus.tone === "danger"
+                  activeLiveStatus.tone === "danger"
                     ? "rgba(255,226,226,0.96)"
-                    : liveStatus.tone === "warning"
+                    : activeLiveStatus.tone === "warning"
                       ? "rgba(255,236,210,0.96)"
                       : chipStyle.color,
               }}
             >
-              {liveStatus.badge}
+              {activeLiveStatus.badge}
             </span>
           </div>
           <p
             style={{
               ...helperTextStyle,
               color:
-                liveStatus.tone === "danger"
+                activeLiveStatus.tone === "danger"
                   ? "rgba(255,220,220,0.88)"
-                  : liveStatus.tone === "warning"
+                  : activeLiveStatus.tone === "warning"
                     ? "rgba(255,232,205,0.88)"
                     : helperTextStyle.color,
             }}
           >
-            {liveStatus.message}
+            {playerFacingLiveMessage}
           </p>
         </article>
       ) : null}
-      <ArenaStageShell shellStyle={shellStyle}>
-        <ArenaStageColumns>
+      <CombatPresentationShell
+        shellStyle={shellStyle}
+        resultReveal={
+          matchLocked
+            ? presentation.player.winner
+              ? {
+                  eyebrow: "Match Result",
+                  title: "Victory",
+                  subtitle: `${presentation.rival.name} falls. You can queue a rematch or leave with the room code in hand.`,
+                  tone: "victory" as const,
+                }
+              : presentation.player.loser
+                ? {
+                    eyebrow: "Match Result",
+                    title: "Defeat",
+                    subtitle: `${presentation.rival.name} takes this duel. Shake it off and fire up the rematch.`,
+                    tone: "defeat" as const,
+                  }
+                : {
+                    eyebrow: "Match Result",
+                    title: "Match Closed",
+                    subtitle: "This room is no longer active. Start a fresh fight when you are ready.",
+                    tone: "neutral" as const,
+                  }
+            : null
+        }
+        left={
           <OnlinePlayerCombatPanel
-            playerName={playerDisplayName}
-            playerFigure={playerFigure}
-            currentHp={playerCurrentHp}
-            maxHp={playerSnapshot.maxHp}
+            playerName={presentation.player.name}
+            playerFigure={presentation.player.figure}
+            currentHp={presentation.player.currentHp}
+            maxHp={presentation.player.maxHp}
             combatantId={playerSnapshot.characterId}
             combatLog={combatLog}
-            activeEffects={playerCombatantState?.activeEffects ?? []}
-            equipment={playerEquipment}
+            activeEffects={presentation.player.activeEffects}
+            equipment={presentation.player.equipment}
             selectedIntent={draft.intent}
             shellStyle={shellStyle}
             panelStyle={panelStyle}
-            derivedStats={playerDerivedStats}
-            roleLabel={playerMode === "host" ? "Host" : "Guest"}
-            presetLabel={playerBuildPresetLabel}
-            winner={matchSyncWinnerSeat === (playerSyncSeat ?? playerSeat)}
-            loser={Boolean(matchSyncWinnerSeat) && matchSyncWinnerSeat !== (playerSyncSeat ?? playerSeat)}
+            derivedStats={presentation.player.derivedStats}
+            roleLabel={presentation.player.badges[0] ?? "Player"}
+            presetLabel={presentation.player.badges[1] ?? "Custom"}
+            winner={presentation.player.winner}
+            loser={presentation.player.loser}
             onOpenProfile={() => setProfileTarget("player")}
             sidePanelComponent={SidePanel}
             chipStyle={chipStyle}
@@ -248,7 +388,8 @@ export function OnlineDuelArena({
             statSummaryLabelStyle={statSummaryLabelStyle}
             statSummaryValueStyle={statSummaryValueStyle}
           />
-
+        }
+        center={
           <OnlineFightSetupPanel
             panelStyle={panelStyle}
             shellStyle={shellStyle}
@@ -261,21 +402,22 @@ export function OnlineDuelArena({
             playerReady={playerReady}
             showPlanner={showPlanner}
             opponentActionSubmitted={opponentActionSubmitted}
-            selectedActionLabel={selectedActionLabel}
-            selectedActionTags={selectedActionTags}
-            selectedActionSummary={selectedActionSummary}
+            selectedActionLabel={presentation.controls.currentActionLabel}
+            selectedActionTags={presentation.controls.currentActionTags}
+            selectedActionSummary={presentation.controls.currentActionSummary}
             draft={draft}
             playerActionSubmitted={playerActionSubmitted}
-            latestRoundSummary={latestRoundSummary}
+            latestRoundSummary={presentation.controls.latestRoundSummary}
+            roundRevealEntries={roundRevealEntries}
             selectedIntent={selectedIntent}
             availableSkills={playerAvailableSkills}
             availableConsumables={availableConsumables}
             playerResources={playerResources}
             playerSkillCooldowns={playerSkillCooldowns}
-            roomCode={roomCode}
+            roomCode={presentation.controls.roomCode ?? ""}
             codeCopied={codeCopied}
-            primaryActionLabel={primaryActionLabel}
-            primaryActionAriaLabel={primaryActionAriaLabel}
+            primaryActionLabel={presentation.controls.primaryActionLabel}
+            primaryActionAriaLabel={presentation.controls.primaryActionAriaLabel}
             onPrimaryAction={onPrimaryAction}
             onCopyRoomCode={onCopyRoomCode}
             onCancelReady={onCancelReady}
@@ -294,25 +436,30 @@ export function OnlineDuelArena({
             chipStyle={chipStyle}
             helperTextStyle={helperTextStyle}
             currentStepCardStyle={currentStepCardStyle}
+            roundProgressLabel={presentation.controls.roundProgressLabel}
+            waitingHint={presentation.controls.waitStatus}
+            canPrimaryAction={presentation.controls.canPrimaryAction}
+            primaryActionTone={presentation.controls.primaryActionTone}
           />
-
+        }
+        right={
           <OnlineOpponentCombatPanel
-            playerName={opponentDisplayName}
-            playerFigure={opponentFigure}
-            currentHp={opponentCurrentHp}
-            maxHp={opponentSnapshot.maxHp}
+            playerName={presentation.rival.name}
+            playerFigure={presentation.rival.figure}
+            currentHp={presentation.rival.currentHp}
+            maxHp={presentation.rival.maxHp}
             combatantId={opponentSnapshot.characterId}
             combatLog={combatLog}
-            activeEffects={opponentCombatantState?.activeEffects ?? []}
-            equipment={opponentEquipment}
+            activeEffects={presentation.rival.activeEffects}
+            equipment={presentation.rival.equipment}
             shellStyle={shellStyle}
             panelStyle={panelStyle}
-            derivedStats={opponentDerivedStats}
-            resources={opponentResources}
-            connectionLabel={opponentParticipant ? (opponentParticipant.connected ? "Connected" : "Offline") : "Pending"}
-            readinessLabel={opponentParticipant?.ready ? "Ready" : "Not ready"}
-            winner={matchSyncWinnerSeat !== null && matchSyncWinnerSeat === opponentParticipant?.seat}
-            loser={Boolean(matchSyncWinnerSeat) && matchSyncWinnerSeat !== opponentParticipant?.seat}
+            derivedStats={presentation.rival.derivedStats}
+            resources={presentation.rival.resources}
+            connectionLabel={presentation.rival.badges[0] ?? "Pending"}
+            readinessLabel={presentation.rival.badges[1] ?? "Not ready"}
+            winner={presentation.rival.winner}
+            loser={presentation.rival.loser}
             onOpenProfile={() => setProfileTarget("opponent")}
             sidePanelComponent={SidePanel}
             chipStyle={chipStyle}
@@ -321,8 +468,8 @@ export function OnlineDuelArena({
             statSummaryLabelStyle={statSummaryLabelStyle}
             statSummaryValueStyle={statSummaryValueStyle}
           />
-        </ArenaStageColumns>
-      </ArenaStageShell>
+        }
+      />
 
       <BattleLogSection
         entries={battleLogEntries}
@@ -429,6 +576,7 @@ function OnlineFightSetupPanel({
   playerActionSubmitted,
   actionsDisabled,
   latestRoundSummary,
+  roundRevealEntries,
   selectedIntent,
   availableSkills,
   availableConsumables,
@@ -455,23 +603,28 @@ function OnlineFightSetupPanel({
   chipStyle,
   helperTextStyle,
   currentStepCardStyle,
+  roundProgressLabel,
+  waitingHint,
+  canPrimaryAction,
+  primaryActionTone,
 }: OnlineFightSetupPanelProps) {
-  const waitingHint =
-    currentStep.badge === "Hold" || currentStep.badge === "Waiting"
-      ? currentStep.message
-      : currentStep.badge === "Pick zones" && playerActionSubmitted
-        ? "Your action is locked. Waiting for the rival to lock theirs."
-        : null;
-  const roundProgressLabel =
-    !duelId
-      ? null
-      : !showPlanner
-        ? `Ready ${readyCount}/2`
-        : `Locked ${Number(playerActionSubmitted) + Number(opponentActionSubmitted)}/2`;
+  const roundRevealTone =
+    currentStep.badge === "Resolving"
+      ? "Resolving exchange"
+      : currentStep.badge === "Match over"
+        ? "Final blow landed"
+        : latestRoundSummary !== "No round resolved yet."
+          ? latestRoundSummary
+          : null;
 
   return (
     <div data-testid="fight-setup-panel" style={{ ...shellStyle, padding: 16, display: "grid", gap: 12, alignContent: "start" }}>
       <div style={{ display: "grid", gap: 12 }}>
+        <CombatRoundReveal
+          title={roundRevealTone}
+          tone={currentStep.badge === "Match over" ? "finish" : "round"}
+          entries={roundRevealEntries}
+        />
         {blockedStatus && recoveryAction ? (
           <div
             style={{
@@ -503,8 +656,8 @@ function OnlineFightSetupPanel({
           <FightControlsPanel
             panelStyle={panelStyle}
             primaryButtonStyle={primaryButtonStyle}
-            canStartFight={Boolean(duelId) && !actionsDisabled && !showPlanner && !matchLocked}
-            primaryActionTone={playerReady && !showPlanner ? "ready" : "warm"}
+            canStartFight={canPrimaryAction}
+            primaryActionTone={primaryActionTone}
             combatPhase={matchLocked ? "finished" : showPlanner ? "planning" : "lobby"}
             combatRound={null}
             combatPhaseLabel={currentStep.badge}
@@ -695,6 +848,7 @@ interface OnlineFightSetupPanelProps {
   playerActionSubmitted: boolean;
   actionsDisabled: boolean;
   latestRoundSummary: string;
+  roundRevealEntries: OnlineRoundRevealEntry[];
   selectedIntent: RoundDraft["intent"];
   availableSkills: OnlineAvailableSkill[];
   availableConsumables: OnlineAvailableConsumable[];
@@ -721,6 +875,10 @@ interface OnlineFightSetupPanelProps {
   chipStyle: CSSProperties;
   helperTextStyle: CSSProperties;
   currentStepCardStyle: CSSProperties;
+  roundProgressLabel: string | null;
+  waitingHint: string | null;
+  canPrimaryAction: boolean;
+  primaryActionTone: "warm" | "ready";
 }
 
 const onlineIntentVisuals: Record<

@@ -1,11 +1,20 @@
 import { useState, type CSSProperties } from "react";
 import razorBoarFigure from "@/assets/combat/Razor-Boar.jpg";
 import kitsuneFigure from "@/assets/combat/Kitsune-Bit.jpg";
+import neoScopeFigure from "@/assets/combat/Neo-Scope.jpg";
 import { ModalOverlay } from "@/ui/components/shared/ModalOverlay";
 import { ModalSurface } from "@/ui/components/shared/ModalSurface";
-import { combatAgentProfile as baseCombatAgentProfile, uiAgentProfile as baseUiAgentProfile, type CombatAgentProfile } from "./combatAgentData";
+import {
+  backendAgentProfile as baseBackendAgentProfile,
+  combatAgentProfile as baseCombatAgentProfile,
+  uiAgentProfile as baseUiAgentProfile,
+  type CombatAgentProfile,
+} from "./combatAgentData";
+import { deriveAgentProgression } from "./combatAgentProgression";
 import combatAgentJournalRaw from "../../../../TAMA_start/combat_agent_journal.md?raw";
 import combatPatchNotesRaw from "../../../../TAMA_start/combat_patch_notes.md?raw";
+import backendAgentJournalRaw from "../../../../TAMA_start/backend_agent_journal.md?raw";
+import backendPatchNotesRaw from "../../../../TAMA_start/backend_patch_notes.md?raw";
 import uiAgentJournalRaw from "../../../../TAMA_start/ui_agent_journal.md?raw";
 import uiPatchNotesRaw from "../../../../TAMA_start/ui_patch_notes.md?raw";
 
@@ -29,9 +38,7 @@ interface CombatJournalEntry {
 interface CombatJournalStatus {
   name: string;
   rank: string;
-  level: number;
   totalXp: number;
-  nextRankXp: number;
   bugsKilled: number;
   tracks: Record<string, number>;
 }
@@ -43,7 +50,7 @@ interface CombatPatchNote {
   bullets: Array<{ text: string; level: number }>;
 }
 
-type AgentTab = "combat" | "ui";
+type AgentTab = "combat" | "ui" | "backend";
 
 const specialistScrollClassName = "ecosystem-agents__scroll";
 
@@ -152,12 +159,7 @@ function parseAgentJournalStatus(markdown: string, baseProfile: CombatAgentProfi
 
   const name = statusBlock.match(/- Name:\s+([^\n]+)/)?.[1]?.trim() ?? baseProfile.name;
   const rank = statusBlock.match(/- Rank:\s+([^\n]+)/)?.[1]?.trim() ?? baseProfile.rank;
-  const level = Number.parseInt(statusBlock.match(/- Level:\s+(\d+)/)?.[1] ?? `${baseProfile.level}`, 10);
   const totalXp = Number.parseInt(statusBlock.match(/- Total XP:\s+(\d+)/)?.[1] ?? `${baseProfile.xpCurrent}`, 10);
-  const nextRankXp = Number.parseInt(
-    statusBlock.match(/- Next Rank XP:\s+(\d+)/)?.[1] ?? `${baseProfile.xpNext}`,
-    10
-  );
 
   const tracks = Object.fromEntries(
     [...tracksBlock.matchAll(/- ([^:]+):\s+(\d+)/g)].map((match) => [match[1].trim(), Number.parseInt(match[2], 10)])
@@ -166,9 +168,7 @@ function parseAgentJournalStatus(markdown: string, baseProfile: CombatAgentProfi
   return {
     name,
     rank,
-    level,
     totalXp,
-    nextRankXp,
     bugsKilled: Number.parseInt(markdown.match(/"bugsKilled":\s*(\d+)/)?.[1] ?? "0", 10),
     tracks,
   };
@@ -213,6 +213,21 @@ function resolveTrackTone(track: string) {
   if (normalized.includes("balance")) {
     return { accent: "#f0cb88", tint: "rgba(240,203,136,0.12)" };
   }
+  if (normalized.includes("api")) {
+    return { accent: "#8ab6ff", tint: "rgba(138,182,255,0.12)" };
+  }
+  if (normalized.includes("authority")) {
+    return { accent: "#f0cb88", tint: "rgba(240,203,136,0.12)" };
+  }
+  if (normalized.includes("sync")) {
+    return { accent: "#85dfd3", tint: "rgba(133,223,211,0.12)" };
+  }
+  if (normalized.includes("service")) {
+    return { accent: "#c5a0ff", tint: "rgba(197,160,255,0.12)" };
+  }
+  if (normalized.includes("deployment")) {
+    return { accent: "#f09b79", tint: "rgba(240,155,121,0.12)" };
+  }
   if (normalized.includes("systems")) {
     return { accent: "#c5a0ff", tint: "rgba(197,160,255,0.12)" };
   }
@@ -249,32 +264,51 @@ function resolveTagTone(index: number) {
 export function CombatAgentScreen({ onBack, onOpenCombatSandbox }: CombatAgentScreenProps) {
   const [activeTab, setActiveTab] = useState<AgentTab>("combat");
   const [patchNotesOpen, setPatchNotesOpen] = useState(false);
-  const agentDefinition = activeTab === "combat"
-    ? {
-        id: "combat" as const,
-        label: "Combat Master",
-        portrait: razorBoarFigure,
-        baseProfile: baseCombatAgentProfile,
-        journalRaw: combatAgentJournalRaw,
-        patchNotesRaw: combatPatchNotesRaw,
-        patchLogsLabel: "Combat Logs",
-        patchSummary: "Canonical running log for combat balance, formula, AI, and UX changes.",
-        activitySummary: "Recent combat-agent milestones",
-      }
-    : {
-        id: "ui" as const,
-        label: "UI Master",
-        portrait: kitsuneFigure,
-        baseProfile: baseUiAgentProfile,
-        journalRaw: uiAgentJournalRaw,
-        patchNotesRaw: uiPatchNotesRaw,
-        patchLogsLabel: "UI Logs",
-        patchSummary: "Canonical running log for UI systems, UX, interaction, and specialist-surface changes.",
-        activitySummary: "Recent UI-agent milestones",
-      };
+  const agentDefinition =
+    activeTab === "combat"
+      ? {
+          id: "combat" as const,
+          label: "Combat Master",
+          portrait: razorBoarFigure,
+          baseProfile: baseCombatAgentProfile,
+          journalRaw: combatAgentJournalRaw,
+          patchNotesRaw: combatPatchNotesRaw,
+          patchLogsLabel: "Combat Logs",
+          patchSummary: "Canonical running log for combat balance, formula, AI, and UX changes.",
+          activitySummary: "Recent combat-agent milestones",
+        }
+      : activeTab === "ui"
+        ? {
+            id: "ui" as const,
+            label: "UI Master",
+            portrait: kitsuneFigure,
+            baseProfile: baseUiAgentProfile,
+            journalRaw: uiAgentJournalRaw,
+            patchNotesRaw: uiPatchNotesRaw,
+            patchLogsLabel: "UI Logs",
+            patchSummary: "Canonical running log for UI systems, UX, interaction, and specialist-surface changes.",
+            activitySummary: "Recent UI-agent milestones",
+          }
+        : {
+            id: "backend" as const,
+            label: "Backend Master",
+            portrait: neoScopeFigure,
+            baseProfile: baseBackendAgentProfile,
+            journalRaw: backendAgentJournalRaw,
+            patchNotesRaw: backendPatchNotesRaw,
+            patchLogsLabel: "Backend Logs",
+            patchSummary:
+              "Canonical running log for backend architecture, authority, sync, service safety, and online-duel planning.",
+            activitySummary: "Recent backend-agent milestones",
+          };
   const journalStatus = parseAgentJournalStatus(agentDefinition.journalRaw, agentDefinition.baseProfile);
   const journalEntries = parseAgentJournalEntries(agentDefinition.journalRaw);
   const patchNotes = parseAgentPatchNotes(agentDefinition.patchNotesRaw);
+  const progression = deriveAgentProgression(
+    journalStatus.totalXp,
+    journalStatus.rank,
+    agentDefinition.baseProfile
+  );
   const achievementCount = new Set(
     journalEntries
       .map((entry) => entry.achievement)
@@ -287,10 +321,10 @@ export function CombatAgentScreen({ onBack, onOpenCombatSandbox }: CombatAgentSc
   const combatAgentProfile = {
     ...agentDefinition.baseProfile,
     name: journalStatus.name,
-    rank: journalStatus.rank,
-    level: journalStatus.level,
-    xpCurrent: journalStatus.totalXp,
-    xpNext: journalStatus.nextRankXp,
+    rank: progression.rank,
+    level: progression.level,
+    xpCurrent: progression.totalXp,
+    xpNext: progression.nextLevelXp,
     achievementsUnlocked: achievementCount,
     battleWins: journalEntries.length,
     safeFixes: highImpactCount,
@@ -300,10 +334,7 @@ export function CombatAgentScreen({ onBack, onOpenCombatSandbox }: CombatAgentSc
       value: journalStatus.tracks[track.label] ?? 0,
     })),
   };
-  const xpPercent =
-    combatAgentProfile.xpNext > 0
-      ? Math.min(100, Math.round((combatAgentProfile.xpCurrent / combatAgentProfile.xpNext) * 100))
-      : 100;
+  const xpPercent = progression.progressPercent;
   const activityLog = journalEntries;
   const highlightedTrack = combatAgentProfile.tracks.reduce((best, current) =>
     current.value > best.value ? current : best
@@ -373,6 +404,22 @@ export function CombatAgentScreen({ onBack, onOpenCombatSandbox }: CombatAgentSc
                 </button>
               );
             })}
+            <button
+              type="button"
+              onClick={() => setActiveTab("backend")}
+              style={{
+                ...chipStyle,
+                cursor: "pointer",
+                borderColor: activeTab === "backend" ? "rgba(240,203,136,0.36)" : "rgba(255,255,255,0.08)",
+                color: activeTab === "backend" ? "#fff0dc" : "rgba(255,244,231,0.76)",
+                background:
+                  activeTab === "backend"
+                    ? "linear-gradient(180deg, rgba(240,203,136,0.18), rgba(255,255,255,0.04))"
+                    : "rgba(255,255,255,0.04)",
+              }}
+            >
+              рџ§± Backend Master
+            </button>
           </div>
 
           <div style={{ display: "grid", gap: "2px" }}>
@@ -449,11 +496,11 @@ export function CombatAgentScreen({ onBack, onOpenCombatSandbox }: CombatAgentSc
                 color: "#ffe6c5",
               }}
             >
-              {activeTab === "combat" ? "Fix" : "UI"}
+              {activeTab === "combat" ? "Fix" : activeTab === "ui" ? "UI" : "BE"}
             </div>
           </div>
 
-          <div style={{ ...cardStyle, display: "grid", gap: "6px" }}>
+          <div style={{ ...cardStyle, display: "grid", gap: "5px", padding: "7px 10px" }}>
             <div style={{ display: "flex", justifyContent: "space-between", gap: "8px", alignItems: "center" }}>
               <div style={sectionLabelStyle}>Progression</div>
               <span
@@ -498,19 +545,15 @@ export function CombatAgentScreen({ onBack, onOpenCombatSandbox }: CombatAgentSc
             </div>
             <div
               style={{
-                display: "flex",
-                justifyContent: "space-between",
-                gap: "8px",
-                fontSize: "9px",
-                color: "rgba(244,239,227,0.68)",
-                textTransform: "uppercase",
-                letterSpacing: "0.08em",
+                lineHeight: 1.25,
+                textAlign: "center",
+                fontSize: "10px",
+                color: "rgba(244,239,227,0.72)",
               }}
             >
-              <span>
-                XP {combatAgentProfile.xpCurrent}/{combatAgentProfile.xpNext}
-              </span>
-              <span>{xpPercent}%</span>
+              {progression.level >= 100
+                ? `Total XP ${progression.totalXp}. Max level reached.`
+                : `${progression.totalXp} / ${progression.nextLevelXp} XP. ${progression.xpToNextLevel} XP left to next level.`}
             </div>
           </div>
 

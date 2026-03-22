@@ -175,6 +175,7 @@ export interface OnlineDuelStateSync {
   resumeToken?: string;
   yourLoadout?: OnlineDuelParticipantLoadout;
   yourSnapshot?: CombatSnapshot;
+  opponentLoadout?: OnlineDuelParticipantLoadout;
   opponentSnapshot?: CombatSnapshot;
   participants: OnlineDuelParticipantSync[];
   currentRoundState?: OnlineDuelCurrentRoundSync;

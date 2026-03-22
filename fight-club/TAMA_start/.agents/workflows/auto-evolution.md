@@ -112,6 +112,7 @@ If one implementation pass spans multiple specialist domains, every affected spe
 Example:
 
 - combat mechanic + combat UI selector = `combat-agent` and `ui-agent`
+- backend architecture + specialist-console surface = `backend-agent` and `ui-agent`
 - UI refactor that changes specialist-console behavior = `ui-agent`, and `combat-agent` too if the combat specialist surface changed
 
 For `combat-agent`:
@@ -151,6 +152,26 @@ For `ui-agent`:
   - `UI Safety`
 - if the fix is tiny and purely cosmetic, patch notes may be enough; if it changes understanding, safety, or a reusable UI pattern, update both patch notes and the journal
 - if a combat-system feature adds or changes a real player-facing UI control, also reflect that UI surface in the `ui-agent` records even when `combat-agent` owns the mechanic itself
+
+For `backend-agent`:
+
+- update `backend_agent_journal.md`
+- update `backend_patch_notes.md` when the change is a meaningful backend, service, sync, authority, infrastructure, or deployment adjustment
+- refresh `COMBAT_AGENT_JSON` in the backend journal block because the specialist viewer currently reuses the same parser shape
+- add a `BE-NNN` entry for meaningful backend bugs or lessons
+- increment specialist counters such as:
+  - `entries`
+  - `bugsLogged`
+  - `bugsKilled`
+  - `safeFixes`
+  - `achievements`
+- update the matching backend mastery track when the lesson clearly belongs to:
+  - `API Design`
+  - `State Authority`
+  - `Realtime Sync`
+  - `Service Safety`
+  - `Deployment Readiness`
+- if the fix is tiny and purely editorial, patch notes may be enough; if it changes understanding, safety, or a reusable backend pattern, update both patch notes and the journal
 
 ### Journal Entry Format
 

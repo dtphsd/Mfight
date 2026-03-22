@@ -115,3 +115,25 @@ function FightSetupStage({
     </div>
   );
 }
+
+export function buildSandboxRoundRevealModel({
+  combatPhase,
+  latestRoundSummary,
+}: {
+  combatPhase: CombatSandboxModel["combatPhase"];
+  latestRoundSummary: string;
+}) {
+  const title =
+    combatPhase === "resolving_round"
+      ? "Resolving exchange"
+      : combatPhase === "finished"
+        ? "Final blow landed"
+        : latestRoundSummary !== "No round resolved yet."
+          ? latestRoundSummary
+          : null;
+
+  return {
+    title,
+    tone: combatPhase === "finished" ? ("finish" as const) : ("round" as const),
+  };
+}

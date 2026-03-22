@@ -1,4 +1,5 @@
 import type { CSSProperties } from "react";
+import type { CombatZone } from "@/modules/combat";
 import "./combat-motion.css";
 import {
   getCombatImpactLabel,
@@ -10,12 +11,14 @@ interface CombatImpactOverlayProps {
   lingerActive: boolean;
   impactVariant: CombatImpactVariant;
   impactValue?: number | null;
+  impactZone?: CombatZone | null;
 }
 
 export function CombatImpactOverlay({
   lingerActive,
   impactVariant,
   impactValue = null,
+  impactZone = null,
 }: CombatImpactOverlayProps) {
   if (!lingerActive) {
     return null;
@@ -50,6 +53,7 @@ export function CombatImpactOverlay({
       {impactVariant === "block_break" ? <BlockBreakImpactFrame /> : null}
       {impactVariant === "penetration" ? <PenetrationImpactFrame /> : null}
       {impactVariant === "block" ? <BlockImpactFrame /> : null}
+      {impactZone ? <ImpactZoneOverlay impactVariant={impactVariant} impactZone={impactZone} /> : null}
       <ImpactText impactVariant={impactVariant} impactValue={impactValue} />
     </>
   );
@@ -187,6 +191,35 @@ function ImpactText({
   );
 }
 
+function ImpactZoneOverlay({
+  impactVariant,
+  impactZone,
+}: {
+  impactVariant: CombatImpactVariant;
+  impactZone: CombatZone;
+}) {
+  const position = zoneOverlayPositions[impactZone];
+  const label = zoneOverlayLabels[impactZone];
+
+  return (
+    <div
+      className={`combat-zone-impact combat-zone-impact--${impactVariant}`}
+      style={{
+        position: "absolute",
+        left: position.left,
+        top: position.top,
+        transform: "translate(-50%, -50%)",
+        pointerEvents: "none",
+        zIndex: 4,
+      }}
+    >
+      <div className="combat-zone-impact-ring" />
+      <div className="combat-zone-impact-ring combat-zone-impact-ring--inner" />
+      <div className="combat-zone-impact-label">{label}</div>
+    </div>
+  );
+}
+
 const sigilContainerStyle: CSSProperties = {
   position: "absolute",
   inset: 0,
@@ -194,6 +227,22 @@ const sigilContainerStyle: CSSProperties = {
   placeItems: "center",
   pointerEvents: "none",
   zIndex: 2,
+};
+
+const zoneOverlayPositions: Record<CombatZone, { left: string; top: string }> = {
+  head: { left: "50%", top: "16%" },
+  chest: { left: "50%", top: "33%" },
+  belly: { left: "50%", top: "47%" },
+  waist: { left: "50%", top: "63%" },
+  legs: { left: "50%", top: "84%" },
+};
+
+const zoneOverlayLabels: Record<CombatZone, string> = {
+  head: "HEAD",
+  chest: "CHEST",
+  belly: "BELLY",
+  waist: "WAIST",
+  legs: "LEGS",
 };
 
 function FrameShieldSigil() {

@@ -34,10 +34,25 @@ const specialistConfig = {
       "- Add verification line if build, review, or UI check was completed.",
     ],
   },
+  backend: {
+    journalPath: path.join(rootDir, "TAMA_start", "backend_agent_journal.md"),
+    patchNotesPath: path.join(rootDir, "TAMA_start", "backend_patch_notes.md"),
+    entryPrefix: "BE",
+    headingPrefix: "BE",
+    entryTitle: "Title",
+    trackLine: "API Design | State Authority | Realtime Sync | Service Safety | Deployment Readiness",
+    typeLine: "Architecture | Backend Planning | Infrastructure | Docs Sync | Safety Rule | Systems Design",
+    achievementLine: "optional",
+    patchBullets: [
+      "- Summary line for the backend or service-architecture change.",
+      "- Name the contract, authority rule, transport layer, or deployment surface that changed.",
+      "- Add verification line if build, docs review, or backend validation was completed.",
+    ],
+  },
 };
 
 function printUsageAndExit() {
-  console.log("Usage: npm run specialist:entry -- <combat|ui>");
+  console.log("Usage: npm run specialist:entry -- <combat|ui|backend>");
   process.exit(1);
 }
 

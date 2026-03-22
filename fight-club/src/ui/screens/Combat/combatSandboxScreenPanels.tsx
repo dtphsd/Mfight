@@ -71,6 +71,7 @@ export function PlayerCombatPanel({
   onSelectEquipmentSlot,
   onCloseEquipmentSlot,
   silhouetteState = null,
+  lowerAction = null,
 }: {
   sandbox: CombatSandboxModel;
   playerName: string;
@@ -90,6 +91,7 @@ export function PlayerCombatPanel({
   onSelectEquipmentSlot: (slot: EquipmentSlot) => void;
   onCloseEquipmentSlot: () => void;
   silhouetteState?: "victory" | "defeat" | null;
+  lowerAction?: ReactNode;
 }) {
   const impactEvent = useCombatImpactPulse(sandbox.playerIncomingResult);
   const selectedIntentTone = playerIntentSilhouetteTone[sandbox.selectedIntent];
@@ -139,7 +141,7 @@ export function PlayerCombatPanel({
           onOpenInventory={onOpenInventory}
         />
       }
-      blocks={[]}
+      blocks={lowerAction ? [<div key="player-lower-action">{lowerAction}</div>] : []}
       overlay={
         <PlayerEquipmentSlotOverlay
           sandbox={sandbox}

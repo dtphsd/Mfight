@@ -1,13 +1,13 @@
 # RULES.md - Documentation And Safe Change Rules
 
-> Last updated: 2026-03-20 18:50 MSK
+> Last updated: 2026-03-22 15:12 MSK
 
 **Project:** Fight Club  
-**Path:** `c:/Users/dtphs/.vscode/Project`
+**Path:** `c:/Users/dtphs/.vscode/Project/fight-club`
 
 ---
 
-## Purpose Of Root Docs
+## Purpose Of Project Docs
 
 | File | Purpose |
 |------|---------|
@@ -21,6 +21,8 @@
 ## Source Of Truth
 
 - Source of truth is always the code in `fight-club/`.
+- All Fight Club work should happen from `c:/Users/dtphs/.vscode/Project/fight-club`.
+- `c:/Users/dtphs/.vscode/Project` is a parent folder that also contains other projects and should not be treated as the Fight Club app root.
 - Documentation must describe current reality, not plans.
 - If docs diverge from code, update docs first.
 - Do not document backend, API, DB, auth, migrations, or services that do not exist in code.
@@ -70,7 +72,7 @@ Update when:
 
 ## How To Write Docs
 
-- Write from real code in `fight-club/`.
+- Write from real code in this `fight-club/` folder.
 - Prefer short high-signal sections.
 - Mark unfinished modules explicitly as `stub`, `skeleton`, or `not implemented`.
 - For missing subsystems, write `absent` instead of using generic template text.
@@ -79,7 +81,7 @@ Update when:
 - Combat docs must be easy to navigate, complete enough for safe changes, and kept in sync with the real runtime because much of the project depends on combat behavior.
 - If combat formulas, turn flow, effects, resource rules, zones, skills, consumables, or bot assumptions change, update the combat design reference so it still contains the full working model.
 - If docs are prepared for GitBook publishing, keep `fight-club/docs/README.md` and `fight-club/docs/SUMMARY.md` in sync with the actual document structure.
-- Before publishing docs changes, run `npm run docs:validate` from `fight-club/`.
+- Before publishing docs changes, run `npm run docs:validate` from this `fight-club/` root.
 - If docs are also published as a static site, keep the VitePress entry pages and config under `fight-club/docs/.vitepress/` in sync with the markdown structure.
 - If a change meaningfully affects a specialist domain surface, sync that specialist memory too:
   - combat work -> `fight-club/TAMA_start/combat_patch_notes.md` and, when meaningful, `fight-club/TAMA_start/combat_agent_journal.md`
@@ -95,7 +97,7 @@ Update when:
 - A task is not complete until the related documentation is updated.
 - After code changes and documentation updates are finished, push the project state to git.
 - Do not leave completed work only in the local workspace if it is ready to be shared as the current project state.
-- Use `./push-git.ps1 -Message "type: short summary"` from the repo root to stage, commit, and push the current state.
+- Use `../push-git.ps1 -Message "type: short summary"` from the `fight-club/` root, or run `./push-git.ps1` from the parent repo root.
 
 ---
 
@@ -216,4 +218,4 @@ Whenever you edit these root docs:
 
 ---
 
-> Last updated: 2026-03-20 18:50 MSK
+> Last updated: 2026-03-22 15:12 MSK

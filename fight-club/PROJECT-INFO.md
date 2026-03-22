@@ -1,6 +1,6 @@
 # PROJECT-INFO - Fight Club
 
-> Last updated: 2026-03-22 15:12 MSK
+> Last updated: 2026-03-22 22:05 MSK
 
 **Project:** Fight Club  
 **Type:** browser-first SPA plus local online-duel authority slice  
@@ -329,6 +329,7 @@ There is also a dedicated balance runner:
 - `fight-club/src/ui/screens/OnlineDuel/onlineDuelScreenArena.tsx`
 - `fight-club/src/ui/screens/OnlineDuel/onlineDuelScreenSession.ts`
 - `fight-club/src/ui/screens/OnlineDuel/onlineDuelScreenDebug.tsx`
+- `fight-club/src/ui/screens/OnlineDuel/onlineDuelScreenState.ts`
 - `fight-club/server/onlineDuelHttpServer.ts`
 - `fight-club/server/onlineDuelServer.ts`
 
@@ -362,12 +363,13 @@ These files are the highest-risk change points:
 - `fight-club/src/content/items/starterItems.ts`
 - `fight-club/src/modules/arena/application/handleOnlineDuelClientMessage.ts`
 - `fight-club/src/ui/screens/OnlineDuel/OnlineDuelScreen.tsx`
+- `fight-club/src/ui/screens/OnlineDuel/onlineDuelScreenState.ts`
 - `fight-club/server/onlineDuelHttpServer.ts`
 
 Reason:
 
 - they control combat math, stackable effects, sandbox state wiring, parity rules, action selection, and user-visible combat output
-- online PvP UI is safer than before, but final state composition still converges inside `OnlineDuelScreen.tsx`, so regressions there can still hit transport, recovery, and rendering together
+- online PvP UI is much safer than before because arena, session, debug, and state composition are split, but `OnlineDuelScreen.tsx` plus its sibling `onlineDuelScreenState.ts` still form a sensitive integration seam for transport/recovery/render parity
 
 ---
 

@@ -1,6 +1,6 @@
 # Online Duel 1v1
 
-> Last updated: 2026-03-22 17:40 MSK
+> Last updated: 2026-03-22 22:05 MSK
 
 **Feature:** online-duel-1v1  
 **Status:** IN PROGRESS
@@ -524,7 +524,8 @@ Goal: make PvP changes safe to keep evolving.
   - fight-stage rendering вынесен в `onlineDuelScreenArena.tsx`
   - session / transport orchestration вынесены в `onlineDuelScreenSession.ts`
   - debug / operator tooling вынесены в `onlineDuelScreenDebug.tsx`
-  - следующий шаг: дочистить state aggregation и entry/status view-model внутри `OnlineDuelScreen.tsx`
+  - derived state и view-model сборка вынесены в `onlineDuelScreenState.ts`
+  - `OnlineDuelScreen.tsx` теперь работает как orchestration-shell, а не как смешанный transport/state/ui монолит
 - `PVP-016` тоже уже в активной работе:
   - live PvP уже показывает явные live-state статусы `Reconnecting`, `Opponent offline`, `Session replaced`, `Match closed`, `Live service offline` и `Syncing room`
   - экран уже показывает recovery CTA вроде `Refresh Room` и `Leave Fight`

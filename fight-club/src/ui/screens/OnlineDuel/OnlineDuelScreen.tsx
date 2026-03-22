@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState, type CSSProperties } from "react";
-import { getEquipmentBonuses } from "@/modules/equipment";
 import {
   createProfileMailboxes,
   createProfileMeta,
@@ -16,8 +15,6 @@ import {
   toggleRoundDraftDefenseZone,
   type RoundDraft,
 } from "@/orchestration/combat/roundDraft";
-import { createBattleLogEntries } from "@/ui/components/combat/battleLogFormatting";
-import { buildProfileDerivedStats, resolvePresetFigure } from "@/ui/screens/Combat/combatSandboxScreenDerived";
 import {
   MatchFinishCard,
   RoundPlannerCard,
@@ -29,25 +26,9 @@ import { OnlineDuelDebugPanel } from "@/ui/screens/OnlineDuel/onlineDuelScreenDe
 import { PresetChooser } from "@/ui/screens/OnlineDuel/onlineDuelScreenLobby";
 import type { PvpPreparedFighter } from "@/ui/screens/PvpLobby/pvpLobbyTypes";
 import {
-  activeParticipantIsReady,
   createOnlineBuildSelection,
-  getOnlineSelectedActionLabel,
-  getOnlineSelectedActionSummary,
-  getOnlineSelectedActionTags,
-  getCurrentStepSummary,
-  getMatchStatusSummary,
   ONLINE_DUEL_MATCHMAKING_TIMEOUT_MS,
-  resolveOnlineDuelRecoveryAction,
-  resolveOnlineDuelLiveStatus,
-  resolveOnlineDuelMatchmakingStatus,
-  pickMostCompleteSync,
-  resolveCombatLoadoutForMode,
-  resolveCombatantSummary,
-  resolveFighterViewFigure,
   resolvePresetById,
-  resolveWinnerName,
-  totalArmorProfileValue,
-  totalDamageProfileValue,
   type ClientMode,
   type EntryMode,
   type OnlineBuildSelection,
@@ -62,6 +43,7 @@ import {
   type OnlineDuelSetup,
 } from "@/ui/screens/OnlineDuel/onlineDuelScreenSetup";
 import { createOnlineDuelSessionController } from "@/ui/screens/OnlineDuel/onlineDuelScreenSession";
+import { buildOnlineDuelScreenState } from "@/ui/screens/OnlineDuel/onlineDuelScreenState";
 
 export { resolveOnlineActionClientMode, resolveOnlineRealtimeClientModes } from "@/ui/screens/OnlineDuel/onlineDuelScreenSupport";
 
@@ -262,86 +244,90 @@ export function OnlineDuelScreen({
 
   const hostSync = setupRef.current.hostClient.getLastSync();
   const guestSync = setupRef.current.guestClient.getLastSync();
-  const resolvedHostSeat = hostSeat === "playerB" ? "playerB" : "playerA";
-  const resolvedGuestSeat = guestSeat === "playerA" ? "playerA" : "playerB";
-  const matchSync = pickMostCompleteSync(hostSync, guestSync);
-  const participants = matchSync?.participants ?? [];
-  const joinedCount = participants.filter((participant) => participant.connected).length;
-  const readyCount = participants.filter((participant) => participant.connected && participant.ready).length;
-  const winnerName = resolveWinnerName(matchSync);
-  const playerSync = playerMode === "host" ? hostSync : guestSync;
-  const playerSeat = playerMode === "host" ? resolvedHostSeat : resolvedGuestSeat;
-  const playerBuild = playerMode === "host" ? hostBuild : guestBuild;
-  const playerParticipant =
-    participants.find((participant) => participant.seat === (playerSync?.yourSeat ?? playerSeat)) ?? null;
-  const opponentParticipant =
-    participants.find((participant) => participant.seat !== (playerSync?.yourSeat ?? playerSeat)) ?? null;
-  const debugSync = debugClientMode === "host" ? hostSync : guestSync;
-  const debugSeat = debugClientMode === "host" ? resolvedHostSeat : resolvedGuestSeat;
-  const playerSeatOffline = Boolean(duelId) && !(playerParticipant?.connected ?? Boolean(playerSync));
-  const opponentSeatOffline = Boolean(duelId) && joinedCount >= 2 && !(opponentParticipant?.connected ?? false);
-  const matchStatusSummary = getMatchStatusSummary({
-    duelId,
-    status: matchSync?.status,
+  const {
+    resolvedHostSeat,
+    resolvedGuestSeat,
+    matchSync,
     joinedCount,
     readyCount,
     winnerName,
-    transportIssue,
-    opponentConnected: !opponentSeatOffline,
-  });
-  const currentStep = getCurrentStepSummary({
-    duelId,
-    status: matchSync?.status,
-    joinedCount,
-    readyCount,
-    playerReady: activeParticipantIsReady(playerSync, playerSeat),
-    opponentConnected: opponentParticipant?.connected ?? false,
-    opponentReady: opponentParticipant?.ready ?? false,
-    playerActionSubmitted: playerSync?.currentRoundState?.yourActionSubmitted ?? false,
-    opponentActionSubmitted: playerSync?.currentRoundState?.opponentActionSubmitted ?? false,
-  });
-  const matchLocked = matchSync?.status === "finished" || matchSync?.status === "abandoned";
-  const playerReady = activeParticipantIsReady(playerSync, playerSeat);
-  const sessionDisplaced = transportIssue === "displaced_session";
-  const roomClosed = transportIssue === "duel_not_found" || matchSync?.status === "abandoned";
-  const liveStatus = resolveOnlineDuelLiveStatus({
+    playerSync,
+    playerSeat,
+    playerBuild,
+    playerParticipant,
+    opponentParticipant,
+    debugSync,
+    debugSeat,
+    playerSeatOffline,
+    opponentSeatOffline,
+    matchStatusSummary,
+    currentStep,
+    matchLocked,
+    playerReady,
+    liveStatus,
+    showPlanner,
+    showPlayerFacingArena,
+    liveRoomRequired,
+    liveRoomUnavailable,
+    matchmakingStatus,
+    playerAvailableSkills,
+    playerAvailableConsumables,
+    opponentAvailableSkills,
+    selectedActionLabel,
+    selectedActionTags,
+    selectedActionSummary,
+    lastResolvedRound,
+    playerActionSubmitted,
+    playerActionLocked,
+    playerDisplayName,
+    playerSnapshot,
+    playerFigure,
+    playerEquipment,
+    playerCombatantState,
+    playerCurrentHp,
+    opponentBuild,
+    opponentSnapshot,
+    opponentDisplayName,
+    opponentFigure,
+    opponentEquipment,
+    opponentCombatantState,
+    opponentCurrentHp,
+    playerResources,
+    opponentResources,
+    battleLogEntries,
+    combatLog,
+    activeRoomCode,
+    primaryFightControlLabel,
+    primaryFightControlAriaLabel,
+    playerProfileDerivedStats,
+    opponentProfileDerivedStats,
+    playerDerivedStats,
+    opponentDerivedStats,
+    actionsDisabled,
+    entryActionsDisabled,
+    recoveryActionConfig,
+  } = buildOnlineDuelScreenState({
+    launchedFromLobby,
+    initialEntryMode,
+    playerMode,
+    debugClientMode,
+    preparedPlayer,
+    hostBuild,
+    guestBuild,
+    hostSeat,
+    guestSeat,
     duelId,
     transportSource,
     transportIssue,
-    matchStatus: matchSync?.status,
-    joinedCount,
-    playerConnected: !playerSeatOffline,
-    opponentConnected: !opponentSeatOffline,
-  });
-  const showPlanner = matchSync?.status === "planning" || matchSync?.status === "ready_to_resolve";
-  const showPlayerFacingArena =
-    !launchedFromLobby || initialEntryMode === "join" || Boolean(duelId);
-  const liveRoomRequired = launchedFromLobby;
-  const liveRoomUnavailable = liveRoomRequired && !duelId && transportSource === "local";
-  const matchmakingStatus = resolveOnlineDuelMatchmakingStatus({
     matchmakingMode,
-    searchActive: matchmakingSearchActive,
-    duelId,
-    joinedCount,
-    status: matchSync?.status,
-    timedOut: matchmakingTimedOut,
-  });
-  const playerCombatLoadout = resolveCombatLoadoutForMode({
-    mode: playerMode,
-    playerMode,
-    preparedPlayer,
-    syncedLoadout: playerSync?.yourLoadout,
-    hostBuild,
-    guestBuild,
-  });
-  const opponentMode = playerMode === "host" ? "guest" : "host";
-  const opponentCombatLoadout = resolveCombatLoadoutForMode({
-    mode: opponentMode,
-    playerMode,
-    syncedLoadout: playerSync?.opponentLoadout,
-    preparedPlayer,
-    hostBuild,
-    guestBuild,
+    matchmakingSearchActive,
+    matchmakingTimedOut,
+    hostSync,
+    guestSync,
+    hostDraft,
+    guestDraft,
+    hostActionSubmitting,
+    guestActionSubmitting,
   });
 
   useEffect(() => {
@@ -364,115 +350,6 @@ export function OnlineDuelScreen({
       window.clearTimeout(timeoutId);
     };
   }, [duelId, joinedCount, matchmakingMode, matchmakingSearchActive, matchSync?.status]);
-  const playerEquipmentBonuses = getEquipmentBonuses(playerCombatLoadout.equipmentState, playerCombatLoadout.inventory);
-  const playerAvailableSkills = playerEquipmentBonuses.skills.filter((skill) =>
-    playerCombatLoadout.equippedSkillIds.includes(skill.id)
-  );
-  const playerAvailableConsumables = playerCombatLoadout.inventory.entries.filter(
-    (entry) => entry.item.consumableEffect && entry.quantity > 0
-  );
-  const opponentAvailableSkills = opponentCombatLoadout.availableSkills;
-  const selectedActionLabel = getOnlineSelectedActionLabel({
-    duelId,
-    playerReady,
-    showPlanner,
-    matchLocked,
-    draft: playerMode === "host" ? hostDraft : guestDraft,
-    playerActionSubmitted: playerSync?.currentRoundState?.yourActionSubmitted ?? false,
-    availableSkills: playerAvailableSkills,
-    availableConsumables: playerAvailableConsumables,
-  });
-  const selectedActionTags = getOnlineSelectedActionTags({
-    duelId,
-    playerReady,
-    showPlanner,
-    currentStepBadge: currentStep.badge,
-    draft: playerMode === "host" ? hostDraft : guestDraft,
-    playerActionSubmitted: playerSync?.currentRoundState?.yourActionSubmitted ?? false,
-    availableSkills: playerAvailableSkills,
-    availableConsumables: playerAvailableConsumables,
-  });
-  const selectedActionSummary = getOnlineSelectedActionSummary({
-    duelId,
-    currentStepMessage: currentStep.message,
-    opponentState:
-      opponentParticipant
-        ? opponentParticipant.connected
-          ? opponentParticipant.ready
-            ? "Ready"
-            : "Waiting"
-          : "Offline"
-        : "Not joined",
-    draft: playerMode === "host" ? hostDraft : guestDraft,
-    playerActionSubmitted: playerSync?.currentRoundState?.yourActionSubmitted ?? false,
-    showPlanner,
-    availableSkills: playerAvailableSkills,
-    availableConsumables: playerAvailableConsumables,
-  });
-  const lastResolvedRound = hostSync?.lastResolvedRound ?? guestSync?.lastResolvedRound ?? null;
-  const playerActionSubmitted = playerSync?.currentRoundState?.yourActionSubmitted ?? false;
-  const playerActionBusy = playerMode === "host" ? hostActionSubmitting : guestActionSubmitting;
-  const playerActionLocked = playerActionSubmitted || playerActionBusy;
-  const playerDisplayName = playerParticipant?.displayName ?? preparedPlayer?.playerName ?? playerBuild.snapshot.name;
-  const playerSnapshot = playerSync?.yourSnapshot ?? playerBuild.snapshot;
-  const playerFigure = resolveFighterViewFigure(
-    playerParticipant?.fighterView?.figure,
-    preparedPlayer?.figure ?? resolvePresetFigure(playerBuild.presetId, playerMode === "host" ? "rush-chip" : "kitsune-bit")
-  );
-  const playerEquipment = playerParticipant?.fighterView?.equipment ?? playerCombatLoadout.equipment;
-  const playerCombatantState =
-    matchSync?.combatState?.combatants.find((combatant) => combatant.id === playerSnapshot.characterId) ?? null;
-  const playerCombatantSummary = resolveCombatantSummary(
-    lastResolvedRound,
-    playerSnapshot.characterId,
-    playerDisplayName
-  );
-  const playerCurrentHp =
-    playerCombatantState?.currentHp ?? playerCombatantSummary?.currentHp ?? playerSnapshot.maxHp;
-  const opponentBuild = playerMode === "host" ? guestBuild : hostBuild;
-  const opponentSnapshot = playerSync?.opponentSnapshot ?? opponentBuild.snapshot;
-  const opponentDisplayName = opponentParticipant?.displayName ?? opponentBuild.snapshot.name ?? "Rival";
-  const opponentFigure = resolveFighterViewFigure(
-    opponentParticipant?.fighterView?.figure,
-    resolvePresetFigure(opponentBuild.presetId, "vermin-tek")
-  );
-  const opponentEquipment = opponentParticipant?.fighterView?.equipment ?? opponentBuild.equipment;
-  const opponentCombatantState =
-    matchSync?.combatState?.combatants.find((combatant) => combatant.id === opponentSnapshot.characterId) ?? null;
-  const opponentCombatantSummary = resolveCombatantSummary(
-    lastResolvedRound,
-    opponentSnapshot.characterId,
-    opponentDisplayName
-  );
-  const opponentCurrentHp =
-    opponentCombatantState?.currentHp ?? opponentCombatantSummary?.currentHp ?? opponentSnapshot.maxHp;
-  const playerResources = playerCombatantState?.resources ?? null;
-  const opponentResources = opponentCombatantState?.resources ?? null;
-  const battleLogEntries = createBattleLogEntries(
-    matchSync?.combatState ?? null,
-    playerSnapshot.characterId,
-    opponentSnapshot.characterId
-  );
-  const combatLog = matchSync?.combatState?.log ?? [];
-  const activeRoomCode = hostSync?.roomCode ?? guestSync?.roomCode ?? "";
-  const primaryFightControlLabel = matchLocked
-    ? "Match Closed"
-    : showPlanner
-      ? playerActionSubmitted
-        ? "Action Locked"
-        : "Planning"
-      : playerReady
-        ? "Cancel Ready"
-        : "Ready Up";
-  const primaryFightControlAriaLabel = matchLocked
-    ? "Match Closed"
-    : showPlanner
-      ? playerActionSubmitted
-        ? "Action Locked"
-        : "Planning phase"
-      : playerReady
-        ? "Cancel Ready"
-        : "Ready Up";
 
   useEffect(() => {
     setPlayerProfileName((current) => (current === playerDisplayName ? current : playerDisplayName));
@@ -506,38 +383,6 @@ export function OnlineDuelScreen({
     setCodeCopied(true);
     window.setTimeout(() => setCodeCopied(false), 1400);
   }
-  const playerProfileDerivedStats = buildProfileDerivedStats({
-    totalDamage: totalDamageProfileValue(playerSnapshot.damage),
-    stats: playerSnapshot.stats,
-    totalArmor: totalArmorProfileValue(playerSnapshot.armor),
-    dodgeBonus: playerSnapshot.dodgeChanceBonus,
-    critBonus: playerSnapshot.critChanceBonus,
-    totalCritMultiplier: 1.5 + playerSnapshot.critMultiplierBonus / 100,
-    baseBlockPenetrationValue: playerSnapshot.blockPowerBonus,
-    armorPenetrationPercent: playerSnapshot.armorPenetrationPercent,
-  });
-  const opponentProfileDerivedStats = buildProfileDerivedStats({
-    totalDamage: totalDamageProfileValue(opponentSnapshot.damage),
-    stats: opponentSnapshot.stats,
-    totalArmor: totalArmorProfileValue(opponentSnapshot.armor),
-    dodgeBonus: opponentSnapshot.dodgeChanceBonus,
-    critBonus: opponentSnapshot.critChanceBonus,
-    totalCritMultiplier: 1.5 + opponentSnapshot.critMultiplierBonus / 100,
-    baseBlockPenetrationValue: opponentSnapshot.blockPowerBonus,
-    armorPenetrationPercent: opponentSnapshot.armorPenetrationPercent,
-  });
-  const playerDerivedStats = playerProfileDerivedStats.slice(0, 4);
-  const opponentDerivedStats = opponentProfileDerivedStats.slice(0, 4);
-  const combatInteractionBlocked = matchLocked || sessionDisplaced || roomClosed || playerSeatOffline;
-  const actionsDisabled = transportSource === "checking" || combatInteractionBlocked;
-  const entryActionsDisabled = actionsDisabled || liveRoomUnavailable;
-  const recoveryActionConfig = resolveOnlineDuelRecoveryAction({
-    transportIssue,
-    matchStatus: matchSync?.status,
-    playerConnected: !playerSeatOffline,
-    opponentConnected: !opponentSeatOffline,
-    joinedCount,
-  });
   const recoveryAction = recoveryActionConfig
     ? {
         label: recoveryActionConfig.label,

@@ -445,8 +445,8 @@ Current status:
 - the repo now also contains a small local backend tree under `server/` for the backend-driven `PvP` room flow
 - bootstrap is currently minimal and direct through `createGameApp.ts`, not a full dependency-registration graph
 - the online PvP screen is no longer a single monolith:
-  - `OnlineDuelScreen.tsx` now delegates arena rendering, session orchestration, and debug tooling to sibling modules under `src/ui/screens/OnlineDuel/`
+  - `OnlineDuelScreen.tsx` now delegates arena rendering, session orchestration, debug tooling, and derived state composition to sibling modules under `src/ui/screens/OnlineDuel/`
 
 ---
 
-> Last updated: 2026-03-22 17:40 MSK
+> Last updated: 2026-03-22 22:05 MSK

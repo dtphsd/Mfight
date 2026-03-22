@@ -1,6 +1,6 @@
 # MASTER-PLAN - Fight Club
 
-> Last updated: 2026-03-22 14:52 MSK
+> Last updated: 2026-03-22 22:05 MSK
 
 **Project:** Fight Club  
 **Scope:** active product planning, task tracking, and sprint history
@@ -98,7 +98,7 @@
 | PVP-012 | Ввести server-side расход расходки и валидацию скиллов | Backend / Economy / Fairness | ✅ DONE | `features/online-duel-1v1.md` | Authority now enforces skill availability, cooldown, resources, consumable quantity, and resolve-time depleted-inventory validation through arena regressions |
 | PVP-013 | Зафиксировать правила snapshot/reconnect/rematch | Backend / PvP Runtime | ✅ DONE | `features/online-duel-1v1.md` | Reconnect now preserves server-owned baseline truth, rematch rebuilds detached runtime state from baseline, and regression tests cover baseline immutability across rejoin/rematch |
 | PVP-014 | Перевести PvP UI на полный server truth для соперника | UI / PvP Sync | 🟢 DONE | `features/online-duel-1v1.md` | `duel_state_sync` теперь отдаёт `opponentLoadout`, opponent profile/skills больше не зависят от локального build fallback, UI truth закреплён arena + EventSource tests |
-| PVP-015 | Разбить `OnlineDuelScreen` на transport / state / ui слои | UI Architecture | 🟡 IN PROGRESS | `features/online-duel-1v1.md` | Arena/presenter, session/controller и debug/operator layout уже вынесены, но state aggregation и часть entry/status presentation всё ещё живут в основном экране |
+| PVP-015 | Разбить `OnlineDuelScreen` на transport / state / ui слои | UI Architecture | 🟢 DONE | `features/online-duel-1v1.md` | `OnlineDuelScreen` теперь делегирует arena/presenter, session/controller, debug/operator и state/view-model сборку соседним модулям `onlineDuelScreenArena`, `onlineDuelScreenSession`, `onlineDuelScreenDebug` и `onlineDuelScreenState` |
 | PVP-016 | Доделать reconnect/disconnect UX для реальных игроков | UX / PvP Recovery | 🔴 TODO | `features/online-duel-1v1.md` | Нужны явные состояния: переподключение, соперник вышел, сессия вытеснена, матч закрыт, ожидание следующего шага |
 | PVP-017 | Подготовить PvP backend к публичному хостингу | Backend / Ops / Deployment | 🔴 TODO | `features/online-duel-1v1.md` | Нужны env-конфиги, health/ops checklist, логирование, reverse proxy/VPS path и базовая защита от abuse |
 | PVP-018 | Расширить регрессионное покрытие реального PvP flow | QA / PvP | 🟡 IN PROGRESS | `features/online-duel-1v1.md` | Уже есть базовый набор, но нужно расширение на reconnect, rematch loops, matchmaking cancel/timeout и authority validation |
@@ -140,12 +140,13 @@
 - `PVP-014` is materially advanced:
   - synced state now carries active-seat `yourSnapshot` and `opponentSnapshot`
   - PvP stat cards and opponent presentation rely much more on server truth and less on local fallback data
-- `PVP-015` is materially advanced:
+- `PVP-015` is now effectively landed:
   - `OnlineDuelScreen` is now split across `setup`, `support`, `panels`, `cards`, and `lobby` siblings
-  - the remaining screen is much closer to an orchestration shell than the old monolith
-  - fight-stage rendering now lives in `onlineDuelScreenArena.tsx`
+  - arena rendering now lives in `onlineDuelScreenArena.tsx`
   - session and transport orchestration now lives in `onlineDuelScreenSession.ts`
   - debug and operator tooling now lives in `onlineDuelScreenDebug.tsx`
+  - derived PvP state and view-model composition now lives in `onlineDuelScreenState.ts`
+  - the remaining screen is now an orchestration shell instead of the old monolith
 - `PVP-016` is materially advanced:
   - live PvP now surfaces explicit reconnect, displaced-session, opponent-offline, room-closed, and syncing states
   - unsafe combat actions are blocked in invalid live states
